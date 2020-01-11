@@ -6,6 +6,8 @@ import com.flybotix.hfr.codex.ICodexTimeProvider;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+
+import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,8 +27,8 @@ import us.ilite.robot.hardware.GetLocalIP;
 import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
-
 import java.util.List;
+import edu.wpi.first.wpilibj.util.Color;
 
 public class Robot extends TimedRobot {
 
@@ -55,6 +57,9 @@ public class Robot extends TimedRobot {
     private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
 
+
+    private final I2C.Port i2cPort = I2C.Port.kOnboard;
+    private final ColorSensorV3 mColorSensorV3 = new ColorSensorV3( i2cPort );
 
     @Override
     public void robotInit() {
@@ -104,6 +109,19 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         mClock.cycleEnded();
+
+        Color detectedColor = mColorSensorV3.getColor();
+
+        double IR = mColorSensorV3.getIR();
+
+        SmartDashboard.putNumber("Red", detectedColor.red);
+        SmartDashboard.putNumber("Green", detectedColor.green);
+        SmartDashboard.putNumber("Blue", detectedColor.blue);
+        SmartDashboard.putNumber("IR", IR);
+
+        int proximity = mColorSensorV3.getProximity();
+
+        SmartDashboard.putNumber("Proximity", proximity);
     }
 
     @Override
