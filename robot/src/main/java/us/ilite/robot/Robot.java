@@ -58,8 +58,8 @@ public class Robot extends TimedRobot {
     private AbstractController mActiveController = null;
 
 
-    private final I2C.Port i2cPort = I2C.Port.kOnboard;
-    private final ColorSensorV3 mColorSensorV3 = new ColorSensorV3( i2cPort );
+    private ColorSensorV3 mColorSensorV3;
+
 
     @Override
     public void robotInit() {
@@ -70,6 +70,8 @@ public class Robot extends TimedRobot {
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
+
+
 
         // Init the actual robot
         initTimer.reset();
@@ -98,6 +100,9 @@ public class Robot extends TimedRobot {
 
         LiveWindow.disableAllTelemetry();
 
+        //Getting Color Sensor
+        I2C.Port i2cPort = I2C.Port.kOnboard;
+        mColorSensorV3 = new ColorSensorV3(i2cPort);
         initTimer.stop();
         mLogger.info("Robot initialization finished. Took: ", initTimer.get(), " seconds");
     }
@@ -109,6 +114,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         mClock.cycleEnded();
+
 
         Color detectedColor = mColorSensorV3.getColor();
 
