@@ -47,7 +47,6 @@ public class Robot extends TimedRobot {
     private FlywheelPrototype mFlywheel;
     private OperatorInput mOI;
     private Limelight mLimelight;
-
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
@@ -228,4 +227,9 @@ public class Robot extends TimedRobot {
         return String.format("State: %s\tMode: %s\tTime: %s", mRobotEnabledDisabled, mRobotMode, mNow);
 
     }
+
+    public Color getColor() {
+        return mColorSensorV3.getColor();
+    }
 }
+
