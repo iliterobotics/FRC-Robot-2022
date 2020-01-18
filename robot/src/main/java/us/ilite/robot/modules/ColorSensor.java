@@ -41,8 +41,13 @@ public class ColorSensor extends Module{
     @Override
     public void update(double pNow) {
         Color detectedColor = mColorSensorV3.getColor();
-        String colorString = "NULL MATCH";
         ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
+        String colorString = getColorStringForMatchResult(match);
+        SmartDashboard.putString( "Detected Color: ", colorString );
+    }
+
+    protected static String getColorStringForMatchResult(ColorMatchResult match) {
+        String colorString = "NULL MATCH";
         if(match != null) {
             if (kBlueTarget.equals(match.color)) {
                 colorString = "Blue";
@@ -58,7 +63,7 @@ public class ColorSensor extends Module{
                                 "RGB={" + match.color.red + ", " + match.color.green + ", " + match.color.blue + "}" : "null");
             }
         }
-        SmartDashboard.putString( "Detected Color: ", colorString );
+        return colorString;
     }
 
     public Color getColor() {
