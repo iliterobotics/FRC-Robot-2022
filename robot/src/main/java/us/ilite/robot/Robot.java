@@ -62,7 +62,6 @@ public class Robot extends TimedRobot {
     private ColorSensorV3 mColorSensorV3;
     private final ColorMatch m_colorMatcher = new ColorMatch();
 
-
     @Override
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();

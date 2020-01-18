@@ -1,8 +1,6 @@
 package us.ilite.robot.modules;
 
 import com.ctre.phoenix.CANifier;
-
-import com.revrobotics.ColorMatch;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.Settings;
