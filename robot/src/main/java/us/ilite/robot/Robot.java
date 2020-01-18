@@ -100,10 +100,6 @@ public class Robot extends TimedRobot {
 
         LiveWindow.disableAllTelemetry();
 
-        //Getting Color Sensor
-        I2C.Port i2cPort = I2C.Port.kOnboard;
-        mColorSensorV3 = new ColorSensorV3(i2cPort);
-
         initTimer.stop();
         mLogger.info("Robot initialization finished. Took: ", initTimer.get(), " seconds");
     }
@@ -215,11 +211,6 @@ public class Robot extends TimedRobot {
         return String.format("State: %s\tMode: %s\tTime: %s", mRobotEnabledDisabled, mRobotMode, mNow);
 
     }
-
-    public Color getColor() {
-        Color detectedColor = mColorSensorV3.getColor();
-        ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
-        return match.color;
-    }
 }
+
 

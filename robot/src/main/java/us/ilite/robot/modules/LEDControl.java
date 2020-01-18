@@ -31,6 +31,7 @@ public class LEDControl extends Module {
 //    private final Limelight mLimelight;
 //    private final Data mData;
 
+
     public static class RGB {
         private int mR;
         private int mG;
@@ -133,6 +134,7 @@ public class LEDControl extends Module {
         }
     }
 
+
     public LEDControl(DJBoothPositionControl pDjBoothPositionControl, DJBoothRotationControl pDjBoothRotationControl ) {
         this.mDjBoothPositionControl = pDjBoothPositionControl;
         this.mDjBoothRotationControl = pDjBoothRotationControl;
@@ -178,6 +180,7 @@ public class LEDControl extends Module {
         Color color = getColor( Robot.DATA.color.get(EColorData.SENSED_COLOR) );
         boolean isPositionDone = mDjBoothPositionControl.isDone();
         boolean isRotationDone = mDjBoothRotationControl.isDone();
+
 
         if (color == kBlueTarget && !isPositionDone && !isRotationDone) {
             mCurrentMessage = Message.ON_BLUE;
