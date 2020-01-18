@@ -62,13 +62,6 @@ public class Robot extends TimedRobot {
     private ColorSensorV3 mColorSensorV3;
     private final ColorMatch m_colorMatcher = new ColorMatch();
 
-    // Ideally, these values would be put into SystemSettings, however, that would require vendordeps
-    // and a gradle build for that vendordeps file
-    private final Color kBlueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
-    private final Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
-    private final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
-    private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
-
 
     @Override
     public void robotInit() {
@@ -111,12 +104,6 @@ public class Robot extends TimedRobot {
         I2C.Port i2cPort = I2C.Port.kOnboard;
         mColorSensorV3 = new ColorSensorV3(i2cPort);
 
-        //Setting Color Matcher with Target Colors
-        m_colorMatcher.addColorMatch(kBlueTarget);
-        m_colorMatcher.addColorMatch(kGreenTarget);
-        m_colorMatcher.addColorMatch(kRedTarget);
-        m_colorMatcher.addColorMatch(kYellowTarget);
-
         initTimer.stop();
         mLogger.info("Robot initialization finished. Took: ", initTimer.get(), " seconds");
     }
@@ -128,24 +115,6 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         mClock.cycleEnded();
-
-        Color detectedColor = mColorSensorV3.getColor();
-
-        String colorString;
-        ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
-
-        if (match.color == kBlueTarget) {
-            colorString = "Blue";
-        } else if (match.color == kRedTarget) {
-            colorString = "Red";
-        } else if (match.color == kGreenTarget) {
-            colorString = "Green";
-        } else if (match.color == kYellowTarget) {
-            colorString = "Yellow";
-        } else {
-            colorString = "Unknown";
-        }
-        SmartDashboard.putString( "Detected Color: ", colorString );
     }
 
     @Override

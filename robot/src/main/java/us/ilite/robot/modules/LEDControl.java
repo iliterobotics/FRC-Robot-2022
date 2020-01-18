@@ -31,7 +31,6 @@ public class LEDControl extends Module {
 //    private final Limelight mLimelight;
 //    private final Data mData;
 
-
     public static class RGB {
         private int mR;
         private int mG;
