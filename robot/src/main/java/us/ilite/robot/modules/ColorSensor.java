@@ -12,6 +12,7 @@ import static us.ilite.robot.utils.ColorUtils.*;
 
 public class ColorSensor extends Module{
     private ColorSensorV3 mColorSensorV3;
+    private ColorSensorV3 mColorSensorV3Other;
     private final ColorMatch m_colorMatcher = new ColorMatch();
 
     private Data mData;
@@ -23,8 +24,10 @@ public class ColorSensor extends Module{
 
     @Override
     public void modeInit(double pNow) {
-        I2C.Port i2cPort = I2C.Port.kOnboard;
-        mColorSensorV3 = new ColorSensorV3(i2cPort);
+        I2C.Port i2cPorta = I2C.Port.kOnboard;
+        I2C.Port i2cPortb = I2C.Port.kMXP;
+        mColorSensorV3 = new ColorSensorV3(i2cPorta);
+        mColorSensorV3Other = new ColorSensorV3( i2cPortb );
 
         m_colorMatcher.addColorMatch(kBlueTarget);
         m_colorMatcher.addColorMatch(kGreenTarget);
@@ -43,7 +46,12 @@ public class ColorSensor extends Module{
         Color detectedColor = mColorSensorV3.getColor();
         ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
         String colorString = getColorStringForMatchResult(match);
-        SmartDashboard.putString( "Detected Color: ", colorString );
+        SmartDashboard.putString( "Detected Color on A: ", colorString );
+
+        Color detectedColorOther = mColorSensorV3.getColor();
+        ColorMatchResult matchOther = m_colorMatcher.matchClosestColor(detectedColorOther);
+        String colorStringOther = getColorStringForMatchResult(matchOther);
+        SmartDashboard.putString( "Detected Color on B: ", colorStringOther );
     }
 
     protected static String getColorStringForMatchResult(ColorMatchResult match) {
