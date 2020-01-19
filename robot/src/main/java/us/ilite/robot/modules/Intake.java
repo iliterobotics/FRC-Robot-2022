@@ -5,9 +5,12 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.robot.hardware.DigitalBeamSensor;
+import us.ilite.robot.hardware.SparkMaxFactory;
+import us.ilite.robot.hardware.TalonSRXFactory;
 
 public class Intake extends Module {
 
@@ -37,6 +40,12 @@ public class Intake extends Module {
 
     public Intake( Data pData ) {
         this.mData = pData;
+
+        mCANMotor = SparkMaxFactory.createDefaultSparkMax( Settings.kCANIntakeID , CANSparkMaxLowLevel.MotorType.kBrushless );
+        mTalonOne = TalonSRXFactory.createDefaultTalon( Settings.kTalonOneID );
+        mTalonTwo = TalonSRXFactory.createDefaultTalon( Settings.kTalonTwoID);
+        mTalonThree = TalonSRXFactory.createDefaultTalon( Settings.kTalonThreeID);
+        
     }
 
     @Override
