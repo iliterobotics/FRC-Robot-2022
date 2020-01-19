@@ -16,16 +16,6 @@ import us.ilite.robot.Robot;
 
 import static us.ilite.robot.utils.ColorUtils.*;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.revrobotics.ColorMatch;
-import com.revrobotics.ColorSensorV3;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.util.Color;
-
-import static us.ilite.robot.utils.ColorUtils.*;
-import us.ilite.common.config.*;
-
-
 public class DJBoothPositionControl implements ICommand {
 
     private ColorSensorV3 mColorSensorV3;
@@ -36,14 +26,11 @@ public class DJBoothPositionControl implements ICommand {
     private ColorState eCurrentColorState;
     private int mSolidStateCounter;
     private MotorState eMotorState;
-<<<<<<< HEAD
     private  boolean mIsDone;
 
     public DJBoothPositionControl ( ColorState pDesiredColorState ) {
         eDesiredColorState = pDesiredColorState;
     }
-=======
->>>>>>> af299501... Driver input stuff
 
     public enum ColorState {
         DEFAULT,
@@ -57,10 +44,6 @@ public class DJBoothPositionControl implements ICommand {
         OFF;
     }
 
-    public enum MotorState {
-        ON,
-        OFF;
-    }
 
     @Override
     public void init(double pNow) {
@@ -84,7 +67,6 @@ public class DJBoothPositionControl implements ICommand {
 
     @Override
     public boolean update(double pNow) {
-<<<<<<< HEAD
 
         updateColor();
 
@@ -150,12 +132,6 @@ public class DJBoothPositionControl implements ICommand {
         }
         else if ( c.equals( kGreenTarget ) ) {
             return ColorState.GREEN;
-=======
-        if ( !eCurrentColorState.equals(eDesiredColorState) && eMotorState == MotorState.ON ) {
-            mTalon.set(ControlMode.PercentOutput, SystemSettings.kDJOutput );
-            mSolidStateCounter = 0;
-            return false;
->>>>>>> af299501... Driver input stuff
         }
         else {
             return ColorState.DEFAULT;
@@ -188,14 +164,6 @@ public class DJBoothPositionControl implements ICommand {
 
     public boolean isDone() {
         return mIsDone;
-    }
-
-    public void updateMotor( MotorState motorState ){
-        eMotorState = motorState;
-    }
-
-    public void setDesiredColorState( ColorState pColorState ){
-        eDesiredColorState = pColorState;
     }
 
     public void updateMotor( MotorState motorState ){
