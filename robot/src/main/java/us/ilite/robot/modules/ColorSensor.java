@@ -25,7 +25,7 @@ public class ColorSensor extends Module{
     @Override
     public void modeInit(double pNow) {
         I2C.Port i2cPorta = I2C.Port.kOnboard;
-        I2C.Port i2cPortb = I2C.Port.kMXP;
+        I2C.Port i2cPortb = I2C.Port.kOnboard;
         mColorSensorV3 = new ColorSensorV3(i2cPorta);
         mColorSensorV3Other = new ColorSensorV3( i2cPortb );
 
