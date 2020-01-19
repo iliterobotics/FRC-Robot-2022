@@ -5,7 +5,7 @@ import com.flybotix.hfr.codex.CodexOf;
 import edu.wpi.first.wpilibj.Joystick;
 
 
-public enum ELogitech310 implements CodexOf<Double>{
+public enum ELogitech310 implements CodexOf<Double> {
     // Do not change the order of these buttons
     A_BTN,
     B_BTN,

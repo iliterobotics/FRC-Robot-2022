@@ -2,6 +2,7 @@ package us.ilite.robot.modules;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.commands.CommandQueue;
 import us.ilite.robot.commands.ICommand;
 
@@ -23,17 +24,17 @@ public class CommandManager extends Module {
     }
 
     @Override
-    public void modeInit(double pNow) {
+    public void modeInit(EMatchMode pMode, double pNow) {
         runCommandQueue = lastRunCommandQueue = false;
     }
 
     @Override
-    public void periodicInput(double pNow) {
+    public void readInputs(double pNow) {
 
     }
 
     @Override
-    public void update(double pNow) {
+    public void setOutputs(double pNow) {
         updateCommands(pNow);
     }
 

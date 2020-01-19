@@ -8,15 +8,15 @@ import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.drive.EDriveData;
-import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.hardware.*;
 import us.ilite.robot.loops.Loop;
 
 /**
- * Class for running all drive train control operations from both autonomous and
+ * Class for running all drivetrain train control operations from both autonomous and
  * driver-control.
  * TODO Support for rotation trajectories
  * TODO Turn-to-heading with Motion Magic
@@ -49,7 +49,7 @@ public class Drive extends Loop {
 	}
 
 	@Override
-	public void modeInit(double pNow) {
+	public void modeInit(EMatchMode pMode, double pNow) {
 		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 		mTargetAngleLockPid.setSetpoint(0);
@@ -63,31 +63,31 @@ public class Drive extends Loop {
 	}
 
 	@Override
-	public void periodicInput(double pNow) {
+	public void readInputs(double pNow) {
 
-		mData.drive.set(EDriveData.LEFT_POS_INCHES, mDriveHardware.getLeftInches());
-		mData.drive.set(EDriveData.RIGHT_POS_INCHES, mDriveHardware.getRightInches());
-//		mData.drive.set(EDriveData.LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
-//		mData.drive.set(EDriveData.RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
-		mData.drive.set(EDriveData.LEFT_VEL_TICKS, (double)mDriveHardware.getLeftVelTicks());
-		mData.drive.set(EDriveData.RIGHT_VEL_TICKS, (double)mDriveHardware.getRightVelTicks());
+		mData.drivetrain.set(EDriveData.LEFT_POS_INCHES, mDriveHardware.getLeftInches());
+		mData.drivetrain.set(EDriveData.RIGHT_POS_INCHES, mDriveHardware.getRightInches());
+//		mData.drivetrain.set(EDriveData.LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
+//		mData.drivetrain.set(EDriveData.RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
+		mData.drivetrain.set(EDriveData.LEFT_VEL_TICKS, (double)mDriveHardware.getLeftVelTicks());
+		mData.drivetrain.set(EDriveData.RIGHT_VEL_TICKS, (double)mDriveHardware.getRightVelTicks());
 
-		mData.drive.set(EDriveData.LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
-		mData.drive.set(EDriveData.RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
-		mData.drive.set(EDriveData.LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
-		mData.drive.set(EDriveData.RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
-		mData.drive.set(EDriveData.LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
-		mData.drive.set(EDriveData.RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
+		mData.drivetrain.set(EDriveData.LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
+		mData.drivetrain.set(EDriveData.RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
+		mData.drivetrain.set(EDriveData.LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
+		mData.drivetrain.set(EDriveData.RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
+		mData.drivetrain.set(EDriveData.LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
+		mData.drivetrain.set(EDriveData.RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 //
-		mData.imu.set(EGyro.YAW_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
+//		mData.imu.set(EGyro.YAW_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
 
-//		SimpleNetworkTable.writeCodexToSmartDashboard(EDriveData.class, mData.drive, mClock.getCurrentTime());
+//		SimpleNetworkTable.writeCodexToSmartDashboard(EDriveData.class, mData.drivetrain, mClock.getCurrentTime());
 	}
 
 	@Override
-	public void update(double pNow) {
+	public void setOutputs(double pNow) {
         if(mDriveState != EDriveState.NORMAL) {
-			mLogger.error("Invalid drive state - maybe you meant to run this a high frequency?");
+			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
 			mDriveHardware.set(mDriveMessage);
@@ -124,7 +124,7 @@ public class Drive extends Loop {
 			case NORMAL:
 				break;
 			default:
-				mLogger.warn("Got drive state: " + mDriveState+" which is unhandled");
+				mLogger.warn("Got drivetrain state: " + mDriveState+" which is unhandled");
 				break;
 		}
 		mDriveHardware.set(mDriveMessage);

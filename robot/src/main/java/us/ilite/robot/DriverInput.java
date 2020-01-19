@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
@@ -60,18 +61,18 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
 
     @Override
-    public void modeInit(double pNow) {
+    public void modeInit(EMatchMode pMode, double pNow) {
 
     }
 
     @Override
-    public void periodicInput(double pNow) {
+    public void readInputs(double pNow) {
         ELogitech310.map(mData.driverinput, mDriverJoystick);
         ELogitech310.map(mData.operatorinput, mOperatorJoystick);
     }
 
     @Override
-    public void update(double pNow) {
+    public void setOutputs(double pNow) {
         /*
         If the driver started the commands that the superstructure is running and then released the button,
         stop running commands.

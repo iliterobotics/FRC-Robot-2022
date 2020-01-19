@@ -3,6 +3,7 @@ package us.ilite.robot.modules;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.Timer;
+import us.ilite.common.types.EMatchMode;
 
 public class ExampleModule extends Module {
 
@@ -14,7 +15,7 @@ public class ExampleModule extends Module {
     private boolean mOn = false;
 
     @Override
-    public void modeInit(double pNow) {
+    public void modeInit(EMatchMode pMode, double pNow) {
         mLog.error("MODE INIT");
 
         mTimer.reset();
@@ -22,12 +23,12 @@ public class ExampleModule extends Module {
     }
 
     @Override
-    public void periodicInput(double pNow) {
+    public void readInputs(double pNow) {
         
     }
 
     @Override
-    public void update(double pNow) {
+    public void setOutputs(double pNow) {
 
         if(mTimer.hasPeriodPassed(kDelaySeconds)) {
             mOn = !mOn;

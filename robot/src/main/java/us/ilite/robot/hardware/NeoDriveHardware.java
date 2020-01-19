@@ -23,7 +23,7 @@ public class NeoDriveHardware implements IDriveHardware {
 
     public NeoDriveHardware(double pGearRatio) {
         kGearRatio = pGearRatio;
-        mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
+//        mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
         // mGyro = new NavX(SerialPort.Port.kMXP);
 
         mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -74,7 +74,7 @@ public class NeoDriveHardware implements IDriveHardware {
 
     @Override
     public void zero() {
-        mGyro.zeroAll();
+//        mGyro.zeroAll();
 
         mLeftMaster.getEncoder().setPosition(0.0);
         mRightMaster.getEncoder().setPosition(0.0);

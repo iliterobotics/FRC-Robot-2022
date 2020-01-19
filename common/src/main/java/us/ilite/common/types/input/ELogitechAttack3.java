@@ -1,11 +1,11 @@
 package us.ilite.common.types.input;
 
 import com.flybotix.hfr.codex.Codex;
-import com.flybotix.hfr.codex.CodexOf;
 
+import com.flybotix.hfr.codex.CodexOf;
 import edu.wpi.first.wpilibj.Joystick;
 
-public enum ELogitechAttack3 implements CodexOf<Double>{
+public enum ELogitechAttack3 implements CodexOf<Double> {
   TRIGGER,
   THUMB_BTN2,
   THUMB_BTN3,

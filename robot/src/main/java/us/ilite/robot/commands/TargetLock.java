@@ -59,7 +59,6 @@ public class TargetLock implements ICommand {
     @Override
     public boolean update(double pNow) {
         Codex<Double, ETargetingData> currentData = mCamera.getTargetingData();
-        Data.kSmartDashboard.getEntry("Has Acquired Target").setBoolean(mHasAcquiredTarget);
 
         mDrive.setTargetTrackingThrottle(mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
 
@@ -69,7 +68,7 @@ public class TargetLock implements ICommand {
             mAlignedCount++;
             if(mEndOnAlignment && Math.abs(currentData.get(ETargetingData.tx)) < mAllowableError && mAlignedCount > kAlignCount) {
                 System.out.println("FINISHED");
-                // Zero drive outputs in shutdown()
+                // Zero drivetrain outputs in shutdown()
                 return true;
             }
 

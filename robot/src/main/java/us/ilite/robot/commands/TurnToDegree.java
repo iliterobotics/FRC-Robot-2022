@@ -77,7 +77,6 @@ public class TurnToDegree implements ICommand {
 
     // Apply output, log, and return false for unfinished
     mDrive.setDriveMessage( new DriveMessage().turn(mOutput));
-    Data.kSmartDashboard.putDouble( "turn_error", pid.getError() );
     mLogger.info( "Target: " + mTargetYaw + " Yaw: " + getYaw() + "\n" );
     return false;
   }
