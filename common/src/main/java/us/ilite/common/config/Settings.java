@@ -17,6 +17,7 @@ public class Settings extends NetworkTablesConstantsBase {
     public static double kNetworkTableUpdateRate = 0.01;
 
     public static int sCODEX_COMMS_PORT = 5805;
+    public static double kIntakeTalonPower = 1d;
 
     // ================================
     // System ID's
