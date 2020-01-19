@@ -36,7 +36,7 @@ public class DriveMessage {
 
   /**
    * Returns the expected left side power. If isDirect() returns TRUE, then the units will be dependent upon what method
-   * created the drive message. Additionally, the values may not match [ -1 < value < 1 ]
+   * created the drivetrain message. Additionally, the values may not match [ -1 < value < 1 ]
    *
    * If isDirect() returns FALSE and the values are outside [-1 < value < 1], then call normalize().
    * @return expected left-side output
@@ -52,7 +52,7 @@ public class DriveMessage {
 
   /**
    * Returns the expected right side power. If isDirect() returns TRUE, then the units will be dependent upon what method
-   * created the drive message. Additionally, the values may not match [ -1 < value < 1 ]
+   * created the drivetrain message. Additionally, the values may not match [ -1 < value < 1 ]
    *
    * If isDirect() returns FALSE and the values are outside [-1 < value < 1], then call normalize().
    * @return expected right-side output
@@ -74,7 +74,7 @@ public class DriveMessage {
   }
 
   /**
-   Normalizes the drive inputs so the driver does not over-saturate the commands.  For example, if both turn + throttle
+   Normalizes the drivetrain inputs so the driver does not over-saturate the commands.  For example, if both turn + throttle
    are at their max ranges, then the robot cannot respond with more than 100% power to one side.
 
    This method will skip normalization if the DriveMessage was created directly from left/right demands.
@@ -111,7 +111,7 @@ public class DriveMessage {
 
   /**
    Implements the same scaling function as CheesyDrive, where turn is scaled by throttle.
-   This *should* give us better performance at low speeds + the benefits of "clamped turn" drive.
+   This *should* give us better performance at low speeds + the benefits of "clamped turn" drivetrain.
 
    This method will skip normalization if the DriveMessage was created directly from left/right demands.
 

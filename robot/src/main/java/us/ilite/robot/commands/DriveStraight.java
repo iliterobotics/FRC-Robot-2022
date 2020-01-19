@@ -4,27 +4,21 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.lib.util.Conversions;
-import us.ilite.common.lib.util.Utils;
 
-import static us.ilite.common.types.drive.EDriveData.*;
 import static us.ilite.common.types.sensor.EGyro.YAW_DEGREES;
 
 import us.ilite.common.types.drive.EDriveData;
-import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.hardware.ECommonControlMode;
-import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.modules.Drive;
 import us.ilite.robot.modules.DriveMessage;
 
 
 /**
- * A drive straight command implementing heading control based on both angular velocity and angle.
+ * A drivetrain straight command implementing heading control based on both angular velocity and angle.
  * Acceleration/deceleration can be controlled using either a custom implementation relying on
  * % output or the Talon's motion magic control mode.
  */
@@ -126,7 +120,7 @@ public class DriveStraight implements ICommand {
     }
 
     private double getAverageDriveDistance() {
-        return (mData.drive.get(EDriveData.LEFT_POS_INCHES) + mData.drive.get(EDriveData.RIGHT_POS_INCHES)) / 2.0;
+        return (mData.drivetrain.get(EDriveData.LEFT_POS_INCHES) + mData.drivetrain.get(EDriveData.RIGHT_POS_INCHES)) / 2.0;
     }
 
     private double getAverageDistanceTraveled() {

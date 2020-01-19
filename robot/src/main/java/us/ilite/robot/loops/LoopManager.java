@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.hardware.Clock;
 
 /**
@@ -43,8 +44,8 @@ public class LoopManager implements Runnable{
         if(!mIsRunning) {
             mLog.info("Starting us.ilite.common.lib.control loop");
             synchronized(mTaskLock) {
-                mLoopList.modeInit(Timer.getFPGATimestamp());
-                mLoopList.periodicInput(Timer.getFPGATimestamp());
+                mLoopList.modeInit(EMatchMode.TELEOPERATED, Timer.getFPGATimestamp());
+                mLoopList.readInputs(Timer.getFPGATimestamp());
                 mIsRunning = true;
             }
             mWpiNotifier.startPeriodic(kLoopPeriodSeconds);
@@ -85,7 +86,7 @@ public class LoopManager implements Runnable{
                     if (mIsRunning) {
 //                        inputTimer.reset();
 //                        inputTimer.start();
-                        mLoopList.periodicInput(Timer.getFPGATimestamp());
+                        mLoopList.readInputs(Timer.getFPGATimestamp());
 //                        inputTimer.stop();
 //                        updateTimer.reset();
 //                        updateTimer.start();

@@ -6,10 +6,7 @@ import com.flybotix.hfr.codex.ICodexTimeProvider;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
@@ -18,14 +15,15 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.common.types.sensor.EPowerDistPanel;
+import us.ilite.robot.controller.AbstractController;
+import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.GetLocalIP;
-import us.ilite.robot.hardware.VisionGyro;
-import us.ilite.robot.loops.LoopManager;
-import us.ilite.robot.modules.CommandManager;
-import us.ilite.robot.modules.Drive;
-import us.ilite.robot.modules.Limelight;
+import us.ilite.robot.modules.FlywheelPrototype;
 import us.ilite.robot.modules.ModuleList;
+import us.ilite.robot.modules.OperatorInput;
+
+import static us.ilite.common.types.EMatchMode.*;
 
 import java.util.List;
 
@@ -33,35 +31,31 @@ public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
 
-    private LoopManager mLoopManager = new LoopManager(Settings.kControlLoopPeriod);
-    // It sure would be convenient if we could reduce this to just a LoopManager...Will have to test timing of Codex first
-    private LoopManager mLoopManagerx = new LoopManager(Settings.kControlLoopPeriod);
     private ModuleList mRunningModules = new ModuleList();
-
     private Clock mClock = new Clock();
-    private Data mData = new Data();
+    public static final Data mData = new Data();
     private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(mData);
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
-
-    // Module declarations here
-    private CommandManager mAutonomousCommandManager = new CommandManager().setManagerTag("Autonomous Manager");
-    private CommandManager mTeleopCommandManager = new CommandManager().setManagerTag("Teleop Manager");
-
-    private Drive mDrive = new Drive(mData);
-    private Limelight mLimelight = new Limelight(mData);
-    private VisionGyro mVisionGyro = new VisionGyro(mData);
-
+    private FlywheelPrototype mFlywheel;
+    private OperatorInput mOI;
 
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
+    private final TestController mTestController = new TestController();
+    private AbstractController mActiveController = null;
+
+
     @Override
     public void robotInit() {
+        mFlywheel = new FlywheelPrototype();
+        mOI = new OperatorInput();
+
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
 
@@ -83,14 +77,13 @@ public class Robot extends TimedRobot {
         };
         CodexMetadata.overrideTimeProvider(provider);
 
-        mRunningModules.setModules();
+        mRunningModules.clearModules();
 
         try {
         } catch(Exception e) {
             mLogger.exception(e);
         }
 
-        mData.registerCodices();
         LiveWindow.disableAllTelemetry();
 
         initTimer.stop();
@@ -108,27 +101,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        initMatchMetadata(); // TODO - move this to a DS connection thread
-        initTimer.reset();
-        initTimer.start();
-        mLogger.info("Starting Autonomous Initialization...");
-
-        mSettings.loadFromNetworkTables();
-
-        // Init modules after commands are set
-        mRunningModules.modeInit(mClock.getCurrentTime());
-        mRunningModules.periodicInput(mClock.getCurrentTime());
-
-        mLoopManager.setRunningLoops(mLimelight, mDrive);
-        mLoopManager.start();
-
-//        mAutonomousCommandManager.startCommands(mAutonomousRoutines.getDefault());
-
-        mData.registerCodices();
-//        mCSVLogger.start(); // Start csv logging
-
-        initTimer.stop();
-        mLogger.info("Autonomous initialization finished. Took: ", initTimer.get(), " seconds");
     }
 
     @Override
@@ -138,31 +110,19 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        initMatchMetadata();
-
-        mSettings.loadFromNetworkTables();
-
-        mRunningModules.modeInit(mClock.getCurrentTime());
-        mRunningModules.periodicInput(mClock.getCurrentTime());
-
-        mLoopManager.setRunningLoops(mLimelight, mDrive);
-        mLoopManager.start();
-
-//        mCSVLogger.start(); // start csv logging
     }
 
     @Override
     public void teleopPeriodic() {
         commonPeriodic();
-//        mData.sendCodices();
     }
 
     @Override
     public void disabledInit() {
         mLogger.info("Disabled Initialization");
         mRunningModules.shutdown(mClock.getCurrentTime());
-        mLoopManager.stop();
         mCSVLogger.stop(); // stop csv logging
+        mActiveController = null;
     }
 
     @Override
@@ -171,18 +131,18 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        mRunningModules.setModules(mDrive);
-        mRunningModules.modeInit(mClock.getCurrentTime());
-        mRunningModules.periodicInput(mClock.getCurrentTime());
+        mActiveController = mTestController;
+        mRunningModules.clearModules();
+        mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mFlywheel);
+        mRunningModules.modeInit(TEST, mClock.getCurrentTime());
+        mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
-
-        mLoopManager.start();
     }
 
     @Override
     public void testPeriodic() {
-
-
+        commonPeriodic();
     }
 
     private void commonPeriodic() {
@@ -190,9 +150,10 @@ public class Robot extends TimedRobot {
         for(Codex c : mData.mAllCodexes) {
             c.reset();
         }
-        EPowerDistPanel.map(mData.pdp, pdp);
-        mRunningModules.periodicInput(mClock.getCurrentTime());
-        mRunningModules.update(mClock.getCurrentTime());
+//        EPowerDistPanel.map(mData.pdp, pdp);
+        mRunningModules.readInputs(mClock.getCurrentTime());
+        mActiveController.update(mClock.getCurrentTime());
+        mRunningModules.setOutputs(mClock.getCurrentTime());
 //        mData.sendCodicesToNetworkTables();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
     }
@@ -249,7 +210,6 @@ public class Robot extends TimedRobot {
             }
 
             List<String> ips = GetLocalIP.getAllIps();
-            mData.initCodexSender(ips);
         }
     }
 }

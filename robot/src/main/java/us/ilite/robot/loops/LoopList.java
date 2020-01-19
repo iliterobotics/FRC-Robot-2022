@@ -2,6 +2,7 @@ package us.ilite.robot.loops;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import us.ilite.common.types.EMatchMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,18 +15,18 @@ public class LoopList extends Loop {
     protected List<Loop> mLoops = new ArrayList<>();
 
     @Override
-    public void modeInit(double pNow) {
-        mLoops.forEach(module -> module.modeInit(pNow));
+    public void modeInit(EMatchMode pMode, double pNow) {
+        mLoops.forEach(module -> module.modeInit(pMode, pNow));
     }
 
     @Override
-    public void periodicInput(double pNow) {
-        mLoops.forEach(module -> module.periodicInput(pNow));
+    public void readInputs(double pNow) {
+        mLoops.forEach(module -> module.readInputs(pNow));
     }
 
     @Override
-    public void update(double pNow) {
-        mLoops.forEach(module -> module.update(pNow));
+    public void setOutputs(double pNow) {
+        mLoops.forEach(module -> module.setOutputs(pNow));
     }
 
     @Override

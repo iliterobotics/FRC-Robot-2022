@@ -1,5 +1,7 @@
 package us.ilite.robot.modules;
 
+import us.ilite.common.types.EMatchMode;
+
 /**
  * The Module class defines how code written to control a specific subsystem (shooter, elevator, arm, etc.).
  * It also contains optional design patterns to adhere to.
@@ -16,26 +18,18 @@ public abstract class Module {
      * Runs when we init a new robot mode, for example teleopInit() or autonomousInit()
      * @param pNow The current time from the FPGA
      */
-    public abstract void modeInit(double pNow);
-
-    /**
-     * Design pattern for caching inputs to avoid hammering HAL/CAN.
-     * Depending on whether you're using the Codex or not, this may or may not be necessary.
-     */
-    public abstract void periodicInput(double pNow);
+    public abstract void modeInit(EMatchMode pMode, double pNow);
 
     /**
      * The module's update function. Runs every time [mode]Periodic() is called (Roughly ~50Hz), or in a loop running at a custom frequency.
      * @param pNow
      */
-    public abstract void update(double pNow);
+    public abstract void readInputs(double pNow);
 
     /**
      * Optional design pattern to keep hardware outputs all in one place.
      */
-    public void periodicOutput(double pNow) {
-
-    }
+    public abstract void setOutputs(double pNow);
 
     /**
      * Shutdown/Cleanup tasks are performed here.

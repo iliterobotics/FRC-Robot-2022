@@ -2,30 +2,32 @@ package us.ilite.robot.modules;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import us.ilite.common.types.EMatchMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ModuleList extends Module {
 
     ILog mLogger = Logger.createLog(ModuleList.class);
 
-    protected List<Module> mModules = new ArrayList<>();
+    protected List<Module> mModules = new LinkedList<>();
 
     @Override
-    public void modeInit(double pNow) {
-        mModules.forEach(module -> module.modeInit(pNow));
+    public void modeInit(EMatchMode pMode, double pNow) {
+        mModules.forEach(module -> module.modeInit(pMode, pNow));
     }
 
     @Override
-    public void periodicInput(double pNow) {
-        mModules.forEach(module -> module.periodicInput(pNow));
+    public void readInputs(double pNow) {
+        mModules.forEach(module -> module.readInputs(pNow));
     }
 
     @Override
-    public void update(double pNow) {
-        mModules.forEach(module -> module.update(pNow));
+    public void setOutputs(double pNow) {
+        mModules.forEach(module -> module.setOutputs(pNow));
     }
 
     @Override
@@ -49,9 +51,12 @@ public class ModuleList extends Module {
         return allSuccessful;
     }
 
-    public void setModules(Module ... pModules) {
+    public void clearModules() {
         mModules.clear();
-        mModules.addAll(Arrays.asList(pModules));
+    }
+
+    public void addModule(Module pModule) {
+        mModules.add(pModule);
     }
 
 }

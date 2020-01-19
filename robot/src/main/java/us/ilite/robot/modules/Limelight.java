@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.config.Settings.VisionTarget;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.ETrackingType;
 
@@ -36,12 +37,12 @@ public class Limelight extends Loop implements ITargetDataProvider {
     }
 
     @Override
-    public void modeInit(double pNow) {
+    public void modeInit(EMatchMode pMode, double pNow) {
         setTracking(ETrackingType.NONE);
     }
 
     @Override
-    public void periodicInput(double pNow) {
+    public void readInputs(double pNow) {
         mData.limelight.reset();
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
         mData.limelight.set(ETargetingData.tv, targetValid ? 1.0d : null);
@@ -71,7 +72,7 @@ public class Limelight extends Loop implements ITargetDataProvider {
     }
 
     @Override
-    public void update(double pNow) {
+    public void setOutputs(double pNow) {
 
         mLog.error("Current Tracking Type: " + (mTrackingType == null ? "Null" : mTrackingType.name()));
         if(mTrackingType != null) {
@@ -83,7 +84,7 @@ public class Limelight extends Loop implements ITargetDataProvider {
     }
 
     public void loop(double pNow) {
-        update(pNow);
+        setOutputs(pNow);
     }
 
     @Override

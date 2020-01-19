@@ -1,14 +1,16 @@
 package us.ilite.robot.hardware;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.loops.Loop;
+import us.ilite.robot.modules.Module;
 
 /**
  * Rapidly polls the Talon Tach for readings.
  * As the Talon Tach is designed for reading velocities, it isn't recommended that you use this - it's pretty likely that
  * you won't be able to poll fast enough and will miss a rising or falling edge.
  */
-public class TalonTachCounter extends Loop {
+public class TalonTachCounter extends Module {
 
     private DigitalInput talonTachSensor;
     private boolean mCurrentState, lastState, hasChanged;
@@ -57,13 +59,13 @@ public class TalonTachCounter extends Loop {
     }
 
     @Override
-    public void modeInit(double pNow) {
+    public void modeInit(EMatchMode pMode, double pNow) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void periodicInput(double pNow) {
+    public void readInputs(double pNow) {
 
     }
 
@@ -80,18 +82,13 @@ public class TalonTachCounter extends Loop {
     }
 
     @Override
-    public void update(double pNow) {
+    public void setOutputs(double pNow) {
         mCurrentState = getState();
         setTapeState(mCurrentState);
         if(mCurrentTapeState != lastTapeState) hasChanged = true;
 
         lastTapeState = mCurrentTapeState;
         lastState = mCurrentState;
-    }
-
-    @Override
-    public void loop(double pNow) {
-        update(pNow);
     }
 
     @Override

@@ -11,7 +11,8 @@ deploy {
             // or from command line. If not found an exception will be thrown.
             // You can use getTeamOrDefault(team) instead of getTeamNumber if you
             // want to store a team number in this file.
-            team = 1885 //frc.getTeamNumber()
+            team = frc.getTeamOrDefault(1885)
+//            team = frc.getTeamNumber()
         }
     }
     artifacts {
@@ -41,43 +42,37 @@ deploy {
         }
     }
 }
+// Set this to true to enable desktop support.
+def includeDesktopSupport = false
+
 
 // Defining my dependencies. In this case, WPILib (+ friends), CTRE Toolsuite (Talon SRX)
 // and NavX.
 dependencies {
 
-    implementation wpi.deps.wpilib()
-    nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
-    nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
-
-
-    implementation wpi.deps.vendor.java()
-    nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
-    nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
-
-    // In Java for now, the argument must be false
-    simulation wpi.deps.sim.gui(wpi.platforms.desktop, false)
-
-    testImplementation 'junit:junit:4.12'
-
     compile project(':common')
     implementation 'com.github.flybotix:highfrequencyrobots:' + HFRVER
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
-
+    implementation wpi.deps.wpilib()
     
     testCompile "org.mockito:mockito-core:2.+"
 
-    // testRuntime group: "edu.wpi.first.ntcore", name: "ntcore-jni", version: "2020.+", classifier: "all"
-    // testCompile group: "edu.wpi.first.ntcore", name: "ntcore-java", version: "2020.+"
-    // testCompile group: "edu.wpi.first.wpiutil", name: "wpiutil-java", version: "2020.+"
-
+    //The following code is used to get the native code to work on a desktop.
+    //Be sure to use the JDK that came with WPILIB because it has additional libraries.
+    implementation wpi.deps.wpilib()
+    nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
+    nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
+    implementation wpi.deps.vendor.java()
+    nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
+    nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
+    testImplementation 'junit:junit:4.12'
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
 // knows where to look for our Robot Class.
 jar {
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
 }
 
