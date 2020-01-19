@@ -22,6 +22,7 @@ import us.ilite.robot.hardware.GetLocalIP;
 import us.ilite.robot.modules.FlywheelPrototype;
 import us.ilite.robot.modules.ModuleList;
 import us.ilite.robot.modules.OperatorInput;
+import us.ilite.robot.modules.PowerCellModule;
 
 import static us.ilite.common.types.EMatchMode.*;
 
@@ -37,6 +38,7 @@ public class Robot extends TimedRobot {
     private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(mData);
+    private final PowerCellModule mIntake = new PowerCellModule(mData);
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -135,6 +137,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
+        mRunningModules.addModule(mIntake);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());

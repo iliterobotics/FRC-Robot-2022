@@ -29,7 +29,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private CommandManager mAutonomousCommandManager;
     private Limelight mLimelight;
     private Data mData;
-    private Intake mIntake;
+    private PowerCellModule mIntake;
     private Timer mGroundCargoTimer = new Timer();
 
     private boolean mIsCargo = false;
@@ -41,7 +41,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private ETrackingType mLastTrackingType = null;
 
     public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
-                       CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager, Intake pIntake
+                       CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager, PowerCellModule pIntake
                        boolean pSimulated) {
         this.mLimelight = pLimelight;
         this.mData = pData;
