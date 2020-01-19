@@ -46,12 +46,19 @@ public class ColorSensor extends Module{
         Color detectedColor = mColorSensorV3.getColor();
         ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
         String colorString = getColorStringForMatchResult(match);
+<<<<<<< HEAD
         SmartDashboard.putString( "Detected Color on A: ", colorString );
 
 //        Color detectedColorOther = mColorSensorV3.getColor();
 //        ColorMatchResult matchOther = m_colorMatcher.matchClosestColor(detectedColorOther);
 //        String colorStringOther = getColorStringForMatchResult(matchOther);
 //        SmartDashboard.putString( "Detected Color on B: ", colorStringOther );
+=======
+        SmartDashboard.putString( "Detected Color: ", colorString );
+        SmartDashboard.putNumber("Red: ",detectedColor.red);
+        SmartDashboard.putNumber("Green: ",detectedColor.green);
+        SmartDashboard.putNumber("Blue: ",detectedColor.blue);
+>>>>>>> e063a2da... Added Smartdashboard to RGB.
     }
 
     protected static String getColorStringForMatchResult(ColorMatchResult match) {
