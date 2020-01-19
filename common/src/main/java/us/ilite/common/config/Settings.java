@@ -19,9 +19,12 @@ public class Settings extends NetworkTablesConstantsBase {
     public static int sCODEX_COMMS_PORT = 5805;
     public static double kIntakeTalonPower = 1d;
     public static int kCANIntakeID = 0; // Change later
-    public static int kTalonOneID;
-    public static int kTalonTwoID;
-    public static int kTalonThreeID;
+    public static int kTalonOneID; // Change later
+    public static int kTalonTwoID; // Change later
+    public static int kTalonThreeID; // Change later
+    public static int kBeamChannel1; // Change later
+    public static int kBeamChannel2; // Change later
+    public static int kBeamChannel3; // Change later
 
     // ================================
     // System ID's

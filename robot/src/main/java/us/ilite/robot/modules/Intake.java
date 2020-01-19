@@ -27,6 +27,7 @@ public class Intake extends Module {
 
     private Data mData;
 
+    //Intake state
     private EIntakeState mIntakeState;
 
     private ILog mLog = Logger.createLog(this.getClass());
@@ -45,7 +46,11 @@ public class Intake extends Module {
         mTalonOne = TalonSRXFactory.createDefaultTalon( Settings.kTalonOneID );
         mTalonTwo = TalonSRXFactory.createDefaultTalon( Settings.kTalonTwoID);
         mTalonThree = TalonSRXFactory.createDefaultTalon( Settings.kTalonThreeID);
-        
+
+        mBeamBreaker1 = new DigitalBeamSensor( Settings.kBeamChannel1);
+        mBeamBreaker2 = new DigitalBeamSensor( Settings.kBeamChannel2);
+        mBeamBreaker3 = new DigitalBeamSensor( Settings.kBeamChannel3);
+
     }
 
     @Override
@@ -60,6 +65,7 @@ public class Intake extends Module {
 
     @Override
     public void update(double pNow) {
+        mLog.info("------------------INTAKE UPDATE HAS BEGUN");
         switch (mIntakeState) {
             case INTAKE:
                 mCANMotor.set(1.0);
@@ -97,4 +103,8 @@ public class Intake extends Module {
     public void setDesiredIntakeState(EIntakeState pDesiredState){
         mIntakeState = pDesiredState;
     }
+    public EIntakeState returnIntakeState(){
+        return this.mIntakeState;
+    }
+
 }
