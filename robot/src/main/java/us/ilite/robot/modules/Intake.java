@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.SparkMaxFactory;
 import us.ilite.robot.hardware.TalonSRXFactory;
@@ -54,17 +55,17 @@ public class Intake extends Module {
     }
 
     @Override
-    public void modeInit(double pNow) {
+    public void modeInit(EMatchMode pMode, double pNow) {
 
     }
 
     @Override
-    public void periodicInput(double pNow) {
+    public void readInputs(double pNow) {
 
     }
 
     @Override
-    public void update(double pNow) {
+    public void setOutputs(double pNow) {
         mLog.info("------------------INTAKE UPDATE HAS BEGUN");
         switch (mIntakeState) {
             case INTAKE:
