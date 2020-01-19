@@ -11,6 +11,7 @@ import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EIntake;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.SparkMaxFactory;
 import us.ilite.robot.hardware.TalonSRXFactory;
@@ -74,27 +75,23 @@ public class PowerCellModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        mData.intake.set(EIntake.INTAKE_CURRENT, mCANMotor.getOutputCurrent());
-        mData.intake.set(EIntake.INTAKE_CURRENT , mTalonOne.getOutputCurrent());
-        mData.intake.set(EIntake.INTAKE_CURRENT , mTalonTwo.getOutputCurrent());
-        mData.intake.set(EIntake.INTAKE_CURRENT , mTalonThree.getOutputCurrent());
+        mData.powercell.set(EPowerCellData.BREAK_SENSOR_0, mCANMotor.getOutputCurrent());
+        mData.powercell.set(EPowerCellData.BREAK_SENSOR_1 , mTalonOne.getOutputCurrent());
+        mData.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonTwo.getOutputCurrent());
+        mData.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , mTalonThree.getOutputCurrent());
 
-        mData.intake.set(EIntake.CURRENT_INTAKE_STATE , (double) returnIntakeState().ordinal());
+        mData.powercell.set(EPowerCellData.CURRENT_POWERCELL_STATE, (double) returnIntakeState().ordinal());
         //mData.intake.set(EIntake.CURRENT_INTAKE_STATE, mData.intake.get(EIntake.TARGET_INTAKE_STATE));
-        mData.intake.set(EIntake.BEAM_BREAKER_STATE , readBeamBreakerState(mBeamBreaker1.isBroken()));
+        mData.powercell.set(EPowerCellData.BEAM_BREAKER_STATE , readBeamBreakerState(mBeamBreaker1.isBroken()));
 
-    }
-
-    public double whatsmycurrent() {
-        return mData.intake.get(EIntake.INTAKE_CURRENT);
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mCANMotor.set(EIntakeState.values()[mData.intake.get(EIntake.CURRENT_INTAKE_STATE).intValue()].getPower());
-        mTalonOne.set(ControlMode.PercentOutput, EIntakeState.values()[mData.intake.get(EIntake.CURRENT_INTAKE_STATE).intValue()].getPower());
-        mTalonTwo.set(ControlMode.PercentOutput, EIntakeState.values()[mData.intake.get(EIntake.CURRENT_INTAKE_STATE).intValue()].getPower());
-        mTalonThree.set(ControlMode.PercentOutput, EIntakeState.values()[mData.intake.get(EIntake.CURRENT_INTAKE_STATE).intValue()].getPower());
+        mCANMotor.set(EIntakeState.values()[mData.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
+        mTalonOne.set(ControlMode.PercentOutput, EIntakeState.values()[mData.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
+        mTalonTwo.set(ControlMode.PercentOutput, EIntakeState.values()[mData.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
+        mTalonThree.set(ControlMode.PercentOutput, EIntakeState.values()[mData.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
         //May want to add beam breakers
     }
 

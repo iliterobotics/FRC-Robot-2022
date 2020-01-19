@@ -9,6 +9,7 @@ import us.ilite.common.lib.util.SimpleNetworkTable;
 import us.ilite.common.types.EFlywheelSubsystem;
 import us.ilite.common.types.EIntake;
 import us.ilite.common.types.EFlywheelData;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
@@ -33,7 +34,7 @@ public class Data {
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
     public Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
     public Codex<Double, EFlywheelSubsystem> flywheel = Codex.of.thisEnum(EFlywheelSubsystem.class);
-    public Codex<Double , EIntake> intake = Codex.of.thisEnum(EIntake.class);
+    public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
     public Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
 
 
