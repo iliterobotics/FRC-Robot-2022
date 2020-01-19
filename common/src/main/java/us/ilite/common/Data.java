@@ -1,23 +1,16 @@
 package us.ilite.common;
 
 import com.flybotix.hfr.codex.Codex;
-import com.flybotix.hfr.codex.CodexSender;
-import com.flybotix.hfr.io.MessageProtocols;
-import com.flybotix.hfr.io.sender.ISendProtocol;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import us.ilite.common.config.Settings;
 import us.ilite.common.io.CodexNetworkTables;
-import us.ilite.common.io.CodexNetworkTablesParser;
 import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.lib.util.SimpleNetworkTable;
 import us.ilite.common.types.EFlywheelSubsystem;
 import us.ilite.common.types.EIntake;
+import us.ilite.common.types.EFlywheelData;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.drive.EDriveData;
-import us.ilite.common.types.input.EDriverInputMode;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
@@ -41,6 +34,7 @@ public class Data {
     public Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
     public Codex<Double, EFlywheelSubsystem> flywheel = Codex.of.thisEnum(EFlywheelSubsystem.class);
     public Codex<Double , EIntake> intake = Codex.of.thisEnum(EIntake.class);
+    public Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
 
 
     public final Codex[] mAllCodexes = new Codex[] {

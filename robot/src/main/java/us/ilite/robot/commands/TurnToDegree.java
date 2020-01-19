@@ -1,9 +1,7 @@
 package us.ilite.robot.commands;
 
 import us.ilite.common.config.Settings;
-import us.ilite.robot.hardware.ECommonControlMode;
-import us.ilite.robot.hardware.ECommonNeutralMode;
-import us.ilite.robot.modules.Drive;
+import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.Data;
@@ -30,10 +28,10 @@ public class TurnToDegree implements ICommand {
 
   private Rotation2d mInitialYaw, mTurnAngle, mTargetYaw;
   private PIDController pid;
-  private Drive mDrive;
+  private DriveModule mDrive;
   public Data mData;
   
-  public TurnToDegree( Drive pDrive, Rotation2d pTurnAngle, double pAllowableError, Data pData ) {
+  public TurnToDegree(DriveModule pDrive, Rotation2d pTurnAngle, double pAllowableError, Data pData ) {
     this.mDrive = pDrive;
     
     this.mTurnAngle = pTurnAngle;

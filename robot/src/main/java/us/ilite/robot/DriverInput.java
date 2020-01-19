@@ -14,7 +14,6 @@ import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 import static us.ilite.robot.hardware.ECommonControlMode.*;
 
-import us.ilite.robot.hardware.ECommonControlMode;
 import us.ilite.robot.modules.Module;
 import us.ilite.robot.modules.*;
 
@@ -25,7 +24,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private ILog mLog = Logger.createLog(DriverInput.class);
 
 
-    protected Drive mDrive;
+    protected DriveModule mDrive;
     private CommandManager mTeleopCommandManager;
     private CommandManager mAutonomousCommandManager;
     private Limelight mLimelight;
@@ -40,7 +39,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     private ETrackingType mLastTrackingType = null;
 
-    public DriverInput(Drive pDrivetrain, Limelight pLimelight, Data pData,
+    public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
                        CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
                        boolean pSimulated) {
         this.mLimelight = pLimelight;

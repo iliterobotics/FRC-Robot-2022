@@ -21,8 +21,8 @@ import us.ilite.robot.loops.Loop;
  * TODO Support for rotation trajectories
  * TODO Turn-to-heading with Motion Magic
  */
-public class Drive extends Loop {
-	private final ILog mLogger = Logger.createLog(Drive.class);
+public class DriveModule extends Loop {
+	private final ILog mLogger = Logger.createLog(DriveModule.class);
 
 	private Data mData;
 
@@ -37,7 +37,7 @@ public class Drive extends Loop {
 
 	private double mPreviousTime = 0;
 
-	public Drive(Data data)
+	public DriveModule(Data data)
 	{
 		this.mData = data;
 		if(AbstractSystemSettingsUtils.isPracticeBot()) {
