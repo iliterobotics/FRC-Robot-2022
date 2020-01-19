@@ -14,6 +14,7 @@ import us.ilite.common.io.CodexNetworkTablesParser;
 import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.lib.util.SimpleNetworkTable;
 import us.ilite.common.types.EFlywheelSubsystem;
+import us.ilite.common.types.EIntake;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.EDriverInputMode;
@@ -39,6 +40,7 @@ public class Data {
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
     public Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
     public Codex<Double, EFlywheelSubsystem> flywheel = Codex.of.thisEnum(EFlywheelSubsystem.class);
+    public Codex<Double , EIntake> intake = Codex.of.thisEnum(EIntake.class);
 
 
     public final Codex[] mAllCodexes = new Codex[] {

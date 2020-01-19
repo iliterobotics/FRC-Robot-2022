@@ -98,6 +98,9 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
         mDrive.setDriveMessage(driveMessage);
     }
+    private void updateIntake(){
+
+    }
 
     @Override
     public void shutdown(double pNow) {

@@ -1,4 +1,6 @@
 package us.ilite.common.types;
 
-public enum EBeamBreakerState {
+import com.flybotix.hfr.codex.CodexOf;
+
+public enum EBeamBreakerState implements CodexOf <Boolean> {
 }

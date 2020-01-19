@@ -2,16 +2,20 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.EIntake;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.SparkMaxFactory;
 import us.ilite.robot.hardware.TalonSRXFactory;
+
+import javax.naming.ldap.Control;
 
 public class Intake extends Module {
 
@@ -33,15 +37,24 @@ public class Intake extends Module {
 
     private ILog mLog = Logger.createLog(this.getClass());
 
+    public enum EIntakeState {
+        INTAKE(1.0),
+        STOP (0.0),
+        REVERSE (-1.0);
 
-    public enum EIntakeState{
-        INTAKE,
-        STOP,
-        REVERSE;
+        private double power;
+
+        EIntakeState (double power) {
+            this.power = power;
+        }
+
+        public double getPower() {
+            return power;
+        }
     }
 
     public Intake( Data pData ) {
-        this.mData = pData;
+        mData = pData;
 
         mCANMotor = SparkMaxFactory.createDefaultSparkMax( Settings.kCANIntakeID , CANSparkMaxLowLevel.MotorType.kBrushless );
         mTalonOne = TalonSRXFactory.createDefaultTalon( Settings.kTalonOneID );
@@ -61,37 +74,28 @@ public class Intake extends Module {
 
     @Override
     public void readInputs(double pNow) {
+        mData.intake.set(EIntake.INTAKE_CURRENT, mCANMotor.getOutputCurrent());
+        mData.intake.set(EIntake.INTAKE_CURRENT , mTalonOne.getOutputCurrent());
+        mData.intake.set(EIntake.INTAKE_CURRENT , mTalonTwo.getOutputCurrent());
+        mData.intake.set(EIntake.INTAKE_CURRENT , mTalonThree.getOutputCurrent());
 
+        mData.intake.set(EIntake.CURRENT_INTAKE_STATE , (double) returnIntakeState().ordinal());
+        mData.intake.set(EIntake.CURRENT_INTAKE_STATE, mData.intake.get(EIntake.TARGET_INTAKE_STATE));
+        mData.intake.set(EIntake.BEAM_BREAKER_STATE , 1.0);
+
+    }
+
+    public double whatsmycurrent() {
+        return mData.intake.get(EIntake.INTAKE_CURRENT);
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mLog.info("------------------INTAKE UPDATE HAS BEGUN");
-        switch (mIntakeState) {
-            case INTAKE:
-                mCANMotor.set(1.0);
-                if ( mBeamBreaker1.isBroken() ){
-                    mTalonOne.set(ControlMode.PercentOutput, Settings.kIntakeTalonPower);
-                }
-                if ( mBeamBreaker2.isBroken() ){
-                    mTalonTwo.set(ControlMode.PercentOutput, Settings.kIntakeTalonPower);
-                }
-                if ( mBeamBreaker3.isBroken() ){
-                    mTalonThree.set(ControlMode.PercentOutput, Settings.kIntakeTalonPower);
-                }
-                break;
-            case REVERSE:
-                mTalonOne.set(ControlMode.PercentOutput, -Settings.kIntakeTalonPower);
-                mTalonTwo.set(ControlMode.PercentOutput, -Settings.kIntakeTalonPower);
-                mTalonThree.set(ControlMode.PercentOutput, -Settings.kIntakeTalonPower);
-                break;
-            case STOP:
-                mTalonOne.set(ControlMode.PercentOutput, 0d);
-                mTalonTwo.set(ControlMode.PercentOutput, 0d);
-                mTalonThree.set(ControlMode.PercentOutput, 0d);
-                break;
-        }
-
+        mCANMotor.set(EIntakeState.values()[mData.intake.get(EIntake.CURRENT_INTAKE_STATE).intValue()].getPower());
+        mTalonOne.set(ControlMode.PercentOutput, EIntakeState.values()[mData.intake.get(EIntake.CURRENT_INTAKE_STATE).intValue()].getPower());
+        mTalonTwo.set(ControlMode.PercentOutput, EIntakeState.values()[mData.intake.get(EIntake.CURRENT_INTAKE_STATE).intValue()].getPower());
+        mTalonThree.set(ControlMode.PercentOutput, EIntakeState.values()[mData.intake.get(EIntake.CURRENT_INTAKE_STATE).intValue()].getPower());
+        //May want to add beam breakers
     }
 
     @Override
@@ -107,5 +111,18 @@ public class Intake extends Module {
     public EIntakeState returnIntakeState(){
         return this.mIntakeState;
     }
+    public void startIntaking(){
+        setDesiredIntakeState(EIntakeState.INTAKE);
+    }
+    public void unjam(){
+        setDesiredIntakeState(EIntakeState.REVERSE);
+    }
+    public double readBeamBreakerState(boolean isBroken){
+        if ( isBroken ){
+            return 1.0;
+        }
+        return 0.0;
+    }
+
 
 }
