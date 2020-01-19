@@ -77,8 +77,10 @@ public class DJBoothRotationControl implements ICommand {
                 mColorChangeLocation--;
                 eCurrentColorState = getStateAtLocation( mColorChangeLocation );
             }
+
 //            String colorString = getColorStringForMatchResult(match);
 //            SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
+
 
             victorSPX.set(ControlMode.PercentOutput, Settings.kDJOutput );
             mIsDone = false;

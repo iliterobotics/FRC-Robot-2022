@@ -19,7 +19,6 @@ import static us.ilite.robot.utils.ColorUtils.*;
 public class DJBoothPositionControl implements ICommand {
 
     private ColorSensorV3 mColorSensorV3;
-
     private VictorSPX victorSPX;
     private final ColorMatch mColorMatcher = new ColorMatch();
     private ColorState eDesiredColorState;
@@ -67,7 +66,6 @@ public class DJBoothPositionControl implements ICommand {
 
     @Override
     public boolean update(double pNow) {
-
         updateColor();
 
         if ( eMotorState.equals( MotorState.ON )) {
