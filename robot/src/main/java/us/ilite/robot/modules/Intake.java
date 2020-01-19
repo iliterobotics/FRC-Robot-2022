@@ -12,7 +12,7 @@ import us.ilite.robot.hardware.DigitalBeamSensor;
 public class Intake extends Module {
 
     // Intake Motors
-    private CANSparkMax mIntakeMotor;
+    private CANSparkMax mCANMotor;
     private TalonSRX mTalonOne;
     private TalonSRX mTalonTwo;
     private TalonSRX mTalonThree;
@@ -53,11 +53,16 @@ public class Intake extends Module {
     public void update(double pNow) {
         switch (mIntakeState) {
             case INTAKE:
-                mIntakeMotor.set(1.0);
-                mTalonOne.set(ControlMode.PercentOutput, Settings.kIntakeTalonPower);
-                mTalonTwo.set(ControlMode.PercentOutput, Settings.kIntakeTalonPower);
-                mTalonThree.set(ControlMode.PercentOutput, Settings.kIntakeTalonPower);
-
+                mCANMotor.set(1.0);
+                if ( mBeamBreaker1.isBroken() ){
+                    mTalonOne.set(ControlMode.PercentOutput, Settings.kIntakeTalonPower);
+                }
+                if ( mBeamBreaker2.isBroken() ){
+                    mTalonTwo.set(ControlMode.PercentOutput, Settings.kIntakeTalonPower);
+                }
+                if ( mBeamBreaker3.isBroken() ){
+                    mTalonThree.set(ControlMode.PercentOutput, Settings.kIntakeTalonPower);
+                }
                 break;
             case REVERSE:
                 mTalonOne.set(ControlMode.PercentOutput, -Settings.kIntakeTalonPower);
@@ -75,6 +80,12 @@ public class Intake extends Module {
 
     @Override
     public void shutdown(double pNow) {
-
+        mCANMotor.set(0.0);
+        mTalonOne.set(ControlMode.PercentOutput, 0d);
+        mTalonTwo.set(ControlMode.PercentOutput, 0d);
+        mTalonThree.set(ControlMode.PercentOutput, 0d);
+    }
+    public void setDesiredIntakeState(EIntakeState pDesiredState){
+        mIntakeState = pDesiredState;
     }
 }
