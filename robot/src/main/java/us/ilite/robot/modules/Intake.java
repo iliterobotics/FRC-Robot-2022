@@ -58,8 +58,8 @@ public class Intake extends Module {
 
         mCANMotor = SparkMaxFactory.createDefaultSparkMax( Settings.kCANIntakeID , CANSparkMaxLowLevel.MotorType.kBrushless );
         mTalonOne = TalonSRXFactory.createDefaultTalon( Settings.kTalonOneID );
-        mTalonTwo = TalonSRXFactory.createDefaultTalon( Settings.kTalonTwoID);
-        mTalonThree = TalonSRXFactory.createDefaultTalon( Settings.kTalonThreeID);
+        mTalonTwo = TalonSRXFactory.createDefaultTalon( Settings.kTalonTwoID );
+        mTalonThree = TalonSRXFactory.createDefaultTalon( Settings.kTalonThreeID );
 
         mBeamBreaker1 = new DigitalBeamSensor( Settings.kBeamChannel1);
         mBeamBreaker2 = new DigitalBeamSensor( Settings.kBeamChannel2);
@@ -81,7 +81,7 @@ public class Intake extends Module {
 
         mData.intake.set(EIntake.CURRENT_INTAKE_STATE , (double) returnIntakeState().ordinal());
         //mData.intake.set(EIntake.CURRENT_INTAKE_STATE, mData.intake.get(EIntake.TARGET_INTAKE_STATE));
-        mData.intake.set(EIntake.BEAM_BREAKER_STATE , 1.0);
+        mData.intake.set(EIntake.BEAM_BREAKER_STATE , readBeamBreakerState(mBeamBreaker1.isBroken()));
 
     }
 
