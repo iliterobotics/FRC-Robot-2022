@@ -16,9 +16,20 @@ import us.ilite.robot.Robot;
 
 import static us.ilite.robot.utils.ColorUtils.*;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorSensorV3;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
+
+import static us.ilite.robot.utils.ColorUtils.*;
+import us.ilite.common.config.*;
+
+
 public class DJBoothPositionControl implements ICommand {
 
     private ColorSensorV3 mColorSensorV3;
+
     private VictorSPX victorSPX;
     private final ColorMatch mColorMatcher = new ColorMatch();
     private ColorState eDesiredColorState;
@@ -27,6 +38,10 @@ public class DJBoothPositionControl implements ICommand {
     private MotorState eMotorState;
     private  boolean mIsDone;
 
+    public DJBoothPositionControl ( ColorState pDesiredColorState ) {
+        eDesiredColorState = pDesiredColorState;
+    }
+
     public enum ColorState {
         DEFAULT,
         RED,
@@ -34,6 +49,7 @@ public class DJBoothPositionControl implements ICommand {
         BLUE,
         YELLOW;
     }
+
     public enum MotorState {
         ON,
         OFF;
@@ -43,11 +59,13 @@ public class DJBoothPositionControl implements ICommand {
     public void init(double pNow) {
         I2C.Port i2cPort = I2C.Port.kOnboard;
         mColorSensorV3 = new ColorSensorV3(i2cPort);
+
         victorSPX = new VictorSPX( 12 );
         mSolidStateCounter = 0;
         eMotorState = MotorState.OFF;
         eDesiredColorState = ColorState.DEFAULT;
         mIsDone = false;
+        mSolidStateCounter = 0;
 
         mColorMatcher.addColorMatch(kBlueTarget);
         mColorMatcher.addColorMatch(kGreenTarget);

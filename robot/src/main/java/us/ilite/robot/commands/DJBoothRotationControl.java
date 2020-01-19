@@ -61,6 +61,7 @@ public class DJBoothRotationControl implements ICommand {
     @Override
     public boolean update(double pNow) {
 
+
         if ( (mColorChangeLocation - mInitialColorStateLocation <= 32) && eMotorState == MotorState.ON ) {
             Color mColor = mColorSensorV3.getColor();
             eLastColorState = eCurrentColorState;
@@ -77,6 +78,7 @@ public class DJBoothRotationControl implements ICommand {
                 mColorChangeLocation--;
                 eCurrentColorState = getStateAtLocation( mColorChangeLocation );
             }
+
 //            String colorString = getColorStringForMatchResult(match);
 //            SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
 
@@ -94,6 +96,7 @@ public class DJBoothRotationControl implements ICommand {
             victorSPX.set(ControlMode.PercentOutput, 0d);
             return false;
         }
+
     }
 
     protected static String getColorStringForMatchResult(ColorMatchResult match) {
