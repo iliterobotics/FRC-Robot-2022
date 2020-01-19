@@ -19,8 +19,14 @@ public class HangerModule extends Module {
 
     }
     public enum EHangerState {
-        HANGING,
-        NOT_HANGING;
+        HANGING(1.0),
+        NOT_HANGING(0.0);
+
+        private double power;
+        EHangerState(double power){
+            this.power = power;
+        }
+
     }
 
     @Override
