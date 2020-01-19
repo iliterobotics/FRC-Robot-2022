@@ -80,7 +80,7 @@ public class Intake extends Module {
         mData.intake.set(EIntake.INTAKE_CURRENT , mTalonThree.getOutputCurrent());
 
         mData.intake.set(EIntake.CURRENT_INTAKE_STATE , (double) returnIntakeState().ordinal());
-        mData.intake.set(EIntake.CURRENT_INTAKE_STATE, mData.intake.get(EIntake.TARGET_INTAKE_STATE));
+        //mData.intake.set(EIntake.CURRENT_INTAKE_STATE, mData.intake.get(EIntake.TARGET_INTAKE_STATE));
         mData.intake.set(EIntake.BEAM_BREAKER_STATE , 1.0);
 
     }

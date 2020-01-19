@@ -29,6 +29,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private CommandManager mAutonomousCommandManager;
     private Limelight mLimelight;
     private Data mData;
+    private Intake mIntake;
     private Timer mGroundCargoTimer = new Timer();
 
     private boolean mIsCargo = false;
@@ -40,7 +41,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private ETrackingType mLastTrackingType = null;
 
     public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
-                       CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
+                       CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager, Intake pIntake
                        boolean pSimulated) {
         this.mLimelight = pLimelight;
         this.mData = pData;
@@ -49,6 +50,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
         this.mDriverInputCodex = mData.driverinput;
         this.mOperatorInputCodex = mData.operatorinput;
+        this.mIntake = pIntake;
         if(pSimulated) {
             // Use a different joystick library?
 
