@@ -61,8 +61,8 @@ public class DJBoothRotationControl implements ICommand {
     @Override
     public boolean update(double pNow) {
 
-
         if ( (mColorChangeLocation - mInitialColorStateLocation <= 32) && eMotorState == MotorState.ON ) {
+
             Color mColor = mColorSensorV3.getColor();
             eLastColorState = eCurrentColorState;
             ColorMatchResult match = mColorMatcher.matchClosestColor( mColor );

@@ -10,13 +10,15 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
-import us.ilite.common.config.DriveTeamInputMap;
+
 import us.ilite.common.lib.util.RangeScale;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.lib.drivers.ECommonControlMode;
 import us.ilite.lib.drivers.ECommonNeutralMode;
+import us.ilite.robot.commands.DJBoothPositionControl;
+import us.ilite.robot.commands.DJBoothRotationControl;
 import us.ilite.robot.commands.LimelightTargetLock;
 import us.ilite.robot.modules.Drive;
 import us.ilite.robot.modules.DriveMessage;
@@ -43,6 +45,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private final CommandManager mAutonomousCommandManager;
     private final Limelight mLimelight;
     private final Data mData;
+    private DJBoothPositionControl djBoothPositionControl;
+    private DJBoothRotationControl djBoothRotationControl;
     private Timer mGroundCargoTimer = new Timer();
     private RangeScale mRampRateRangeScale;
 
@@ -57,7 +61,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private ETrackingType mLastTrackingType = null;
     private ETrackingType mTrackingType = null;
 
-    public DriverInput(Drive pDrivetrain, Elevator pElevator, HatchFlower pHatchFlower, Intake pIntake, PneumaticIntake pPneumaticIntake, CargoSpit pCargoSpit, Limelight pLimelight, Data pData, CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager, FourBar pFourBar, boolean pSimulated) {
+    public DriverInput(Drive pDrivetrain, Elevator pElevator, HatchFlower pHatchFlower, Intake pIntake, PneumaticIntake pPneumaticIntake, CargoSpit pCargoSpit, Limelight pLimelight, Data pData, CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager, FourBar pFourBar,DJBoothRotationControl pDJBoothRotationControl, DJBoothPositionControl pDJBoothPositionControl, boolean pSimulated) {
         this.mDrive = pDrivetrain;
         this.mElevator = pElevator;
         this.mIntake = pIntake;
@@ -69,6 +73,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         this.mTeleopCommandManager = pTeleopCommandManager;
         this.mAutonomousCommandManager = pAutonomousCommandManager;
         this.mFourBar = pFourBar;
+        this.djBoothPositionControl = pDJBoothPositionControl;
+        this.djBoothRotationControl = pDJBoothRotationControl;
 
         this.mDriverInputCodex = mData.driverinput;
         this.mOperatorInputCodex = mData.operatorinput;
@@ -86,8 +92,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
                 Elevator.EElevatorPosition.CARGO_TOP.getEncoderRotations());
     }
 
-    public DriverInput(Drive pDrivetrain, Elevator pElevator, HatchFlower pHatchFlower, Intake pIntake, PneumaticIntake pPneumaticIntake, CargoSpit pCargoSpit, Limelight pLimelight, Data pData, CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager, FourBar pFourBar) {
-        this(pDrivetrain, pElevator, pHatchFlower, pIntake, pPneumaticIntake, pCargoSpit, pLimelight, pData, pTeleopCommandManager, pAutonomousCommandManager, pFourBar, false);
+    public DriverInput(Drive pDrivetrain, Elevator pElevator, HatchFlower pHatchFlower, Intake pIntake, PneumaticIntake pPneumaticIntake, CargoSpit pCargoSpit, Limelight pLimelight, Data pData, CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager, FourBar pFourBar, DJBoothRotationControl pDJBoothRotationControl, DJBoothPositionControl pDJBoothPositionControl) {
+        this(pDrivetrain, pElevator, pHatchFlower, pIntake, pPneumaticIntake, pCargoSpit, pLimelight, pData, pTeleopCommandManager, pAutonomousCommandManager, pFourBar, pDJBoothRotationControl, pDJBoothPositionControl, false);
     }
 
     @Override
@@ -128,7 +134,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 //            updateCheesyDrivetrain();
             updateHatchGrabber();
             updateCargoSpit();
-            updateElevator();
+            //updateElevator();
 //            updateIntake();
             updatePneumaticIntake();
         }
@@ -138,6 +144,27 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
         mLastTrackingType = mTrackingType;
 
+    }
+
+    private void updateDJBooth() {
+        if ( mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL) &&
+                mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
+            djBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
+            djBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
+            //do nothing
+        }
+        else if (mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL)) {
+            djBoothPositionControl.setDesiredColorState( DJBoothPositionControl.ColorState.RED );
+            djBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.ON );
+        }
+        else if (mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
+            djBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.ON );
+        }
+        else {
+            djBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
+            djBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
+
+        }
     }
 
     private void updateIntake() {
@@ -321,53 +348,53 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         mDrive.setDriveMessage(driveMessage);
     }
 
-    private void updateElevator() {
+//    private void updateElevator() {
+//
+//        double manualThrottle = -mData.operatorinput.get(DriveTeamInputMap.OPERATOR_CONTROL_ELEVATOR);
+//
+//        if(manualThrottle > 0) {
+//            manualThrottle *= SystemSettings.kElevatorManualUpThrottleReduction;
+//        } else if(manualThrottle < 0) {
+//            manualThrottle *= SystemSettings.kElevatorManualDownThrottleReduction;
+//        }
+//
+//        if(mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_GROUND_POSITION_ELEVATOR)) {
+//            mElevator.setDesiredPosition(Elevator.EElevatorPosition.HATCH_BOTTOM);
+//        } else {
+//            if(mIsCargo) {
+//                if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_BOTTOM_POSITION_ELEVATOR)) {
+//                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_BOTTOM);
+//                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_LOW_POSITION_ELEVATOR)) {
+//                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_CARGO_SHIP);
+//                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_MIDDLE_POSITION_ELEVATOR)) {
+//                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_MIDDLE);
+//                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_TOP_POSITION_ELEVATOR)) {
+//                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_TOP);
+//                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_INTAKE_LOADING_STATION)) {
+//                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_LOADING_STATION);
+//                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_CONTROL_ELEVATOR)) {
+//                    mElevator.setDesiredPower(manualThrottle);
+//                } else {
+//                    mElevator.setDesiredPower(0d);
+//                }
+//            } else {
+//                if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_BOTTOM_POSITION_ELEVATOR)) {
+//                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.HATCH_BOTTOM);
+//                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_LOW_POSITION_ELEVATOR)) {
+//                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.HATCH_MIDDLE);
+//                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_TOP_POSITION_ELEVATOR) ||
+//                            mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_MIDDLE_POSITION_ELEVATOR)) {
+//                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.HATCH_TOP);
+//                } else if (mData.driverinput.isSet(DriveTeamInputMap.OPERATOR_CONTROL_ELEVATOR)) {
+//                    mElevator.setDesiredPower(manualThrottle);
+//                } else {
+//                    mElevator.setDesiredPower(0d);
+//                }
+//            }
+//
+//        }
 
-        double manualThrottle = -mData.operatorinput.get(DriveTeamInputMap.OPERATOR_CONTROL_ELEVATOR);
-
-        if(manualThrottle > 0) {
-            manualThrottle *= SystemSettings.kElevatorManualUpThrottleReduction;
-        } else if(manualThrottle < 0) {
-            manualThrottle *= SystemSettings.kElevatorManualDownThrottleReduction;
-        }
-
-        if(mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_GROUND_POSITION_ELEVATOR)) {
-            mElevator.setDesiredPosition(Elevator.EElevatorPosition.HATCH_BOTTOM);
-        } else {
-            if(mIsCargo) {
-                if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_BOTTOM_POSITION_ELEVATOR)) {
-                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_BOTTOM);
-                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_LOW_POSITION_ELEVATOR)) {
-                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_CARGO_SHIP);
-                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_MIDDLE_POSITION_ELEVATOR)) {
-                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_MIDDLE);
-                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_TOP_POSITION_ELEVATOR)) {
-                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_TOP);
-                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_INTAKE_LOADING_STATION)) {
-                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.CARGO_LOADING_STATION);
-                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_CONTROL_ELEVATOR)) {
-                    mElevator.setDesiredPower(manualThrottle);
-                } else {
-                    mElevator.setDesiredPower(0d);
-                }
-            } else {
-                if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_BOTTOM_POSITION_ELEVATOR)) {
-                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.HATCH_BOTTOM);
-                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_LOW_POSITION_ELEVATOR)) {
-                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.HATCH_MIDDLE);
-                } else if (mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_TOP_POSITION_ELEVATOR) ||
-                            mData.operatorinput.isSet(DriveTeamInputMap.OPERATOR_MIDDLE_POSITION_ELEVATOR)) {
-                    mElevator.setDesiredPosition(Elevator.EElevatorPosition.HATCH_TOP);
-                } else if (mData.driverinput.isSet(DriveTeamInputMap.OPERATOR_CONTROL_ELEVATOR)) {
-                    mElevator.setDesiredPower(manualThrottle);
-                } else {
-                    mElevator.setDesiredPower(0d);
-                }
-            }
-
-        }
-
-    }
+    //}
 
     private void updateSplitTriggerAxisFlip() {
 
@@ -412,7 +439,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         if(mDriverInputCodex.isSet(DriveTeamInputMap.DRIVER_TRACK_TARGET_BTN)) {
             mTrackingType = ETrackingType.TARGET;
             // TODO Determine which target height we're using
-            visionTarget = SystemSettings.VisionTarget.HatchPort;
+//            visionTarget = SystemSettings.VisionTarget.HatchPort;
 //        } else if(mDriverInputCodex.isSet(DriveTeamInputMap.DRIVER_TRACK_CARGO_BTN)) {
 //            trackingType = ETrackingType.CARGO;
 //            visionTarget = SystemSettings.VisionTarget.CargoHeight;
