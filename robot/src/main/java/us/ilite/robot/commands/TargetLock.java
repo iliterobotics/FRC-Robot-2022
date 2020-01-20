@@ -2,11 +2,10 @@ package us.ilite.robot.commands;
 
 import com.flybotix.hfr.codex.Codex;
 
-import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.ETrackingType;
-import us.ilite.robot.modules.Drive;
+import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.IThrottleProvider;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
@@ -17,7 +16,7 @@ public class TargetLock implements ICommand {
     private static final int kAlignCount = 10;
     private static final double kTargetAreaScalar = 1.0;
 
-    private Drive mDrive;
+    private DriveModule mDrive;
     private ITargetDataProvider mCamera;
     // Different throttle providers give us some control over behavior in autonomous
     private IThrottleProvider mTargetSearchThrottleProvider, mTargetLockThrottleProvider;
@@ -29,11 +28,11 @@ public class TargetLock implements ICommand {
     private int mAlignedCount = 0;
     private boolean mHasAcquiredTarget = false;
 
-    public TargetLock(Drive pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
+    public TargetLock(DriveModule pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
         this(pDrive, pAllowableError, pTrackingType, pCamera, pThrottleProvider, true);
     }
 
-    public TargetLock(Drive pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
+    public TargetLock(DriveModule pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
         this.mDrive = pDrive;
         this.mAllowableError = pAllowableError;
         this.mTrackingType = pTrackingType;
