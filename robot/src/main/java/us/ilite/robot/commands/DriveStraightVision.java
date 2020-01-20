@@ -4,13 +4,13 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.robot.hardware.IMU;
-import us.ilite.robot.modules.Drive;
+import us.ilite.robot.modules.DriveModule;
 
 public class DriveStraightVision extends CommandQueue {
 
     private IMU mInitialImu;
 
-    public DriveStraightVision(Drive pDrive, IMU pImu, Data pData, DriveStraight.EDriveControlMode pDriveControlMode, double pDistanceToDrive) {
+    public DriveStraightVision(DriveModule pDrive, IMU pImu, Data pData, DriveStraight.EDriveControlMode pDriveControlMode, double pDistanceToDrive) {
         mInitialImu = pDrive.getDriveHardware().getImu();
         setCommands(
                 new FunctionalCommand(() -> pDrive.getDriveHardware().setImu(pImu)),

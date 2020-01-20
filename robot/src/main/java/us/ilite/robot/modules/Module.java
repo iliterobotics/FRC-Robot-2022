@@ -18,7 +18,9 @@ public abstract class Module {
      * Runs when we init a new robot mode, for example teleopInit() or autonomousInit()
      * @param pNow The current time from the FPGA
      */
-    public abstract void modeInit(EMatchMode pMode, double pNow);
+    public void modeInit(EMatchMode pMode, double pNow){
+
+    }
 
     /**
      * The module's update function. Runs every time [mode]Periodic() is called (Roughly ~50Hz), or in a loop running at a custom frequency.
@@ -35,12 +37,15 @@ public abstract class Module {
      * Shutdown/Cleanup tasks are performed here.
      * @param pNow
      */
-    public abstract void shutdown(double pNow);
+    public void shutdown(double pNow) {
+
+    }
 
     /**
      * Runs a self-test routine on this module's hardware.
      */
     public boolean checkModule(double pNow) {
+
         return true;
     }
 

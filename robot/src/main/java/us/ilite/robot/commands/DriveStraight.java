@@ -13,7 +13,7 @@ import static us.ilite.common.types.sensor.EGyro.YAW_DEGREES;
 
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.hardware.ECommonControlMode;
-import us.ilite.robot.modules.Drive;
+import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
 
 
@@ -26,7 +26,7 @@ public class DriveStraight implements ICommand {
 
     private final ILog mLog = Logger.createLog(DriveStraight.class);
 
-    private final Drive mDrive;
+    private final DriveModule mDrive;
     private final Data mData;
 
     private final EDriveControlMode mDriveControlMode;
@@ -40,11 +40,11 @@ public class DriveStraight implements ICommand {
     private double mRampDistance = 120.0;
     private double mLastTime = 0.0;
     private double mStartTime = 0.0;
-    private PIDController mHeadingController = new PIDController(Settings.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
+    private PIDController mHeadingController = new PIDController(DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
 
-    private ProfiledPIDController mDistanceController = Settings.Drive.kDistancePID.generateController();
+    private ProfiledPIDController mDistanceController = DriveModule.kDistancePID.generateController();
 
-    public DriveStraight(Drive pDrive, Data pData, EDriveControlMode pDriveControlMode, double pDistanceToDrive) {
+    public DriveStraight(DriveModule pDrive, Data pData, EDriveControlMode pDriveControlMode, double pDistanceToDrive) {
         mDrive = pDrive;
         mData = pData;
         mDistanceToDrive = pDistanceToDrive;
