@@ -10,8 +10,10 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
-import us.ilite.common.types.drive.EDriveData;
+import static us.ilite.common.types.ETargetingData.*;
+import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.common.types.sensor.EPowerDistPanel;
+import static us.ilite.common.types.sensor.EPowerDistPanel.*;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.*;
 import us.ilite.robot.loops.Loop;
@@ -56,12 +58,12 @@ public class DriveModule extends Loop {
 
 	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
 			/* Left */
-			EPowerDistPanel.CURRENT1,
-			EPowerDistPanel.CURRENT2,
+			CURRENT1,
+			CURRENT2,
 
 			/* Right */
-			EPowerDistPanel.CURRENT13,
-			EPowerDistPanel.CURRENT14,
+			CURRENT13,
+			CURRENT14,
 
 	};
 	
@@ -104,19 +106,19 @@ public class DriveModule extends Loop {
 	@Override
 	public void readInputs(double pNow) {
 
-		Robot.DATA.drivetrain.set(EDriveData.LEFT_POS_INCHES, mDriveHardware.getLeftInches());
-		Robot.DATA.drivetrain.set(EDriveData.RIGHT_POS_INCHES, mDriveHardware.getRightInches());
+		Robot.DATA.drivetrain.set(LEFT_POS_INCHES, mDriveHardware.getLeftInches());
+		Robot.DATA.drivetrain.set(RIGHT_POS_INCHES, mDriveHardware.getRightInches());
 //		Robot.mData.drivetrain.set(EDriveData.LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
 //		Robot.mData.drivetrain.set(EDriveData.RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
-		Robot.DATA.drivetrain.set(EDriveData.LEFT_VEL_TICKS, (double)mDriveHardware.getLeftVelTicks());
-		Robot.DATA.drivetrain.set(EDriveData.RIGHT_VEL_TICKS, (double)mDriveHardware.getRightVelTicks());
+		Robot.DATA.drivetrain.set(LEFT_VEL_TICKS, (double)mDriveHardware.getLeftVelTicks());
+		Robot.DATA.drivetrain.set(RIGHT_VEL_TICKS, (double)mDriveHardware.getRightVelTicks());
 
-		Robot.DATA.drivetrain.set(EDriveData.LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
-		Robot.DATA.drivetrain.set(EDriveData.RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
-		Robot.DATA.drivetrain.set(EDriveData.LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
-		Robot.DATA.drivetrain.set(EDriveData.RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
-		Robot.DATA.drivetrain.set(EDriveData.LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
-		Robot.DATA.drivetrain.set(EDriveData.RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
+		Robot.DATA.drivetrain.set(LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
+		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
+		Robot.DATA.drivetrain.set(LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
+		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
+		Robot.DATA.drivetrain.set(LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
+		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 //
 //		mData.imu.set(EGyro.YAW_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
 
@@ -149,10 +151,10 @@ public class DriveModule extends Loop {
 
 				Codex<Double, ETargetingData> targetData = Robot.DATA.limelight;
 				double pidOutput;
-				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(ETargetingData.tv) && targetData.get(ETargetingData.tx) != null) {
+				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(tv) && targetData.get(tx) != null) {
 
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ETargetingData.tx), pNow - mPreviousTime);
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(tx), pNow - mPreviousTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 
 					mDriveMessage = new DriveMessage().throttle(mTargetTrackingThrottle).turn(pidOutput).calculateCurvature();
