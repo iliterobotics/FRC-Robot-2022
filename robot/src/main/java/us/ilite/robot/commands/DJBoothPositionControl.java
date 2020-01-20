@@ -66,6 +66,7 @@ public class DJBoothPositionControl implements ICommand {
 
     @Override
     public boolean update(double pNow) {
+
         updateColor();
 
         if ( eMotorState.equals( MotorState.ON )) {
@@ -73,7 +74,6 @@ public class DJBoothPositionControl implements ICommand {
 
             Color detectedColor = mColorSensorV3.getColor();
             ColorMatchResult match = mColorMatcher.matchClosestColor(detectedColor);
-            String colorString = getColorStringForMatchResult(match);
             eCurrentColorState = getState( match.color );
             SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
 
