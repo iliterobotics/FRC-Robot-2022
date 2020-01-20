@@ -8,14 +8,13 @@ public enum ETrackingType {
     Line - 4
     Add one to prioritize right-hand targets.
     */
+    NONE(0, 0, false),
     TARGET(1, 0, true),
-    /*CARGO_LEFT(2, -1, false),
-    CARGO_RIGHT(3, 1, false),*/
-    CARGO(3, 0, true),
+    CELL(3,0,false);
+    //CARGO(3, 0, true),
     /*LINE_LEFT(4, -1, false),
     LINE_RIGHT(5, 1, false),*/
-    LINE(5, 0, false),
-    NONE(6, 0, false);
+    //LINE(5, 0, false),
 
     private final int kPipelineNum;
     private final boolean kLedOn;

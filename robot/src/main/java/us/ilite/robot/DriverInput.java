@@ -9,6 +9,7 @@ import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
@@ -31,6 +32,9 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private Limelight mLimelight;
     private Data mData;
     private Timer mGroundCargoTimer = new Timer();
+    private Shooter mShooter;
+
+    private ETrackingType mTrackingType;
 
     private boolean mIsCargo = false;
     private Joystick mDriverJoystick;
@@ -73,12 +77,21 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     @Override
     public void setOutputs(double pNow) {
-        /*
-        If the driver started the commands that the superstructure is running and then released the button,
-        stop running commands.
-        */
+       updateShootSystem();
+       updateDriveTrain();
+    }
 
-
+    private void updateShootSystem() {
+        if ( mDriverInputCodex.isSet(ELogitech310.B_BTN) ) {
+            mTrackingType = ETrackingType.CELL;
+            if (mData.limelight.get(ETargetingData.ty) != null) {
+                mShooter.shoot();
+                if (mShooter.isMaxVelocity()) {
+                    mShooter.feed();
+                }
+                mShooter.turnTurret();
+            }
+        }
     }
 
     private void updateDriveTrain() {

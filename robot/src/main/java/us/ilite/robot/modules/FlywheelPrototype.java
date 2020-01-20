@@ -11,13 +11,13 @@ import us.ilite.robot.Robot;
 import static us.ilite.common.types.EFlywheelSubsystem.*;
 
 public class FlywheelPrototype extends Module{
-    private final TalonFX master = new TalonFX(50);
-    private final TalonFX follower = new TalonFX(51);
+//    private final TalonFX master = new TalonFX(50);
+//    private final TalonFX follower = new TalonFX(51);
 
     public FlywheelPrototype() {
 
-        follower.follow(master);
-        follower.setInverted(TalonFXInvertType.FollowMaster);
+//        follower.follow(master);
+//        follower.setInverted(TalonFXInvertType.FollowMaster);
 
         System.err.println("CREATED TALON FX's");
     }
@@ -35,10 +35,10 @@ public class FlywheelPrototype extends Module{
 
     @Override
     public void setOutputs(double pNow) {
-        master.set(
-                ControlMode.PercentOutput,
-                Robot.mData.driverinput.get(LEFT_Y_AXIS)
-        );
+//        master.set(
+//                ControlMode.PercentOutput,
+//                Robot.mData.driverinput.get(LEFT_Y_AXIS)
+//        );
         System.out.println("FLYWHEEL %: " + Robot.mData.driverinput.get(LEFT_Y_AXIS));
     }
 

@@ -19,9 +19,7 @@ import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.GetLocalIP;
-import us.ilite.robot.modules.FlywheelPrototype;
-import us.ilite.robot.modules.ModuleList;
-import us.ilite.robot.modules.OperatorInput;
+import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
 
@@ -30,7 +28,7 @@ import java.util.List;
 public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
-
+    private Limelight mLimelight = new Limelight(mData);
     private ModuleList mRunningModules = new ModuleList();
     private Clock mClock = new Clock();
     public static final Data mData = new Data();
@@ -40,7 +38,7 @@ public class Robot extends TimedRobot {
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
-    private FlywheelPrototype mFlywheel;
+    private Shooter mFlywheel;
     private OperatorInput mOI;
 
     private MatchMetadata mMatchMeta = null;
@@ -53,7 +51,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        mFlywheel = new FlywheelPrototype();
+        mFlywheel = new Shooter(mData, mLimelight);
         mOI = new OperatorInput();
 
         //look for practice robot config:

@@ -137,7 +137,23 @@ public class Settings extends NetworkTablesConstantsBase {
         public static double kRightCCoeff = -0.0437470770400814;
     }
 
+    // =============================================================================
+    // Shooter
+    // =============================================================================
 
+    public static class Shooter {
+
+        public static final int kShooterID = 16;
+        public static final int kAnglerID = 9;
+        public static final int kTurretID = 9;
+        public static final int kAccelerator = -1;
+        public static final int kBaseAngle = 45;
+        public static final int kMaxShooterVelocity = 900; // 75% of max possible
+        public static final int kMaxAcceleratorVelocity = 900; // 75% of max possible
+        public static double kShooterPGain = (1.0/5676d) * 2;
+        public static double kShooterFF = 1.0/5676d;
+
+    }
 
     // =============================================================================
     // Heading Gains
