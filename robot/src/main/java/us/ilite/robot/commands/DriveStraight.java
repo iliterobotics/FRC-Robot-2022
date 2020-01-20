@@ -40,9 +40,9 @@ public class DriveStraight implements ICommand {
     private double mRampDistance = 120.0;
     private double mLastTime = 0.0;
     private double mStartTime = 0.0;
-    private PIDController mHeadingController = new PIDController(Settings.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
+    private PIDController mHeadingController = new PIDController(DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
 
-    private ProfiledPIDController mDistanceController = Settings.Drive.kDistancePID.generateController();
+    private ProfiledPIDController mDistanceController = DriveModule.kDistancePID.generateController();
 
     public DriveStraight(DriveModule pDrive, Data pData, EDriveControlMode pDriveControlMode, double pDistanceToDrive) {
         mDrive = pDrive;
