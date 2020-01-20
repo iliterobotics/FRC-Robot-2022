@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
+import us.ilite.common.types.EFlywheelData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.robot.hardware.SparkMaxFactory;
@@ -28,10 +29,10 @@ public class FlywheelModule extends Module {
     private double distanceToTarget;
 
     public FlywheelModule(Data pData) {
-    //        mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.Shooter.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
-//        mAccelerator = SparkMaxFactory.createDefaultSparkMax(Settings.Shooter.kAccelerator, CANSparkMaxLowLevel.MotorType.kBrushless);
-//        mAngler = new Servo(Settings.Shooter.kAnglerID);
-//        mTurret = new TalonSRX(Settings.Shooter.kTurretID);
+            mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mAccelerator = SparkMaxFactory.createDefaultSparkMax(Settings.kAccelerator, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mAngler = new Servo(Settings.kAnglerID);
+        mTurret = new TalonSRX(Settings.kTurretID);
         mData = pData;
 
 
@@ -76,11 +77,9 @@ public class FlywheelModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-//        mData.flywheel.set(EFlywheelSubsystem.CURRENT_FLYWHEEL_STATE, (double) getShooterState().ordinal());
-//        mData.flywheel.set(EFlywheelSubsystem.TARGET_FLYWHEEL_STATE, (double) mShooterState.ordinal());
-//        mData.flywheel.set(EFlywheelSubsystem.CURRENT_FLYWHEEL_VELOCITY, mShooter.getEncoder().getVelocity());
-//        mData.flywheel.set(EFlywheelSubsystem.TARGET_FLYWHEEL_VELOCITY, mDesiredOutput);
-//        mData.flywheel.set(EFlywheelSubsystem.FLYWHEEL_CURRENT, mShooter.getOutputCurrent());
+        mData.flywheel.set(EFlywheelData.CURRENT_FLYWHEEL_STATE, (double) getShooterState().ordinal());
+        mData.flywheel.set(EFlywheelData.TARGET_FLYWHEEL_STATE, (double) mShooterState.ordinal());
+        mData.flywheel.set(EFlywheelData.CURRENT_FLYWHEEL_VELOCITY, mShooter.getEncoder().getVelocity());
     }
 
     @Override
