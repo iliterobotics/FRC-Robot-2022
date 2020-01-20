@@ -29,7 +29,7 @@ public class FlywheelPrototype extends Module{
     @Override
     public void readInputs(double pNow) {
 
-        Robot.DATA.flywheel.set(ACTUAL_FLYWHEEL_VELOCITY, 0d);
+       // Robot.DATA.flywheel.set(ACTUAL_FLYWHEEL_VELOCITY, 0d);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class FlywheelPrototype extends Module{
 //                ControlMode.PercentOutput,
 //                Robot.mData.driverinput.get(LEFT_Y_AXIS)
 //        );
-        System.out.println("FLYWHEEL %: " + Robot.mData.driverinput.get(LEFT_Y_AXIS));
+        //System.out.println("FLYWHEEL %: " + Robot.mData.driverinput.get(LEFT_Y_AXIS));
     }
 
     @Override

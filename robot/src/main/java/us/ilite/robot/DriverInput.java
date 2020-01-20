@@ -31,7 +31,6 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private Limelight mLimelight;
     private Data mData;
     private Timer mGroundCargoTimer = new Timer();
-    private Shooter mShooter;
 
     private ETrackingType mTrackingType;
 
@@ -76,22 +75,11 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     @Override
     public void setOutputs(double pNow) {
-       updateShootSystem();
+
        updateDriveTrain();
     }
 
-    private void updateShootSystem() {
-        if ( mDriverInputCodex.isSet(ELogitech310.B_BTN) ) {
-            mTrackingType = ETrackingType.CELL;
-            if (mData.limelight.get(ETargetingData.ty) != null) {
-                mShooter.shoot();
-                if (mShooter.isMaxVelocity()) {
-                    mShooter.feed();
-                }
-                mShooter.turnTurret();
-            }
-        }
-    }
+
 
     private void updateDriveTrain() {
         double rotate = getTurn();

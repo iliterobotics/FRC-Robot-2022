@@ -4,6 +4,7 @@ import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import edu.wpi.first.wpilibj.Talon;
 
 /**
  * Creates CANTalon objects and configures all the parameters we care about to factory defaults. Closed-loop and sensor
@@ -154,7 +155,7 @@ public class TalonSRXFactory {
     }
 
     public static TalonSRX createTalon(int id, Configuration config) {
-        TalonSRX talon = new com.team254.lib.drivers.talon.LazyTalonSRX(id);
+        TalonSRX talon = new TalonSRX(id);
         talon.configFactoryDefault();
         talon.set(ControlMode.PercentOutput, 0.0);
 

@@ -27,6 +27,7 @@ import java.util.List;
 public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
+    private Data mData;
     private Limelight mLimelight = new Limelight(mData);
     private ModuleList mRunningModules = new ModuleList();
     private Clock mClock = new Clock();
@@ -37,7 +38,7 @@ public class Robot extends TimedRobot {
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
-    private Shooter mFlywheel;
+    private FlywheelModule mFlywheel;
     private OperatorInput mOI;
 
     private MatchMetadata mMatchMeta = null;
@@ -50,7 +51,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        mFlywheel = new Shooter(mData, mLimelight);
+        mFlywheel = new FlywheelModule(mData);
         mOI = new OperatorInput();
 
         //look for practice robot config:
