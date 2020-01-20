@@ -29,7 +29,6 @@ public class PowerCellModule extends Module {
     //Beam Breakers
     private DigitalBeamSensor mBeamBreaker1;
     private DigitalBeamSensor mBeamBreaker2;
-    private DigitalBeamSensor mBeamBreaker3;
 
     private Data mData;
 
@@ -64,7 +63,6 @@ public class PowerCellModule extends Module {
 
         mBeamBreaker1 = new DigitalBeamSensor( Settings.kBeamChannel1);
         mBeamBreaker2 = new DigitalBeamSensor( Settings.kBeamChannel2);
-        mBeamBreaker3 = new DigitalBeamSensor( Settings.kBeamChannel3);
 
     }
 
@@ -79,10 +77,12 @@ public class PowerCellModule extends Module {
         mData.powercell.set(EPowerCellData.BREAK_SENSOR_1 , mTalonOne.getOutputCurrent());
         mData.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonTwo.getOutputCurrent());
         mData.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , mTalonThree.getOutputCurrent());
-
         mData.powercell.set(EPowerCellData.CURRENT_POWERCELL_STATE, (double) returnIntakeState().ordinal());
+
         //mData.intake.set(EIntake.CURRENT_INTAKE_STATE, mData.intake.get(EIntake.TARGET_INTAKE_STATE));
-        mData.powercell.set(EPowerCellData.BEAM_BREAKER_STATE , readBeamBreakerState(mBeamBreaker1.isBroken()));
+
+        mData.powercell.set(EPowerCellData.BREAK_SENSOR_0 , readBeamBreakerState(mBeamBreaker1.isBroken()));
+        mData.powercell.set(EPowerCellData.BREAK_SENSOR_1 , readBeamBreakerState(mBeamBreaker2.isBroken()));
 
     }
 
@@ -105,15 +105,19 @@ public class PowerCellModule extends Module {
     public void setDesiredIntakeState(EIntakeState pDesiredState){
         mIntakeState = pDesiredState;
     }
+
     public EIntakeState returnIntakeState(){
         return this.mIntakeState;
     }
+    
     public void startIntaking(){
         setDesiredIntakeState(EIntakeState.INTAKE);
     }
+
     public void unjam(){
         setDesiredIntakeState(EIntakeState.REVERSE);
     }
+
     public double readBeamBreakerState(boolean isBroken){
         if ( isBroken ){
             return 1.0;
