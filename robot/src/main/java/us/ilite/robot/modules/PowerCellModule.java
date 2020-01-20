@@ -29,6 +29,7 @@ public class PowerCellModule extends Module {
     //Beam Breakers
     private DigitalBeamSensor mBeamBreaker1;
     private DigitalBeamSensor mBeamBreaker2;
+    private DigitalBeamSensor mBeamBreaker3;
 
     private Data mData;
 
@@ -63,6 +64,7 @@ public class PowerCellModule extends Module {
 
         mBeamBreaker1 = new DigitalBeamSensor( Settings.kBeamChannel1);
         mBeamBreaker2 = new DigitalBeamSensor( Settings.kBeamChannel2);
+        mBeamBreaker3 = new DigitalBeamSensor( Settings.kBeamChannel3);
 
     }
 
@@ -73,16 +75,13 @@ public class PowerCellModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        mData.powercell.set(EPowerCellData.BREAK_SENSOR_0, mCANMotor.getOutputCurrent());
-        mData.powercell.set(EPowerCellData.BREAK_SENSOR_1 , mTalonOne.getOutputCurrent());
-        mData.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonTwo.getOutputCurrent());
-        mData.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , mTalonThree.getOutputCurrent());
-        mData.powercell.set(EPowerCellData.CURRENT_POWERCELL_STATE, (double) returnIntakeState().ordinal());
-
-        //mData.intake.set(EIntake.CURRENT_INTAKE_STATE, mData.intake.get(EIntake.TARGET_INTAKE_STATE));
+        mData.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , mCANMotor.getOutputCurrent());
+        mData.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonOne.getOutputCurrent());
+        mData.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT ,mTalonTwo.getOutputCurrent() );
 
         mData.powercell.set(EPowerCellData.BREAK_SENSOR_0 , readBeamBreakerState(mBeamBreaker1.isBroken()));
         mData.powercell.set(EPowerCellData.BREAK_SENSOR_1 , readBeamBreakerState(mBeamBreaker2.isBroken()));
+        mData.powercell.set(EPowerCellData.BREAK_SENSOR_2 , readBeamBreakerState(mBeamBreaker3.isBroken()));
 
     }
 

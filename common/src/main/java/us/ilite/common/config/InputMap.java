@@ -15,14 +15,13 @@ public class InputMap {
 
         TRACK_CARGO_BTN = ELogitech310.X_BTN,
         TRACK_TARGET_BTN = ELogitech310.A_BTN,
-        TRACK_HATCH_BTN = ELogitech310.B_BTN
-
-
-        ;
+        TRACK_HATCH_BTN = ELogitech310.B_BTN;
 
     }
 
     public static class OPERATOR {
+        public static final ELogitech310
+        INTAKE_STUFF = ELogitech310.X_BTN;
 
     }
 

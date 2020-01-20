@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
     public static final Data DATA = new Data();
     private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
-    private final PowerCellModule mIntake = new PowerCellModule(mData);
+    private PowerCellModule mIntake = new PowerCellModule(DATA);
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
@@ -55,6 +55,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
+        mIntake = new PowerCellModule(DATA);
         mOI = new OperatorInput();
 
         //look for practice robot config:

@@ -41,8 +41,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private ETrackingType mLastTrackingType = null;
 
     public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
-                       CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager, PowerCellModule pIntake
-                       boolean pSimulated) {
+                       CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager, PowerCellModule pIntake ){
         this.mLimelight = pLimelight;
         this.mData = pData;
         this.mTeleopCommandManager = pTeleopCommandManager;
@@ -51,13 +50,10 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         this.mDriverInputCodex = mData.driverinput;
         this.mOperatorInputCodex = mData.operatorinput;
         this.mIntake = pIntake;
-        if(pSimulated) {
-            // Use a different joystick library?
 
-        } else {
             this.mDriverJoystick = new Joystick(0);
             this.mOperatorJoystick = new Joystick(1);
-        }
+
     }
 
 
@@ -100,7 +96,9 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         mDrive.setDriveMessage(driveMessage);
     }
     private void updateIntake(){
-
+        if ( mOperatorInputCodex.isSet(InputMap.OPERATOR.INTAKE_STUFF)){
+            mIntake.startIntaking();
+        }
     }
 
     @Override
