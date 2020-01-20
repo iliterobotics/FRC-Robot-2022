@@ -47,7 +47,7 @@ public class TurnToDegree implements ICommand {
     mTargetYaw = mInitialYaw.rotateBy( mTurnAngle );
 
     // PIDController configuration
-    pid = new PIDController( Settings.Drive.kTurnToProfileGains, -180, 180, Settings.kControlLoopPeriod );
+    pid = new PIDController( DriveModule.kTurnToProfileGains, -180, 180, Settings.kControlLoopPeriod );
     pid.setContinuous( true );
     pid.setOutputRange( kMIN_POWER, kMAX_POWER );
     pid.setSetpoint( mTargetYaw.getDegrees() );
@@ -57,7 +57,7 @@ public class TurnToDegree implements ICommand {
 
   public boolean update( double pNow ) {
     mOutput = pid.calculate( getYaw().getDegrees(), pNow );
-    mOutput += Math.signum( mOutput ) * Settings.Drive.kTurnToProfileGains.F;
+    mOutput += Math.signum( mOutput ) * DriveModule.kTurnToProfileGains.F;
 
     // Keep track of time on target
     if ( ( Math.abs( pid.getError() ) <= Math.abs( mAllowableError ) ) ) {
