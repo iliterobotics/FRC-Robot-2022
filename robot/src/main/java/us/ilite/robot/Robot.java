@@ -14,7 +14,6 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
@@ -34,11 +33,11 @@ public class Robot extends TimedRobot {
 
     private ModuleList mRunningModules = new ModuleList();
     private Clock mClock = new Clock();
-    public static final Data mData = new Data();
+    public static final Data DATA = new Data();
     private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
-    private CSVLogger mCSVLogger = new CSVLogger(mData);
     private final PowerCellModule mIntake = new PowerCellModule(mData);
+    private CSVLogger mCSVLogger = new CSVLogger(DATA);
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -150,7 +149,7 @@ public class Robot extends TimedRobot {
 
     private void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for(Codex c : mData.mAllCodexes) {
+        for(Codex c : DATA.mAllCodexes) {
             c.reset();
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
@@ -165,7 +164,7 @@ public class Robot extends TimedRobot {
         if (mMatchMeta == null) {
             mMatchMeta = new MatchMetadata();
             int gid = mMatchMeta.hash;
-            for (Codex c : mData.mAllCodexes) {
+            for (Codex c : DATA.mAllCodexes) {
                 c.meta().setGlobalId(gid);
             }
         }

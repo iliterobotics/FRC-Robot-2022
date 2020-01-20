@@ -9,6 +9,13 @@ import us.ilite.common.types.sensor.EPowerDistPanel;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * ONLY ROBOT-wide settings should go into this class (e.g. things like
+ *  - CAN/DIO/etc ID's
+ *  - IP ports, addresses
+ *  - Driver Input
+ *  - Field element locations & vision target heights
+ */
 public class Settings extends NetworkTablesConstantsBase {
 
     public static double kControlLoopPeriod = 0.01; // seconds
@@ -49,6 +56,9 @@ public class Settings extends NetworkTablesConstantsBase {
             public static int kDriveRightMiddle = 4;
         }
 
+        public static class Analog {
+        }
+
         public static class DIO {
         }
 
@@ -68,38 +78,6 @@ public class Settings extends NetworkTablesConstantsBase {
     // Drive Train Constants
     // =============================================================================
     public static class Drive {
-        public static double kGearboxRatio = (12.0 / 80.0) * (42.0 / 80.0);
-        public static double kClosedLoopVoltageRampRate = 0.0;
-        public static double kOpenLoopVoltageRampRate = 0.1;
-        public static int kCurrentLimitAmps = 50;
-        public static int kCurrentLimitTriggerDurationMs = 100;
-        public static double kWheelDiameterInches = 6.0;
-        public static double kWheelDiameterFeet = kWheelDiameterInches / 12.0;
-        public static double kWheelCircumference = kWheelDiameterInches * Math.PI;
-        public static double kDefaultRampRate = 120.0; // in V/sec
-        public static double kTicksPerRotation = 1.0;
-        public static double kEffectiveWheelbase = 23.25;
-        public static double kTurnCircumference = kEffectiveWheelbase * Math.PI;
-        public static double kInchesPerDegree = kTurnCircumference / 360.0;
-        public static double kWheelTurnsPerDegree = kInchesPerDegree / kWheelDiameterInches;
-        // =============================================================================
-        // Closed-Loop Velocity Constants
-        // =============================================================================
-        public static ProfileGains kDistancePID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d);
-        public static ProfileGains kVelocityPID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d);
-        public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
-        public static double kTurnSensitivity = 0.85;
-
-        public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
-                /* Left */
-                EPowerDistPanel.CURRENT1,
-                EPowerDistPanel.CURRENT2,
-
-                /* Right */
-                EPowerDistPanel.CURRENT13,
-                EPowerDistPanel.CURRENT14,
-
-        };
     }
 
     public static class Input {
@@ -119,41 +97,6 @@ public class Settings extends NetworkTablesConstantsBase {
         public static int kJoystickPortTester = 2;
     }
 
-    public static class LimeLight {
-        // =============================================================================
-        // LimeLight Camera Constants
-        // Note: These constants need to be recalculted for a specific robot geometry
-        // =============================================================================
-        public static double kHeightIn = 58.0;
-        public static double kToBumperIn = 10.0;
-        public static double kAngleDeg = 28.55;
-
-        // Left angle coefficients for angle = a + bx + cx^2
-        //    a	0.856905324060421
-        //    b	-3.01414088331715
-        //    c	-0.0331854848038372
-        public static double kLeftACoeff = 0.856905324060421;
-        public static double kLeftBCoeff = -3.01414088331715;
-        public static double kLeftCCoeff = -0.0331854848038372;
-
-        // Right angle coefficients for angle = a + bx + cx^2
-        // a	-54.3943883842204
-        // b	-4.53956454545558
-        // c	-0.0437470770400814
-        public static double kRightACoeff = -54.3943883842204;
-        public static double kRightBCoeff = -4.53956454545558;
-        public static double kRightCCoeff = -0.0437470770400814;
-    }
-
-
-
-    // =============================================================================
-    // Heading Gains
-    // =============================================================================
-    public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
-    public static double kDriveLinearPercentOutputLimit = 0.5;
-
-
     public static List<ELogitech310> kTeleopCommandTriggers = Arrays.asList(InputMap.DRIVER.TRACK_TARGET_BTN,
                                                                             InputMap.DRIVER.TRACK_CARGO_BTN,
                                                                             InputMap.DRIVER.TRACK_HATCH_BTN);
@@ -161,11 +104,6 @@ public class Settings extends NetworkTablesConstantsBase {
     public static List<ELogitech310> kAutonOverrideTriggers = Arrays.asList(InputMap.DRIVER.THROTTLE_AXIS,
                                                                             InputMap.DRIVER.TURN_AXIS);
     public static double kAutonOverrideAxisThreshold = 0.3;
-
-    // =============================================================================
-    // Motion Magic Constants
-    // =============================================================================
-
 
 
     // =============================================================================

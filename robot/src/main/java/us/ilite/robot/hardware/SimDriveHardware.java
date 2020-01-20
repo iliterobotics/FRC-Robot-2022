@@ -7,6 +7,7 @@ import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.lib.RobotProfile;
 import us.ilite.common.lib.util.Conversions;
 import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.DriveModule;
 
 /**
  * Simple drivebase simulation. Only supports velocity control (for now).
@@ -84,11 +85,11 @@ public class SimDriveHardware implements IDriveHardware {
     }
     
     public double getLeftInches() {
-        return Conversions.ticksToInches((int)mLeftEncoder.getPosition());
+        return DriveModule.Conversions.ticksToInches((int)mLeftEncoder.getPosition());
     }
 
     public double getRightInches() {
-        return Conversions.ticksToInches((int)mRightEncoder.getPosition());
+        return DriveModule.Conversions.ticksToInches((int)mRightEncoder.getPosition());
     }
 
     public double getLeftVelTicks() {
@@ -110,11 +111,11 @@ public class SimDriveHardware implements IDriveHardware {
     }
 
     public double getLeftVelInches() {
-        return Conversions.ticksPer100msToInchesPerSecond((int)mLeftEncoder.getVelocity());
+        return DriveModule.Conversions.ticksPer100msToInchesPerSecond((int)mLeftEncoder.getVelocity());
     }
 
     public double getRightVelInches() {
-        return Conversions.ticksPer100msToInchesPerSecond((int)mRightEncoder.getVelocity());
+        return DriveModule.Conversions.ticksPer100msToInchesPerSecond((int)mRightEncoder.getVelocity());
     }
 
     //TODO

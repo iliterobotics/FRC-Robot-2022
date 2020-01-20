@@ -5,12 +5,8 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.io.CodexNetworkTables;
 import us.ilite.common.io.CodexCsvLogger;
+import us.ilite.common.types.*;
 import us.ilite.common.lib.util.SimpleNetworkTable;
-import us.ilite.common.types.EFlywheelSubsystem;
-import us.ilite.common.types.EIntake;
-import us.ilite.common.types.EFlywheelData;
-import us.ilite.common.types.EPowerCellData;
-import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
@@ -20,15 +16,18 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
+/**
+ * Think of this class link an in-memory database optimized for 1 row.  If you need multiple rows, simply manage multiple
+ * instances of this class.  Just like all databases, access to data should be universal but without assumptions of
+ * null-ness, order of operations, etc.
+ */
 public class Data {
 
-    public CodexNetworkTables mCodexNT = CodexNetworkTables.getInstance();
     private final ILog mLogger = Logger.createLog(Data.class);
     
     //Add new codexes here as we need more
 
     public final Codex<Double, EGyro> imu = Codex.of.thisEnum(EGyro.class);
-    public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
     public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
@@ -36,6 +35,12 @@ public class Data {
     public Codex<Double, EFlywheelSubsystem> flywheel = Codex.of.thisEnum(EFlywheelSubsystem.class);
     public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
     public Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
+
+    public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
+    public final Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
+    public final Codex<Double, EColorWheelData> colorwheel = Codex.of.thisEnum(EColorWheelData.class);
+    public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
+    public final Codex<Double, EHangerData> hanger = Codex.of.thisEnum(EHangerData.class);
 
 
     public final Codex[] mAllCodexes = new Codex[] {
@@ -51,8 +56,6 @@ public class Data {
     };
 
     //Stores writers per codex needed for CSV logging
-    private Map<String, Writer> mNetworkTableWriters = new HashMap<>();
-
     private List<CodexCsvLogger> mCodexCsvLoggers;
 
     /**
@@ -91,16 +94,6 @@ public class Data {
      * Closes all the writers in mNetworkTableWriters
      */
     public void closeWriters() {
-        for (Writer writer : mNetworkTableWriters.values()) {
-            try {
-                writer.flush();
-                writer.close();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         mCodexCsvLoggers.forEach(c -> c.closeWriter());
     }
 

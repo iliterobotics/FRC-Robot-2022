@@ -9,6 +9,7 @@ import com.revrobotics.ControlType;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Conversions;
 import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.DriveModule;
 
 public class NeoDriveHardware implements IDriveHardware {
 
@@ -167,8 +168,8 @@ public class NeoDriveHardware implements IDriveHardware {
         // Position according to REV docs
         sparkMax.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 5);
 
-        sparkMax.setSmartCurrentLimit(Settings.Drive.kCurrentLimitAmps);
-        sparkMax.setSecondaryCurrentLimit(Settings.Drive.kCurrentLimitAmps);
+        sparkMax.setSmartCurrentLimit(DriveModule.kCurrentLimitAmps);
+        sparkMax.setSecondaryCurrentLimit(DriveModule.kCurrentLimitAmps);
         // Set a peak current limit duration??
     }
 
@@ -179,8 +180,8 @@ public class NeoDriveHardware implements IDriveHardware {
          */
 //        motorController.enableVoltageCompensation(12.0);
         // No velocity measurement filter
-        motorController.setOpenLoopRampRate(Settings.Drive.kOpenLoopVoltageRampRate);
-        motorController.setClosedLoopRampRate(Settings.Drive.kClosedLoopVoltageRampRate);
+        motorController.setOpenLoopRampRate(DriveModule.kOpenLoopVoltageRampRate);
+        motorController.setClosedLoopRampRate(DriveModule.kClosedLoopVoltageRampRate);
         // motorController.configNeutralDeadband(0.04, 0);
     }
 
@@ -192,7 +193,7 @@ public class NeoDriveHardware implements IDriveHardware {
         mLogger.info("Reloading gains for Talon ID ", pSparkMax.getDeviceId());
 
         CANPIDController sparkMaxPid = pSparkMax.getPIDController();
-        HardwareUtils.setGains(sparkMaxPid, Settings.Drive.kVelocityPID);
+        HardwareUtils.setGains(sparkMaxPid, DriveModule.kVelocityPID);
     }
 
     private void configSparkForSmartMotion(CANSparkMax talon) {
@@ -200,11 +201,11 @@ public class NeoDriveHardware implements IDriveHardware {
     }
 
     public double getLeftInches() {
-        return Conversions.ticksToInches(mLeftMaster.getEncoder().getPosition());
+        return DriveModule.Conversions.ticksToInches(mLeftMaster.getEncoder().getPosition());
     }
 
     public double getRightInches() {
-        return Conversions.ticksToInches(mRightMaster.getEncoder().getPosition());
+        return DriveModule.Conversions.ticksToInches(mRightMaster.getEncoder().getPosition());
     }
 
     public double getLeftVelTicks() {
@@ -232,11 +233,11 @@ public class NeoDriveHardware implements IDriveHardware {
     }
 
     public double getLeftVelInches() {
-        return Conversions.ticksPer100msToRadiansPerSecond(getLeftVelTicks());
+        return DriveModule.Conversions.ticksPer100msToRadiansPerSecond(getLeftVelTicks());
     }
 
     public double getRightVelInches() {
-        return Conversions.ticksPer100msToRadiansPerSecond(getRightVelTicks());
+        return DriveModule.Conversions.ticksPer100msToRadiansPerSecond(getRightVelTicks());
     }
 
     @Override

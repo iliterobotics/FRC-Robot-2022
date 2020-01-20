@@ -5,8 +5,8 @@ import com.ctre.phoenix.motorcontrol.can.*;
 import com.ctre.phoenix.motorcontrol.*;
 
 import static us.ilite.common.types.input.ELogitech310.*;
-import us.ilite.robot.Robot;
 import static us.ilite.common.types.EFlywheelData.*;
+import us.ilite.robot.Robot;
 
 public class FlywheelPrototype extends Module{
     private final TalonFX master = new TalonFX(50);
@@ -28,16 +28,17 @@ public class FlywheelPrototype extends Module{
 
     @Override
     public void readInputs(double pNow) {
-        Robot.mData.flywheel.set(CURRENT_FLYWHEEL_VELOCITY, 0d);
+
+        Robot.DATA.flywheel.set(ACTUAL_FLYWHEEL_VELOCITY, 0d);
     }
 
     @Override
     public void setOutputs(double pNow) {
         master.set(
                 ControlMode.PercentOutput,
-                Robot.mData.driverinput.get(LEFT_Y_AXIS)
+                Robot.DATA.driverinput.get(LEFT_Y_AXIS)
         );
-        System.out.println("FLYWHEEL %: " + Robot.mData.driverinput.get(LEFT_Y_AXIS));
+        System.out.println("FLYWHEEL %: " + Robot.DATA.driverinput.get(LEFT_Y_AXIS));
     }
 
     @Override
