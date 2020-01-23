@@ -25,7 +25,7 @@ public class Settings extends NetworkTablesConstantsBase {
 
     public static int sCODEX_COMMS_PORT = 5805;
     public static int kShooterID;
-    public static int kAccelerator;
+    public static int kAcceleratorID;
     public static int kAnglerID;
     public static int kTurretID;
 

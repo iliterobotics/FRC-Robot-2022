@@ -1,10 +1,10 @@
 package us.ilite.robot.modules;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
@@ -13,6 +13,7 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.types.EFlywheelData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ETrackingType;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
 public class FlywheelModule extends Module {
@@ -24,13 +25,18 @@ public class FlywheelModule extends Module {
     private CANSparkMax mAccelerator;
     private EShooterState mShooterState;
     private Limelight mLimelight;
+    private PigeonIMU mGyro;
+    private PIDController mTurretAnglePid;
+    private ETrackingType mTrackingType;
 
-    private double mDesiredOutput;
+    private final double kTurretTurnRate = 0.05;
+
+    private double mDesiredOutput = 75;
     private double distanceToTarget;
 
     public FlywheelModule(Data pData) {
-            mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mAccelerator = SparkMaxFactory.createDefaultSparkMax(Settings.kAccelerator, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mAccelerator = SparkMaxFactory.createDefaultSparkMax(Settings.kAcceleratorID, CANSparkMaxLowLevel.MotorType.kBrushless);
         mAngler = new Servo(Settings.kAnglerID);
         mTurret = new TalonSRX(Settings.kTurretID);
         mData = pData;
@@ -52,22 +58,29 @@ public class FlywheelModule extends Module {
 
     public EShooterState getShooterState() { return mShooterState; }
 
-    public void shoot() { mShooter.set(mDesiredOutput); }
-
-//    public void feed() { mAccelerator.set(Settings.Shooter.kMaxAcceleratorVelocity); }
-//
-    private void angle() {
-        if ( mData.limelight.get(ETargetingData.ty) != null ) {
-            distanceToTarget = mLimelight.calcTargetDistance(62); // inner port is 98.25
-            mAngler.set(distanceToTarget / 15); // Under Review
-        }
-        else {
-            //mAngler.setAngle(Settings.Shooter.kBaseAngle);
+    public void shoot() {
+        if ( getShooterState().equals( EShooterState.SHOOT ) )
+        {
+            mShooter.set(mDesiredOutput);
         }
     }
 
-    public void turnTurret() {
+    private void angle() {
+        if ( mData.flywheel.get(EFlywheelData.CURRENT_LIMELIGHT_TARGET).equals(ETrackingType.TARGET) ) {
+            if ( mData.limelight.get(ETargetingData.ty) != null ) {
+                distanceToTarget = mLimelight.calcTargetDistance(62); // inner port is 98.25
+                mAngler.set(distanceToTarget / 15); // Math to be changed
+            }
+        }
+    }
 
+    public void turnTurret(double pTime) {
+        if ( mData.limelight.get(ETargetingData.tv) == null ) {
+            mTurret.set(ControlMode.PercentOutput, kTurretTurnRate );
+        }
+        else {
+            mTurretAnglePid.calculate(-1 * mData.limelight.get(ETargetingData.tx), pTime ); // To be tuned
+        }
     }
 
     @Override
@@ -80,10 +93,14 @@ public class FlywheelModule extends Module {
         mData.flywheel.set(EFlywheelData.CURRENT_FLYWHEEL_STATE, (double) getShooterState().ordinal());
         mData.flywheel.set(EFlywheelData.TARGET_FLYWHEEL_STATE, (double) mShooterState.ordinal());
         mData.flywheel.set(EFlywheelData.CURRENT_FLYWHEEL_VELOCITY, mShooter.getEncoder().getVelocity());
+        mData.flywheel.set(EFlywheelData.CURRENT_LIMELIGHT_TARGET, (double) mTrackingType.ordinal() );
     }
 
     @Override
     public void setOutputs(double pNow) {
+        shoot();
+        angle();
+        turnTurret(pNow);
         SmartDashboard.putNumber("Hood Angle", mAngler.getAngle());
     }
 
