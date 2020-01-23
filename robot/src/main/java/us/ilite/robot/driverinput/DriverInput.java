@@ -150,26 +150,21 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     }
 
     private void updateDJBooth() {
-        if ( mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL) &&
-                mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
-            DriverStation.reportError("----------------------------Position and Rotation Control Detected------------------------------", false);
+        if ( mDriverInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL) &&
+                mDriverInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
             djBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
             djBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
         }
-        else if (mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL)) {
-            DriverStation.reportError("----------------------------Position Control Detected------------------------------", false);
+        else if (mDriverInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL)) {
             djBoothPositionControl.setDesiredColorState( DJBoothPositionControl.ColorState.RED );
             djBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.ON );
         }
-        else if (mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
-            DriverStation.reportError("----------------------------Rotation Control Detected------------------------------", false);
+        else if (mDriverInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
             djBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.ON );
         }
         else {
             djBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
             djBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
-            DriverStation.reportError("----------------------------DJBooth is updating------------------------------", false);
-
         }
     }
 
