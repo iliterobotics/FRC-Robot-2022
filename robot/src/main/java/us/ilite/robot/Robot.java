@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
     private final TestController mTestController = new TestController();
-    private AbstractController mActiveController = null;
+   // private AbstractController mActiveController = null;
 
 
     @Override
@@ -124,7 +124,7 @@ public class Robot extends TimedRobot {
         mLogger.info("Disabled Initialization");
         mRunningModules.shutdown(mClock.getCurrentTime());
         mCSVLogger.stop(); // stop csv logging
-        mActiveController = null;
+      //  mActiveController = null;
     }
 
     @Override
@@ -133,7 +133,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        mActiveController = mTestController;
+ //       mActiveController = mTestController;
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
@@ -155,7 +155,7 @@ public class Robot extends TimedRobot {
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
         mRunningModules.readInputs(mClock.getCurrentTime());
-        mActiveController.update(mClock.getCurrentTime());
+     //   mActiveController.update(mClock.getCurrentTime());
         mRunningModules.setOutputs(mClock.getCurrentTime());
 //        mData.sendCodicesToNetworkTables();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);

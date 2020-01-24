@@ -25,7 +25,7 @@ public class Settings extends NetworkTablesConstantsBase {
 
     public static int sCODEX_COMMS_PORT = 5805;
     public static double kIntakeTalonPower = 1d;
-    public static int kCANIntakeID = 0; // Change later
+    public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
     public static int kTalonOneID; // Change later
     public static int kTalonTwoID; // Change later
     public static int kTalonThreeID; // Change later
