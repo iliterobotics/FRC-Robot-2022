@@ -74,6 +74,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         If the driver started the commands that the superstructure is running and then released the button,
         stop running commands.
         */
+        updateIntake();
 
 
     }
