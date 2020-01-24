@@ -150,16 +150,16 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     }
 
     private void updateDJBooth() {
-        if ( mDriverInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL) &&
-                mDriverInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
+        if ( mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL) &&
+                mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
             djBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
             djBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
         }
-        else if (mDriverInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL)) {
-            djBoothPositionControl.setDesiredColorState( DJBoothPositionControl.ColorState.RED );
+        else if (mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_POSITION_CONTROL)) {
             djBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.ON );
+            djBoothPositionControl.setDesiredColorState( DJBoothPositionControl.ColorState.RED );
         }
-        else if (mDriverInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
+        else if (mOperatorInputCodex.isSet(DriveTeamInputMap.OPERATOR_ROTATION_CONTROL) ) {
             djBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.ON );
         }
         else {

@@ -86,6 +86,7 @@ public class DJBoothPositionControl implements ICommand {
             else {
                 victorSPX.set(ControlMode.PercentOutput, 0d);
                 mSolidStateCounter++;
+
                 if ( mSolidStateCounter >= 5 ) {
                     mIsDone = true;
                     return true;

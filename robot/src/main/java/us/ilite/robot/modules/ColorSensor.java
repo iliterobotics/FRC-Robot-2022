@@ -53,12 +53,19 @@ public class ColorSensor extends Module{
 //        ColorMatchResult matchOther = m_colorMatcher.matchClosestColor(detectedColorOther);
 //        String colorStringOther = getColorStringForMatchResult(matchOther);
 //        SmartDashboard.putString( "Detected Color on B: ", colorStringOther );
+<<<<<<< HEAD
 =======
         SmartDashboard.putString( "Detected Color: ", colorString );
         SmartDashboard.putNumber("Red: ",detectedColor.red);
         SmartDashboard.putNumber("Green: ",detectedColor.green);
         SmartDashboard.putNumber("Blue: ",detectedColor.blue);
 >>>>>>> e063a2da... Added Smartdashboard to RGB.
+=======
+//        SmartDashboard.putString( "Detected Color: ", colorString );
+//        SmartDashboard.putNumber("Red: ",detectedColor.red);
+//        SmartDashboard.putNumber("Green: ",detectedColor.green);
+//        SmartDashboard.putNumber("Blue: ",detectedColor.blue);
+>>>>>>> 40bfa3ea... Joystick doesn't work again
     }
 
     protected static String getColorStringForMatchResult(ColorMatchResult match) {
