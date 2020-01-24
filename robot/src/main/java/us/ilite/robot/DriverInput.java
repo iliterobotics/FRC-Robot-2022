@@ -56,6 +56,14 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     }
 
+    public DriverInput(DriveModule pDrive, Limelight pLimelight, Data pData, PowerCellModule pIntake) {
+        super();
+        this.mDrive = pDrive;
+        this.mLimelight = pLimelight;
+        this.mData = pData;
+        this.mIntake = pIntake;
+    }
+
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {

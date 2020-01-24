@@ -18,10 +18,7 @@ import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.GetLocalIP;
-import us.ilite.robot.modules.FlywheelPrototype;
-import us.ilite.robot.modules.ModuleList;
-import us.ilite.robot.modules.OperatorInput;
-import us.ilite.robot.modules.PowerCellModule;
+import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
 
@@ -30,19 +27,21 @@ import java.util.List;
 public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
-
+    private PowerCellModule mIntake = new PowerCellModule(DATA);
     private ModuleList mRunningModules = new ModuleList();
+    private DriveModule mDrive = new DriveModule();
+    private Limelight mLimelight = new Limelight(DATA);
     private Clock mClock = new Clock();
     public static final Data DATA = new Data();
     private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
-    private PowerCellModule mIntake = new PowerCellModule(DATA);
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private FlywheelPrototype mFlywheel;
     private OperatorInput mOI;
+    private DriverInput mDriverInput = new DriverInput( mDrive , mLimelight , DATA ,  mIntake );
 
     private MatchMetadata mMatchMeta = null;
 
@@ -112,6 +111,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        mRunningModules.addModule(mIntake);
+        mLogger.error("kasdjdaksljsadl;kjfdas;ld");
     }
 
     @Override
