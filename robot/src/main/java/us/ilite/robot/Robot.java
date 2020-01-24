@@ -111,6 +111,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        mRunningModules.addModule(mDriverInput);
         mRunningModules.addModule(mIntake);
         mLogger.error("kasdjdaksljsadl;kjfdas;ld");
     }
@@ -136,6 +137,7 @@ public class Robot extends TimedRobot {
     public void testInit() {
  //       mActiveController = mTestController;
         mRunningModules.clearModules();
+        mRunningModules.addModule(mDriverInput);
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
         mRunningModules.addModule(mIntake);
