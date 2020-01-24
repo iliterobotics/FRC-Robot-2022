@@ -70,6 +70,7 @@ public class PowerCellModule extends Module {
     @Override
     public void readInputs(double pNow) {
         mData.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , mCANMotor.getOutputCurrent());
+        mData.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , (double) returnIntakeState().ordinal());
 //        mData.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonOne.getOutputCurrent());
 //        mData.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT ,mTalonTwo.getOutputCurrent() );
 //
@@ -107,11 +108,6 @@ public class PowerCellModule extends Module {
         //setDesiredIntakeState(EIntakeState.INTAKE);
         mCANMotor.set(1.0);
     }
-
-    public void unjam(){
-        setDesiredIntakeState(EIntakeState.REVERSE);
-    }
-
     public double readBeamBreakerState(boolean isBroken){
         if ( isBroken ){
             return 1.0;
