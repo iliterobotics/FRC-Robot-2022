@@ -26,6 +26,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
 
     protected DriveModule mDrive;
+    private FlywheelModule mShooter;
     private CommandManager mTeleopCommandManager;
     private CommandManager mAutonomousCommandManager;
     private Limelight mLimelight;
@@ -42,10 +43,11 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     private ETrackingType mLastTrackingType = null;
 
-    public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
+    public DriverInput(DriveModule pDrivetrain, FlywheelModule pShooter, Limelight pLimelight, Data pData,
                        CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
                        boolean pSimulated) {
         this.mLimelight = pLimelight;
+        this.mShooter = pShooter;
         this.mData = pData;
         this.mTeleopCommandManager = pTeleopCommandManager;
         this.mAutonomousCommandManager = pAutonomousCommandManager;
@@ -76,10 +78,17 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     @Override
     public void setOutputs(double pNow) {
 
-       updateDriveTrain();
+       //updateDriveTrain();
     }
 
-
+    private void updateShooter() {
+        if (mDriverInputCodex.isSet(InputMap.DRIVER.SUB_WARP_AXIS)) {
+            mShooter.setShooterState(FlywheelModule.EShooterState.SHOOT);
+        }
+        else {
+            mShooter.setShooterState(FlywheelModule.EShooterState.STOP);
+        }
+    }
 
     private void updateDriveTrain() {
         double rotate = getTurn();

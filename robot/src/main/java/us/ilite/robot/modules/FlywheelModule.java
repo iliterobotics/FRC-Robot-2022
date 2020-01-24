@@ -24,27 +24,24 @@ public class FlywheelModule extends Module {
     private TalonSRX mTurret;
     private CANSparkMax mAccelerator;
     private EShooterState mShooterState;
-    private Limelight mLimelight;
-    private PigeonIMU mGyro;
-    private PIDController mTurretAnglePid;
-    private ETrackingType mTrackingType;
+    private PIDController mShooterPid;
+    private ETrackingType mTrackingType = ETrackingType.NONE;
 
     private final double kTurretTurnRate = 0.05;
 
-    private double mDesiredOutput = 75;
+    private double mPreviousTime= 0;
+    private double desiredServoAngle = 0;
     private double distanceToTarget;
+    private double shooterOutput = 0;
+    private double mTurretOutput;
 
     public FlywheelModule(Data pData) {
         mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
         mAccelerator = SparkMaxFactory.createDefaultSparkMax(Settings.kAcceleratorID, CANSparkMaxLowLevel.MotorType.kBrushless);
         mAngler = new Servo(Settings.kAnglerID);
         mTurret = new TalonSRX(Settings.kTurretID);
+        mShooterPid = new PIDController(Settings.kTurretAngleLockGains, 0, 1, Settings.kControlLoopPeriod );
         mData = pData;
-
-
-//        mShooter.getPIDController().setP(Settings.Shooter.kShooterPGain);
-//        mShooter.getPIDController().setFF(Settings.Shooter.kShooterFF);
-//        mShooter.getPIDController().setReference(mDesiredOutput, ControlType.kVelocity);
     }
 
     public enum EShooterState {
@@ -52,40 +49,47 @@ public class FlywheelModule extends Module {
         STOP
     }
 
- //   public boolean isMaxVelocity() { return mShooter.getEncoder().getVelocity() >= Settings.Shooter.kMaxShooterVelocity; }
+    public boolean isMaxVelocity() { return mShooter.getEncoder().getVelocity() >= 5000; }
+
+    public boolean targetValid() { return mData.limelight.get(ETargetingData.ty) != null; }
 
     public void setShooterState( EShooterState pShooterState ) { mShooterState = pShooterState; }
 
     public EShooterState getShooterState() { return mShooterState; }
 
-    public void shoot() {
-        if ( getShooterState().equals( EShooterState.SHOOT ) )
-        {
-            mShooter.set(mDesiredOutput);
+    private void hoodAngle() {
+        if ( mData.flywheel.get(EFlywheelData.CURRENT_LIMELIGHT_TARGET).equals((double)ETrackingType.TARGET.ordinal())) {
+            if (targetValid()) {
+                double targetHeight = mData.limelight.get(ETargetingData.ty);
+                desiredServoAngle = targetHeight * 90;
+            }
+            desiredServoAngle = 45;
         }
+        mAngler.set(desiredServoAngle);
     }
 
-    private void angle() {
-        if ( mData.flywheel.get(EFlywheelData.CURRENT_LIMELIGHT_TARGET).equals(ETrackingType.TARGET) ) {
-            if ( mData.limelight.get(ETargetingData.ty) != null ) {
-                distanceToTarget = mLimelight.calcTargetDistance(62); // inner port is 98.25
-                mAngler.set(distanceToTarget / 15); // Math to be changed
+    private void shoot(double pTime) {
+        if ( isMaxVelocity() ) {
+            mAccelerator.set(0.75);
+        }
+        if ( targetValid() ) {
+            if (mData.flywheel.get(EFlywheelData.CURRENT_FLYWHEEL_STATE).equals((double) EShooterState.SHOOT.ordinal())) {
+                mShooter.set(calcSpeedFromDistance(mData.limelight.get(ETargetingData.calcDistToTarget)));
             }
         }
+        else if ( mData.flywheel.get(EFlywheelData.CURRENT_FLYWHEEL_STATE).equals((double)EShooterState.SHOOT.ordinal()) ){
+            mShooterPid.calculate(2000, pTime - mPreviousTime);
+        }
+        mPreviousTime = pTime;
     }
 
-    public void turnTurret(double pTime) {
-        if ( mData.limelight.get(ETargetingData.tv) == null ) {
-            mTurret.set(ControlMode.PercentOutput, kTurretTurnRate );
-        }
-        else {
-            mTurretAnglePid.calculate(-1 * mData.limelight.get(ETargetingData.tx), pTime ); // To be tuned
-        }
+    private double calcSpeedFromDistance(double distance) {
+        return distance / 200 * Settings.kNeoMaxVelocity;
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        setShooterState(EShooterState.STOP);
+
     }
 
     @Override
@@ -98,10 +102,7 @@ public class FlywheelModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        shoot();
-        angle();
-        turnTurret(pNow);
-        SmartDashboard.putNumber("Hood Angle", mAngler.getAngle());
+        shoot(pNow);
     }
 
     @Override

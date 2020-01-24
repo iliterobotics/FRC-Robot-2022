@@ -24,10 +24,20 @@ public class Settings extends NetworkTablesConstantsBase {
     public static double kNetworkTableUpdateRate = 0.01;
 
     public static int sCODEX_COMMS_PORT = 5805;
+
+    public static ProfileGains kTurretAngleLockGains = new ProfileGains().p(0.0005);
+    public static ProfileGains kShooterGains = new ProfileGains().p(0.0005);
+
+    public static double kShooterTargetOutput = 0.5 * 7500;
+
+    public static int kTalonMaxVelocity = 1500; // probably needs readjustment
+    public static int kNeoMaxVelocity = 1500; // probably needs readjustments
     public static int kShooterID;
     public static int kAcceleratorID;
     public static int kAnglerID;
     public static int kTurretID;
+
+    public static double kTurretTurnRate = 0.05 * kTalonMaxVelocity;
 
     // ================================
     // System ID's
