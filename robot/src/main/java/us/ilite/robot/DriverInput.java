@@ -5,15 +5,18 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 import static us.ilite.robot.hardware.ECommonControlMode.*;
 
+import us.ilite.robot.commands.LimelightTargetLock;
 import us.ilite.robot.modules.Module;
 import us.ilite.robot.modules.*;
 
@@ -37,7 +40,11 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     protected Codex<Double, ELogitech310> mDriverInputCodex, mOperatorInputCodex;
 
+    private ETrackingType mTrackingType;
     private ETrackingType mLastTrackingType = null;
+
+    private double mLimelightZoomThreshold = 7.0;
+
 
     public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
                        CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
@@ -97,6 +104,47 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
         mDrive.setDriveMessage(driveMessage);
     }
+    private void updateLimelightTargetLock(double pNow) {
+        if ( mDriverInputCodex.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)){
+            if (mData.selectedTarget.get(ETargetingData.ty) != null) {
+                SmartDashboard.putNumber("Distance to Target", mLimelight.calcTargetDistance(72));
+            }
+            mTrackingType = ETrackingType.TARGET;
+        }
+        else if (mDriverInputCodex.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)){
+            if (mData.selectedTarget.get(ETargetingData.ty) != null) {
+                if (Math.abs(mData.selectedTarget.get(ETargetingData.tx)) < mLimelightZoomThreshold) {
+                    mLimelight.setTracking(ETrackingType.TARGET_ZOOM);
+                    System.out.println("ZOOMING");
+                } else {
+                    mLimelight.setTracking(ETrackingType.TARGET);
+                }
+            } else {
+                mTrackingType = ETrackingType.TARGET;
+            }
+        }
+        else if (mDriverInputCodex.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
+            mTrackingType = ETrackingType.BALL;
+        }
+        else if (mDriverInputCodex.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
+            mTrackingType = ETrackingType.BALL_DUAL;
+        }
+        else if (mDriverInputCodex.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
+            mTrackingType = ETrackingType.BALL_TRI;
+        }
+        else {
+            mTrackingType = ETrackingType.NONE;
+            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
+        }
+        if(!mTrackingType.equals(mLastTrackingType) && !mTrackingType.equals(ETrackingType.NONE)) {
+            mLog.error("Requesting command start");
+            mLog.error("Stopping teleop command queue");
+            mTeleopCommandManager.stopRunningCommands(pNow);
+            mTeleopCommandManager.startCommands(new LimelightTargetLock(mDrive, mLimelight, 2, mTrackingType, this, false).setStopWhenTargetLost(false));
+        }
+        mLastTrackingType = mTrackingType;
+    }
+
 
     @Override
     public void shutdown(double pNow) {

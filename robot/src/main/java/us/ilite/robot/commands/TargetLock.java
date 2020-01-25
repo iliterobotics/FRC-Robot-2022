@@ -27,6 +27,8 @@ public class TargetLock implements ICommand {
     private boolean mEndOnAlignment = true;
     private int mAlignedCount = 0;
     private boolean mHasAcquiredTarget = false;
+    private boolean mStopWhenTargetLost = true;
+
 
     public TargetLock(DriveModule pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
         this(pDrive, pAllowableError, pTrackingType, pCamera, pThrottleProvider, true);
@@ -108,6 +110,10 @@ public class TargetLock implements ICommand {
 
     public TargetLock setTargetSearchThrottleProvider(IThrottleProvider pThrottleProvider) {
         this.mTargetSearchThrottleProvider = pThrottleProvider;
+        return this;
+    }
+    public TargetLock setStopWhenTargetLost(boolean pStopWhenTargetLost) {
+        this.mStopWhenTargetLost = pStopWhenTargetLost;
         return this;
     }
 
