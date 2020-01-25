@@ -13,4 +13,5 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
     compile name: 'json-simple-1.1.1'
     compile name: 'poof-power-up-lib'
+    compile wpi.deps.wpilib()
 }

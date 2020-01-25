@@ -1,6 +1,7 @@
 apply plugin: "edu.wpi.first.GradleRIO"
 
 def ROBOT_MAIN_CLASS = "us.ilite.robot.Main"
+apply plugin: "edu.wpi.first.GradleRIO"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
@@ -52,8 +53,10 @@ dependencies {
 
     compile project(':common')
     implementation 'com.github.flybotix:highfrequencyrobots:' + HFRVER
+    compile 'com.github.Team319:BobTrajectory:master-SNAPSHOT'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
     implementation wpi.deps.wpilib()
+    compile wpi.deps.wpilib()
     
     testCompile "org.mockito:mockito-core:2.+"
 
