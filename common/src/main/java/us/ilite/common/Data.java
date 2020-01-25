@@ -38,6 +38,10 @@ public class Data {
     public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
     public final Codex<Double, EHangerData> hanger = Codex.of.thisEnum(EHangerData.class);
 
+    public final Codex<Double, ETargetingData> selectedTarget = Codex.of.thisEnum(ETargetingData.class);
+    public final Codex<Double, ERawTargetingData> rawLimelight = Codex.of.thisEnum(ERawTargetingData.class);
+
+
 
     public final Codex[] mAllCodexes = new Codex[] {
             imu, /*drivetrain,*/ driverinput, operatorinput, pdp, /*limelight,*/

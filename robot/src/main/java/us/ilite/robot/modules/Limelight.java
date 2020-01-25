@@ -27,6 +27,8 @@ public class Limelight extends Loop implements ITargetDataProvider {
 
     private final ILog mLog = Logger.createLog(Limelight.class);
     private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable("limelight");
+    public VisionTarget mVisionTarget = null;
+
 
     // =============================================================================
     // LimeLight Camera Constants
@@ -35,6 +37,9 @@ public class Limelight extends Loop implements ITargetDataProvider {
     public static double kHeightIn = 58.0;
     public static double kToBumperIn = 10.0;
     public static double kAngleDeg = 28.55;
+
+    public static double llFOVVertical = 49.7;
+    public static double llFOVHorizontal = 59.6;
 
     // Left angle coefficients for angle = a + bx + cx^2
     //    a	0.856905324060421
@@ -53,7 +58,6 @@ public class Limelight extends Loop implements ITargetDataProvider {
     public static double kRightCCoeff = -0.0437470770400814;
 
     private ETrackingType mTrackingType = null;
-    private VisionTarget mVisionTarget = null;
 
     public Limelight(Data pData) {
 
