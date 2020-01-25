@@ -2,12 +2,6 @@ package us.ilite.common.types;
 
 public enum ETrackingType {
 
-    /*
-    Target - 0
-    Cargo - 2
-    Line - 4
-    Add one to prioritize right-hand targets.
-    */
     NONE(0, 0, true),
     TARGET(1, 0, true),
     TARGET_ZOOM( 2, 0 , false),

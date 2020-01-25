@@ -18,6 +18,7 @@ import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.GetLocalIP;
+import us.ilite.robot.modules.CommandManager;
 import us.ilite.robot.modules.FlywheelPrototype;
 import us.ilite.robot.modules.ModuleList;
 import us.ilite.robot.modules.OperatorInput;
@@ -36,6 +37,7 @@ public class Robot extends TimedRobot {
     private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
+    private DriverInput mDriverInput = new DriverInput();
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -134,6 +136,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
+        mRunningModules.addModule(mDriverInput);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());

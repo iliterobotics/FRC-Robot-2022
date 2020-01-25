@@ -82,7 +82,7 @@ public class Limelight extends Loop implements ITargetDataProvider {
             Robot.DATA.limelight.set(ETargetingData.tshort,mTable.getEntry("tshort").getDouble(Double.NaN));
             Robot.DATA.limelight.set(ETargetingData.tlong,mTable.getEntry("tlong").getDouble(Double.NaN));
             Robot.DATA.limelight.set(ETargetingData.thoriz,mTable.getEntry("thoriz").getDouble(Double.NaN));
-            Robot. DATA.limelight.set(ETargetingData.tvert,mTable.getEntry("tvert").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ETargetingData.tvert,mTable.getEntry("tvert").getDouble(Double.NaN));
             if(mVisionTarget != null) {
 
                 Robot.DATA.limelight.set(ETargetingData.targetOrdinal, (double)mVisionTarget.ordinal());
