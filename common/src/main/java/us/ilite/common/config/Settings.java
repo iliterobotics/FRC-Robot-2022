@@ -1,6 +1,7 @@
 package us.ilite.common.config;
 
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import us.ilite.common.lib.control.PIDGains;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.NetworkTablesConstantsBase;
 import us.ilite.common.types.input.ELogitech310;
