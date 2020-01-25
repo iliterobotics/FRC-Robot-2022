@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.robot.DriverInput;
 import us.ilite.robot.Robot;
@@ -32,16 +32,19 @@ public class TestController extends AbstractController {
     }
 
     public void update(double pNow) {
+        updateLimelightTargetLock();
+    }
+    public void updateLimelightTargetLock(){
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)){
-            if (Robot.DATA.selectedTarget.get(ETargetingData.ty) != null) {
+            if (Robot.DATA.selectedTarget.get(ELimelightData.ty) != null) {
                 SmartDashboard.putNumber("Distance to Target", mLimelight.calcTargetDistance(72));
             }
             mTrackingType = ETrackingType.TARGET;
         }
         else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)){
-            if (Robot.DATA.selectedTarget.get(ETargetingData.ty) != null) {
-                if (Math.abs(Robot.DATA.selectedTarget.get(ETargetingData.tx)) < mLimelightZoomThreshold) {
-                    mLimelight.setTracking(ETrackingType.TARGET_ZOOM);
+            if (Robot.DATA.selectedTarget.get(ELimelightData.ty) != null) {
+                if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.tx)) < mLimelightZoomThreshold) {
+                    Robot.DATA.limelight.set(ELimelightData.LIMELIGHT_STATE , );
                     System.out.println("ZOOMING");
                 } else {
                     mLimelight.setTracking(ETrackingType.TARGET);
@@ -61,14 +64,15 @@ public class TestController extends AbstractController {
         }
         else {
             mTrackingType = ETrackingType.NONE;
-            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
+//            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
         }
         if(!mTrackingType.equals(mLastTrackingType) && !mTrackingType.equals(ETrackingType.NONE)) {
             mLog.error("Requesting command start");
             mLog.error("Stopping teleop command queue");
-            mTeleopCommandManager.stopRunningCommands(pNow);
-            mTeleopCommandManager.startCommands(new LimelightTargetLock(mDrive, mLimelight, 2, mTrackingType, this, false).setStopWhenTargetLost(false));
+//            mTeleopCommandManager.stopRunningCommands(pNow);
+//            mTeleopCommandManager.startCommands(new LimelightTargetLock(mDrive, mLimelight, 2, mTrackingType, this, false).setStopWhenTargetLost(false));
         }
         mLastTrackingType = mTrackingType;
+    }
     }
 }

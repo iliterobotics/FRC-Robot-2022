@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ERawTargetingData;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
 
 import java.util.Optional;
@@ -80,9 +80,9 @@ public class Vision extends Module {
             mData.rawLimelight.set(ERawTargetingData.tvert1, mTable.getEntry("tvert1").getDouble(Double.NaN));
             mData.rawLimelight.set(ERawTargetingData.tvert2, mTable.getEntry("tvert2").getDouble(Double.NaN));
 
-            mData.rawLimelight.set(ERawTargetingData.targetOrdinal, mData.limelight.get(ETargetingData.targetOrdinal));
-            mData.rawLimelight.set(ERawTargetingData.calcDistToTarget, mData.limelight.get(ETargetingData.calcDistToTarget));
-            mData.rawLimelight.set(ERawTargetingData.calcAngleToTarget, mData.limelight.get(ETargetingData.calcAngleToTarget));
+            mData.rawLimelight.set(ERawTargetingData.targetOrdinal, mData.limelight.get(ELimelightData.targetOrdinal));
+            mData.rawLimelight.set(ERawTargetingData.calcDistToTarget, mData.limelight.get(ELimelightData.calcDistToTarget));
+            mData.rawLimelight.set(ERawTargetingData.calcAngleToTarget, mData.limelight.get(ELimelightData.calcAngleToTarget));
 
             if (mLimelight.mVisionTarget != null) {
                 Optional<Translation2d> p = mLimelight.calcTargetLocation(mLimelight.mVisionTarget);
@@ -104,8 +104,8 @@ public class Vision extends Module {
         mData.selectedTarget.reset();
 
         if (mTrackingType.equals(ETrackingType.BALL)) {
-            mData.selectedTarget.set(ETargetingData.tv, mData.rawLimelight.get(ERawTargetingData.tv));
-            boolean targetValid = mData.selectedTarget.isSet(ETargetingData.tv);
+            mData.selectedTarget.set(ELimelightData.tv, mData.rawLimelight.get(ERawTargetingData.tv));
+            boolean targetValid = mData.selectedTarget.isSet(ELimelightData.tv);
             if (targetValid) {
                 if (!isTracking) {
                     if (abs(mData.rawLimelight.get(ERawTargetingData.ty0) - mData.rawLimelight.get(ERawTargetingData.ty1)) < acceptableError) {
@@ -117,33 +117,33 @@ public class Vision extends Module {
                 }
 
                 System.out.println("Selected Target" + selectedTarget);
-                mData.selectedTarget.set(ETargetingData.tx, mTable.getEntry("tx" + selectedTarget).getDouble(Double.NaN) * (Limelight.llFOVHorizontal / 2));
-                mData.selectedTarget.set(ETargetingData.ty, mTable.getEntry("ty" + selectedTarget).getDouble(Double.NaN) * (Limelight.llFOVVertical / 2));
-                mData.selectedTarget.set(ETargetingData.ta, mTable.getEntry("ta" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ETargetingData.ts, mTable.getEntry("ts" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ETargetingData.tl, mData.rawLimelight.get(ERawTargetingData.tl));
-                mData.selectedTarget.set(ETargetingData.tshort, mTable.getEntry("tshort" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ETargetingData.tlong, mTable.getEntry("tlong" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ETargetingData.thoriz, mTable.getEntry("thor" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ETargetingData.tvert, mTable.getEntry("tvert" + selectedTarget).getDouble(Double.NaN));
+                mData.selectedTarget.set(ELimelightData.tx, mTable.getEntry("tx" + selectedTarget).getDouble(Double.NaN) * (Limelight.llFOVHorizontal / 2));
+                mData.selectedTarget.set(ELimelightData.ty, mTable.getEntry("ty" + selectedTarget).getDouble(Double.NaN) * (Limelight.llFOVVertical / 2));
+                mData.selectedTarget.set(ELimelightData.ta, mTable.getEntry("ta" + selectedTarget).getDouble(Double.NaN));
+                mData.selectedTarget.set(ELimelightData.ts, mTable.getEntry("ts" + selectedTarget).getDouble(Double.NaN));
+                mData.selectedTarget.set(ELimelightData.tl, mData.rawLimelight.get(ERawTargetingData.tl));
+                mData.selectedTarget.set(ELimelightData.tshort, mTable.getEntry("tshort" + selectedTarget).getDouble(Double.NaN));
+                mData.selectedTarget.set(ELimelightData.tlong, mTable.getEntry("tlong" + selectedTarget).getDouble(Double.NaN));
+                mData.selectedTarget.set(ELimelightData.thoriz, mTable.getEntry("thor" + selectedTarget).getDouble(Double.NaN));
+                mData.selectedTarget.set(ELimelightData.tvert, mTable.getEntry("tvert" + selectedTarget).getDouble(Double.NaN));
 
-                mData.selectedTarget.set(ETargetingData.targetOrdinal, mData.rawLimelight.get(ERawTargetingData.targetOrdinal));
-                mData.selectedTarget.set(ETargetingData.calcDistToTarget, mData.rawLimelight.get(ERawTargetingData.calcDistToTarget));
-                mData.selectedTarget.set(ETargetingData.calcAngleToTarget, mData.rawLimelight.get(ERawTargetingData.calcAngleToTarget));
+                mData.selectedTarget.set(ELimelightData.targetOrdinal, mData.rawLimelight.get(ERawTargetingData.targetOrdinal));
+                mData.selectedTarget.set(ELimelightData.calcDistToTarget, mData.rawLimelight.get(ERawTargetingData.calcDistToTarget));
+                mData.selectedTarget.set(ELimelightData.calcAngleToTarget, mData.rawLimelight.get(ERawTargetingData.calcAngleToTarget));
 
-                mData.selectedTarget.set(ETargetingData.calcTargetX, mData.rawLimelight.get(ERawTargetingData.calcTargetX));
-                mData.selectedTarget.set(ETargetingData.calcTargetY, mData.rawLimelight.get(ERawTargetingData.calcTargetY));
+                mData.selectedTarget.set(ELimelightData.calcTargetX, mData.rawLimelight.get(ERawTargetingData.calcTargetX));
+                mData.selectedTarget.set(ELimelightData.calcTargetY, mData.rawLimelight.get(ERawTargetingData.calcTargetY));
 
                 System.out.println("last tx and ty: " + lastXPosition + ", " + lastYPosition);
-                System.out.println("current tx and ty: " + mData.selectedTarget.get(ETargetingData.tx) + ", " + mData.selectedTarget.get(ETargetingData.ty));
-                if (abs(lastXPosition - mData.selectedTarget.get(ETargetingData.tx)) > acceptableXError || abs(lastYPosition - mData.selectedTarget.get(ETargetingData.ty)) > acceptableYError) {
+                System.out.println("current tx and ty: " + mData.selectedTarget.get(ELimelightData.tx) + ", " + mData.selectedTarget.get(ELimelightData.ty));
+                if (abs(lastXPosition - mData.selectedTarget.get(ELimelightData.tx)) > acceptableXError || abs(lastYPosition - mData.selectedTarget.get(ELimelightData.ty)) > acceptableYError) {
                     isTracking = false;
                 }
-                lastXPosition = mData.selectedTarget.get(ETargetingData.tx);
-                lastYPosition = mData.selectedTarget.get(ETargetingData.ty);
+                lastXPosition = mData.selectedTarget.get(ELimelightData.tx);
+                lastYPosition = mData.selectedTarget.get(ELimelightData.ty);
             }
         } else {          //set selectedTarget codex straight from limelight codex
-            for (ETargetingData e : EnumUtils.getEnums(ETargetingData.class)) {
+            for (ELimelightData e : EnumUtils.getEnums(ELimelightData.class)) {
                 mData.selectedTarget.set(e, mData.limelight.get(e));
             }
 //            System.out.println("SELECTED TARGET FROM LIMELIGHT");

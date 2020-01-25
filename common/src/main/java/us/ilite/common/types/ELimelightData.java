@@ -3,7 +3,7 @@ package us.ilite.common.types;
 
 import com.flybotix.hfr.codex.CodexOf;
 
-public enum ETargetingData implements CodexOf<Double> {
+public enum ELimelightData implements CodexOf<Double> {
     // TODO - document what these values represent
     tv,
     tx,
@@ -20,5 +20,7 @@ public enum ETargetingData implements CodexOf<Double> {
     calcDistToTarget,
     calcAngleToTarget,
     calcTargetX,
-    calcTargetY
+    calcTargetY,
+
+    LIMELIGHT_STATE;
 }

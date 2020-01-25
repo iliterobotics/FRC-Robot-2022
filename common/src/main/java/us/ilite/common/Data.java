@@ -30,7 +30,7 @@ public class Data {
     public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
-    public final Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
+    public final Codex<Double, ELimelightData> limelight = Codex.of.thisEnum(ELimelightData.class);
 
     public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
     public final Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
@@ -38,7 +38,7 @@ public class Data {
     public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
     public final Codex<Double, EHangerData> hanger = Codex.of.thisEnum(EHangerData.class);
 
-    public final Codex<Double, ETargetingData> selectedTarget = Codex.of.thisEnum(ETargetingData.class);
+    public final Codex<Double, ELimelightData> selectedTarget = Codex.of.thisEnum(ELimelightData.class);
     public final Codex<Double, ERawTargetingData> rawLimelight = Codex.of.thisEnum(ERawTargetingData.class);
 
 

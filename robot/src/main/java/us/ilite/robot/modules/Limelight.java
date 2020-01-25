@@ -14,10 +14,10 @@ import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.config.Settings.VisionTarget;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
 
-import static us.ilite.common.types.ETargetingData.*;
+import static us.ilite.common.types.ELimelightData.*;
 
 import us.ilite.robot.Robot;
 import us.ilite.robot.loops.Loop;
@@ -71,27 +71,27 @@ public class Limelight extends Loop implements ITargetDataProvider {
     @Override
     public void readInputs(double pNow) {
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
-        Robot.DATA.limelight.set(ETargetingData.tv, targetValid ? 1.0d : null);
+        Robot.DATA.limelight.set(ELimelightData.tv, targetValid ? 1.0d : null);
 
         if(targetValid) {
-            Robot.DATA.limelight.set(ETargetingData.tx, mTable.getEntry("tx").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.ty,mTable.getEntry("ty").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.ta,mTable.getEntry("ta").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.ts,mTable.getEntry("ts").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.tl,mTable.getEntry("tl").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.tshort,mTable.getEntry("tshort").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.tlong,mTable.getEntry("tlong").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.thoriz,mTable.getEntry("thoriz").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.tvert,mTable.getEntry("tvert").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.tx, mTable.getEntry("tx").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.ty,mTable.getEntry("ty").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.ta,mTable.getEntry("ta").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.ts,mTable.getEntry("ts").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.tl,mTable.getEntry("tl").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.tshort,mTable.getEntry("tshort").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.tlong,mTable.getEntry("tlong").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.thoriz,mTable.getEntry("thoriz").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.tvert,mTable.getEntry("tvert").getDouble(Double.NaN));
             if(mVisionTarget != null) {
 
-                Robot.DATA.limelight.set(ETargetingData.targetOrdinal, (double)mVisionTarget.ordinal());
-                Robot.DATA.limelight.set(ETargetingData.calcDistToTarget, calcTargetDistance(mVisionTarget));
+                Robot.DATA.limelight.set(ELimelightData.targetOrdinal, (double)mVisionTarget.ordinal());
+                Robot.DATA.limelight.set(ELimelightData.calcDistToTarget, calcTargetDistance(mVisionTarget));
                 Robot.DATA.limelight.set(calcAngleToTarget, calcTargetApproachAngle());
                 Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
                 if(p.isPresent()) {
-                    Robot.DATA.limelight.set(ETargetingData.calcTargetX, p.get().getX());
-                    Robot.DATA.limelight.set(ETargetingData.calcTargetY, p.get().getY());
+                    Robot.DATA.limelight.set(ELimelightData.calcTargetX, p.get().getX());
+                    Robot.DATA.limelight.set(ELimelightData.calcTargetY, p.get().getY());
                 }
             }
         }
@@ -173,7 +173,7 @@ public class Limelight extends Loop implements ITargetDataProvider {
     }
 
     @Override
-    public Codex<Double, ETargetingData> getTargetingData() {
+    public Codex<Double, ELimelightData> getTargetingData() {
         return Robot.DATA.limelight;
     }
 

@@ -1,7 +1,7 @@
 package us.ilite.robot.commands;
 
 import us.ilite.common.Data;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.robot.modules.Limelight;
 
@@ -26,9 +26,9 @@ public class WaitForVisionTarget implements ICommand {
     public boolean update(double pNow) {
 
         // If target is valid
-        if(mData.limelight.isSet(ETargetingData.tv)) {
+        if(mData.limelight.isSet(ELimelightData.tv)) {
             // If area above threshold exit command
-            if(mData.limelight.get(ETargetingData.ta) > mTargetAreaThreshold) {
+            if(mData.limelight.get(ELimelightData.ta) > mTargetAreaThreshold) {
                 return true;
             }
         }

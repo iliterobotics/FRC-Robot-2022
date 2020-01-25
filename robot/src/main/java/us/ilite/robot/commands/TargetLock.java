@@ -3,7 +3,7 @@ package us.ilite.robot.commands;
 import com.flybotix.hfr.codex.Codex;
 
 import us.ilite.common.config.Settings;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
@@ -59,22 +59,22 @@ public class TargetLock implements ICommand {
 
     @Override
     public boolean update(double pNow) {
-        Codex<Double, ETargetingData> currentData = mCamera.getTargetingData();
+        Codex<Double, ELimelightData> currentData = mCamera.getTargetingData();
 
         mDrive.setTargetTrackingThrottle(mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
 
-        if(currentData != null && currentData.isSet(ETargetingData.tv) && currentData.get(ETargetingData.tx) != null) {
+        if(currentData != null && currentData.isSet(ELimelightData.tv) && currentData.get(ELimelightData.tx) != null) {
             mHasAcquiredTarget = true;
 
             mAlignedCount++;
-            if(mEndOnAlignment && Math.abs(currentData.get(ETargetingData.tx)) < mAllowableError && mAlignedCount > kAlignCount) {
+            if(mEndOnAlignment && Math.abs(currentData.get(ELimelightData.tx)) < mAllowableError && mAlignedCount > kAlignCount) {
                 System.out.println("FINISHED");
                 // Zero drivetrain outputs in shutdown()
                 return true;
             }
 
         // If we've already seen the target and lose tracking, exit.
-        } else if(mHasAcquiredTarget && !currentData.isSet(ETargetingData.tv)) {
+        } else if(mHasAcquiredTarget && !currentData.isSet(ELimelightData.tv)) {
             return true;
         }
 //        if(!mHasAcquiredTarget){

@@ -10,7 +10,7 @@ import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
@@ -106,14 +106,14 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     }
     private void updateLimelightTargetLock(double pNow) {
         if ( mDriverInputCodex.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)){
-            if (mData.selectedTarget.get(ETargetingData.ty) != null) {
+            if (mData.selectedTarget.get(ELimelightData.ty) != null) {
                 SmartDashboard.putNumber("Distance to Target", mLimelight.calcTargetDistance(72));
             }
             mTrackingType = ETrackingType.TARGET;
         }
         else if (mDriverInputCodex.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)){
-            if (mData.selectedTarget.get(ETargetingData.ty) != null) {
-                if (Math.abs(mData.selectedTarget.get(ETargetingData.tx)) < mLimelightZoomThreshold) {
+            if (mData.selectedTarget.get(ELimelightData.ty) != null) {
+                if (Math.abs(mData.selectedTarget.get(ELimelightData.tx)) < mLimelightZoomThreshold) {
                     mLimelight.setTracking(ETrackingType.TARGET_ZOOM);
                     System.out.println("ZOOMING");
                 } else {

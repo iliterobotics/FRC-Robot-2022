@@ -4,7 +4,7 @@ import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.util.Utils;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
@@ -42,7 +42,7 @@ public class DriveToVisionTarget implements ICommand {
     public void init(double pNow) {
         mHasAcquiredTarget = false;
         mHeadingController.reset();
-        mInitialTargetAngle = mData.limelight.get(ETargetingData.tx);
+        mInitialTargetAngle = mData.limelight.get(ELimelightData.tx);
     }
 
     @Override
@@ -51,13 +51,13 @@ public class DriveToVisionTarget implements ICommand {
         /*
          We either drove into the target and lost sight of it (meaning we're done) or we never had sight of it to begin with (in which case we quit)
          */
-        if(!mData.limelight.isSet(ETargetingData.tv)) {
+        if(!mData.limelight.isSet(ELimelightData.tv)) {
             return true;
         }
 
         // Target "distance" is just area - min_area, clamped to a maximum and minimum value
-        double distanceFromTarget = Utils.clamp(mData.limelight.get(ETargetingData.ta) - kMinTargetArea, kMinTargetArea, kMaxTargetArea);
-        double angleToTarget = mData.limelight.get(ETargetingData.tx);
+        double distanceFromTarget = Utils.clamp(mData.limelight.get(ELimelightData.ta) - kMinTargetArea, kMinTargetArea, kMaxTargetArea);
+        double angleToTarget = mData.limelight.get(ELimelightData.tx);
 
         // Only adjust target angle if we are far away
         if(distanceFromTarget < kAngleAdjustDistanceThreshold) {

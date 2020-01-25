@@ -9,8 +9,8 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ETargetingData;
-import static us.ilite.common.types.ETargetingData.*;
+import us.ilite.common.types.ELimelightData;
+import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -149,7 +149,7 @@ public class DriveModule extends Loop {
 			case PATH_FOLLOWING:
 			case TARGET_ANGLE_LOCK:
 
-				Codex<Double, ETargetingData> targetData = Robot.DATA.limelight;
+				Codex<Double, ELimelightData> targetData = Robot.DATA.limelight;
 				double pidOutput;
 				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(tv) && targetData.get(tx) != null) {
 
