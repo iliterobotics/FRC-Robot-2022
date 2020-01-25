@@ -38,21 +38,24 @@ public class Robot extends TimedRobot {
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
-    private FlywheelModule mFlywheel;
+    private FlywheelModule mShooter;
+    private DriveModule mDrive;
     private OperatorInput mOI;
+    private DriverInput mDI;
 
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final TestController mTestController = new TestController();
+    private final TestController mTestController = new TestController(mData, mShooter);
     private AbstractController mActiveController = null;
 
 
     @Override
     public void robotInit() {
-        mFlywheel = new FlywheelModule(mData);
+        mShooter = new FlywheelModule(mData, mLimelight);
         mOI = new OperatorInput();
+        mDI = new DriverInput(mDrive, mShooter, mLimelight, DATA, false);
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -132,7 +135,8 @@ public class Robot extends TimedRobot {
         mActiveController = mTestController;
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mFlywheel);
+        mRunningModules.addModule(mDI);
+        mRunningModules.addModule(mShooter);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
@@ -150,7 +154,7 @@ public class Robot extends TimedRobot {
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
         mRunningModules.readInputs(mClock.getCurrentTime());
-        mActiveController.update(mClock.getCurrentTime());
+//        mActiveController.update(mClock.getCurrentTime());
         mRunningModules.setOutputs(mClock.getCurrentTime());
 //        mData.sendCodicesToNetworkTables();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);

@@ -13,12 +13,13 @@ public class InputMap {
         NUDGE_SEEK_LEFT = ELogitech310.L_BTN,
         NUDGE_SEEK_RIGHT = ELogitech310.R_BTN,
 
-        TRACK_CARGO_BTN = ELogitech310.X_BTN,
-        TRACK_TARGET_BTN = ELogitech310.A_BTN,
-        TRACK_HATCH_BTN = ELogitech310.B_BTN
+//        TRACK_CARGO_BTN = ELogitech310.X_BTN,
+//        TRACK_TARGET_BTN = ELogitech310.A_BTN,
+//        TRACK_HATCH_BTN = ELogitech310.B_BTN;
 
-
-        ;
+        TARGET_LOCK = ELogitech310.A_BTN,
+        CELL_LOCK = ELogitech310.B_BTN,
+        FLYWHEEL_SHOOT = ELogitech310.RIGHT_TRIGGER_AXIS;
 
     }
 

@@ -1,12 +1,6 @@
 package us.ilite.robot.modules;
 
 import us.ilite.common.types.EMatchMode;
-import com.ctre.phoenix.motorcontrol.can.*;
-import com.ctre.phoenix.motorcontrol.*;
-
-import static us.ilite.common.types.input.ELogitech310.*;
-import static us.ilite.common.types.EFlywheelData.*;
-import us.ilite.robot.Robot;
 
 public class FlywheelPrototype extends Module{
 //    private final TalonFX master = new TalonFX(50);

@@ -44,13 +44,12 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private ETrackingType mLastTrackingType = null;
 
     public DriverInput(DriveModule pDrivetrain, FlywheelModule pShooter, Limelight pLimelight, Data pData,
-                       CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
                        boolean pSimulated) {
         this.mLimelight = pLimelight;
         this.mShooter = pShooter;
         this.mData = pData;
-        this.mTeleopCommandManager = pTeleopCommandManager;
-        this.mAutonomousCommandManager = pAutonomousCommandManager;
+//        this.mTeleopCommandManager = pTeleopCommandManager;
+//        this.mAutonomousCommandManager = pAutonomousCommandManager;
 
         this.mDriverInputCodex = mData.driverinput;
         this.mOperatorInputCodex = mData.operatorinput;
@@ -77,16 +76,32 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     @Override
     public void setOutputs(double pNow) {
-
-       //updateDriveTrain();
+        updateShooter();
+        updateDriveTrain();
+        updateLimelightTargetLock();
     }
 
     private void updateShooter() {
         if (mDriverInputCodex.isSet(InputMap.DRIVER.SUB_WARP_AXIS)) {
             mShooter.setShooterState(FlywheelModule.EShooterState.SHOOT);
+            mShooter.setAcceleratorState(FlywheelModule.EAcceleratorState.FEED);
         }
         else {
             mShooter.setShooterState(FlywheelModule.EShooterState.STOP);
+        }
+        mShooter.isGyro = !mDriverInputCodex.isSet(InputMap.DRIVER.TARGET_LOCK);
+
+    }
+
+    private void updateLimelightTargetLock() {
+        if ( mDriverInputCodex.isSet(InputMap.DRIVER.TARGET_LOCK) ) {
+            mTrackingType = ETrackingType.TARGET;
+        }
+        else if ( mDriverInputCodex.isSet(InputMap.DRIVER.CELL_LOCK) ) {
+            mTrackingType = ETrackingType.CELL;
+        }
+        else {
+            mTrackingType = ETrackingType.NONE;
         }
     }
 

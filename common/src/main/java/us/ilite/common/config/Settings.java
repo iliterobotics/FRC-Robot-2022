@@ -25,19 +25,31 @@ public class Settings extends NetworkTablesConstantsBase {
 
     public static int sCODEX_COMMS_PORT = 5805;
 
-    public static ProfileGains kTurretAngleLockGains = new ProfileGains().p(0.0005);
-    public static ProfileGains kShooterGains = new ProfileGains().p(0.0005);
-
     public static double kShooterTargetOutput = 0.5 * 7500;
 
-    public static int kTalonMaxVelocity = 1500; // probably needs readjustment
-    public static int kNeoMaxVelocity = 1500; // probably needs readjustments
-    public static int kShooterID;
-    public static int kAcceleratorID;
-    public static int kAnglerID;
-    public static int kTurretID;
 
-    public static double kTurretTurnRate = 0.05 * kTalonMaxVelocity;
+    public static int kMaxTalonVelocity = 1500; // probably needs readjustment
+    public static int kMaxNeoVelocity = 3750; // probably needs readjustments
+
+
+    public static double kAcceleratorTargetVelocity = 0.75 * kMaxTalonVelocity;
+    public static double kTurretTurnRate = 0.05 * kMaxTalonVelocity;
+
+    // =================================================================================
+    //  Shooter System
+    // =================================================================================
+
+    public static class ShooterSystem {
+
+        public static ProfileGains kTurretAngleLockGains = new ProfileGains().p(0.0005);
+        public static ProfileGains kShooterGains = new ProfileGains().p(0.0005);
+        public static int kShooterID = 16;
+        public static int kAcceleratorID;
+        public static int kAnglerID = 9;
+        public static int kTurretID = 9;
+        public static int kTurretGyroID = 1;
+
+    }
 
     // ================================
     // System ID's
@@ -103,9 +115,9 @@ public class Settings extends NetworkTablesConstantsBase {
         public static int kJoystickPortTester = 2;
     }
 
-    public static List<ELogitech310> kTeleopCommandTriggers = Arrays.asList(InputMap.DRIVER.TRACK_TARGET_BTN,
-                                                                            InputMap.DRIVER.TRACK_CARGO_BTN,
-                                                                            InputMap.DRIVER.TRACK_HATCH_BTN);
+//    public static List<ELogitech310> kTeleopCommandTriggers = Arrays.asList(InputMap.DRIVER.TRACK_TARGET_BTN,
+//                                                                            InputMap.DRIVER.TRACK_CARGO_BTN,
+//                                                                            InputMap.DRIVER.TRACK_HATCH_BTN);
 
     public static List<ELogitech310> kAutonOverrideTriggers = Arrays.asList(InputMap.DRIVER.THROTTLE_AXIS,
                                                                             InputMap.DRIVER.TURN_AXIS);
