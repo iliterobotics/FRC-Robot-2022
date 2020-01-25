@@ -96,18 +96,9 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         double rightSetpoint = driveMessage.getRightOutput();
         leftSetpoint = Math.abs(leftSetpoint) > 0.01 ? leftSetpoint : 0.0; //Handling Deadband
         rightSetpoint = Math.abs(rightSetpoint) > 0.01 ? rightSetpoint : 0.0; //Handling Deadband
-        Robot.DATA.drivetrain.set(EDriveData.LEFT_DEMAND, leftSetpoint * getMaxVelocity());
-        Robot.DATA.drivetrain.set(EDriveData.RIGHT_DEMAND, rightSetpoint * getMaxVelocity());
+        Robot.DATA.drivetrain.set(EDriveData.LEFT_DEMAND, leftSetpoint * Settings.Drive.kDriveTrainMaxVelocity);
+        Robot.DATA.drivetrain.set(EDriveData.RIGHT_DEMAND, rightSetpoint * Settings.Drive.kDriveTrainMaxVelocity);
 
-//        mDrive.setDriveMessage(driveMessage);
-    }
-
-    private double getMaxVelocity() {
-//        if (mData.driverinput.get(InputMap.DRIVER_NITRO_BUTTON) > 0.5) {
-//            return (42*5676/60) * 3;
-//        } else {
-            return Settings.Drive.kDriveTrainMaxVelocity;
-//        }
     }
 
     @Override

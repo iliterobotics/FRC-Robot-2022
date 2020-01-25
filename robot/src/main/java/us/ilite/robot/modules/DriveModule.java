@@ -83,14 +83,13 @@ public class DriveModule extends Loop {
 
 	private double mPreviousTime = 0;
 
-	boolean inited = false;
 	public DriveModule()
 	{
-//		if(AbstractSystemSettingsUtils.isPracticeBot()) {
-//
-//		} else {
+		if(AbstractSystemSettingsUtils.isPracticeBot()) {
+
+		} else {
 			this.mDriveHardware = new NeoDriveHardware(kGearboxRatio);
-//		}
+		}
 
 		this.mDriveHardware.init();
 	}
@@ -102,7 +101,6 @@ public class DriveModule extends Loop {
 		mTargetAngleLockPid.setSetpoint(0);
 		mTargetAngleLockPid.reset();
 		mDriveHardware.zero();
-		inited = true;
 	  	setDriveMessage(DriveMessage.kNeutral);
 	  	setDriveState(EDriveState.NORMAL);
 
@@ -127,14 +125,6 @@ public class DriveModule extends Loop {
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
-
-//		Robot.DATA.drivetrain.set(LEFT_DEMAND, 500.0);
-//		Robot.DATA.drivetrain.set(RIGHT_DEMAND, 500.0);
-
-
-
-
-//		SimpleNetworkTable.writeCodexToSmartDashboard(EDriveData.class, mData.drivetrain, mClock.getCurrentTime());
 	}
 
 	@Override
@@ -143,13 +133,6 @@ public class DriveModule extends Loop {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
-//        	System.out.println(Robot.DATA.drivetrain);
-
-        	mLogger.error("*********LEFT DEMAND: " + Robot.DATA.drivetrain.get(LEFT_DEMAND));
-			mLogger.error("*********RIGHT DEMAND: " + Robot.DATA.drivetrain.get(RIGHT_DEMAND));
-
-
-//			mLogger.error("*********DRIVE HARDWARE: " + mDriveHardware.getLeftVoltage());
 			((NeoDriveHardware)mDriveHardware).setTarget(Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
 		}
 

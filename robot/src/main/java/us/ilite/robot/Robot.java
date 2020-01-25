@@ -139,8 +139,8 @@ public class Robot extends TimedRobot {
         mActiveController = mTestController;
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-//        mRunningModules.addModule(mFlywheel);
         mRunningModules.addModule(mDI);
+        mRunningModules.addModule(mFlywheel);
         mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
