@@ -8,6 +8,8 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Conversions;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.DriveModule;
 
@@ -101,7 +103,11 @@ public class NeoDriveHardware implements IDriveHardware {
         // TODO - update arbitrary FF with the ProfileGains FF
         mLeftMaster.getPIDController().setReference(pDriveMessage.getLeftOutput(), mLeftControlMode, 1, 0);
         mRightMaster.getPIDController().setReference(pDriveMessage.getRightOutput(), mRightControlMode, 1, 0);
+    }
 
+    public void setTarget(double pLeftSetpoint, double pRightSetpoint) {
+        mLeftMaster.getPIDController().setReference(pLeftSetpoint, ControlType.kVelocity);
+        mRightMaster.getPIDController().setReference(pRightSetpoint, ControlType.kVelocity);
     }
 
     /**

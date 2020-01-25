@@ -70,6 +70,7 @@ public class Settings extends NetworkTablesConstantsBase {
     // Drive Train Constants
     // =============================================================================
     public static class Drive {
+        public static double kDriveTrainMaxVelocity = 5676;
     }
 
     public static class Input {

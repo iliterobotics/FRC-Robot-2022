@@ -8,10 +8,14 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.lib.util.SimpleNetworkTable;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
 import static us.ilite.common.types.ETargetingData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
+
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
 import us.ilite.robot.Robot;
@@ -113,16 +117,18 @@ public class DriveModule extends Loop {
 		Robot.DATA.drivetrain.set(LEFT_VEL_TICKS, (double)mDriveHardware.getLeftVelTicks());
 		Robot.DATA.drivetrain.set(RIGHT_VEL_TICKS, (double)mDriveHardware.getRightVelTicks());
 
+		mLogger.error(mDriveMessage);
+
 		Robot.DATA.drivetrain.set(LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
 		Robot.DATA.drivetrain.set(LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
 		Robot.DATA.drivetrain.set(LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
-//
-//		mData.imu.set(EGyro.YAW_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
 
-//		SimpleNetworkTable.writeCodexToSmartDashboard(EDriveData.class, mData.drivetrain, mClock.getCurrentTime());
+		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
+
+		SimpleNetworkTable.writeCodexToSmartDashboard(EDriveData.class, mData.drivetrain, mClock.getCurrentTime());
 	}
 
 	@Override
@@ -131,7 +137,8 @@ public class DriveModule extends Loop {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
-			mDriveHardware.set(mDriveMessage);
+//			mDriveHardware.set(mDriveMessage);
+//			((NeoDriveHardware)mDriveHardware).setTarget(Robot.DATA.drivetrain.get(EDriveData.LEFT_DEMAND), Robot.DATA.drivetrain.get(EDriveData.RIGHT_DEMAND));
 		}
 
 		mPreviousTime = pNow;

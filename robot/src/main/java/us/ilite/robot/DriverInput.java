@@ -10,6 +10,7 @@ import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETrackingType;
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 import static us.ilite.robot.hardware.ECommonControlMode.*;
@@ -40,12 +41,12 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private ETrackingType mLastTrackingType = null;
 
     public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
-                       CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
+                       //CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
                        boolean pSimulated) {
         this.mLimelight = pLimelight;
         this.mData = pData;
-        this.mTeleopCommandManager = pTeleopCommandManager;
-        this.mAutonomousCommandManager = pAutonomousCommandManager;
+//        this.mTeleopCommandManager = pTeleopCommandManager;
+//        this.mAutonomousCommandManager = pAutonomousCommandManager;
 
         this.mDriverInputCodex = mData.driverinput;
         this.mOperatorInputCodex = mData.operatorinput;
@@ -66,8 +67,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     @Override
     public void readInputs(double pNow) {
-        ELogitech310.map(mData.driverinput, mDriverJoystick);
-        ELogitech310.map(mData.operatorinput, mOperatorJoystick);
+        ELogitech310.map(Robot.DATA.driverinput, mDriverJoystick);
+        ELogitech310.map(Robot.DATA.operatorinput, mOperatorJoystick);
     }
 
     @Override
@@ -76,6 +77,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         If the driver started the commands that the superstructure is running and then released the button,
         stop running commands.
         */
+        updateDriveTrain();
 
 
     }
@@ -94,8 +96,20 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         }
 
         DriveMessage driveMessage = new DriveMessage().throttle(throttle).turn(rotate).mode(PERCENT_OUTPUT).normalize().calculateCurvature();
+        double leftSetpoint = driveMessage.getLeftOutput() * getMaxVelocity();
+        double rightSetpoint = driveMessage.getRightOutput() * getMaxVelocity();
+        Robot.DATA.drivetrain.set(EDriveData.LEFT_DEMAND, leftSetpoint);
+        Robot.DATA.drivetrain.set(EDriveData.LEFT_DEMAND, rightSetpoint);
 
-        mDrive.setDriveMessage(driveMessage);
+//        mDrive.setDriveMessage(driveMessage);
+    }
+
+    private double getMaxVelocity() {
+//        if (mData.driverinput.get(InputMap.DRIVER_NITRO_BUTTON) > 0.5) {
+//            return (42*5676/60) * 3;
+//        } else {
+            return Settings.Drive.kDriveTrainMaxVelocity;
+//        }
     }
 
     @Override
