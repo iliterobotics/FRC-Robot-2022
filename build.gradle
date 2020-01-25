@@ -21,7 +21,6 @@ allprojects {
 
 subprojects {
     apply plugin: "java"
-    apply plugin: "edu.wpi.first.GradleRIO"
     apply plugin: 'pmd'
     pmd {
         ignoreFailures = true
@@ -40,7 +39,6 @@ subprojects {
     }
 
     dependencies {
-        compile wpi.deps.wpilib()
         testCompile 'junit:junit:4.12'
     }
 
