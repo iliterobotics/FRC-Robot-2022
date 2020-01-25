@@ -1,5 +1,6 @@
 package us.ilite.robot.hardware;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANPIDController;
@@ -28,6 +29,7 @@ public class NeoDriveHardware implements IDriveHardware {
         kGearRatio = pGearRatio;
 //        mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
         // mGyro = new NavX(SerialPort.Port.kMXP);
+        mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
 
         mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
         mLeftMiddle = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kDriveLeftMiddle, mLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -106,8 +108,8 @@ public class NeoDriveHardware implements IDriveHardware {
     }
 
     public void setTarget(double pLeftSetpoint, double pRightSetpoint) {
-        mLeftMaster.getPIDController().setReference(pLeftSetpoint, ControlType.kVelocity);
-        mRightMaster.getPIDController().setReference(pRightSetpoint, ControlType.kVelocity);
+        mLeftMaster.getPIDController().setReference(pLeftSetpoint, ControlType.kVelocity, 1, 0);
+        mRightMaster.getPIDController().setReference(pRightSetpoint, ControlType.kVelocity, 1, 0);
     }
 
     /**

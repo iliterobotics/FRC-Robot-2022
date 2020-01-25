@@ -49,7 +49,7 @@ public class DriveModule extends Loop {
 	// Closed-Loop Velocity Constants
 	// =============================================================================
 	public static ProfileGains kDistancePID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d);
-	public static ProfileGains kVelocityPID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d);
+	public static ProfileGains kVelocityPID = new ProfileGains().p(1.5234375e-4).d(0.001174257 * 4).maxVelocity(5676d).maxAccel(56760d);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
 
@@ -83,12 +83,14 @@ public class DriveModule extends Loop {
 
 	private double mPreviousTime = 0;
 
+	boolean inited = false;
 	public DriveModule()
 	{
-		if(AbstractSystemSettingsUtils.isPracticeBot()) {
-		} else {
+//		if(AbstractSystemSettingsUtils.isPracticeBot()) {
+//
+//		} else {
 			this.mDriveHardware = new NeoDriveHardware(kGearboxRatio);
-		}
+//		}
 
 		this.mDriveHardware.init();
 	}
@@ -100,7 +102,7 @@ public class DriveModule extends Loop {
 		mTargetAngleLockPid.setSetpoint(0);
 		mTargetAngleLockPid.reset();
 		mDriveHardware.zero();
-
+		inited = true;
 	  	setDriveMessage(DriveMessage.kNeutral);
 	  	setDriveState(EDriveState.NORMAL);
 
@@ -112,12 +114,10 @@ public class DriveModule extends Loop {
 
 		Robot.DATA.drivetrain.set(LEFT_POS_INCHES, mDriveHardware.getLeftInches());
 		Robot.DATA.drivetrain.set(RIGHT_POS_INCHES, mDriveHardware.getRightInches());
-//		Robot.mData.drivetrain.set(EDriveData.LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
-//		Robot.mData.drivetrain.set(EDriveData.RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
-		Robot.DATA.drivetrain.set(LEFT_VEL_TICKS, (double)mDriveHardware.getLeftVelTicks());
-		Robot.DATA.drivetrain.set(RIGHT_VEL_TICKS, (double)mDriveHardware.getRightVelTicks());
-
-		mLogger.error(mDriveMessage);
+		Robot.DATA.drivetrain.set(LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
+		Robot.DATA.drivetrain.set(RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
+		Robot.DATA.drivetrain.set(LEFT_VEL_TICKS, mDriveHardware.getLeftVelTicks());
+		Robot.DATA.drivetrain.set(RIGHT_VEL_TICKS, mDriveHardware.getRightVelTicks());
 
 		Robot.DATA.drivetrain.set(LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
@@ -128,7 +128,13 @@ public class DriveModule extends Loop {
 
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
 
-		SimpleNetworkTable.writeCodexToSmartDashboard(EDriveData.class, mData.drivetrain, mClock.getCurrentTime());
+//		Robot.DATA.drivetrain.set(LEFT_DEMAND, 500.0);
+//		Robot.DATA.drivetrain.set(RIGHT_DEMAND, 500.0);
+
+
+
+
+//		SimpleNetworkTable.writeCodexToSmartDashboard(EDriveData.class, mData.drivetrain, mClock.getCurrentTime());
 	}
 
 	@Override
@@ -137,8 +143,14 @@ public class DriveModule extends Loop {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
-//			mDriveHardware.set(mDriveMessage);
-//			((NeoDriveHardware)mDriveHardware).setTarget(Robot.DATA.drivetrain.get(EDriveData.LEFT_DEMAND), Robot.DATA.drivetrain.get(EDriveData.RIGHT_DEMAND));
+//        	System.out.println(Robot.DATA.drivetrain);
+
+        	mLogger.error("*********LEFT DEMAND: " + Robot.DATA.drivetrain.get(LEFT_DEMAND));
+			mLogger.error("*********RIGHT DEMAND: " + Robot.DATA.drivetrain.get(RIGHT_DEMAND));
+
+
+//			mLogger.error("*********DRIVE HARDWARE: " + mDriveHardware.getLeftVoltage());
+			((NeoDriveHardware)mDriveHardware).setTarget(Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
 		}
 
 		mPreviousTime = pNow;

@@ -57,7 +57,7 @@ public class Robot extends TimedRobot {
         mDrive = new DriveModule();
         mLimelight = new Limelight(DATA);
         mOI = new OperatorInput();
-        mDI = new DriverInput(mDrive, mLimelight, DATA, false);
+        mDI = new DriverInput(false);
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -113,8 +113,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        mRunningModules.addModule(mDrive);
-        mRunningModules.addModule(mDI);
+
 
     }
 
@@ -140,7 +139,9 @@ public class Robot extends TimedRobot {
         mActiveController = mTestController;
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mFlywheel);
+//        mRunningModules.addModule(mFlywheel);
+        mRunningModules.addModule(mDI);
+        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());

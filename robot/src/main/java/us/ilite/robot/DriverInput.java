@@ -40,16 +40,12 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     private ETrackingType mLastTrackingType = null;
 
-    public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
-                       //CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
-                       boolean pSimulated) {
-        this.mLimelight = pLimelight;
-        this.mData = pData;
+    public DriverInput(boolean pSimulated) {
 //        this.mTeleopCommandManager = pTeleopCommandManager;
 //        this.mAutonomousCommandManager = pAutonomousCommandManager;
 
-        this.mDriverInputCodex = mData.driverinput;
-        this.mOperatorInputCodex = mData.operatorinput;
+        this.mDriverInputCodex = Robot.DATA.driverinput;
+        this.mOperatorInputCodex = Robot.DATA.operatorinput;
         if(pSimulated) {
             // Use a different joystick library?
 
@@ -90,16 +86,18 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
         rotate *= Settings.Input.kNormalPercentThrottleReduction;
 
-        if (mData.driverinput.isSet(InputMap.DRIVER.SUB_WARP_AXIS) && mData.driverinput.get(InputMap.DRIVER.SUB_WARP_AXIS) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
+        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.SUB_WARP_AXIS) && Robot.DATA.driverinput.get(InputMap.DRIVER.SUB_WARP_AXIS) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
             throttle *= Settings.Input.kSnailModePercentThrottleReduction;
             rotate *= Settings.Input.kSnailModePercentRotateReduction;
         }
 
         DriveMessage driveMessage = new DriveMessage().throttle(throttle).turn(rotate).mode(PERCENT_OUTPUT).normalize().calculateCurvature();
-        double leftSetpoint = driveMessage.getLeftOutput() * getMaxVelocity();
-        double rightSetpoint = driveMessage.getRightOutput() * getMaxVelocity();
-        Robot.DATA.drivetrain.set(EDriveData.LEFT_DEMAND, leftSetpoint);
-        Robot.DATA.drivetrain.set(EDriveData.LEFT_DEMAND, rightSetpoint);
+        double leftSetpoint = driveMessage.getLeftOutput();
+        double rightSetpoint = driveMessage.getRightOutput();
+        leftSetpoint = Math.abs(leftSetpoint) > 0.01 ? leftSetpoint : 0.0; //Handling Deadband
+        rightSetpoint = Math.abs(rightSetpoint) > 0.01 ? rightSetpoint : 0.0; //Handling Deadband
+        Robot.DATA.drivetrain.set(EDriveData.LEFT_DEMAND, leftSetpoint * getMaxVelocity());
+        Robot.DATA.drivetrain.set(EDriveData.RIGHT_DEMAND, rightSetpoint * getMaxVelocity());
 
 //        mDrive.setDriveMessage(driveMessage);
     }
@@ -119,8 +117,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     @Override
     public double getThrottle() {
-        if(mData.driverinput.isSet(InputMap.DRIVER.THROTTLE_AXIS)) {
-            return -mData.driverinput.get(InputMap.DRIVER.THROTTLE_AXIS);
+        if(Robot.DATA.driverinput.isSet(InputMap.DRIVER.THROTTLE_AXIS)) {
+            return -Robot.DATA.driverinput.get(InputMap.DRIVER.THROTTLE_AXIS);
         } else {
             return 0.0;
         }
@@ -128,8 +126,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     @Override
     public double getTurn() {
-        if(mData.driverinput.isSet(InputMap.DRIVER.TURN_AXIS)) {
-            return mData.driverinput.get(InputMap.DRIVER.TURN_AXIS);
+        if(Robot.DATA.driverinput.isSet(InputMap.DRIVER.TURN_AXIS)) {
+            return Robot.DATA.driverinput.get(InputMap.DRIVER.TURN_AXIS);
         } else {
             return 0.0;
         }
