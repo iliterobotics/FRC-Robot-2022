@@ -19,8 +19,7 @@ import us.ilite.robot.modules.*;
 
 public class DriverInput extends Module implements IThrottleProvider, ITurnProvider {
 
-    protected static final double
-            DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
+    protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
     private ILog mLog = Logger.createLog(DriverInput.class);
 
 
@@ -32,7 +31,6 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private PowerCellModule mIntake;
     private Timer mGroundCargoTimer = new Timer();
 
-    private boolean mIsCargo = false;
     private Joystick mDriverJoystick;
     private Joystick mOperatorJoystick;
 
@@ -82,6 +80,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         If the driver started the commands that the superstructure is running and then released the button,
         stop running commands.
         */
+        updateDriveTrain();
         updateIntake();
 
 
@@ -105,7 +104,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         mDrive.setDriveMessage(driveMessage);
     }
     private void updateIntake(){
-        if ( mOperatorInputCodex.isSet(InputMap.OPERATOR.INTAKE_STUFF)){
+        if ( mData.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STUFF )) {
             mIntake.startIntaking();
         }
     }

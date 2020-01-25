@@ -42,11 +42,11 @@ public class Data {
 
 
     public final Codex[] mAllCodexes = new Codex[] {
-            imu, /*drivetrain,*/ driverinput, operatorinput, pdp, /*limelight,*/
+            imu, /*drivetrain,*/ driverinput, operatorinput, pdp, powercell /*limelight,*/
     };
 
     public final Codex[] mLoggedCodexes = new Codex[] {
-        imu, drivetrain, driverinput, /*operatorinput,*/  pdp, limelight
+        imu, drivetrain, driverinput, /*operatorinput,*/  pdp, limelight, powercell
     };
 
     public final Codex[] mDisplayedCodexes = new Codex[] {
