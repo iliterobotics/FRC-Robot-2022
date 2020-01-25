@@ -12,6 +12,8 @@ public class LimelightTargetLock extends TargetLock {
     private ILog mLog = Logger.createLog(LimelightTargetLock.class);
 
     private Limelight mLimelight;
+    private ETrackingType mTrackingType;
+
 
 //    public LimelightTargetLock(Drive pDrive, Limelight pLimelight, double pAllowableError, ETrackingType pTrackingType, IThrottleProvider pThrottleProvider) {
 //        super(pDrive, pAllowableError, pTrackingType, pLimelight, pThrottleProvider);
@@ -24,14 +26,22 @@ public class LimelightTargetLock extends TargetLock {
         super(pDrive, pAllowableError, pTrackingType, pLimelight, pThrottleProvider, pEndOnAlignment);
 
         this.mLimelight = pLimelight;
-        mLimelight.setTracking(pTrackingType);
+        this.mTrackingType = pTrackingType;
+        mLimelight.setTracking(mTrackingType);
+        mLog.error("STARTED LIMELIGHT TARGET LOCK");
+    }
+
+    @Override
+    public void init(double pNow) {
+        super.init(pNow);
+        mLimelight.setTracking(mTrackingType);
         mLog.error("STARTED LIMELIGHT TARGET LOCK");
     }
 
     public void shutdown(double pNow) {
         super.shutdown(pNow);
         mLog.warn("SHUT DOWN LIMELIGHT TARGET LOCK");
-        //mLimelight.setTracking(ETrackingType.NONE);
+        mLimelight.setTracking(ETrackingType.NONE);
     }
 
 }
