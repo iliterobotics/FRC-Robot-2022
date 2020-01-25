@@ -75,7 +75,7 @@ public class PowerCellModule extends Module {
         mData.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , (double) returnIntakeState().ordinal());
         mData.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonOne.getOutputCurrent());
         mData.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT ,mTalonTwo.getOutputCurrent() );
-//
+
         mData.powercell.set(EPowerCellData.BREAK_SENSOR_0 , readBeamBreakerState(mBeamBreaker1.isBroken()));
         mData.powercell.set(EPowerCellData.BREAK_SENSOR_1 , readBeamBreakerState(mBeamBreaker2.isBroken()));
         mData.powercell.set(EPowerCellData.BREAK_SENSOR_2 , readBeamBreakerState(mBeamBreaker3.isBroken()));
@@ -88,7 +88,7 @@ public class PowerCellModule extends Module {
         mTalonOne.set(ControlMode.PercentOutput, EIntakeState.values()[mData.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
         mTalonTwo.set(ControlMode.PercentOutput, EIntakeState.values()[mData.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
         mTalonThree.set(ControlMode.PercentOutput, EIntakeState.values()[mData.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
-        //May want to add beam breakers
+        // I May want to add beam breakers
     }
 
     @Override
@@ -118,7 +118,7 @@ public class PowerCellModule extends Module {
             }
         }
     }
-    public double readBeamBreakerState(boolean isBroken){
+    private double readBeamBreakerState(boolean isBroken){
         if ( isBroken ){
             return 1.0;
         }
