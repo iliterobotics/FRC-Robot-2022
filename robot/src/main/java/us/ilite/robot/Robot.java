@@ -18,10 +18,7 @@ import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.GetLocalIP;
-import us.ilite.robot.modules.CommandManager;
-import us.ilite.robot.modules.FlywheelPrototype;
-import us.ilite.robot.modules.ModuleList;
-import us.ilite.robot.modules.OperatorInput;
+import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
 
@@ -33,11 +30,11 @@ public class Robot extends TimedRobot {
 
     private ModuleList mRunningModules = new ModuleList();
     private Clock mClock = new Clock();
+    private Limelight mLimelight;
     public static final Data DATA = new Data();
     private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
-    private DriverInput mDriverInput = new DriverInput();
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -48,7 +45,7 @@ public class Robot extends TimedRobot {
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final TestController mTestController = new TestController();
+    private final TestController mTestController = new TestController(mLimelight);
     private AbstractController mActiveController = null;
 
 
@@ -136,7 +133,6 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
-        mRunningModules.addModule(mDriverInput);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());

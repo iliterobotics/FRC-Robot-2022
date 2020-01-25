@@ -44,13 +44,13 @@ public class TestController extends AbstractController {
         else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)){
             if (Robot.DATA.selectedTarget.get(ELimelightData.ty) != null) {
                 if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.tx)) < mLimelightZoomThreshold) {
-                    Robot.DATA.limelight.set(ELimelightData.LIMELIGHT_STATE , );
+                    Robot.DATA.limelight.set(ELimelightData.LIMELIGHT_STATE , (double) mTrackingType.ordinal());
                     System.out.println("ZOOMING");
                 } else {
-                    mLimelight.setTracking(ETrackingType.TARGET);
+                    Robot.DATA.limelight.set(ELimelightData.LIMELIGHT_STATE , (double) mTrackingType.ordinal());
                 }
             } else {
-                mTrackingType = ETrackingType.TARGET;
+             //   Robot.DATA.selectedTarget.set(E);
             }
         }
         else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
@@ -73,6 +73,5 @@ public class TestController extends AbstractController {
 //            mTeleopCommandManager.startCommands(new LimelightTargetLock(mDrive, mLimelight, 2, mTrackingType, this, false).setStopWhenTargetLost(false));
         }
         mLastTrackingType = mTrackingType;
-    }
     }
 }
