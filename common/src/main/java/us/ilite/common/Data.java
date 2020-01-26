@@ -32,7 +32,7 @@ public class Data {
     public final Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
 
     public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
-    public final Codex<Double, EShooterData> flywheel = Codex.of.thisEnum(EShooterData.class);
+    public final Codex<Double, EShooterSystemData> flywheel = Codex.of.thisEnum(EShooterSystemData.class);
     public final Codex<Double, EColorWheelData> colorwheel = Codex.of.thisEnum(EColorWheelData.class);
     public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
     public final Codex<Double, EHangerData> hanger = Codex.of.thisEnum(EHangerData.class);

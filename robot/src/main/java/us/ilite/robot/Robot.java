@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        mShooter = new FlywheelModule(mData, mLimelight);
+        mShooter = new FlywheelModule();
         mOI = new OperatorInput();
         mDI = new DriverInput(mDrive, mShooter, mLimelight, DATA, false);
 

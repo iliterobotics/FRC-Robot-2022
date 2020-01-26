@@ -9,7 +9,7 @@ import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
@@ -27,8 +27,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     protected DriveModule mDrive;
     private FlywheelModule mShooter;
-    private CommandManager mTeleopCommandManager;
-    private CommandManager mAutonomousCommandManager;
+//    private CommandManager mTeleopCommandManager;
+//    private CommandManager mAutonomousCommandManager;
     private Limelight mLimelight;
     private Data mData;
     private Timer mGroundCargoTimer = new Timer();
@@ -78,31 +78,15 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     public void setOutputs(double pNow) {
         updateShooter();
         updateDriveTrain();
-        updateLimelightTargetLock();
     }
 
     private void updateShooter() {
-        if (mDriverInputCodex.isSet(InputMap.DRIVER.SUB_WARP_AXIS)) {
-            mShooter.setShooterState(FlywheelModule.EShooterState.SHOOT);
-            mShooter.setAcceleratorState(FlywheelModule.EAcceleratorState.FEED);
-        }
-        else {
-            mShooter.setShooterState(FlywheelModule.EShooterState.STOP);
-        }
-        mShooter.isGyro = !mDriverInputCodex.isSet(InputMap.DRIVER.TARGET_LOCK);
-
-    }
-
-    private void updateLimelightTargetLock() {
-        if ( mDriverInputCodex.isSet(InputMap.DRIVER.TARGET_LOCK) ) {
-            mTrackingType = ETrackingType.TARGET;
-        }
-        else if ( mDriverInputCodex.isSet(InputMap.DRIVER.CELL_LOCK) ) {
-            mTrackingType = ETrackingType.CELL;
-        }
-        else {
-            mTrackingType = ETrackingType.NONE;
-        }
+//        if (mDriverInputCodex.isSet(InputMap.DRIVER.SHOOT)) {
+//        }
+//        else {
+//            mShooter.setShooterState(FlywheelModule.EShooterState.STOP);
+//        }
+//        mShooter.isGyro = !mDriverInputCodex.isSet(InputMap.DRIVER.TARGET_LOCK);
     }
 
     private void updateDriveTrain() {
@@ -120,7 +104,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
         DriveMessage driveMessage = new DriveMessage().throttle(throttle).turn(rotate).mode(PERCENT_OUTPUT).normalize().calculateCurvature();
 
-        mDrive.setDriveMessage(driveMessage);
+        //mDrive.setDriveMessage(driveMessage);
     }
 
     @Override

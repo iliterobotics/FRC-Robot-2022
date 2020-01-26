@@ -2,54 +2,38 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.Servo;
-import us.ilite.common.Data;
+import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.control.PIDController;
-import us.ilite.common.types.EShooterData;
+import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.ETrackingType;
+import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
+
 public class FlywheelModule extends Module {
-
-    private Data mData;
-    private Limelight mLimelight;
-    private PigeonIMU mTurretGyro;
-    private PIDController mShooterPid;
-
-    private CANSparkMax mShooter;
+    private CANSparkMax mShooterNeo;
     private Servo mHoodAngler;
     private TalonSRX mTurret;
-    private CANSparkMax mAccelerator;
-
+    //private CANSparkMax mAccelerator;
+    private TalonSRX mAccelerator;
     private EShooterState mShooterState = EShooterState.STOP;
+    private EHoodState mHoodState = EHoodState.BASE;
     private EAcceleratorState mAcceleratorState = EAcceleratorState.STOP;
     private ETrackingType mTrackingType = ETrackingType.NONE;
+    private ETurretMode mTurretMode = ETurretMode.GYRO;
 
-    private double mPreviousTime= 0;
-    private double desiredHoodAngle = 60;
-    private double desiredShooterVelocity = 0;
-    private double desiredTurretVelocity = 0;
-    private double desiredAcceleratorVelocity = 0;
-    private double robotHeading;
-
-    public boolean isGyro;
-
-    public FlywheelModule(Data pData, Limelight pLimelight) {
-        mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.ShooterSystem.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mAccelerator = SparkMaxFactory.createDefaultSparkMax(Settings.ShooterSystem.kAcceleratorID, CANSparkMaxLowLevel.MotorType.kBrushless);
+    public FlywheelModule() {
+        mShooterNeo = SparkMaxFactory.createDefaultSparkMax(Settings.ShooterSystem.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
+//        mAccelerator = SparkMaxFactory.createDefaultSparkMax(Settings.ShooterSystem.kAcceleratorID, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mAccelerator = new TalonSRX(Settings.ShooterSystem.kAcceleratorID);
         mHoodAngler = new Servo(Settings.ShooterSystem.kAnglerID);
         mTurret = new TalonSRX(Settings.ShooterSystem.kTurretID);
-
-        mTurretGyro = new PigeonIMU(Settings.ShooterSystem.kTurretGyroID);
-        mShooterPid = new PIDController(Settings.ShooterSystem.kTurretAngleLockGains, 0, 1, Settings.kControlLoopPeriod );
-        mLimelight = pLimelight;
-        mData = pData;
     }
 
     public enum EShooterState {
@@ -57,58 +41,62 @@ public class FlywheelModule extends Module {
         STOP
     }
 
+    public enum ETurretMode {
+        GYRO,
+        LIMELIGHT
+    }
+
     public enum EAcceleratorState {
         FEED,
         STOP
     }
 
-    private double calcSpeedFromDistance(double distance) { return 0.09 * Math.pow(distance, 2) + 8.0; }
-    private double calcAngleFromDistance(double distance, double height) { return Math.atan(height / distance); }
+    public enum EHoodState {
+        BASE,
+        ADJUSTABLE
+    }
 
-    private boolean isMaxVelocity() { return mShooter.getEncoder().getVelocity() >= Settings.kMaxNeoVelocity; }
-    private boolean targetValid() { return mData.limelight.get(ETargetingData.ty) != null; }
+    public double calcSpeedFromDistance(double distance) { return 0.09 * Math.pow(distance, 2) + 8.0; }
+    public double calcAngleFromDistance(double distance, double height) { return Math.atan(height / distance); }
 
-    private EShooterState getShooterState() { return mShooterState; }
+    public boolean isMaxVelocity() { return mShooterNeo.getEncoder().getVelocity() >= Settings.kMaxNeoVelocity; }
+    public boolean targetValid() { return Robot.DATA.limelight.get(ETargetingData.ty) != null; }
 
     public void setShooterState(EShooterState pShooterState) { mShooterState = pShooterState; }
-    public void hoodAngle() { desiredHoodAngle = targetValid() ? calcAngleFromDistance(mData.limelight.get(ETargetingData.calcDistToTarget), mData.limelight.get(ETargetingData.ty)) : 60; }
-
-    public void shoot(double pTime) {
-        desiredAcceleratorVelocity = isMaxVelocity() ? Settings.kAcceleratorTargetVelocity : 0;
-        desiredShooterVelocity = targetValid() ? calcSpeedFromDistance(mData.limelight.get(ETargetingData.calcDistToTarget)) : mShooterPid.calculate(Settings.kMaxNeoVelocity, pTime - mPreviousTime);
-        mPreviousTime = pTime;
-    }
-
-    public void turretTurn(boolean isGyro) {
-        robotHeading = isGyro ?  mTurretGyro.getCompassHeading() : mData.limelight.get(ETargetingData.tx);
-        desiredTurretVelocity = isGyro ? -2 * robotHeading : -10 * robotHeading;
-    }
+    private void reset() { setShooterState(EShooterState.STOP); }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
+        reset();
     }
 
     @Override
     public void readInputs(double pNow) {
-        mData.flywheel.set(EShooterData.CURRENT_FLYWHEEL_STATE, (double) getShooterState().ordinal());
-        mData.flywheel.set(EShooterData.TARGET_FLYWHEEL_STATE, (double) mShooterState.ordinal());
-        mData.flywheel.set(EShooterData.CURRENT_FLYWHEEL_VELOCITY, mShooter.getEncoder().getVelocity());
-        mData.flywheel.set(EShooterData.CURRENT_LIMELIGHT_TARGET, (double) mTrackingType.ordinal());
-        mData.flywheel.set(EShooterData.CURRENT_HOOD_ANGLE, desiredHoodAngle);
-        mData.flywheel.set(EShooterData.CURRENT_TURRET_HEADING, robotHeading );
-        mData.flywheel.set(EShooterData.CURRENT_TURRET_VELOCITY, desiredTurretVelocity );
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_STATE, (double)mShooterState.ordinal());
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, (double)EShooterState.SHOOT.ordinal());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mShooterNeo.getEncoder().getVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_LIMELIGHT_TARGET, Robot.DATA.limelight.get(ETargetingData.targetOrdinal));
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_LIMELIGHT_TARGET, (double) mTrackingType.ordinal());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_HOOD_ANGLE, mHoodAngler.getAngle());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY, (double) mTurret.getSelectedSensorVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_MODE, (double) mTurretMode.ordinal());
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mAccelerator.set(desiredAcceleratorVelocity);
-        mHoodAngler.setAngle(desiredHoodAngle);
-        mShooter.set(desiredShooterVelocity);
-        mTurret.set(ControlMode.Velocity, desiredTurretVelocity);
+        if ( isMaxVelocity() ) {
+            mAccelerator.set(ControlMode.PercentOutput, Settings.ShooterSystem.kAcceleratorTargetVelocity);
+        }
+        else {
+            mAccelerator.set(ControlMode.PercentOutput, 0.0);
+        }
+        mHoodAngler.setAngle(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_HOOD_ANGLE));
+        Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY);
+        mTurret.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY));
     }
 
     @Override
     public void shutdown(double pNow) {
-
+        reset();
     }
 }
