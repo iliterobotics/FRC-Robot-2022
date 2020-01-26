@@ -49,6 +49,7 @@ public class DriveModule extends Loop {
 	public static double kTurnCircumference = kEffectiveWheelbase * Math.PI;
 	public static double kInchesPerDegree = kTurnCircumference / 360.0;
 	public static double kWheelTurnsPerDegree = kInchesPerDegree / kWheelDiameterInches;
+
 	// =============================================================================
 	// Closed-Loop Velocity Constants
 	// =============================================================================
@@ -56,7 +57,6 @@ public class DriveModule extends Loop {
 	public static ProfileGains kVelocityPID = new ProfileGains().p(1.5234375e-4).d(0.001174257 * 4).maxVelocity(5676d).maxAccel(56760d);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
-
 
 	// =============================================================================
 	// Heading Gains
@@ -75,8 +75,7 @@ public class DriveModule extends Loop {
 			CURRENT14,
 
 	};
-	
-	
+
 	private IDriveHardware mDriveHardware;
 	private Rotation2d mGyroOffset = new Rotation2d();
 
@@ -90,9 +89,8 @@ public class DriveModule extends Loop {
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
 
-	public DriveModule()
-	{
-		if (AbstractSystemSettingsUtils.isPracticeBot()) {
+	public DriveModule() {
+		if(AbstractSystemSettingsUtils.isPracticeBot()) {
 
 		} else {
 			this.mDriveHardware = new NeoDriveHardware(kGearboxRatio);
@@ -123,7 +121,6 @@ public class DriveModule extends Loop {
 
 	@Override
 	public void readInputs(double pNow) {
-
 		Robot.DATA.drivetrain.set(LEFT_POS_INCHES, mDriveHardware.getLeftInches());
 		Robot.DATA.drivetrain.set(RIGHT_POS_INCHES, mDriveHardware.getRightInches());
 		Robot.DATA.drivetrain.set(LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
