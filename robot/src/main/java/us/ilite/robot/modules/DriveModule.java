@@ -4,6 +4,7 @@ import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
@@ -22,6 +23,8 @@ import static us.ilite.common.types.sensor.EPowerDistPanel.*;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.*;
 import us.ilite.robot.loops.Loop;
+
+import java.io.OutputStream;
 
 /**
  * Class for running all drivetrain train control operations from both autonomous and
@@ -83,6 +86,7 @@ public class DriveModule extends Loop {
 
 	private PIDController mTargetAngleLockPid;
 	private PIDController mYawPid;
+	private double mCurrentHeading;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
 
@@ -93,10 +97,7 @@ public class DriveModule extends Loop {
 		} else {
 			this.mDriveHardware = new NeoDriveHardware(kGearboxRatio);
 		}
-		mYawPid = new PIDController(kYawGains,
-									-Settings.Drive.kMaxHeadingChange,
-									Settings.Drive.kMaxHeadingChange,
-									Settings.kControlLoopPeriod);
+
 		this.mDriveHardware.init();
 	}
 
@@ -106,6 +107,13 @@ public class DriveModule extends Loop {
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 		mTargetAngleLockPid.setSetpoint(0);
 		mTargetAngleLockPid.reset();
+
+		mYawPid = new PIDController(kYawGains,
+									-Settings.Drive.kMaxHeadingChange,
+									Settings.Drive.kMaxHeadingChange,
+									Settings.kControlLoopPeriod);
+		mYawPid.setOutputRange(-1, 1);
+
 		mDriveHardware.zero();
 	  	setDriveMessage(DriveMessage.kNeutral);
 	  	setDriveState(EDriveState.NORMAL);
@@ -132,10 +140,16 @@ public class DriveModule extends Loop {
 
 		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
 
-		double currentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
-		Robot.DATA.imu.set(EGyro.YAW_DEGREES, currentHeading - mPreviousHeading);
+		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
+		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
 
-//		mYawPid.setSetpoint(Robot.DATA.drivetrain.get(TURN) * Settings.Drive.kMaxHeadingChange);
+		try {
+			mYawPid.setSetpoint(Robot.DATA.drivetrain.get(TURN) * Settings.Drive.kMaxHeadingChange);
+//			System.out.println(Robot.DATA.drivetrain.get(TURN));
+		} catch (NullPointerException ne) {
+			mYawPid.setSetpoint(0.0);
+//			System.out.println("0.0");
+		}
 	}
 
 	@Override
@@ -144,17 +158,19 @@ public class DriveModule extends Loop {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
-
-        	double mOutput = mYawPid.calculate(Units.degrees_to_radians(mDriveHardware.getImu().getYaw()), pNow);
-			System.out.println(Robot.DATA.imu.get(EGyro.YAW_DEGREES));
-			((NeoDriveHardware)mDriveHardware).setTarget(Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
-		}
+			double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
+			double mThrottle = Robot.DATA.drivetrain.get(THROTTLE);
+			DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
+			SmartDashboard.putNumber("DESIRED YAW", (Robot.DATA.drivetrain.get(TURN) * Settings.Drive.kMaxHeadingChange));
+			SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
+			((NeoDriveHardware)mDriveHardware).setTarget(driveMessage.getLeftOutput() * Settings.Drive.kDriveTrainMaxVelocity, driveMessage.getRightOutput() * Settings.Drive.kDriveTrainMaxVelocity);//Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
+}
 
 		mPreviousHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
-		mPreviousTime = pNow;
-	}
-	
-	@Override
+				mPreviousTime = pNow;
+				}
+
+@Override
 	public void shutdown(double pNow) {
 		mDriveHardware.zero();
 	}
