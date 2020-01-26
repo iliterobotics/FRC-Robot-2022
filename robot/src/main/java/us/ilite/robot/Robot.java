@@ -18,9 +18,7 @@ import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.GetLocalIP;
-import us.ilite.robot.modules.FlywheelPrototype;
-import us.ilite.robot.modules.ModuleList;
-import us.ilite.robot.modules.OperatorInput;
+import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
 
@@ -39,8 +37,11 @@ public class Robot extends TimedRobot {
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
+    private DriveModule mDrive;
     private FlywheelPrototype mFlywheel;
     private OperatorInput mOI;
+    private DriverInput mDI;
+    private Limelight mLimelight;
 
     private MatchMetadata mMatchMeta = null;
 
@@ -53,7 +54,10 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
+        mDrive = new DriveModule();
+        mLimelight = new Limelight(DATA);
         mOI = new OperatorInput();
+        mDI = new DriverInput(false);
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -109,6 +113,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+
+
     }
 
     @Override
@@ -133,7 +139,9 @@ public class Robot extends TimedRobot {
         mActiveController = mTestController;
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mDI);
         mRunningModules.addModule(mFlywheel);
+        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
@@ -151,7 +159,7 @@ public class Robot extends TimedRobot {
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
         mRunningModules.readInputs(mClock.getCurrentTime());
-        mActiveController.update(mClock.getCurrentTime());
+//        mActiveController.update(mClock.getCurrentTime());
         mRunningModules.setOutputs(mClock.getCurrentTime());
 //        mData.sendCodicesToNetworkTables();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);

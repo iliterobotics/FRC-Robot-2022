@@ -38,7 +38,7 @@ public class FlywheelPrototype extends Module{
                 ControlMode.PercentOutput,
                 Robot.DATA.driverinput.get(LEFT_Y_AXIS)
         );
-        System.out.println("FLYWHEEL %: " + Robot.DATA.driverinput.get(LEFT_Y_AXIS));
+//        System.out.println("FLYWHEEL %: " + Robot.DATA.driverinput.get(LEFT_Y_AXIS));
     }
 
     @Override
