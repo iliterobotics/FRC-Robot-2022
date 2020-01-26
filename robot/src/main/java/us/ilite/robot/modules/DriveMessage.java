@@ -65,6 +65,10 @@ public class DriveMessage {
     }
   }
 
+  public double getTurn() { return mTurn; }
+
+  public double getThrottle() { return mThrottle; }
+
   public ECommonControlMode getMode() {
     return mControlMode;
   }
