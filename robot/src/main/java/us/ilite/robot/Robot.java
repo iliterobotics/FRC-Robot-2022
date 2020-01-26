@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final TestController mTestController = new TestController(mLimelight);
+    private final TestController mTestController = new TestController();
     private AbstractController mActiveController = null;
 
 
@@ -133,6 +133,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
+        mRunningModules.addModule(mLimelight);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
