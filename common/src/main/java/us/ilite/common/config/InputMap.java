@@ -21,8 +21,8 @@ public class InputMap {
 
     public static class OPERATOR {
         public static final ELogitech310
-        INTAKE_STUFF = ELogitech310.X_BTN;
-
+        INTAKE = ELogitech310.X_BTN,
+        REVERSE_INTAKE = ELogitech310.A_BTN;
     }
 
 

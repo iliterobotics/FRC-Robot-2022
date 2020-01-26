@@ -104,6 +104,16 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         mDrive.setDriveMessage(driveMessage);
     }
 
+    private void updateIntake() {
+        if(mOperatorInputCodex.isSet(InputMap.OPERATOR.INTAKE)) {
+            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.INTAKE);
+        } else if (mOperatorInputCodex.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
+            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.REVERSE);
+        } else {
+            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.STOP);
+        }
+    }
+
     @Override
     public void shutdown(double pNow) {
 

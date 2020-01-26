@@ -27,7 +27,7 @@ import java.util.List;
 public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
-    private PowerCellModule mIntake = new PowerCellModule(DATA);
+    private PowerCellModule mIntake = new PowerCellModule();
     private ModuleList mRunningModules = new ModuleList();
     private DriveModule mDrive = new DriveModule();
     private Limelight mLimelight = new Limelight(DATA);
@@ -47,14 +47,14 @@ public class Robot extends TimedRobot {
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final TestController mTestController = new TestController();
+    private final TestController mTestController = new TestController(mIntake);
    // private AbstractController mActiveController = null;
 
 
     @Override
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
-        mIntake = new PowerCellModule(DATA);
+        mIntake = new PowerCellModule();
         mOI = new OperatorInput();
 
         //look for practice robot config:
