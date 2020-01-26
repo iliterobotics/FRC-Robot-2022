@@ -15,12 +15,12 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.controller.AbstractController;
+import us.ilite.robot.controller.BaseAutonController;
+import us.ilite.robot.controller.TeleopController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.GetLocalIP;
-import us.ilite.robot.modules.FlywheelPrototype;
-import us.ilite.robot.modules.ModuleList;
-import us.ilite.robot.modules.OperatorInput;
+import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
 
@@ -39,20 +39,26 @@ public class Robot extends TimedRobot {
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
+    private DriveModule mDrive;
     private FlywheelPrototype mFlywheel;
     private OperatorInput mOI;
+    private Limelight mLimelight;
 
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final TestController mTestController = new TestController();
+    private final AbstractController mTestController = new TestController();
+    private final AbstractController mTeleopController = new TeleopController();
+    private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
 
 
     @Override
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
+        mDrive = new DriveModule();
+        mLimelight = new Limelight(DATA);
         mOI = new OperatorInput();
 
         //look for practice robot config:
@@ -79,7 +85,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
 
         try {
-        } catch(Exception e) {
+        } catch (Exception e) {
             mLogger.exception(e);
         }
 
@@ -100,6 +106,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        mActiveController = mBaseAutonController;
     }
 
     @Override
@@ -109,6 +116,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        mActiveController = mTeleopController;
     }
 
     @Override
@@ -134,6 +142,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
+        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
@@ -144,9 +153,9 @@ public class Robot extends TimedRobot {
         commonPeriodic();
     }
 
-    private void commonPeriodic() {
+    void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for(Codex c : DATA.mAllCodexes) {
+        for (Codex c : DATA.mAllCodexes) {
             c.reset();
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
@@ -192,23 +201,5 @@ public class Robot extends TimedRobot {
 
         return String.format("State: %s\tMode: %s\tTime: %s", mRobotEnabledDisabled, mRobotMode, mNow);
 
-    }
-
-    private class DSConnectInitThread implements Runnable {
-
-        @Override
-        public void run() {
-
-            while(!DriverStation.getInstance().isDSAttached()) {
-                try {
-                    mLogger.error("Waiting on Robot <--> DS Connection...");
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            List<String> ips = GetLocalIP.getAllIps();
-        }
     }
 }

@@ -1,5 +1,6 @@
 package us.ilite.robot.hardware;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANPIDController;
@@ -8,6 +9,8 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Conversions;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.DriveModule;
 
@@ -26,6 +29,7 @@ public class NeoDriveHardware implements IDriveHardware {
         kGearRatio = pGearRatio;
 //        mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
         // mGyro = new NavX(SerialPort.Port.kMXP);
+        mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
 
         mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
         mLeftMiddle = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kDriveLeftMiddle, mLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -101,7 +105,11 @@ public class NeoDriveHardware implements IDriveHardware {
         // TODO - update arbitrary FF with the ProfileGains FF
         mLeftMaster.getPIDController().setReference(pDriveMessage.getLeftOutput(), mLeftControlMode, 1, 0);
         mRightMaster.getPIDController().setReference(pDriveMessage.getRightOutput(), mRightControlMode, 1, 0);
+    }
 
+    public void setTarget(double pLeftPercentMaxVelocity, double pRightPercentMaxVelocity) {
+        mLeftMaster.getPIDController().setReference(pLeftPercentMaxVelocity, ControlType.kVelocity, 1, 0);
+        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity, ControlType.kVelocity, 1, 0);
     }
 
     /**
