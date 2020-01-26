@@ -5,8 +5,11 @@ import com.flybotix.hfr.codex.Codex;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.ETrackingType;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.EDriveState;
 import us.ilite.robot.modules.IThrottleProvider;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
@@ -28,12 +31,11 @@ public class TargetLock implements ICommand {
     private int mAlignedCount = 0;
     private boolean mHasAcquiredTarget = false;
 
-    public TargetLock(DriveModule pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
-        this(pDrive, pAllowableError, pTrackingType, pCamera, pThrottleProvider, true);
+    public TargetLock(double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
+        this(pAllowableError, pTrackingType, pCamera, pThrottleProvider, true);
     }
 
-    public TargetLock(DriveModule pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
-        this.mDrive = pDrive;
+    public TargetLock(double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
         this.mAllowableError = pAllowableError;
         this.mTrackingType = pTrackingType;
         this.mCamera = pCamera;
@@ -86,7 +88,6 @@ public class TargetLock implements ICommand {
 //                    ECommonControlMode.PERCENT_OUTPUT
 //                ).setNeutralMode(ECommonNeutralMode.BRAKE)
 //            );
-//
 //        }
 
         mPreviousTime = pNow;
@@ -97,7 +98,7 @@ public class TargetLock implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-        mDrive.setNormal();
+        Robot.DATA.drivetrain.set(EDriveData.DRIVE_STATE, (double) EDriveState.NORMAL.ordinal());
         mDrive.setDriveMessage(DriveMessage.kNeutral);
     }
 
