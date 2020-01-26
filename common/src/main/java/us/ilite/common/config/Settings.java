@@ -3,6 +3,7 @@ package us.ilite.common.config;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.NetworkTablesConstantsBase;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 
@@ -73,7 +74,9 @@ public class Settings extends NetworkTablesConstantsBase {
     // =============================================================================
     public static class Drive {
         public static double kDriveTrainMaxVelocity = 5676;
-        public static double kMaxHeadingChange = 6; // Radians per cycle
+
+        // TODO Find out what units this is in
+        public static double kMaxHeadingChange = 5;
     }
 
     public static class Input {

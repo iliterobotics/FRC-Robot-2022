@@ -98,7 +98,7 @@ public class TargetLock implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-        Robot.DATA.drivetrain.set(EDriveData.DRIVE_STATE, (double) EDriveState.NORMAL.ordinal());
+        mDrive.setNormal();
         mDrive.setDriveMessage(DriveMessage.kNeutral);
     }
 
