@@ -85,6 +85,9 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
 
+        if (throttle == 0.0 && rotate != 0.0) {
+            throttle += 0.01;
+        }
         //		    throttle = EInputScale.EXPONENTIAL.map(throttle, 2);
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
         rotate *= Settings.Input.kNormalPercentThrottleReduction;
