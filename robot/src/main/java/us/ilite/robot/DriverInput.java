@@ -45,14 +45,11 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
                        CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
-                       DJBoothRotationControl pDjBoothRotationControl, DJBoothPositionControl pDjBoothPositionControl,
                        boolean pSimulated) {
         this.mLimelight = pLimelight;
         this.mData = pData;
         this.mTeleopCommandManager = pTeleopCommandManager;
         this.mAutonomousCommandManager = pAutonomousCommandManager;
-        this.mDjBoothPositionControl = pDjBoothPositionControl;
-        this.mDjBoothRotationControl = pDjBoothRotationControl;
 
         this.mDriverInputCodex = mData.driverinput;
         this.mOperatorInputCodex = mData.operatorinput;
@@ -75,6 +72,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     public void readInputs(double pNow) {
         ELogitech310.map(mData.driverinput, mDriverJoystick);
         ELogitech310.map(mData.operatorinput, mOperatorJoystick);
+
     }
 
     @Override
@@ -83,8 +81,6 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         If the driver started the commands that the superstructure is running and then released the button,
         stop running commands.
         */
-
-
     }
 
     private void updateDriveTrain() {
@@ -103,25 +99,6 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         DriveMessage driveMessage = new DriveMessage().throttle(throttle).turn(rotate).mode(PERCENT_OUTPUT).normalize().calculateCurvature();
 
         mDrive.setDriveMessage(driveMessage);
-    }
-
-    private void updateDJBooth() {
-        if ( mDriverInputCodex.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL) &&
-                mDriverInputCodex.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL) ) {
-            mDjBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
-            mDjBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
-        }
-        else if (mDriverInputCodex.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
-            mDjBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.ON );
-            mDjBoothPositionControl.setDesiredColorState( DJBoothPositionControl.ColorState.RED );
-        }
-        else if (mDriverInputCodex.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL) ) {
-            mDjBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.ON );
-        }
-        else {
-            mDjBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
-            mDjBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
-        }
     }
 
     @Override

@@ -14,6 +14,8 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.robot.commands.DJBoothPositionControl;
+import us.ilite.robot.commands.DJBoothRotationControl;
 import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
@@ -53,7 +55,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
-        mOI = new OperatorInput();
+        mOI = new OperatorInput( new DJBoothRotationControl(), new DJBoothPositionControl());
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
