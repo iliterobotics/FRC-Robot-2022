@@ -6,7 +6,6 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
-import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EPowerCellData;
@@ -14,6 +13,8 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.SparkMaxFactory;
 import us.ilite.robot.hardware.TalonSRXFactory;
+
+import java.util.List;
 
 public class PowerCellModule extends Module {
 
@@ -28,13 +29,19 @@ public class PowerCellModule extends Module {
     private DigitalBeamSensor mBeamBreaker2;
     private DigitalBeamSensor mBeamBreaker3;
 
+    private DigitalBeamSensor[] mDigitalBeamSensors;
+
     //Intake state
     private EIntakeState mIntakeState;
-
-    private ILog mLog = Logger.createLog(this.getClass());
     private EIntakeState mIntaker;
     private EIntakeState mConveyor;
     private EIntakeState mSerializer;
+
+    private int mGoalBeamCountBroken = 0;
+    private int mBeamCountBroken = 0;
+
+    private ILog mLog = Logger.createLog(this.getClass());
+
     public enum EIntakeState {
         INTAKE (1.0),
         STOP (0.0),
@@ -62,6 +69,8 @@ public class PowerCellModule extends Module {
         mBeamBreaker2 = new DigitalBeamSensor( Settings.kBeamChannel2 );
         mBeamBreaker3 = new DigitalBeamSensor( Settings.kBeamChannel3) ;
 
+        mDigitalBeamSensors = new DigitalBeamSensor[]{mBeamBreaker1, mBeamBreaker2, mBeamBreaker3};
+
     }
 
     @Override
@@ -72,11 +81,11 @@ public class PowerCellModule extends Module {
     @Override
     public void readInputs(double pNow) {
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , mCANMotor.getOutputCurrent());
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , (double) returnIntakeState().ordinal());
+        Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , (double) getIntakeState().ordinal());
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonOne.getOutputCurrent());
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , (double) returnIntakeState().ordinal());
+        Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , (double) getIntakeState().ordinal());
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT ,mTalonTwo.getOutputCurrent() );
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , (double) returnIntakeState().ordinal() );
+        Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , (double) getIntakeState().ordinal() );
 
         Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_0 , readBeamBreakerState(mBeamBreaker1.isBroken()));
         Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_1 , readBeamBreakerState(mBeamBreaker2.isBroken()));
@@ -104,22 +113,31 @@ public class PowerCellModule extends Module {
         mIntakeState = pDesiredState;
     }
 
-    public EIntakeState returnIntakeState(){
+    public EIntakeState getIntakeState(){
         return this.mIntakeState;
     }
     
-    public void startIntaking(){
-        mLog.info("------------------INTAKING HAS BEGUN-----------------");
-        if ( mBeamBreaker1.isBroken() ){
-           mIntaker = EIntakeState.INTAKE;
-            if ( mBeamBreaker2.isBroken() ){
-                mConveyor = EIntakeState.INTAKE;
-                if ( mBeamBreaker3.isBroken() ){
-                    mSerializer = EIntakeState.INTAKE;
-                }
-            }
+    public void intakePowecells() {
+        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().map(DigitalBeamSensor::isBroken).filter(e -> e).count();
+        if ( mBeamCountBroken < mGoalBeamCountBroken) {
+            setDesiredIntakeState(EIntakeState.INTAKE);
+        } else {
+            setDesiredIntakeState(EIntakeState.STOP);
         }
+        mGoalBeamCountBroken = mBeamCountBroken + 1;
     }
+//    public void startIntaking() {
+//        mCANMotor.set(1.0);
+//        mTalonOne.set(ControlMode.PercentOutput, 1d);
+//        mTalonTwo.set(ControlMode.PercentOutput, 1d);
+//        mTalonThree.set(ControlMode.PercentOutput, 1d);
+//    }
+//    public void startIndexing() {
+//        mCANMotor.set(1.0);
+//        if ( mBeamBreaker1.isBroken() ){
+//
+//        }
+//    }
     private double readBeamBreakerState(boolean isBroken){
         if ( isBroken ){
             return 1.0;

@@ -99,8 +99,7 @@ public class Settings extends NetworkTablesConstantsBase {
 
     public static List<ELogitech310> kTeleopCommandTriggers = Arrays.asList(InputMap.DRIVER.TRACK_TARGET_BTN,
                                                                             InputMap.DRIVER.TRACK_CARGO_BTN,
-                                                                            InputMap.DRIVER.TRACK_HATCH_BTN,
-                                                                            InputMap.OPERATOR.INTAKE_STUFF);
+                                                                            InputMap.DRIVER.TRACK_HATCH_BTN);
 
     public static List<ELogitech310> kAutonOverrideTriggers = Arrays.asList(InputMap.DRIVER.THROTTLE_AXIS,
                                                                             InputMap.DRIVER.TURN_AXIS);

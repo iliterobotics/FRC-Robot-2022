@@ -17,11 +17,12 @@ public class TestController extends AbstractController {
     }
     private void updateIntake() {
         if(Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.INTAKE);
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT, (double) PowerCellModule.EIntakeState.REVERSE.ordinal());
         } else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
-            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.REVERSE);
+//            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.REVERSE);
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_STATE, (double)PowerCellModule.EIntakeState.REVERSE.ordinal());
         } else {
-            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.STOP);
+           Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_STATE , (double) PowerCellModule.EIntakeState.STOP.ordinal());
         }
     }
 }
