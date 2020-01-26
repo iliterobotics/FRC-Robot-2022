@@ -20,8 +20,7 @@ public class TestController extends AbstractController {
     private ILog mLog = Logger.createLog(DriverInput.class);
 
     private Limelight mLimelight;
-    private ETrackingType mTrackingType;
-    private ETrackingType mLastTrackingType = null;
+    private Double mLastTrackingType;
 
     private CommandManager mTestCommandManager;
 
@@ -34,44 +33,43 @@ public class TestController extends AbstractController {
     public void update(double pNow) {
         updateLimelightTargetLock();
     }
-    public void updateLimelightTargetLock(){
-        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)){
+
+    public void updateLimelightTargetLock() {
+        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
             if (Robot.DATA.selectedTarget.get(ELimelightData.ty) != null) {
                 SmartDashboard.putNumber("Distance to Target", mLimelight.calcTargetDistance(72));
             }
-            mTrackingType = ETrackingType.TARGET;
-        }
-        else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)){
+            Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.TARGET.ordinal() );
+        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
             if (Robot.DATA.selectedTarget.get(ELimelightData.ty) != null) {
                 if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.tx)) < mLimelightZoomThreshold) {
-                    Robot.DATA.limelight.set(ELimelightData.LIMELIGHT_STATE , (double) mTrackingType.ordinal());
+                    Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.TARGET_ZOOM.ordinal());
                     System.out.println("ZOOMING");
                 } else {
-                    Robot.DATA.limelight.set(ELimelightData.LIMELIGHT_STATE , (double) mTrackingType.ordinal());
+                    Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.TARGET.ordinal() );
                 }
             } else {
-             //   Robot.DATA.selectedTarget.set(E);
+                //   Robot.DATA.selectedTarget.set(E);
             }
-        }
-        else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
-            mTrackingType = ETrackingType.BALL;
-        }
-        else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
-            mTrackingType = ETrackingType.BALL_DUAL;
-        }
-        else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
-            mTrackingType = ETrackingType.BALL_TRI;
+        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
+            Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.BALL.ordinal());
+        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
+            Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.BALL_DUAL.ordinal());
+        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
+            Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.BALL_TRI.ordinal());
         }
         else {
-            mTrackingType = ETrackingType.NONE;
+                Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.NONE.ordinal());
 //            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
         }
-        if(!mTrackingType.equals(mLastTrackingType) && !mTrackingType.equals(ETrackingType.NONE)) {
-            mLog.error("Requesting command start");
-            mLog.error("Stopping teleop command queue");
+        if (!(Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE.ordinal()).equals(mLastTrackingType) )
+                && !(Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE.ordinal()) == ETrackingType.NONE.ordinal())) {
+                mLog.error("Requesting command start");
+                mLog.error("Stopping teleop command queue");
 //            mTeleopCommandManager.stopRunningCommands(pNow);
 //            mTeleopCommandManager.startCommands(new LimelightTargetLock(mDrive, mLimelight, 2, mTrackingType, this, false).setStopWhenTargetLost(false));
         }
-        mLastTrackingType = mTrackingType;
+            mLastTrackingType =  Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE.ordinal());
+        }
     }
-}
+

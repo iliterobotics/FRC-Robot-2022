@@ -22,5 +22,5 @@ public enum ELimelightData implements CodexOf<Double> {
     calcTargetX,
     calcTargetY,
 
-    LIMELIGHT_STATE;
+    TRACKING_TYPE;
 }
