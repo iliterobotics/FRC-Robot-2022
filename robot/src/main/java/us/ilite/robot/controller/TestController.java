@@ -13,11 +13,16 @@ public class TestController extends AbstractController {
         this.mIntake = pIntake;
     }
     public void update(double pNow) {
-        updatePowerCellModule();
+        updateIntake();
     }
-    public void updatePowerCellModule(){
-        if ( Robot.DATA.operatorinput.isSet(ELogitech310.X_BTN) ) {
-                mIntake.startIntaking();
+    private void updateIntake() {
+        if(Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
+            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.INTAKE);
+        } else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
+            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.REVERSE);
+        } else {
+            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.STOP);
         }
     }
 }
+
