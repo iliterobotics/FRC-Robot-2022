@@ -3,6 +3,7 @@ package us.ilite.robot.auto.paths;
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import org.junit.Test;
+import java.lang.Math.*;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -69,6 +70,10 @@ public class BobUtilsUnitTest {
         sb.append(pLabel + " = ").append(nf.format(pNumber)).append("\t");
     }
 
+    private static void csv(StringBuilder sb, double pNumber) {
+        sb.append(csvf.format(pNumber)).append(",");
+    }
+
     @Test
     public void testTrajectoryMapping() {
         System.out.println("=== TRAJECTORY MAPPING ===");
@@ -78,14 +83,16 @@ public class BobUtilsUnitTest {
 
     @Test
     public void testCurvature() {
-        Path p = WONKY;
-
-        for(int i = 2; i < 102; i+=10) {
-            double c = calculateCurvature(p, i);
-            System.out.println("Curvature @ " + i * 0.020d + " = " + c);
+        System.out.println("=== CURVATURE === (deg / yd)");
+        for(Path p : ALL_PATHS) {
+            StringBuilder sb = new StringBuilder(p.getClass().getSimpleName()).append("\t");
+            for(int i = 2; i < p.getSegmentCount(); i += 5) {
+                csv(sb, 180/Math.PI*calculateCurvature(p, i) * METERS_TO_FEET * 3d);
+            }
+            System.out.println(sb);
         }
-
     }
 
     private static final NumberFormat nf = new DecimalFormat("0.00");
+    private static final NumberFormat csvf = new DecimalFormat("0.0000");
 }
