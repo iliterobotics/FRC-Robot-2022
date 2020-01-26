@@ -94,5 +94,5 @@ public class BobUtilsUnitTest {
     }
 
     private static final NumberFormat nf = new DecimalFormat("0.00");
-    private static final NumberFormat csvf = new DecimalFormat("0.0000");
+    private static final NumberFormat csvf = new DecimalFormat("0.00");
 }
