@@ -3,50 +3,76 @@ package us.ilite.robot.auto.paths;
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import org.junit.Test;
-import us.ilite.paths.Squiggle;
-import us.ilite.paths.UNIT_TEST_STRAIGHT_LINE;
-import us.ilite.paths.Wonky;
-import us.ilite.paths.Yoink;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import static us.ilite.robot.auto.paths.BobUtils.*;
 
-import java.util.Arrays;
-
 public class BobUtilsUnitTest {
-    private static final Path UNIT_TEST_STRAIGHT_LINE = new UNIT_TEST_STRAIGHT_LINE();
-    private static final Path SQUIGGLE = new Squiggle();
-    private static final Path WONKY = new Wonky();
-    private static final Path YOINK = new Yoink();
+    private static final Path
+            T_LINE_27_FT = new T_LINE_27_FT(),
+            T_90DEG_12FT = new T_90DEG_12FT(),
+            T_180DEG_24FT = new T_180DEG_24FT(),
+            SQUIGGLE = new Squiggle(),
+            WONKY = new Wonky(),
+            YOINK = new Yoink(),
+            LOOP = new Loop(),
+            OURTRENCH = new OurTrench(),
+            TRENCH5 = new Trench5()
+    ;
     private static final Path[] ANALYSIS_PATHS = new Path[] {
-        UNIT_TEST_STRAIGHT_LINE,
-        SQUIGGLE,
-        WONKY,
-        YOINK
+            SQUIGGLE,
+            WONKY,
+            LOOP,
+            OURTRENCH,
+            TRENCH5,
+            YOINK,
+    };
+
+    private static final Path[] TEST_PATHS = new Path[] {
+            T_LINE_27_FT,
+            T_90DEG_12FT,
+            T_180DEG_24FT
+    };
+
+    private static final Path[] ALL_PATHS = new Path[] {
+            SQUIGGLE,
+            WONKY,
+            LOOP,
+            OURTRENCH,
+            TRENCH5,
+            YOINK,
+            T_LINE_27_FT,
+            T_90DEG_12FT,
+            T_180DEG_24FT
     };
 
     @Test
     public void testTotalTime() {
         System.out.println("=== TRAJECTORY ANALYSIS ===");
-        for (Path p : ANALYSIS_PATHS) {
+        for (Path p : ALL_PATHS) {
             StringBuilder sb = new StringBuilder(p.getClass().getSimpleName()).append("\t");
-            sb.append("SEGMENTS: " + p.getSegmentCount());
-            sb.append("\t");
-            sb.append("TIME (s) = " + BobUtils.getPathTotalTime(p));
-            sb.append("\t");
-            sb.append("MAX VEL (ft/s) = " + BobUtils.getPathMaxVelocity(p));
-            sb.append("\t");
-            sb.append("INDEX @ 1s = " + getIndexForCumulativeTime(p, 1.0, 0.0));
-            sb.append("\t");
-            sb.append("INDEX @ 5s = " + getIndexForCumulativeTime(p, 5.0, 0.0));
+            append("SEGS", p.getSegmentCount(), sb);
+            append("DT (s)", getPathTotalTime(p), sb);
+            append("DIST (FT)", getPathTotalDistanceFt(p), sb);
+            append("MAX VEL (ft/s)", getPathMaxVelocity(p), sb);
+            append("AVG VEL (ft/s)", getPathTotalDistanceFt(p) / getPathTotalTime(p), sb);
+            append("INDEX @ 1s", getIndexForCumulativeTime(p, 1.0, 0.0), sb);
+            append("INDEX @ 5s", getIndexForCumulativeTime(p, 5.0, 0.0), sb);
             System.out.println(sb);
         }
 
     }
 
+    private static void append(String pLabel, double pNumber, StringBuilder sb) {
+        sb.append(pLabel + " = ").append(nf.format(pNumber)).append("\t");
+    }
+
     @Test
     public void testTrajectoryMapping() {
         System.out.println("=== TRAJECTORY MAPPING ===");
-        Trajectory.State goal = sample(UNIT_TEST_STRAIGHT_LINE, 1.0, 0.0);
+        Trajectory.State goal = sample(T_LINE_27_FT, 1.0, 0.0);
         System.out.println(goal);
     }
 
@@ -60,4 +86,6 @@ public class BobUtilsUnitTest {
         }
 
     }
+
+    private static final NumberFormat nf = new DecimalFormat("0.00");
 }

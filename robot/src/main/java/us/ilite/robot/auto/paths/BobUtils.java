@@ -113,4 +113,21 @@ public class BobUtils {
         mMaxTimeCache.put(key, time);
         return time;
     }
+
+    public static double getPathTotalDistanceFt(Path pPath) {
+        double distance = 0;
+        for (int i = 1; i < pPath.getSegmentCount(); i++) {
+            distance += calculateDistance(
+                    pPath.getValue(i-1, X),
+                    pPath.getValue(i-1, Y),
+                    pPath.getValue(i, X),
+                    pPath.getValue(i, Y)
+            );
+        }
+        return distance;
+    }
+
+    public static double calculateDistance(double x1, double y1, double x2, double y2) {
+        return sqrt(pow(x2-x1,2) + pow(y2-y1,2));
+    }
 }
