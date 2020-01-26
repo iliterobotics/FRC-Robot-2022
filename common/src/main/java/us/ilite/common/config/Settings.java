@@ -23,6 +23,9 @@ public class Settings extends NetworkTablesConstantsBase {
 
     public static double kNetworkTableUpdateRate = 0.01;
 
+    public static double kDJOutput = .25;
+    public static int kDJBoothTalonId = 12;
+
     public static int sCODEX_COMMS_PORT = 5805;
 
     // ================================

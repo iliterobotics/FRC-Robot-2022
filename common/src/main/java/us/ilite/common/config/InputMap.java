@@ -23,7 +23,9 @@ public class InputMap {
     }
 
     public static class OPERATOR {
-
+        public static  final ELogitech310
+        OPERATOR_POSITION_CONTROL = ELogitech310.R_BTN,
+        OPERATOR_ROTATION_CONTROL = ELogitech310.R_BTN;
     }
 
 

@@ -14,6 +14,8 @@ import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 import static us.ilite.robot.hardware.ECommonControlMode.*;
 
+import us.ilite.robot.commands.DJBoothPositionControl;
+import us.ilite.robot.commands.DJBoothRotationControl;
 import us.ilite.robot.modules.Module;
 import us.ilite.robot.modules.*;
 
@@ -29,6 +31,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private CommandManager mAutonomousCommandManager;
     private Limelight mLimelight;
     private Data mData;
+    private DJBoothPositionControl mDjBoothPositionControl;
+    private DJBoothRotationControl mDjBoothRotationControl;
     private Timer mGroundCargoTimer = new Timer();
 
     private boolean mIsCargo = false;
@@ -41,11 +45,14 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
                        CommandManager pTeleopCommandManager, CommandManager pAutonomousCommandManager,
+                       DJBoothRotationControl pDjBoothRotationControl, DJBoothPositionControl pDjBoothPositionControl,
                        boolean pSimulated) {
         this.mLimelight = pLimelight;
         this.mData = pData;
         this.mTeleopCommandManager = pTeleopCommandManager;
         this.mAutonomousCommandManager = pAutonomousCommandManager;
+        this.mDjBoothPositionControl = pDjBoothPositionControl;
+        this.mDjBoothRotationControl = pDjBoothRotationControl;
 
         this.mDriverInputCodex = mData.driverinput;
         this.mOperatorInputCodex = mData.operatorinput;
@@ -96,6 +103,25 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         DriveMessage driveMessage = new DriveMessage().throttle(throttle).turn(rotate).mode(PERCENT_OUTPUT).normalize().calculateCurvature();
 
         mDrive.setDriveMessage(driveMessage);
+    }
+
+    private void updateDJBooth() {
+        if ( mDriverInputCodex.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL) &&
+                mDriverInputCodex.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL) ) {
+            mDjBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
+            mDjBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
+        }
+        else if (mDriverInputCodex.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
+            mDjBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.ON );
+            mDjBoothPositionControl.setDesiredColorState( DJBoothPositionControl.ColorState.RED );
+        }
+        else if (mDriverInputCodex.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL) ) {
+            mDjBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.ON );
+        }
+        else {
+            mDjBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
+            mDjBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
+        }
     }
 
     @Override
