@@ -103,11 +103,6 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
         mDrive.setDriveMessage(driveMessage);
     }
-    private void updateIntake(){
-        if ( mData.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STUFF )) {
-            mIntake.startIntaking();
-        }
-    }
 
     @Override
     public void shutdown(double pNow) {
