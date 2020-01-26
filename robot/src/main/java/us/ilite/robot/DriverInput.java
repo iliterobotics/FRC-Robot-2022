@@ -91,13 +91,16 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
             rotate *= Settings.Input.kSnailModePercentRotateReduction;
         }
 
-        DriveMessage driveMessage = new DriveMessage().throttle(throttle).turn(rotate).mode(PERCENT_OUTPUT).normalize().calculateCurvature();
+        DriveMessage driveMessage = new DriveMessage().throttle(throttle).turn(rotate).mode(PERCENT_OUTPUT).normalize();//.calculateCurvature();
         double leftSetpoint = driveMessage.getLeftOutput();
         double rightSetpoint = driveMessage.getRightOutput();
         leftSetpoint = Math.abs(leftSetpoint) > 0.01 ? leftSetpoint : 0.0; //Handling Deadband
         rightSetpoint = Math.abs(rightSetpoint) > 0.01 ? rightSetpoint : 0.0; //Handling Deadband
         Robot.DATA.drivetrain.set(EDriveData.LEFT_DEMAND, leftSetpoint * Settings.Drive.kDriveTrainMaxVelocity);
         Robot.DATA.drivetrain.set(EDriveData.RIGHT_DEMAND, rightSetpoint * Settings.Drive.kDriveTrainMaxVelocity);
+
+        Robot.DATA.drivetrain.set(EDriveData.TURN, rotate);
+        Robot.DATA.drivetrain.set(EDriveData.THROTTLE, throttle);
 
     }
 

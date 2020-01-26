@@ -73,6 +73,7 @@ public class Settings extends NetworkTablesConstantsBase {
     // =============================================================================
     public static class Drive {
         public static double kDriveTrainMaxVelocity = 5676;
+        public static double kMaxHeadingChange = 6; // Radians per cycle
     }
 
     public static class Input {

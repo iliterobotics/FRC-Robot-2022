@@ -9,6 +9,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.SimpleNetworkTable;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
 import static us.ilite.common.types.ETargetingData.*;
@@ -58,6 +59,7 @@ public class DriveModule extends Loop {
 	// Heading Gains
 	// =============================================================================
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
+	public static ProfileGains kYawGains = new ProfileGains().f(.15);
 	public static double kDriveLinearPercentOutputLimit = 0.5;
 
 	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
@@ -80,17 +82,21 @@ public class DriveModule extends Loop {
 	private double mTargetTrackingThrottle = 0;
 
 	private PIDController mTargetAngleLockPid;
-
+	private PIDController mYawPid;
+	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
 
 	public DriveModule()
 	{
-		if(AbstractSystemSettingsUtils.isPracticeBot()) {
+		if (AbstractSystemSettingsUtils.isPracticeBot()) {
 
 		} else {
 			this.mDriveHardware = new NeoDriveHardware(kGearboxRatio);
 		}
-
+		mYawPid = new PIDController(kYawGains,
+									-Settings.Drive.kMaxHeadingChange,
+									Settings.Drive.kMaxHeadingChange,
+									Settings.kControlLoopPeriod);
 		this.mDriveHardware.init();
 	}
 
@@ -124,7 +130,12 @@ public class DriveModule extends Loop {
 		Robot.DATA.drivetrain.set(LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 
-		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
+		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
+
+		double currentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
+		Robot.DATA.imu.set(EGyro.YAW_DEGREES, currentHeading - mPreviousHeading);
+
+//		mYawPid.setSetpoint(Robot.DATA.drivetrain.get(TURN) * Settings.Drive.kMaxHeadingChange);
 	}
 
 	@Override
@@ -133,9 +144,13 @@ public class DriveModule extends Loop {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
+
+        	double mOutput = mYawPid.calculate(Units.degrees_to_radians(mDriveHardware.getImu().getYaw()), pNow);
+			System.out.println(Robot.DATA.imu.get(EGyro.YAW_DEGREES));
 			((NeoDriveHardware)mDriveHardware).setTarget(Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
 		}
 
+		mPreviousHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
 		mPreviousTime = pNow;
 	}
 	
