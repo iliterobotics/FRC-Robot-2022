@@ -133,16 +133,16 @@ public class DJBoothPositionControl implements ICommand {
         Data mData = Robot.DATA;
         if (match != null) {
             if (kBlueTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, kBlueTarget);
+                mData.color.set( EColorData.SENSED_COLOR, EColorData.EColor.BLUE.ordinal() );
                 return kBlueTarget;
             } else if (kRedTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, kRedTarget);
+                mData.color.set(EColorData.SENSED_COLOR, EColorData.EColor.RED.ordinal());
                 return kRedTarget;
             } else if (kGreenTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, kGreenTarget);
+                mData.color.set(EColorData.SENSED_COLOR, EColorData.EColor.GREEN.ordinal());
                 return kGreenTarget;
             } else if (kYellowTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, kYellowTarget);
+                mData.color.set(EColorData.SENSED_COLOR, EColorData.EColor.YELLOW.ordinal());
                 return kYellowTarget;
             } else {
                 mData.color.set(EColorData.SENSED_COLOR, Color.kBlack);

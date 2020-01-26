@@ -40,7 +40,7 @@ public class Data {
     public final Codex<Double, EColorWheelData> colorwheel = Codex.of.thisEnum(EColorWheelData.class);
     public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
     public final Codex<Double, EHangerData> hanger = Codex.of.thisEnum(EHangerData.class);
-    public final Codex<Color, EColorData> color = Codex.of.thisEnum(EColorData.class);
+    public final Codex<Double, EColorData> color = Codex.of.thisEnum(EColorData.class);
 
 
     public final Codex[] mAllCodexes = new Codex[] {
