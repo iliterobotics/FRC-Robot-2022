@@ -20,8 +20,8 @@ public class LimelightTargetLock extends TargetLock {
 //        mLog.error("STARTED LIMELIGHT TARGET LOCK");
 //    }
 
-    public LimelightTargetLock(DriveModule pDrive, Limelight pLimelight, double pAllowableError, ETrackingType pTrackingType, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
-        super(pDrive, pAllowableError, pTrackingType, pLimelight, pThrottleProvider, pEndOnAlignment);
+    public LimelightTargetLock(Limelight pLimelight, double pAllowableError, ETrackingType pTrackingType, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
+        super(pAllowableError, pTrackingType, pLimelight, pThrottleProvider, pEndOnAlignment);
 
         this.mLimelight = pLimelight;
         mLimelight.setTracking(pTrackingType);
