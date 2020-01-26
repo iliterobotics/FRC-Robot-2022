@@ -2,7 +2,9 @@ package us.ilite.robot.commands;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
+import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.IThrottleProvider;
 import us.ilite.robot.modules.Limelight;
@@ -12,7 +14,6 @@ public class LimelightTargetLock extends TargetLock {
     private ILog mLog = Logger.createLog(LimelightTargetLock.class);
 
     private Limelight mLimelight;
-    private ETrackingType mTrackingType;
 
 
 //    public LimelightTargetLock(Drive pDrive, Limelight pLimelight, double pAllowableError, ETrackingType pTrackingType, IThrottleProvider pThrottleProvider) {
@@ -22,26 +23,23 @@ public class LimelightTargetLock extends TargetLock {
 //        mLog.error("STARTED LIMELIGHT TARGET LOCK");
 //    }
 
-    public LimelightTargetLock(DriveModule pDrive, Limelight pLimelight, double pAllowableError, ETrackingType pTrackingType, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
-        super(pDrive, pAllowableError, pTrackingType, pLimelight, pThrottleProvider, pEndOnAlignment);
+    public LimelightTargetLock(DriveModule pDrive, Limelight pLimelight, double pAllowableError, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
+        super(pDrive, pAllowableError, pLimelight, pThrottleProvider, pEndOnAlignment);
 
         this.mLimelight = pLimelight;
-        this.mTrackingType = pTrackingType;
-        mLimelight.setTracking(mTrackingType);
         mLog.error("STARTED LIMELIGHT TARGET LOCK");
     }
 
     @Override
     public void init(double pNow) {
         super.init(pNow);
-        mLimelight.setTracking(mTrackingType);
         mLog.error("STARTED LIMELIGHT TARGET LOCK");
     }
 
     public void shutdown(double pNow) {
         super.shutdown(pNow);
         mLog.warn("SHUT DOWN LIMELIGHT TARGET LOCK");
-        mLimelight.setTracking(ETrackingType.NONE);
+        Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE , (double) ETrackingType.NONE.ordinal());
     }
 
 }

@@ -5,6 +5,8 @@ import com.flybotix.hfr.codex.Codex;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.IThrottleProvider;
@@ -30,14 +32,13 @@ public class TargetLock implements ICommand {
     private boolean mStopWhenTargetLost = true;
 
 
-    public TargetLock(DriveModule pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
-        this(pDrive, pAllowableError, pTrackingType, pCamera, pThrottleProvider, true);
+    public TargetLock(DriveModule pDrive, double pAllowableError, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
+        this(pDrive, pAllowableError, pCamera, pThrottleProvider, true);
     }
 
-    public TargetLock(DriveModule pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
+    public TargetLock(DriveModule pDrive, double pAllowableError, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
         this.mDrive = pDrive;
         this.mAllowableError = pAllowableError;
-        this.mTrackingType = pTrackingType;
         this.mCamera = pCamera;
         this.mTargetSearchThrottleProvider = pThrottleProvider;
         this.mTargetLockThrottleProvider = pThrottleProvider;
