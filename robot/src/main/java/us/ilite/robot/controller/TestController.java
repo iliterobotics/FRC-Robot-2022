@@ -18,16 +18,10 @@ import us.ilite.robot.modules.Limelight;
 public class TestController extends AbstractController {
 
     private ILog mLog = Logger.createLog(DriverInput.class);
-
-    private Limelight mLimelight;
     private Double mLastTrackingType;
-
-    private CommandManager mTestCommandManager;
-
     private double mLimelightZoomThreshold = 7.0;
 
-    public TestController(Limelight pLimelight) {
-        mLimelight = pLimelight;
+    public TestController() { ;
     }
 
     public void update(double pNow) {
@@ -37,7 +31,7 @@ public class TestController extends AbstractController {
     public void updateLimelightTargetLock() {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
             if (Robot.DATA.selectedTarget.get(ELimelightData.ty) != null) {
-                SmartDashboard.putNumber("Distance to Target", mLimelight.calcTargetDistance(72));
+                SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.calcDistToTarget));
             }
             Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.TARGET.ordinal() );
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
