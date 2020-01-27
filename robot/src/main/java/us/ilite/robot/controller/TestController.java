@@ -17,12 +17,18 @@ public class TestController extends AbstractController {
     }
     private void updateIntake() {
         if(Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT, (double) PowerCellModule.EIntakeState.REVERSE.ordinal());
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT, (double) PowerCellModule.EIntakeState.INTAKE.ordinal());
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT, (double) PowerCellModule.EIntakeState.INTAKE.ordinal());
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT, (double) PowerCellModule.EIntakeState.INTAKE.ordinal());
         } else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
 //            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.REVERSE);
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_STATE, (double)PowerCellModule.EIntakeState.REVERSE.ordinal());
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT, (double) PowerCellModule.EIntakeState.REVERSE.ordinal());
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT, (double) PowerCellModule.EIntakeState.REVERSE.ordinal());
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT, (double) PowerCellModule.EIntakeState.REVERSE.ordinal());
         } else {
-           Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_STATE , (double) PowerCellModule.EIntakeState.STOP.ordinal());
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT, (double) PowerCellModule.EIntakeState.STOP.ordinal());
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT, (double) PowerCellModule.EIntakeState.STOP.ordinal());
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT, (double) PowerCellModule.EIntakeState.STOP.ordinal());
         }
     }
 }
