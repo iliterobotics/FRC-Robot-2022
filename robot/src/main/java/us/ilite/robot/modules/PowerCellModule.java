@@ -33,10 +33,8 @@ public class PowerCellModule extends Module {
 
     //Intake state
     private EIntakeState mIntakeState;
-    private EIntakeState mIntaker;
-    private EIntakeState mConveyor;
-    private EIntakeState mSerializer;
-
+    
+    //For indexing
     private int mGoalBeamCountBroken = 0;
     private int mBeamCountBroken = 0;
 
@@ -60,14 +58,15 @@ public class PowerCellModule extends Module {
 
     public PowerCellModule() {
 
-        mCANMotor = SparkMaxFactory.createDefaultSparkMax( Settings.kCANIntakeID , CANSparkMaxLowLevel.MotorType.kBrushless );
-        mTalonOne = TalonSRXFactory.createDefaultTalon( Settings.kTalonOneID );
-        mTalonTwo = TalonSRXFactory.createDefaultTalon( Settings.kTalonTwoID );
-        mTalonThree = TalonSRXFactory.createDefaultTalon( Settings.kTalonThreeID );
+        mCANMotor = SparkMaxFactory.createDefaultSparkMax( Settings.PowerCellModule.kCANIntakeID ,
+                CANSparkMaxLowLevel.MotorType.kBrushless );
+        mTalonOne = TalonSRXFactory.createDefaultTalon( Settings.PowerCellModule.kTalonOneID );
+        mTalonTwo = TalonSRXFactory.createDefaultTalon( Settings.PowerCellModule.kTalonTwoID );
+        mTalonThree = TalonSRXFactory.createDefaultTalon( Settings.PowerCellModule.kTalonThreeID );
 
-        mBeamBreaker1 = new DigitalBeamSensor( Settings.kBeamChannel1 );
-        mBeamBreaker2 = new DigitalBeamSensor( Settings.kBeamChannel2 );
-        mBeamBreaker3 = new DigitalBeamSensor( Settings.kBeamChannel3) ;
+        mBeamBreaker1 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel1 );
+        mBeamBreaker2 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel2 );
+        mBeamBreaker3 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel3) ;
 
         mDigitalBeamSensors = new DigitalBeamSensor[]{mBeamBreaker1, mBeamBreaker2, mBeamBreaker3};
 
@@ -80,11 +79,22 @@ public class PowerCellModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , mCANMotor.getOutputCurrent());
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_INTAKE_POWER_PCT , (double) getIntakeState().ordinal());
+        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_TWO_POWER_PCT , (double) getIntakeState().ordinal());
+        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_TWO_POWER_PCT , mTalonTwo.getOutputCurrent());
+
+        Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , mTalonTwo.getOutputCurrent());
+        Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , (double) getIntakeState().ordinal());
+
+        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_POWER_PCT , (double) getIntakeState().ordinal());
+        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_POWER_PCT , mTalonOne.getOutputCurrent());
+
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonOne.getOutputCurrent());
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , (double) getIntakeState().ordinal());
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT ,mTalonTwo.getOutputCurrent() );
+
+        Robot.DATA.powercell.set(EPowerCellData.CURRENT_SERIALIZER_POWER_PCT , (double) getIntakeState().ordinal());
+        Robot.DATA.powercell.set(EPowerCellData.CURRENT_SERIALIZER_POWER_PCT, mCANMotor.getOutputCurrent());
+
+        Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT ,mCANMotor.getOutputCurrent() );
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , (double) getIntakeState().ordinal() );
 
         Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_0 , readBeamBreakerState(mBeamBreaker1.isBroken()));
@@ -99,15 +109,29 @@ public class PowerCellModule extends Module {
         mTalonOne.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
         mTalonTwo.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
         mTalonThree.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
-        // I May want to add beam breakers
+
+        switch (mIntakeState) {
+            case INTAKE:
+                mCANMotor.set( Settings.PowerCellModule.kIntakeCANPower);
+                mTalonOne.set(ControlMode.PercentOutput, Settings.PowerCellModule.kIntakeTalonPower);
+                mTalonTwo.set(ControlMode.PercentOutput, Settings.PowerCellModule.kIntakeTalonPower);
+                break;
+            case REVERSE:
+                mCANMotor.set( -Settings.PowerCellModule.kIntakeCANPower);
+                mTalonOne.set(ControlMode.PercentOutput, Settings.PowerCellModule.kIntakeTalonPower);
+                mTalonTwo.set(ControlMode.PercentOutput, Settings.PowerCellModule.kIntakeTalonPower);
+                break;
+            case STOP:
+                mCANMotor.set(Settings.PowerCellModule.kForStopCAN);
+                mTalonOne.set(ControlMode.PercentOutput, Settings.PowerCellModule.kForStopTalon);
+                mTalonTwo.set(ControlMode.PercentOutput, Settings.PowerCellModule.kForStopTalon);
+                break;
+        }
     }
 
     @Override
     public void shutdown(double pNow) {
-        mCANMotor.set(0.0);
-        mTalonOne.set(ControlMode.PercentOutput, 0d);
-        mTalonTwo.set(ControlMode.PercentOutput, 0d);
-        mTalonThree.set(ControlMode.PercentOutput, 0d);
+       Robot.DATA.powercell.set(EIntakeState.STOP.ordinal() , 0.0);
     }
     public void setDesiredIntakeState(EIntakeState pDesiredState){
         mIntakeState = pDesiredState;
@@ -117,7 +141,7 @@ public class PowerCellModule extends Module {
         return this.mIntakeState;
     }
     
-    public void intakePowecells() {
+    public void indexPowecells() {
         mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().map(DigitalBeamSensor::isBroken).filter(e -> e).count();
         if ( mBeamCountBroken < mGoalBeamCountBroken) {
             setDesiredIntakeState(EIntakeState.INTAKE);

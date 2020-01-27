@@ -34,7 +34,7 @@ public class OperatorInput extends Module {
     @Override
     public void readInputs(double pNow) {
         ELogitech310.map(Robot.DATA.driverinput, mDriverJoystick);
-//        ELogitech310.map(Robot.mData.operatorinput, mOperatorJoystick);
+        ELogitech310.map(Robot.DATA.operatorinput, mOperatorJoystick);
     }
 
     @Override

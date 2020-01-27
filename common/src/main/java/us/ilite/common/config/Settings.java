@@ -24,14 +24,22 @@ public class Settings extends NetworkTablesConstantsBase {
     public static double kNetworkTableUpdateRate = 0.01;
 
     public static int sCODEX_COMMS_PORT = 5805;
-    public static double kIntakeTalonPower = 1d;
-    public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
-    public static int kTalonOneID; // Change later
-    public static int kTalonTwoID; // Change later
-    public static int kTalonThreeID; // Change later
-    public static int kBeamChannel1; // Change later
-    public static int kBeamChannel2; // Change later
-    public static int kBeamChannel3; // Change later
+
+    public static class PowerCellModule {
+        public static double kIntakeTalonPower = 1d;
+        public static double kForStopTalon = 0d;
+        public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
+        public static int kTalonOneID; // Change later
+        public static int kTalonTwoID; // Change later
+        public static int kTalonThreeID; // Change later
+        public static int kBeamChannel1; // Change later
+        public static int kBeamChannel2; // Change later
+        public static int kBeamChannel3; // Change later
+        public static double kIntakeCANPower = 1.0;
+        public static double kForStopCAN = 1.0;
+
+    }
+
 
     // ================================
     // System ID's
