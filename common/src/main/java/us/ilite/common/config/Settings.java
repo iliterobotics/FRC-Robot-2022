@@ -37,6 +37,12 @@ public class Settings extends NetworkTablesConstantsBase {
         public static int kBeamChannel3; // Change later
         public static double kIntakeCANPower = 1.0;
         public static double kForStopCAN = 1.0;
+        public static double kWarnCurrentLimitThreshold = 30; //Tune this later
+        public static double kPowerCellP;
+        public static double kPowerCellI;
+        public static double kPowerCellD;
+        public static double kPowerCellF;
+
 
     }
 

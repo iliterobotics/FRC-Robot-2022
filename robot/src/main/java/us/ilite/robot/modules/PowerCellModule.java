@@ -4,11 +4,14 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EPowerCellData;
+import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.SparkMaxFactory;
@@ -29,6 +32,7 @@ public class PowerCellModule extends Module {
     private DigitalBeamSensor mBeamBreaker2;
     private DigitalBeamSensor mBeamBreaker3;
 
+    //Array of beam-breakers (Used when indexing PowerCells)
     private DigitalBeamSensor[] mDigitalBeamSensors;
 
     //Intake state
@@ -37,6 +41,10 @@ public class PowerCellModule extends Module {
     //For indexing
     private int mGoalBeamCountBroken = 0;
     private int mBeamCountBroken = 0;
+
+    private CANEncoder mNeoEncoder;
+    private CANPIDController mCanController;
+
 
     private ILog mLog = Logger.createLog(this.getClass());
 
@@ -70,11 +78,17 @@ public class PowerCellModule extends Module {
 
         mDigitalBeamSensors = new DigitalBeamSensor[]{mBeamBreaker1, mBeamBreaker2, mBeamBreaker3};
 
+        mNeoEncoder = mCANMotor.getEncoder();
+        mCanController = mCANMotor.getPIDController();
+
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-
+        mCanController.setP(Settings.PowerCellModule.kPowerCellP);
+        mCanController.setI(Settings.PowerCellModule.kPowerCellI);
+        mCanController.setD(Settings.PowerCellModule.kPowerCellD);
+        mCanController.setFF(Settings.PowerCellModule.kPowerCellF);
     }
 
     @Override
@@ -140,8 +154,10 @@ public class PowerCellModule extends Module {
     public EIntakeState getIntakeState(){
         return this.mIntakeState;
     }
+
     
-    public void indexPowecells() {
+    public void indexPowerCells() {
+        mLog.info("----------------INDEXING OF POWERCELLS HAS BEGUN------------------");
         mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().map(DigitalBeamSensor::isBroken).filter(e -> e).count();
         if ( mBeamCountBroken < mGoalBeamCountBroken) {
             setDesiredIntakeState(EIntakeState.INTAKE);
@@ -167,6 +183,10 @@ public class PowerCellModule extends Module {
             return 1.0;
         }
         return 0.0;
+    }
+
+    public boolean isCurrentLimiting(){
+        return Robot.DATA.pdp.get(EPowerDistPanel.CURRENT5) > Settings.PowerCellModule.kWarnCurrentLimitThreshold;
     }
 
 
