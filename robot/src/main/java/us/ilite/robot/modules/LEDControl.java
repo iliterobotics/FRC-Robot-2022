@@ -173,7 +173,7 @@ public class LEDControl extends Module {
 //
 //        if(mLimelight.getTracking() != ETrackingType.NONE) mCurrentMessage = Message.VISION_TRACKING;
 //
-        Color color = Robot.DATA.color.get( EColorData.SENSED_COLOR );
+        Color color = getColor( Robot.DATA.color.get(EColorData.SENSED_COLOR) );
         boolean isPositionDone = mDjBoothPositionControl.isDone();
         boolean isRotationDone = mDjBoothRotationControl.isDone();
 
@@ -229,6 +229,20 @@ public class LEDControl extends Module {
         controlLED(mCurrentMessage);
     }
 
+    public Color getColor(double ordinal) {
+        double ordinalOfSensedColor = Robot.DATA.color.get( EColorData.SENSED_COLOR );
+        if (ordinalOfSensedColor == EColorData.EColor.RED.ordinal() ) {
+            return kRedTarget;
+        } else if (ordinalOfSensedColor == EColorData.EColor.BLUE.ordinal() ) {
+            return kBlueTarget;
+        } else if (ordinalOfSensedColor == EColorData.EColor.GREEN.ordinal() ) {
+            return kGreenTarget;
+        } else if (ordinalOfSensedColor == EColorData.EColor.BLUE.ordinal() ) {
+            return kBlueTarget;
+        } else {
+            return Color.kBlack;
+        }
+    }
 
     public void controlLED(Message m)
     {
