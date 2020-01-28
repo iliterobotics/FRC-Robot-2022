@@ -27,9 +27,6 @@ public class DJBoothPositionControl implements ICommand {
     private MotorState eMotorState;
     private  boolean mIsDone;
 
-    public DJBoothPositionControl ( ColorState pDesiredColorState ) {
-        eDesiredColorState = pDesiredColorState;
-    }
 
     public enum ColorState {
         DEFAULT,
@@ -54,9 +51,6 @@ public class DJBoothPositionControl implements ICommand {
         eMotorState = MotorState.OFF;
         eDesiredColorState = ColorState.DEFAULT;
         mIsDone = false;
-        mSolidStateCounter = 0;
-        eMotorState = MotorState.OFF;
-        eDesiredColorState = ColorState.DEFAULT;
 
         mColorMatcher.addColorMatch(kBlueTarget);
         mColorMatcher.addColorMatch(kGreenTarget);

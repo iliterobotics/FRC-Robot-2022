@@ -3,7 +3,6 @@ package us.ilite.robot.driverinput;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.DriverStation;
 import us.ilite.common.lib.util.CheesyDriveHelper;
 import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.Util;
@@ -11,7 +10,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
-import us.ilite.common.config.*;
 import us.ilite.common.lib.util.RangeScale;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.common.types.input.EInputScale;
@@ -26,7 +24,6 @@ import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.HatchFlower;
 import us.ilite.robot.modules.*;
 import us.ilite.robot.modules.Module;
-import us.ilite.robot.modules.Intake.EIntakeState;
 
 public class DriverInput extends Module implements IThrottleProvider, ITurnProvider {
 

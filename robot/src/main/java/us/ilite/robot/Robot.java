@@ -6,10 +6,6 @@ import com.flybotix.hfr.codex.ICodexTimeProvider;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-
-import com.revrobotics.ColorMatch;
-import com.revrobotics.ColorMatchResult;
-import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,8 +25,8 @@ import us.ilite.robot.hardware.GetLocalIP;
 import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
+
 import java.util.List;
-import edu.wpi.first.wpilibj.util.Color;
 
 public class Robot extends TimedRobot {
 
@@ -49,6 +45,7 @@ public class Robot extends TimedRobot {
     private FlywheelPrototype mFlywheel;
     private OperatorInput mOI;
     private Limelight mLimelight;
+
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
@@ -58,9 +55,6 @@ public class Robot extends TimedRobot {
     private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
 
-
-    private ColorSensorV3 mColorSensorV3;
-    private final ColorMatch m_colorMatcher = new ColorMatch();
 
     @Override
     public void robotInit() {
@@ -211,5 +205,3 @@ public class Robot extends TimedRobot {
 
     }
 }
-
-
