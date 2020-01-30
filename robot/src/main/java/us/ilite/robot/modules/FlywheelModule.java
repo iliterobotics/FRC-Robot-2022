@@ -2,6 +2,8 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
@@ -27,6 +29,7 @@ public class FlywheelModule extends Module {
     private EAcceleratorState mAcceleratorState = EAcceleratorState.STOP;
     private ETrackingType mTrackingType = ETrackingType.NONE;
     private ETurretMode mTurretMode = ETurretMode.GYRO;
+    private ILog mLogger = Logger.createLog(FlywheelModule.class);
 
     public FlywheelModule() {
         mShooterNeo = SparkMaxFactory.createDefaultSparkMax(Settings.ShooterSystem.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -60,7 +63,6 @@ public class FlywheelModule extends Module {
     public double calcAngleFromDistance(double distance, double height) { return Math.atan(height / distance); }
 
     public boolean isMaxVelocity() { return mShooterNeo.getEncoder().getVelocity() >= Settings.kMaxNeoVelocity; }
-    public boolean targetValid() { return Robot.DATA.limelight.get(ETargetingData.ty) != null; }
 
     public void setShooterState(EShooterState pShooterState) { mShooterState = pShooterState; }
     private void reset() { setShooterState(EShooterState.STOP); }
@@ -73,13 +75,16 @@ public class FlywheelModule extends Module {
     @Override
     public void readInputs(double pNow) {
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_STATE, (double)mShooterState.ordinal());
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, (double)EShooterState.SHOOT.ordinal());
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mShooterNeo.getEncoder().getVelocity());
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_LIMELIGHT_TARGET, Robot.DATA.limelight.get(ETargetingData.targetOrdinal));
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_LIMELIGHT_TARGET, (double) mTrackingType.ordinal());
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_HOOD_ANGLE, mHoodAngler.getAngle());
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY, (double) mTurret.getSelectedSensorVelocity());
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_MODE, (double) mTurretMode.ordinal());
+
+        if (Robot.DATA.limelight.isSet(ETargetingData.targetOrdinal)) {
+            Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_LIMELIGHT_TARGET, Robot.DATA.limelight.get(ETargetingData.targetOrdinal));
+        }
     }
 
     @Override
@@ -93,6 +98,9 @@ public class FlywheelModule extends Module {
         mHoodAngler.setAngle(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_HOOD_ANGLE));
         Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY);
         mTurret.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY));
+        mLogger.error(" -------------------------------------------- CURRENT FLYWHEEL STATE" + EShooterSystemData.CURRENT_FLYWHEEL_STATE);
+        mLogger.error(" -------------------------------------------- CURRENT LIMELIGHT TARGET" + EShooterSystemData.CURRENT_LIMELIGHT_TARGET);
+        mLogger.error(" -------------------------------------------- TARGET LIMELIGHT TARGET" + EShooterSystemData.TARGET_LIMELIGHT_TARGET);
     }
 
     @Override

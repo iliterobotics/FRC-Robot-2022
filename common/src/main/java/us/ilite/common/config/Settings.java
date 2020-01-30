@@ -46,6 +46,8 @@ public class Settings extends NetworkTablesConstantsBase {
 
         public static final double kShooterTargetVelocity = 3750;
         public static final double kAcceleratorTargetVelocity = 0.5;
+
+        public static final double kBaseHoodAngle = 60;
     }
 
     // ================================
