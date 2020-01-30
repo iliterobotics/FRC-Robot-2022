@@ -4,6 +4,8 @@ import com.team2363.commands.HelixFollower;
 import com.team319.trajectory.Path;
 
 import static com.team319.trajectory.Path.SegmentValue.*;
+
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -30,6 +32,7 @@ public class BobUtils {
      * @return the calculated curvature in
      */
     public static double calculateCurvature(Path pPath, int i) {
+        PIDController
         Trajectory t;
         // https://www.math24.net/curvature-radius/
         // https://math.dartmouth.edu/~m8f19/lectures/m8f19curvature.pdf
