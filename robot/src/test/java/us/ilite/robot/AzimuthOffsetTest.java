@@ -6,7 +6,6 @@ import us.ilite.common.Angle;
 import us.ilite.common.Distance;
 import us.ilite.common.Field2020;
 import us.ilite.common.lib.util.Utils;
-import static java.lang.Math.*;
 
 public class AzimuthOffsetTest extends BaseTest{
 
@@ -37,7 +36,7 @@ public class AzimuthOffsetTest extends BaseTest{
         boolean[] goal = new boolean[] {false, true, true, true, true, true, false, false};
         for(int i =0 ; i < a.length; i++) {
             Angle thetaT = Angle.fromDegrees(a[i]);
-            Angle o = Utils.calculateAngleOffset(thetaT, d, offset);
+            Angle o = Utils.calculateAngleOffsetY(thetaT, d, offset);
             boolean inner = Field2020.canHitInnerGoal(thetaT.subtract(o), d);
             String msg = (inner ? "INNER " : "OUTER ") + "Distance " + nf.format(d.inches()) + " @ " + a[i] + ", Offset = " + nf.format(o.degrees());
             assertEquals("Incorrect Offset Angle: " + msg, nf.format(o.degrees()), nf.format(exptected[i]));
