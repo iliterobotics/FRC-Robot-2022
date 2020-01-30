@@ -10,13 +10,10 @@ import static java.lang.Math.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.config.InputMap;
-import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.BaseTest;
 import us.ilite.robot.Robot;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
-public class DriveTrainUnitTest {
+public class DriveTrainUnitTest extends BaseTest {
     private final Data db = Robot.DATA;
 
 
@@ -58,5 +55,4 @@ public class DriveTrainUnitTest {
 //        }
     }
 
-    private static final NumberFormat nf = new DecimalFormat("0.00");
 }
