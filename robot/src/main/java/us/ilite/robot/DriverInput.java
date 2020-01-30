@@ -18,6 +18,7 @@ import static us.ilite.robot.hardware.ECommonControlMode.*;
 import us.ilite.robot.modules.Module;
 import us.ilite.robot.modules.*;
 
+@Deprecated
 public class DriverInput extends Module implements IThrottleProvider, ITurnProvider {
 
     protected static final double
