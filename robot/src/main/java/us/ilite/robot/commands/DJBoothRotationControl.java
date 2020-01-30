@@ -9,7 +9,10 @@ import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
+import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.sensor.EColorData;
+import us.ilite.robot.Robot;
 import us.ilite.robot.utils.ColorUtils;
 
 import static us.ilite.robot.utils.ColorUtils.*;
@@ -64,7 +67,7 @@ public class DJBoothRotationControl implements ICommand {
         if ( (mColorChangeLocation - mInitialColorStateLocation <= 32) && eMotorState == MotorState.ON ) {
 
             Color mColor = mColorSensorV3.getColor();
-            eLastColorState = eCurrentColorState;
+            updateColor();
             ColorMatchResult match = mColorMatcher.matchClosestColor( mColor );
             setColorState( match.color );
 
@@ -155,18 +158,28 @@ public class DJBoothRotationControl implements ICommand {
         }
     }
 
-    public Color getColor() {
-        ColorMatchResult match = mColorMatcher.matchClosestColor( mColorSensorV3.getColor() );
+    public Color updateColor() {
+        Color detectedColor = mColorSensorV3.getColor();
+        ColorMatchResult match = mColorMatcher.matchClosestColor( detectedColor );
+        eLastColorState = eCurrentColorState;
+        setColorState( detectedColor );
+
+        Data mData = Robot.DATA;
         if (match != null) {
             if (kBlueTarget.equals(match.color)) {
+                mData.color.set( EColorData.SENSED_COLOR, (double)EColorData.EColor.BLUE.ordinal() );
                 return kBlueTarget;
             } else if (kRedTarget.equals(match.color)) {
+                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.RED.ordinal());
                 return kRedTarget;
             } else if (kGreenTarget.equals(match.color)) {
+                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.GREEN.ordinal());
                 return kGreenTarget;
             } else if (kYellowTarget.equals(match.color)) {
+                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.YELLOW.ordinal());
                 return kYellowTarget;
             } else {
+                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.NONE.ordinal());
                 return null;
             }
         }
