@@ -141,8 +141,8 @@ public class DriveModule extends Loop {
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
 
 		try {
-			mYawPid.setSetpoint(Robot.DATA.drivetrain.get(TURN) * Settings.Drive.kMaxHeadingChange);
-//			System.out.println(Robot.DATA.drivetrain.get(TURN));
+			mYawPid.setSetpoint(Robot.DATA.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
+//			System.out.println(Robot.DATA.drivetrain.get(DESIRED_TURN));
 		} catch (NullPointerException ne) {
 			mYawPid.setSetpoint(0.0);
 //			System.out.println("0.0");
@@ -156,9 +156,9 @@ public class DriveModule extends Loop {
 			mDriveState = EDriveState.NORMAL;
 		} else {
 			double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-			double mThrottle = Robot.DATA.drivetrain.get(THROTTLE);
+			double mThrottle = Robot.DATA.drivetrain.get(DESIRED_THROTTLE);
 			DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
-			SmartDashboard.putNumber("DESIRED YAW", (Robot.DATA.drivetrain.get(TURN) * Settings.Drive.kMaxHeadingChange));
+			SmartDashboard.putNumber("DESIRED YAW", (Robot.DATA.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange));
 			SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
 			((NeoDriveHardware)mDriveHardware).setTarget(driveMessage.getLeftOutput() * Settings.Drive.kDriveTrainMaxVelocity, driveMessage.getRightOutput() * Settings.Drive.kDriveTrainMaxVelocity);//Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
 }
