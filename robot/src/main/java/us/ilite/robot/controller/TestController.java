@@ -68,7 +68,7 @@ public class TestController extends AbstractController {
         } else {
             Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE, (double) PowerCellModule.EArmState.DISENGAGED.ordinal());
         }
-        //TODO default state 
+        //TODO default state
     }
 }
 

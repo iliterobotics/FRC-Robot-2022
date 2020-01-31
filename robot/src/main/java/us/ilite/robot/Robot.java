@@ -41,17 +41,14 @@ public class Robot extends TimedRobot {
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
-    private DriveModule mDrive;
     private FlywheelPrototype mFlywheel;
     private OperatorInput mOI;
-    private Limelight mLimelight;
     private DriverInput mDriverInput = new DriverInput( mDrive , mLimelight , DATA ,  mIntake );
 
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final AbstractController mTestController = new TestController();
     private final AbstractController mTeleopController = new TeleopController();
     private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;

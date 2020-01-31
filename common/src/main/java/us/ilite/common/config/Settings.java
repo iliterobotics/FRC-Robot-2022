@@ -43,7 +43,7 @@ public class Settings extends NetworkTablesConstantsBase {
         public static double kPowerCellI;
         public static double kPowerCellD;
         public static double kPowerCellF;
-        public static int kArmNEOAdress;
+        public static int kArmNEOAdress = 16;
         public static double kArmCANPowerEngaged = 1.0;
         public static double kArmCANPowerDisengaged = 0.0;
 

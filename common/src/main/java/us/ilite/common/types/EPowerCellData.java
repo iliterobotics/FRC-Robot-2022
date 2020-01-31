@@ -10,7 +10,7 @@ public enum EPowerCellData  implements CodexOf<Double> {
 
     // etc - 1 per beam break sensor
 
-    DESIRED_CONVEYOR_TWO_POWER_PCT,, //Neo
+    DESIRED_CONVEYOR_TWO_POWER_PCT, //Neo
     DESIRED_SERLIALIZER_POWER_PCT, //Talon
     DESIRED_CONVEYOR_POWER_PCT, //Talon
 
