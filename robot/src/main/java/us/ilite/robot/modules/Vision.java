@@ -5,8 +5,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import us.ilite.common.Data;
-import us.ilite.common.config.Settings;
-import us.ilite.common.types.ERawTargetingData;
+import us.ilite.common.types.ERawLimelightData;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
 
@@ -43,46 +42,46 @@ public class Vision extends Module {
     public void setOutputs(double pNow) {
         mData.rawLimelight.reset();
         boolean targetValid = mTable.getEntry("tv").getDouble((Double.NaN)) > 0.0;
-        mData.rawLimelight.set(ERawTargetingData.tv, targetValid ? 1.0 : null);
+        mData.rawLimelight.set(ERawLimelightData.tv, targetValid ? 1.0 : null);
         mTrackingType = mLimelight.getTracking();
         if (targetValid) {
-            mData.rawLimelight.set(ERawTargetingData.tx, mTable.getEntry("tx").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tx0, mTable.getEntry("tx0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tx1, mTable.getEntry("tx1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tx2, mTable.getEntry("tx2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ty, mTable.getEntry("ty").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ty0, mTable.getEntry("ty0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ty1, mTable.getEntry("ty1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ty2, mTable.getEntry("ty2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ta, mTable.getEntry("ta").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ta0, mTable.getEntry("ta0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ta1, mTable.getEntry("ta1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ta2, mTable.getEntry("ta2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ts, mTable.getEntry("ts").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ts0, mTable.getEntry("ts0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ts1, mTable.getEntry("ts1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.ts2, mTable.getEntry("ts2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tl, mTable.getEntry("tl").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tshort, mTable.getEntry("tshort").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tshort0, mTable.getEntry("tshort0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tshort1, mTable.getEntry("tshort1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tshort2, mTable.getEntry("tshort2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tlong, mTable.getEntry("tlong").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tlong0, mTable.getEntry("tlong0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tlong1, mTable.getEntry("tlong1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tlong2, mTable.getEntry("tlong2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.thoriz, mTable.getEntry("thor").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.thoriz0, mTable.getEntry("thor0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.thoriz1, mTable.getEntry("thor1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.thoriz2, mTable.getEntry("thor2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tvert, mTable.getEntry("tvert").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tvert0, mTable.getEntry("tvert0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tvert1, mTable.getEntry("tvert1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawTargetingData.tvert2, mTable.getEntry("tvert2").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tx, mTable.getEntry("tx").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tx0, mTable.getEntry("tx0").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tx1, mTable.getEntry("tx1").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tx2, mTable.getEntry("tx2").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ty, mTable.getEntry("ty").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ty0, mTable.getEntry("ty0").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ty1, mTable.getEntry("ty1").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ty2, mTable.getEntry("ty2").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ta, mTable.getEntry("ta").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ta0, mTable.getEntry("ta0").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ta1, mTable.getEntry("ta1").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ta2, mTable.getEntry("ta2").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ts, mTable.getEntry("ts").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ts0, mTable.getEntry("ts0").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ts1, mTable.getEntry("ts1").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.ts2, mTable.getEntry("ts2").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tl, mTable.getEntry("tl").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tshort, mTable.getEntry("tshort").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tshort0, mTable.getEntry("tshort0").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tshort1, mTable.getEntry("tshort1").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tshort2, mTable.getEntry("tshort2").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tlong, mTable.getEntry("tlong").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tlong0, mTable.getEntry("tlong0").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tlong1, mTable.getEntry("tlong1").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tlong2, mTable.getEntry("tlong2").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.thoriz, mTable.getEntry("thor").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.thoriz0, mTable.getEntry("thor0").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.thoriz1, mTable.getEntry("thor1").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.thoriz2, mTable.getEntry("thor2").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tvert, mTable.getEntry("tvert").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tvert0, mTable.getEntry("tvert0").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tvert1, mTable.getEntry("tvert1").getDouble(Double.NaN));
+            mData.rawLimelight.set(ERawLimelightData.tvert2, mTable.getEntry("tvert2").getDouble(Double.NaN));
 
-            mData.rawLimelight.set(ERawTargetingData.targetOrdinal, mData.limelight.get(ELimelightData.targetOrdinal));
-            mData.rawLimelight.set(ERawTargetingData.calcDistToTarget, mData.limelight.get(ELimelightData.calcDistToTarget));
-            mData.rawLimelight.set(ERawTargetingData.calcAngleToTarget, mData.limelight.get(ELimelightData.calcAngleToTarget));
+            mData.rawLimelight.set(ERawLimelightData.targetOrdinal, mData.limelight.get(ELimelightData.targetOrdinal));
+            mData.rawLimelight.set(ERawLimelightData.calcDistToTarget, mData.limelight.get(ELimelightData.calcDistToTarget));
+            mData.rawLimelight.set(ERawLimelightData.calcAngleToTarget, mData.limelight.get(ELimelightData.calcAngleToTarget));
 
             if (mLimelight.mVisionTarget != null) {
                 Optional<Translation2d> p = mLimelight.calcTargetLocation(mLimelight.mVisionTarget);
@@ -104,12 +103,12 @@ public class Vision extends Module {
         mData.selectedTarget.reset();
 
         if (mTrackingType.equals(ETrackingType.BALL)) {
-            mData.selectedTarget.set(ELimelightData.tv, mData.rawLimelight.get(ERawTargetingData.tv));
+            mData.selectedTarget.set(ELimelightData.tv, mData.rawLimelight.get(ERawLimelightData.tv));
             boolean targetValid = mData.selectedTarget.isSet(ELimelightData.tv);
             if (targetValid) {
                 if (!isTracking) {
-                    if (abs(mData.rawLimelight.get(ERawTargetingData.ty0) - mData.rawLimelight.get(ERawTargetingData.ty1)) < acceptableError) {
-                        selectedTarget = mData.rawLimelight.get(ERawTargetingData.tx0) > mData.rawLimelight.get(ERawTargetingData.tx1) ? 0 : 1;
+                    if (abs(mData.rawLimelight.get(ERawLimelightData.ty0) - mData.rawLimelight.get(ERawLimelightData.ty1)) < acceptableError) {
+                        selectedTarget = mData.rawLimelight.get(ERawLimelightData.tx0) > mData.rawLimelight.get(ERawLimelightData.tx1) ? 0 : 1;
                         isTracking = true;
                     } else {
                         selectedTarget = 0;
@@ -121,18 +120,18 @@ public class Vision extends Module {
                 mData.selectedTarget.set(ELimelightData.ty, mTable.getEntry("ty" + selectedTarget).getDouble(Double.NaN) * (Limelight.llFOVVertical / 2));
                 mData.selectedTarget.set(ELimelightData.ta, mTable.getEntry("ta" + selectedTarget).getDouble(Double.NaN));
                 mData.selectedTarget.set(ELimelightData.ts, mTable.getEntry("ts" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ELimelightData.tl, mData.rawLimelight.get(ERawTargetingData.tl));
+                mData.selectedTarget.set(ELimelightData.tl, mData.rawLimelight.get(ERawLimelightData.tl));
                 mData.selectedTarget.set(ELimelightData.tshort, mTable.getEntry("tshort" + selectedTarget).getDouble(Double.NaN));
                 mData.selectedTarget.set(ELimelightData.tlong, mTable.getEntry("tlong" + selectedTarget).getDouble(Double.NaN));
                 mData.selectedTarget.set(ELimelightData.thoriz, mTable.getEntry("thor" + selectedTarget).getDouble(Double.NaN));
                 mData.selectedTarget.set(ELimelightData.tvert, mTable.getEntry("tvert" + selectedTarget).getDouble(Double.NaN));
 
-                mData.selectedTarget.set(ELimelightData.targetOrdinal, mData.rawLimelight.get(ERawTargetingData.targetOrdinal));
-                mData.selectedTarget.set(ELimelightData.calcDistToTarget, mData.rawLimelight.get(ERawTargetingData.calcDistToTarget));
-                mData.selectedTarget.set(ELimelightData.calcAngleToTarget, mData.rawLimelight.get(ERawTargetingData.calcAngleToTarget));
+                mData.selectedTarget.set(ELimelightData.targetOrdinal, mData.rawLimelight.get(ERawLimelightData.targetOrdinal));
+                mData.selectedTarget.set(ELimelightData.calcDistToTarget, mData.rawLimelight.get(ERawLimelightData.calcDistToTarget));
+                mData.selectedTarget.set(ELimelightData.calcAngleToTarget, mData.rawLimelight.get(ERawLimelightData.calcAngleToTarget));
 
-                mData.selectedTarget.set(ELimelightData.calcTargetX, mData.rawLimelight.get(ERawTargetingData.calcTargetX));
-                mData.selectedTarget.set(ELimelightData.calcTargetY, mData.rawLimelight.get(ERawTargetingData.calcTargetY));
+                mData.selectedTarget.set(ELimelightData.calcTargetX, mData.rawLimelight.get(ERawLimelightData.calcTargetX));
+                mData.selectedTarget.set(ELimelightData.calcTargetY, mData.rawLimelight.get(ERawLimelightData.calcTargetY));
 
                 System.out.println("last tx and ty: " + lastXPosition + ", " + lastYPosition);
                 System.out.println("current tx and ty: " + mData.selectedTarget.get(ELimelightData.tx) + ", " + mData.selectedTarget.get(ELimelightData.ty));

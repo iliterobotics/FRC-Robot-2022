@@ -10,14 +10,12 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
-import us.ilite.common.config.Settings.VisionTarget;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
 
-import static us.ilite.common.types.ELimelightData.*;
+//import static us.ilite.common.types.ELimelightData.*;
 
 import us.ilite.robot.Robot;
 import us.ilite.robot.loops.Loop;
@@ -27,12 +25,11 @@ public class Limelight extends Loop implements ITargetDataProvider {
 
     private final ILog mLog = Logger.createLog(Limelight.class);
     private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable("limelight");
-    public VisionTarget mVisionTarget = null;
 
 
     // =============================================================================
     // LimeLight Camera Constants
-    // Note: These constants need to be recalculted for a specific robot geometry
+    // Note: These constants need to be recalculated for a specific robot geometry
     // =============================================================================
     public static double kHeightIn = 58.0;
     public static double kToBumperIn = 10.0;
@@ -56,16 +53,13 @@ public class Limelight extends Loop implements ITargetDataProvider {
     public static double kRightACoeff = -54.3943883842204;
     public static double kRightBCoeff = -4.53956454545558;
     public static double kRightCCoeff = -0.0437470770400814;
-
-    private ETrackingType mTrackingType = null;
-
-    public Limelight(Data pData) {
+    public Limelight() {
 
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        setTracking(ETrackingType.NONE);
+        setTracking(ETrackingType.NONE);//TODO fix this to not use a set call
     }
 
     @Override
@@ -75,7 +69,7 @@ public class Limelight extends Loop implements ITargetDataProvider {
 
         if(targetValid) {
             Robot.DATA.limelight.set(ELimelightData.tx, mTable.getEntry("tx").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ELimelightData.ty,mTable.getEntry("ty").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(ELimelightData.ty, mTable.getEntry("ty").getDouble(Double.NaN));
             Robot.DATA.limelight.set(ELimelightData.ta,mTable.getEntry("ta").getDouble(Double.NaN));
             Robot.DATA.limelight.set(ELimelightData.ts,mTable.getEntry("ts").getDouble(Double.NaN));
             Robot.DATA.limelight.set(ELimelightData.tl,mTable.getEntry("tl").getDouble(Double.NaN));
@@ -83,12 +77,12 @@ public class Limelight extends Loop implements ITargetDataProvider {
             Robot.DATA.limelight.set(ELimelightData.tlong,mTable.getEntry("tlong").getDouble(Double.NaN));
             Robot.DATA.limelight.set(ELimelightData.thoriz,mTable.getEntry("thoriz").getDouble(Double.NaN));
             Robot.DATA.limelight.set(ELimelightData.tvert,mTable.getEntry("tvert").getDouble(Double.NaN));
-            if(mVisionTarget != null) {
+            if(Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE) != null) {
 
-                Robot.DATA.limelight.set(ELimelightData.targetOrdinal, (double)mVisionTarget.ordinal());
-                Robot.DATA.limelight.set(ELimelightData.calcDistToTarget, calcTargetDistance(mVisionTarget));
-                Robot.DATA.limelight.set(calcAngleToTarget, calcTargetApproachAngle());
-                Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
+                Robot.DATA.limelight.set(ELimelightData.targetOrdinal, Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE));
+                Robot.DATA.limelight.set(ELimelightData.calcDistToTarget, calcTargetDistance(Settings.kVisionTargetHeight));
+                Robot.DATA.limelight.set(ELimelightData.calcAngleToTarget, calcTargetApproachAngle());
+                Optional<Translation2d> p = calcTargetLocation(Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE));
                 if(p.isPresent()) {
                     Robot.DATA.limelight.set(ELimelightData.calcTargetX, p.get().getX());
                     Robot.DATA.limelight.set(ELimelightData.calcTargetY, p.get().getY());
@@ -99,7 +93,6 @@ public class Limelight extends Loop implements ITargetDataProvider {
 
     @Override
     public void setOutputs(double pNow) {
-
         mLog.error("Current Tracking Type: " + (mTrackingType == null ? "Null" : mTrackingType.name()));
         if(mTrackingType != null) {
             setLedMode(mTrackingType.getLedOn() ? LedMode.LED_ON : LedMode.LED_OFF);
@@ -162,7 +155,7 @@ public class Limelight extends Loop implements ITargetDataProvider {
         mTable.getEntry("snapshot").setBoolean(snapshot);
     }
 
-    public void setStream(Stream stream) { 
+    public void setStream(Stream stream) {
         mTable.getEntry("stream").setNumber(stream.ordinal());
     }
 

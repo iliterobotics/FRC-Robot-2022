@@ -31,6 +31,7 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private Clock mClock = new Clock();
     private Limelight mLimelight;
+    private RawLimelight mRawLimelight;
     public static final Data DATA = new Data();
     private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
@@ -53,6 +54,9 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
         mOI = new OperatorInput();
+        mLimelight = new Limelight();
+        mRawLimelight = new RawLimelight();
+
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);

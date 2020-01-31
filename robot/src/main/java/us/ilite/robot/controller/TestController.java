@@ -3,17 +3,11 @@ package us.ilite.robot.controller;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
 import us.ilite.robot.DriverInput;
 import us.ilite.robot.Robot;
-import us.ilite.robot.commands.LimelightTargetLock;
-import us.ilite.robot.modules.CommandManager;
-import us.ilite.robot.modules.FlywheelPrototype;
-import us.ilite.robot.modules.Limelight;
 
 public class TestController extends AbstractController {
 
@@ -43,7 +37,7 @@ public class TestController extends AbstractController {
                     Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.TARGET.ordinal() );
                 }
             } else {
-                //   Robot.DATA.selectedTarget.set(E);
+                   Robot.DATA.selectedTarget.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.TARGET.ordinal());
             }
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
             Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) ETrackingType.BALL.ordinal());

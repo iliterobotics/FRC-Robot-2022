@@ -3,7 +3,6 @@ package us.ilite.common;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import us.ilite.common.io.CodexNetworkTables;
 import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
@@ -31,6 +30,8 @@ public class Data {
     public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
     public final Codex<Double, ELimelightData> limelight = Codex.of.thisEnum(ELimelightData.class);
+    public final Codex<Double, ERawLimelightData> rawLimelight = Codex.of.thisEnum(ERawLimelightData.class);
+    public final Codex<Double, ELimelightData> selectedTarget = Codex.of.thisEnum(ELimelightData.class);
 
     public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
     public final Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
@@ -38,8 +39,6 @@ public class Data {
     public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
     public final Codex<Double, EHangerData> hanger = Codex.of.thisEnum(EHangerData.class);
 
-    public final Codex<Double, ELimelightData> selectedTarget = Codex.of.thisEnum(ELimelightData.class);
-    public final Codex<Double, ERawTargetingData> rawLimelight = Codex.of.thisEnum(ERawTargetingData.class);
 
 
 

@@ -2,17 +2,17 @@ package us.ilite.common.types;
 
 import com.flybotix.hfr.codex.CodexOf;
 
-public enum ERawTargetingData implements CodexOf<Double> {
+public enum ERawLimelightData implements CodexOf<Double> {
     // TODO - document what these values represent
     tv,
-    tx,
-    tx0,
-    tx1,
-    tx2,
-    ty,
-    ty0,
-    ty1,
-    ty2,
+//    tx,
+    tx0,        // Raw Screenspace X of contour 0
+    tx1,        // Raw Screenspace X of contour 1
+    tx2,        // Raw Screenspace X of contour 2
+//    ty,
+    ty0,        // Raw Screenspace Y of contour 0
+    ty1,        // Raw Screenspace Y of contour 1
+    ty2,        // Raw Screenspace Y of contour 2
     ta,
     ta0,
     ta1,

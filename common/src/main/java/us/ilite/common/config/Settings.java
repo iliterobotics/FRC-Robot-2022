@@ -113,7 +113,7 @@ public class Settings extends NetworkTablesConstantsBase {
 
     // =============================================================================
     // Target Constants
-    // Note: These constants need to be recalculted for the specific target geometry
+    // Note: These constants need to be recalculated for the specific target geometry
     // =============================================================================
     // TODO These values are specific to the targets, not the camera, and may belong elsewhere
     // The current target values assume the limelight processing stream is configured to target
