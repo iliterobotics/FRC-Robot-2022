@@ -22,4 +22,37 @@ public class Field2020 {
     public static boolean canHitInnerGoal(Angle pAzimuth, Distance pDistance) {
         return abs(pAzimuth.degrees()) <= 0.00006 * pow(pDistance.inches(),2) - 0.0241*pDistance.inches() + 18.906;
     }
+
+    /**
+     * Any trackable field component for 2020's game.
+     */
+    public enum FieldElement implements IFieldComponent {
+
+        TARGET(12d,1, true),
+        LINE(0d,5, false),
+        OUTER_GOAL(98.25, 0, false),
+        POWER_CELL(0.0, 0, false),
+        NONE(0d,6, false);
+
+        private final double height;
+        private final int pipeline;
+        private final boolean led;
+
+        private FieldElement(double pHeight, int pPipeline, boolean pLED){
+            height = pHeight;
+            pipeline = pPipeline;
+            led = pLED;
+        }
+
+        @Override
+        public double height() { return height;}
+
+        @Override
+        public boolean led() {return led;}
+
+        @Override
+        public int pipeline() {return pipeline; }
+
+        public int id() { return ordinal(); }
+    }
 }

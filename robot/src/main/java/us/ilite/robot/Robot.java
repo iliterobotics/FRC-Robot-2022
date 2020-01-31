@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
         mDrive = new DriveModule();
-        mLimelight = new Limelight(DATA);
+        mLimelight = new Limelight();
         mOI = new OperatorInput();
 
         //look for practice robot config:
