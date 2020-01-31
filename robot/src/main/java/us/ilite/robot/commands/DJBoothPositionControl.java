@@ -23,9 +23,11 @@ public class DJBoothPositionControl implements ICommand {
     private final ColorMatch mColorMatcher = new ColorMatch();
     private ColorState eDesiredColorState;
     private ColorState eCurrentColorState;
+    private ColorState eLastColorState;
     private int mSolidStateCounter;
     private MotorState eMotorState;
-    private  boolean mIsDone;
+    private boolean mIsDone;
+    private boolean mMightBeDone;
 
 
     public enum ColorState {
@@ -49,8 +51,11 @@ public class DJBoothPositionControl implements ICommand {
         victorSPX = new VictorSPX( 12 );
         mSolidStateCounter = 0;
         eMotorState = MotorState.OFF;
+        eCurrentColorState = ColorState.DEFAULT;
+        eLastColorState = ColorState.DEFAULT;
         eDesiredColorState = ColorState.DEFAULT;
         mIsDone = false;
+        mMightBeDone = false;
 
         mColorMatcher.addColorMatch(kBlueTarget);
         mColorMatcher.addColorMatch(kGreenTarget);
@@ -68,6 +73,9 @@ public class DJBoothPositionControl implements ICommand {
 
             Color detectedColor = mColorSensorV3.getColor();
             ColorMatchResult match = mColorMatcher.matchClosestColor(detectedColor);
+            if ( !mMightBeDone ) {
+                eLastColorState = eCurrentColorState;
+            }
             eCurrentColorState = getState( match.color );
             SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
 
@@ -75,18 +83,24 @@ public class DJBoothPositionControl implements ICommand {
                 victorSPX.set(ControlMode.PercentOutput, Settings.kDJOutput );
                 mSolidStateCounter = 0;
                 mIsDone = false;
+                mMightBeDone = false;
                 return false;
             }
-            else {
+            else if ( eLastColorState.equals( ColorState.BLUE ) ) {
                 victorSPX.set(ControlMode.PercentOutput, 0d);
                 mSolidStateCounter++;
 
                 if ( mSolidStateCounter >= 5 ) {
                     mIsDone = true;
+                    mMightBeDone = false;
                     return true;
                 }
                 mIsDone = false;
+                mMightBeDone = true;
                 return false;
+            }
+            else {
+                mMightBeDone = true;
             }
         }
         mIsDone = false;
