@@ -47,14 +47,14 @@ public class FlywheelModule extends Module {
     }
 
     public enum EHoodState {
-        BASE,
+        STATIONARY,
         ADJUSTABLE
     }
 
-    public double calcSpeedFromDistance(double distance) { return 0.09 * Math.pow(distance, 2) + 8.0; }
+    public double calcSpeedFromDistance(double distance) { return 0.09 * Math.pow(distance, 2) + 8.0; } // Need recalculation
     public double calcAngleFromDistance(double distance, double height) { return Math.atan(height / distance); }
 
-    public boolean isMaxVelocity() { return mShooter.getEncoder().getVelocity() >= Settings.kMaxNeoVelocity; }
+    public boolean isMaxVelocity() { return mShooter.getEncoder().getVelocity() >= Settings.ShooterSystem.kAcceleratorThreshold; }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
@@ -95,7 +95,7 @@ public class FlywheelModule extends Module {
             mAccelerator.set(ControlMode.PercentOutput, 0.0);
         }
         mHoodAngler.setAngle(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_HOOD_ANGLE));
-        mShooter.set(-Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
+        mShooter.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
         mTurret.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY));
     }
 

@@ -4,7 +4,6 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
@@ -36,18 +35,17 @@ public class TestController extends AbstractController {
     }
 
     public void update(double pNow) {
-        if (!Robot.DATA.driverinput.get(InputMap.DRIVER.SHOOT).equals(0.0) ) {
+        if (!Robot.DATA.driverinput.get(InputMap.OPERATOR.SHOOT).equals(0.0) ) {
             mTurretMode = FlywheelModule.ETurretMode.LIMELIGHT;
             mHoodState = FlywheelModule.EHoodState.ADJUSTABLE;
             mAcceleratorState = FlywheelModule.EAcceleratorState.FEED;
             mShooterState = FlywheelModule.EShooterState.SHOOT;
-            mLog.error("-----------------------------------------------------------------------FLYWHEEL VELOCITY: " + Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
         }
         else {
             mTurretMode = FlywheelModule.ETurretMode.GYRO;
             mAcceleratorState = FlywheelModule.EAcceleratorState.STOP;
             mShooterState = FlywheelModule.EShooterState.STOP;
-            mHoodState = FlywheelModule.EHoodState.BASE;
+            mHoodState = FlywheelModule.EHoodState.STATIONARY;
         }
 
         switch(mAcceleratorState) {
@@ -81,7 +79,7 @@ public class TestController extends AbstractController {
         }
 
         switch(mHoodState) {
-            case BASE: Robot.DATA.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
+            case STATIONARY: Robot.DATA.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
                 break;
             case ADJUSTABLE:
                 if (Robot.DATA.limelight.isSet(ETargetingData.ty)) {
@@ -92,5 +90,10 @@ public class TestController extends AbstractController {
                 }
         }
         mPreviousTime = pNow;
+
+        SmartDashboard.putNumber("Flywheel Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
+        SmartDashboard.putNumber("Turret Mode", Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_MODE));
+        SmartDashboard.putNumber("Accelerator Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY));
+        SmartDashboard.putNumber("Hood Angle", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_HOOD_ANGLE));
     }
 }
