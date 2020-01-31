@@ -43,4 +43,9 @@ public class Arm extends Module {
 
 
     }
+
+    public void raiseArm(){
+        Robot.DATA.arm.set(EArmData.TARGET_POSITION , (double) EArmState.ENGAGED.ordinal());
+
+    }
 }
