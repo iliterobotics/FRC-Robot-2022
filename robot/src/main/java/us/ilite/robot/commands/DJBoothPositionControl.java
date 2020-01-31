@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.Data;
-import us.ilite.common.config.Settings;
+import us.ilite.common.config.*;
 import us.ilite.common.types.sensor.EColorData;
 import us.ilite.robot.Robot;
 
@@ -66,45 +66,70 @@ public class DJBoothPositionControl implements ICommand {
     @Override
     public boolean update(double pNow) {
 
-        updateColor();
+        if ( !mIsDone ) {
+            updateColor();
 
-        if ( eMotorState.equals( MotorState.ON )) {
-            DriverStation.reportError( "Running Motor for Position Control", false );
+            if ( eMotorState.equals( MotorState.ON )) {
+                DriverStation.reportError( "Running Motor for Position Control", false );
 
-            Color detectedColor = mColorSensorV3.getColor();
-            ColorMatchResult match = mColorMatcher.matchClosestColor(detectedColor);
-            if ( !mMightBeDone ) {
-                eLastColorState = eCurrentColorState;
-            }
-            eCurrentColorState = getState( match.color );
-            SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
+                Color detectedColor = mColorSensorV3.getColor();
+                ColorMatchResult match = mColorMatcher.matchClosestColor(detectedColor);
+//                if ( !mMightBeDone ) {
+                    eLastColorState = eCurrentColorState;
+//                }
+                eCurrentColorState = getState( match.color );
+                SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
 
-            if ( !eCurrentColorState.equals(eDesiredColorState) ) {
-                victorSPX.set(ControlMode.PercentOutput, Settings.kDJOutput );
-                mSolidStateCounter = 0;
-                mIsDone = false;
-                mMightBeDone = false;
-                return false;
-            }
-            else if ( eLastColorState.equals( ColorState.BLUE ) ) {
-                victorSPX.set(ControlMode.PercentOutput, 0d);
-                mSolidStateCounter++;
+//                if ( (!eLastColorState.equals( ColorState.BLUE ) && eDesiredColorState.equals(ColorState.GREEN)) && !eCurrentColorState.equals(ColorState.GREEN)) {
+//                    victorSPX.set(ControlMode.PercentOutput, Settings.kDJOutput );
+//                    mSolidStateCounter = 0;
+//                    mIsDone = false;
+//                    mMightBeDone = false;
+//                    return false;
+//                }
+//                else if ( (eLastColorState.equals( ColorState.BLUE ) && eDesiredColorState.equals(ColorState.GREEN)) && eCurrentColorState.equals(ColorState.GREEN)) {
+//                    victorSPX.set(ControlMode.PercentOutput, 0d);
+//                    mSolidStateCounter++;
+//
+//                    if ( mSolidStateCounter >= 5 ) {
+//                        mIsDone = true;
+//                        mMightBeDone = false;
+//                        return true;
+//                    }
+//                    mIsDone = false;
+//                    mMightBeDone = true;
+//                    return false;
+//                }
+//                else if (  !eCurrentColorState.equals(eDesiredColorState) ) {
+//                    victorSPX.set(ControlMode.PercentOutput, Settings.kDJOutput );
+//                    mSolidStateCounter = 0;
+//                    mIsDone = false;
+//                    mMightBeDone = false;
+//                    return false;
+//                }
+//                else {
+                if (eCurrentColorState.equals(eDesiredColorState)) {
 
-                if ( mSolidStateCounter >= 5 ) {
-                    mIsDone = true;
-                    mMightBeDone = false;
-                    return true;
+                    if ( mSolidStateCounter >= 5 ) {
+                        victorSPX.set(ControlMode.PercentOutput, 0d);
+                        mSolidStateCounter++;
+                        mIsDone = true;
+//                        mMightBeDone = false;
+                        return true;
+                    }
+                    else {
+                        victorSPX.set(ControlMode.PercentOutput, Settings.kDJOutput);
+                        mSolidStateCounter++;
+                    }
+                    mIsDone = false;
+//                    mMightBeDone = true;
+                    return false;
                 }
-                mIsDone = false;
-                mMightBeDone = true;
-                return false;
             }
-            else {
-                mMightBeDone = true;
-            }
+            mIsDone = false;
+            return false;
         }
-        mIsDone = false;
-        return false;
+        return true;
     }
 
     protected static String getColorStringForMatchResult(ColorMatchResult match) {

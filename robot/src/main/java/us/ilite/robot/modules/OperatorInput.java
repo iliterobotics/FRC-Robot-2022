@@ -60,8 +60,8 @@ public class OperatorInput extends Module {
             mDjBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.ON );
         }
         else {
-            mDjBoothPositionControl.updateMotor( DJBoothPositionControl.MotorState.OFF );
-            mDjBoothRotationControl.updateMotor( DJBoothRotationControl.MotorState.OFF );
+            mDjBoothPositionControl.updateMotor(DJBoothPositionControl.MotorState.OFF);
+            mDjBoothRotationControl.updateMotor(DJBoothRotationControl.MotorState.OFF);
         }
     }
 
