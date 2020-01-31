@@ -40,21 +40,6 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     private ETrackingType mLastTrackingType = null;
 
-    public DriverInput(DriveModule pDrivetrain, Limelight pLimelight, Data pData,
-        this.mLimelight = pLimelight;
-        this.mData = pData;
-//        this.mTeleopCommandManager = pTeleopCommandManager;
-//        this.mAutonomousCommandManager = pAutonomousCommandManager;
-
-        this.mDriverInputCodex = mData.driverinput;
-        this.mOperatorInputCodex = mData.operatorinput;
-        this.mIntake = pIntake;
-
-            this.mDriverJoystick = new Joystick(0);
-            this.mOperatorJoystick = new Joystick(1);
-
-    }
-
     public DriverInput(DriveModule pDrive, Limelight pLimelight, Data pData, PowerCellModule pIntake) {
         super();
         this.mDrive = pDrive;

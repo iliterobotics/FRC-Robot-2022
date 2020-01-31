@@ -43,6 +43,7 @@ public class TestController extends AbstractController {
         db.drivetrain.set(THROTTLE, throttle);
         db.drivetrain.set(TURN, rotate);
         updateIntake();
+        updateArm();
     }
 
     private void updateIntake() {
@@ -60,6 +61,14 @@ public class TestController extends AbstractController {
             Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT, (double) PowerCellModule.EIntakeState.STOP.ordinal());
             Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT, (double) PowerCellModule.EIntakeState.STOP.ordinal());
         }
+    }
+    public void updateArm() {
+        if(Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE, (double) PowerCellModule.EArmState.ENGAGED.ordinal());
+        } else {
+            Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE, (double) PowerCellModule.EArmState.DISENGAGED.ordinal());
+        }
+        //TODO default state 
     }
 }
 
