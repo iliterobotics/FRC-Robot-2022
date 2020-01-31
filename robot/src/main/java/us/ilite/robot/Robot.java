@@ -15,6 +15,8 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.controller.AbstractController;
+import us.ilite.robot.controller.BaseAutonController;
+import us.ilite.robot.controller.TeleopController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.GetLocalIP;
@@ -39,14 +41,20 @@ public class Robot extends TimedRobot {
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
+    private DriveModule mDrive;
     private FlywheelPrototype mFlywheel;
     private OperatorInput mOI;
+    private Limelight mLimelight;
     private DriverInput mDriverInput = new DriverInput( mDrive , mLimelight , DATA ,  mIntake );
 
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
+    private final AbstractController mTestController = new TestController();
+    private final AbstractController mTeleopController = new TeleopController();
+    private final AbstractController mBaseAutonController = new BaseAutonController();
+    private AbstractController mActiveController = null;
     private final TestController mTestController = new TestController(mIntake);
    // private AbstractController mActiveController = null;
 
@@ -54,6 +62,8 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
+        mDrive = new DriveModule();
+        mLimelight = new Limelight(DATA);
         mIntake = new PowerCellModule();
         mOI = new OperatorInput();
 
@@ -81,7 +91,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
 
         try {
-        } catch(Exception e) {
+        } catch (Exception e) {
             mLogger.exception(e);
         }
 
@@ -102,6 +112,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        mActiveController = mBaseAutonController;
     }
 
     @Override
@@ -111,6 +122,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        mActiveController = mTeleopController;
         mRunningModules.addModule(mDriverInput);
         mRunningModules.addModule(mIntake);
         mLogger.error("kasdjdaksljsadl;kjfdas;ld");
@@ -140,6 +152,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mDriverInput);
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
+        mRunningModules.addModule(mDrive);
         mRunningModules.addModule(mIntake);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
@@ -151,9 +164,9 @@ public class Robot extends TimedRobot {
         commonPeriodic();
     }
 
-    private void commonPeriodic() {
+    void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for(Codex c : DATA.mAllCodexes) {
+        for (Codex c : DATA.mAllCodexes) {
             c.reset();
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
@@ -199,23 +212,5 @@ public class Robot extends TimedRobot {
 
         return String.format("State: %s\tMode: %s\tTime: %s", mRobotEnabledDisabled, mRobotMode, mNow);
 
-    }
-
-    private class DSConnectInitThread implements Runnable {
-
-        @Override
-        public void run() {
-
-            while(!DriverStation.getInstance().isDSAttached()) {
-                try {
-                    mLogger.error("Waiting on Robot <--> DS Connection...");
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            List<String> ips = GetLocalIP.getAllIps();
-        }
     }
 }
