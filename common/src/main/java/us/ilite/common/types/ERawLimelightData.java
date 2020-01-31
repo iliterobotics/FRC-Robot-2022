@@ -5,11 +5,11 @@ import com.flybotix.hfr.codex.CodexOf;
 public enum ERawLimelightData implements CodexOf<Double> {
     // TODO - document what these values represent
     tv,
-//    tx,
+    tx,
     tx0,        // Raw Screenspace X of contour 0
     tx1,        // Raw Screenspace X of contour 1
     tx2,        // Raw Screenspace X of contour 2
-//    ty,
+    ty,
     ty0,        // Raw Screenspace Y of contour 0
     ty1,        // Raw Screenspace Y of contour 1
     ty2,        // Raw Screenspace Y of contour 2

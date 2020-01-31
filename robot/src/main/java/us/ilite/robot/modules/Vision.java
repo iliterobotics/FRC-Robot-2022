@@ -5,9 +5,10 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import us.ilite.common.Data;
-import us.ilite.common.types.ERawLimelightData;
+import static us.ilite.common.types.ERawLimelightData.*;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.ETrackingType;
+import us.ilite.robot.Robot;
 
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ import static java.lang.Math.*;
 public class Vision extends Module {
     private Limelight mLimelight;
     private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable("limelight");
-    private final Data mData;
+    private Data mData;
     private ETrackingType mTrackingType;
 
     private double lastXPosition = 0.0;
@@ -40,54 +41,54 @@ public class Vision extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        mData.rawLimelight.reset();
+        Robot.DATA.rawLimelight.reset();
         boolean targetValid = mTable.getEntry("tv").getDouble((Double.NaN)) > 0.0;
-        mData.rawLimelight.set(ERawLimelightData.tv, targetValid ? 1.0 : null);
+        Robot.DATA.rawLimelight.set(tv, targetValid ? 1.0 : null);
         mTrackingType = mLimelight.getTracking();
         if (targetValid) {
-            mData.rawLimelight.set(ERawLimelightData.tx, mTable.getEntry("tx").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tx0, mTable.getEntry("tx0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tx1, mTable.getEntry("tx1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tx2, mTable.getEntry("tx2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ty, mTable.getEntry("ty").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ty0, mTable.getEntry("ty0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ty1, mTable.getEntry("ty1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ty2, mTable.getEntry("ty2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ta, mTable.getEntry("ta").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ta0, mTable.getEntry("ta0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ta1, mTable.getEntry("ta1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ta2, mTable.getEntry("ta2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ts, mTable.getEntry("ts").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ts0, mTable.getEntry("ts0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ts1, mTable.getEntry("ts1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.ts2, mTable.getEntry("ts2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tl, mTable.getEntry("tl").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tshort, mTable.getEntry("tshort").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tshort0, mTable.getEntry("tshort0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tshort1, mTable.getEntry("tshort1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tshort2, mTable.getEntry("tshort2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tlong, mTable.getEntry("tlong").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tlong0, mTable.getEntry("tlong0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tlong1, mTable.getEntry("tlong1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tlong2, mTable.getEntry("tlong2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.thoriz, mTable.getEntry("thor").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.thoriz0, mTable.getEntry("thor0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.thoriz1, mTable.getEntry("thor1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.thoriz2, mTable.getEntry("thor2").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tvert, mTable.getEntry("tvert").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tvert0, mTable.getEntry("tvert0").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tvert1, mTable.getEntry("tvert1").getDouble(Double.NaN));
-            mData.rawLimelight.set(ERawLimelightData.tvert2, mTable.getEntry("tvert2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tx, mTable.getEntry("tx").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tx0, mTable.getEntry("tx0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tx1, mTable.getEntry("tx1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tx2, mTable.getEntry("tx2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ty, mTable.getEntry("ty").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ty0, mTable.getEntry("ty0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ty1, mTable.getEntry("ty1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ty2, mTable.getEntry("ty2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ta, mTable.getEntry("ta").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ta0, mTable.getEntry("ta0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ta1, mTable.getEntry("ta1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ta2, mTable.getEntry("ta2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ts, mTable.getEntry("ts").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ts0, mTable.getEntry("ts0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ts1, mTable.getEntry("ts1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(ts2, mTable.getEntry("ts2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tl, mTable.getEntry("tl").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tshort, mTable.getEntry("tshort").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tshort0, mTable.getEntry("tshort0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tshort1, mTable.getEntry("tshort1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tshort2, mTable.getEntry("tshort2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tlong, mTable.getEntry("tlong").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tlong0, mTable.getEntry("tlong0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tlong1, mTable.getEntry("tlong1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tlong2, mTable.getEntry("tlong2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(thoriz, mTable.getEntry("thor").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(thoriz0, mTable.getEntry("thor0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(thoriz1, mTable.getEntry("thor1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(thoriz2, mTable.getEntry("thor2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tvert, mTable.getEntry("tvert").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tvert0, mTable.getEntry("tvert0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tvert1, mTable.getEntry("tvert1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(tvert2, mTable.getEntry("tvert2").getDouble(Double.NaN));
 
-            mData.rawLimelight.set(ERawLimelightData.targetOrdinal, mData.limelight.get(ELimelightData.targetOrdinal));
-            mData.rawLimelight.set(ERawLimelightData.calcDistToTarget, mData.limelight.get(ELimelightData.calcDistToTarget));
-            mData.rawLimelight.set(ERawLimelightData.calcAngleToTarget, mData.limelight.get(ELimelightData.calcAngleToTarget));
+            Robot.DATA.rawLimelight.set(targetOrdinal, Robot.DATA.limelight.get(ELimelightData.targetOrdinal));
+            Robot.DATA.rawLimelight.set(calcDistToTarget, Robot.DATA.limelight.get(ELimelightData.calcDistToTarget));
+            Robot.DATA.rawLimelight.set(calcAngleToTarget, Robot.DATA.limelight.get(ELimelightData.calcAngleToTarget));
 
             if (mLimelight.mVisionTarget != null) {
                 Optional<Translation2d> p = mLimelight.calcTargetLocation(mLimelight.mVisionTarget);
                 if (p.isPresent()) {
-                   // mData.rawLimelight.set(ERawTargetingData.calcTargetX, p.get().x());
-                   // mData.rawLimelight.set(ERawTargetingData.calcTargetY, p.get().y());
+                   // Robot.DATA.rawLimelight.set(calcTargetX, p.get().x());
+                   // Robot.DATA.rawLimelight.set(calcTargetY, p.get().y());
                 }
             }
         }
@@ -100,15 +101,15 @@ public class Vision extends Module {
     }
 
     public void sortTrackingData() {
-        mData.selectedTarget.reset();
+        Robot.DATA.selectedTarget.reset();
 
         if (mTrackingType.equals(ETrackingType.BALL)) {
-            mData.selectedTarget.set(ELimelightData.tv, mData.rawLimelight.get(ERawLimelightData.tv));
-            boolean targetValid = mData.selectedTarget.isSet(ELimelightData.tv);
+            mData.selectedTarget.set(ELimelightData.tv, mData.rawLimelight.get(tv));
+            boolean targetValid = Robot.DATA.selectedTarget.isSet(ELimelightData.tv);
             if (targetValid) {
                 if (!isTracking) {
-                    if (abs(mData.rawLimelight.get(ERawLimelightData.ty0) - mData.rawLimelight.get(ERawLimelightData.ty1)) < acceptableError) {
-                        selectedTarget = mData.rawLimelight.get(ERawLimelightData.tx0) > mData.rawLimelight.get(ERawLimelightData.tx1) ? 0 : 1;
+                    if (abs(Robot.DATA.rawLimelight.get(ty0) - Robot.DATA.rawLimelight.get(ty1)) < acceptableError) {
+                        selectedTarget = Robot.DATA.rawLimelight.get(tx0) > Robot.DATA.rawLimelight.get(tx1) ? 0 : 1;
                         isTracking = true;
                     } else {
                         selectedTarget = 0;
@@ -116,34 +117,34 @@ public class Vision extends Module {
                 }
 
                 System.out.println("Selected Target" + selectedTarget);
-                mData.selectedTarget.set(ELimelightData.tx, mTable.getEntry("tx" + selectedTarget).getDouble(Double.NaN) * (Limelight.llFOVHorizontal / 2));
-                mData.selectedTarget.set(ELimelightData.ty, mTable.getEntry("ty" + selectedTarget).getDouble(Double.NaN) * (Limelight.llFOVVertical / 2));
-                mData.selectedTarget.set(ELimelightData.ta, mTable.getEntry("ta" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ELimelightData.ts, mTable.getEntry("ts" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ELimelightData.tl, mData.rawLimelight.get(ERawLimelightData.tl));
-                mData.selectedTarget.set(ELimelightData.tshort, mTable.getEntry("tshort" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ELimelightData.tlong, mTable.getEntry("tlong" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ELimelightData.thoriz, mTable.getEntry("thor" + selectedTarget).getDouble(Double.NaN));
-                mData.selectedTarget.set(ELimelightData.tvert, mTable.getEntry("tvert" + selectedTarget).getDouble(Double.NaN));
+                Robot.DATA.selectedTarget.set(ELimelightData.tx, mTable.getEntry("tx" + selectedTarget).getDouble(Double.NaN) * (Limelight.llFOVHorizontal / 2));
+                Robot.DATA.selectedTarget.set(ELimelightData.ty, mTable.getEntry("ty" + selectedTarget).getDouble(Double.NaN) * (Limelight.llFOVVertical / 2));
+                Robot.DATA.selectedTarget.set(ELimelightData.ta, mTable.getEntry("ta" + selectedTarget).getDouble(Double.NaN));
+                Robot.DATA.selectedTarget.set(ELimelightData.ts, mTable.getEntry("ts" + selectedTarget).getDouble(Double.NaN));
+                Robot.DATA.selectedTarget.set(ELimelightData.tl, Robot.DATA.rawLimelight.get(tl));
+                Robot.DATA.selectedTarget.set(ELimelightData.tshort, mTable.getEntry("tshort" + selectedTarget).getDouble(Double.NaN));
+                Robot.DATA.selectedTarget.set(ELimelightData.tlong, mTable.getEntry("tlong" + selectedTarget).getDouble(Double.NaN));
+                Robot.DATA.selectedTarget.set(ELimelightData.thoriz, mTable.getEntry("thor" + selectedTarget).getDouble(Double.NaN));
+                Robot.DATA.selectedTarget.set(ELimelightData.tvert, mTable.getEntry("tvert" + selectedTarget).getDouble(Double.NaN));
 
-                mData.selectedTarget.set(ELimelightData.targetOrdinal, mData.rawLimelight.get(ERawLimelightData.targetOrdinal));
-                mData.selectedTarget.set(ELimelightData.calcDistToTarget, mData.rawLimelight.get(ERawLimelightData.calcDistToTarget));
-                mData.selectedTarget.set(ELimelightData.calcAngleToTarget, mData.rawLimelight.get(ERawLimelightData.calcAngleToTarget));
+                Robot.DATA.selectedTarget.set(ELimelightData.targetOrdinal, Robot.DATA.rawLimelight.get(targetOrdinal));
+                Robot.DATA.selectedTarget.set(ELimelightData.calcDistToTarget, Robot.DATA.rawLimelight.get(calcDistToTarget));
+                Robot.DATA.selectedTarget.set(ELimelightData.calcAngleToTarget, Robot.DATA.rawLimelight.get(calcAngleToTarget));
 
-                mData.selectedTarget.set(ELimelightData.calcTargetX, mData.rawLimelight.get(ERawLimelightData.calcTargetX));
-                mData.selectedTarget.set(ELimelightData.calcTargetY, mData.rawLimelight.get(ERawLimelightData.calcTargetY));
+                Robot.DATA.selectedTarget.set(ELimelightData.calcTargetX, Robot.DATA.rawLimelight.get(calcTargetX));
+                Robot.DATA.selectedTarget.set(ELimelightData.calcTargetY, Robot.DATA.rawLimelight.get(calcTargetY));
 
                 System.out.println("last tx and ty: " + lastXPosition + ", " + lastYPosition);
-                System.out.println("current tx and ty: " + mData.selectedTarget.get(ELimelightData.tx) + ", " + mData.selectedTarget.get(ELimelightData.ty));
-                if (abs(lastXPosition - mData.selectedTarget.get(ELimelightData.tx)) > acceptableXError || abs(lastYPosition - mData.selectedTarget.get(ELimelightData.ty)) > acceptableYError) {
+                System.out.println("current tx and ty: " + Robot.DATA.selectedTarget.get(ELimelightData.tx) + ", " + Robot.DATA.selectedTarget.get(ELimelightData.ty));
+                if (abs(lastXPosition - Robot.DATA.selectedTarget.get(ELimelightData.tx)) > acceptableXError || abs(lastYPosition - Robot.DATA.selectedTarget.get(ELimelightData.ty)) > acceptableYError) {
                     isTracking = false;
                 }
-                lastXPosition = mData.selectedTarget.get(ELimelightData.tx);
-                lastYPosition = mData.selectedTarget.get(ELimelightData.ty);
+                lastXPosition = Robot.DATA.selectedTarget.get(ELimelightData.tx);
+                lastYPosition = Robot.DATA.selectedTarget.get(ELimelightData.ty);
             }
         } else {          //set selectedTarget codex straight from limelight codex
             for (ELimelightData e : EnumUtils.getEnums(ELimelightData.class)) {
-                mData.selectedTarget.set(e, mData.limelight.get(e));
+                Robot.DATA.selectedTarget.set(e, Robot.DATA.limelight.get(e));
             }
 //            System.out.println("SELECTED TARGET FROM LIMELIGHT");
         }
