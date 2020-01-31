@@ -61,6 +61,8 @@ public class Robot extends TimedRobot {
         mLimelight = new Limelight(DATA);
         mOI = new OperatorInput();
 
+        mCSVLogger.start();
+
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
 

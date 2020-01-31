@@ -22,6 +22,8 @@ public class Settings extends NetworkTablesConstantsBase {
     public static double kControlLoopPeriod = 0.01; // seconds
     public static double kCSVLoggingPeriod = 0.02;  // seconds
 
+    public static int kSecondsToUpdateCSVLogger = 5; //seconds
+
     public static double kNetworkTableUpdateRate = 0.01;
 
     public static int sCODEX_COMMS_PORT = 5805;

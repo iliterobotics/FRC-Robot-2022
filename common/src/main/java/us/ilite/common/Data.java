@@ -82,7 +82,7 @@ public class Data {
     public void logFromCodexToCSVLog() {
         // Check that the USB drivetrain is still plugged in
 //        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
-            mCodexCsvLoggers.forEach(c -> c.writeLine());
+            mCodexCsvLoggers.forEach(c -> c.writeAllLines());
 //        }
     }
 

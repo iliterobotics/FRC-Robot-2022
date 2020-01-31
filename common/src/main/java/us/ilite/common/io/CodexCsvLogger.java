@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import com.flybotix.hfr.codex.Codex;
@@ -12,6 +13,7 @@ import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
+import us.ilite.common.CSVLoggerQueue;
 import us.ilite.common.Data;
 
 public class CodexCsvLogger {
@@ -47,10 +49,13 @@ public class CodexCsvLogger {
         }
     }
 
-    public void writeLine() {
+    public void writeAllLines() {
         try {
-            writer.append(mCodex.toCSV());
-            writer.newLine();
+            ArrayList<Object> stuffToLog = new ArrayList<>();
+            while ( !CSVLoggerQueue.kCSVLoggingQueue.isEmpty() ) {
+                writer.append(mCodex.toCSV());
+                writer.newLine();
+            }
         } catch (IOException pE) {
             pE.printStackTrace();
         }
