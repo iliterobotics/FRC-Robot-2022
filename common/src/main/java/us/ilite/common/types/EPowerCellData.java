@@ -19,5 +19,8 @@ public enum EPowerCellData  implements CodexOf<Double> {
     CURRENT_CONVEYOR_POWER_PCT,
 
     CURRENT_POWERCELL_STATE,
-    DESIRED_INTAKE_STATE;
+    DESIRED_INTAKE_STATE,
+
+    CURRENT_ARM_STATE,
+    DESIRED_ARM_STATE;
 }
