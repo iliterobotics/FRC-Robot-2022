@@ -27,7 +27,7 @@ public class Settings extends NetworkTablesConstantsBase {
     public static int sCODEX_COMMS_PORT = 5805;
 
     public static int kMaxTalonVelocity = 1500; // probably needs readjustment
-    public static double kMaxNeoVelocity = 0.5; // probably needs readjustments
+    public static double kMaxNeoVelocity = 0.25; // probably needs readjustments
 
     // =================================================================================
     //  Shooter System
@@ -38,13 +38,13 @@ public class Settings extends NetworkTablesConstantsBase {
         public static final ProfileGains kTurretAngleLockGains = new ProfileGains().p(0.0005);
         public static final ProfileGains kShooterGains = new ProfileGains().p(0.0005);
 
-        public static final int kShooterID = 16; // Bunnybot Shooter
-        public static final int kAcceleratorID = 11; // Bunnybot Conveyor
-        public static final int kAnglerID = 9; // Bunnybot Catapult
-        public static final int kTurretID = 9; // Bunnybot Hopper
-        public static final int kTurretGyroID = 1;
+        public static final int kShooterID = 16; // BunnyBot Shooter
+        public static final int kAcceleratorID = 11; // BunnyBot Conveyor
+        public static final int kAnglerID = 9; // BunnyBot Catapult
+        public static final int kTurretID = 9; // BunnyBot Hopper
+        public static final int kTurretGyroID = 1; // There isn't a gyro on the BunnyBot
 
-        public static final double kShooterTargetVelocity = 3750;
+        public static final double kShooterTargetVelocity = 1885;
         public static final double kAcceleratorTargetVelocity = 0.5;
 
         public static final double kBaseHoodAngle = 60;

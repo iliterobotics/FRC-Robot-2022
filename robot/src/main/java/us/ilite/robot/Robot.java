@@ -14,6 +14,7 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
@@ -47,7 +48,7 @@ public class Robot extends TimedRobot {
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final TestController mTestController = new TestController(mData, mShooter);
+    private final TestController mTestController = new TestController(mShooter);
     private AbstractController mActiveController = null;
 
 
@@ -154,9 +155,9 @@ public class Robot extends TimedRobot {
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
         mRunningModules.readInputs(mClock.getCurrentTime());
-//        mActiveController.update(mClock.getCurrentTime());
+        mActiveController.update(mClock.getCurrentTime());
         mRunningModules.setOutputs(mClock.getCurrentTime());
-//        mData.sendCodicesToNetworkTables();
+//        Robot.DATA.sendCodicesToNetworkTables();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
     }
 
