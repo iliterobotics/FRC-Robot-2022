@@ -2,7 +2,6 @@ package us.ilite.robot.commands;
 
 import us.ilite.common.Data;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.ETrackingType;
 import us.ilite.robot.modules.Limelight;
 
 public class WaitForVisionTarget implements ICommand {
@@ -19,7 +18,7 @@ public class WaitForVisionTarget implements ICommand {
 
     @Override
     public void init(double pNow) {
-        mLimelight.setTracking(ETrackingType.TARGET);
+        mLimelight.setTracking(null);
     }
 
     @Override
@@ -38,6 +37,6 @@ public class WaitForVisionTarget implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-        mLimelight.setTracking(ETrackingType.NONE);
+        mLimelight.setTracking(null);
     }
 }

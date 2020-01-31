@@ -12,14 +12,8 @@ public class OperatorInput extends Module {
     protected static final double
             DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
     private ILog mLog = Logger.createLog(OperatorInput.class);
-
-
     private Joystick mDriverJoystick;
     private Joystick mOperatorJoystick;
-
-
-
-    protected Codex<Double, ELogitech310> mDriverInputCodex, mOperatorInputCodex;
 
     public OperatorInput() {
         mDriverJoystick = new Joystick(0);
@@ -34,19 +28,11 @@ public class OperatorInput extends Module {
     @Override
     public void readInputs(double pNow) {
         ELogitech310.map(Robot.DATA.driverinput, mDriverJoystick);
-//        ELogitech310.map(Robot.mData.operatorinput, mOperatorJoystick);
+        ELogitech310.map(Robot.DATA.operatorinput, mOperatorJoystick);
     }
 
     @Override
     public void setOutputs(double pNow) {
     }
-
-
-    @Override
-    public void shutdown(double pNow) {
-
-    }
-
-
 
 }

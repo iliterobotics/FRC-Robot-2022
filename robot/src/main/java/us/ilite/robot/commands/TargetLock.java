@@ -2,11 +2,9 @@ package us.ilite.robot.commands;
 
 import com.flybotix.hfr.codex.Codex;
 
+import us.ilite.common.IFieldComponent;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.ETrackingType;
-import us.ilite.common.types.drive.EDriveData;
-import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.IThrottleProvider;
@@ -22,7 +20,7 @@ public class TargetLock implements ICommand {
     private ITargetDataProvider mCamera;
     // Different throttle providers give us some control over behavior in autonomous
     private IThrottleProvider mTargetSearchThrottleProvider, mTargetLockThrottleProvider;
-    private ETrackingType mTrackingType;
+    private IFieldComponent mTrackingType;
 
     private double mAllowableError, mPreviousTime, mOutput = 0.0;
 
@@ -31,13 +29,11 @@ public class TargetLock implements ICommand {
     private boolean mHasAcquiredTarget = false;
     private boolean mStopWhenTargetLost = true;
 
-
-    public TargetLock(DriveModule pDrive, double pAllowableError, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
-        this(pDrive, pAllowableError, pCamera, pThrottleProvider, true);
+    public TargetLock(double pAllowableError, IFieldComponent pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
+        this(pAllowableError, pTrackingType, pCamera, pThrottleProvider, true);
     }
 
-    public TargetLock(DriveModule pDrive, double pAllowableError, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
-        this.mDrive = pDrive;
+    public TargetLock(double pAllowableError, IFieldComponent pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
         this.mAllowableError = pAllowableError;
         this.mCamera = pCamera;
         this.mTargetSearchThrottleProvider = pThrottleProvider;
@@ -89,7 +85,6 @@ public class TargetLock implements ICommand {
 //                    ECommonControlMode.PERCENT_OUTPUT
 //                ).setNeutralMode(ECommonNeutralMode.BRAKE)
 //            );
-//
 //        }
 
         mPreviousTime = pNow;

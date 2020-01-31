@@ -4,19 +4,27 @@ import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.lib.util.SimpleNetworkTable;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ELimelightData;
 import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
+
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.*;
 import us.ilite.robot.loops.Loop;
+
+import java.io.OutputStream;
 
 /**
  * Class for running all drivetrain train control operations from both autonomous and
@@ -41,19 +49,20 @@ public class DriveModule extends Loop {
 	public static double kTurnCircumference = kEffectiveWheelbase * Math.PI;
 	public static double kInchesPerDegree = kTurnCircumference / 360.0;
 	public static double kWheelTurnsPerDegree = kInchesPerDegree / kWheelDiameterInches;
+
 	// =============================================================================
 	// Closed-Loop Velocity Constants
 	// =============================================================================
 	public static ProfileGains kDistancePID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d);
-	public static ProfileGains kVelocityPID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d);
+	public static ProfileGains kVelocityPID = new ProfileGains().p(1.5234375e-4).d(0.001174257 * 4).maxVelocity(5676d).maxAccel(56760d);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
-
 
 	// =============================================================================
 	// Heading Gains
 	// =============================================================================
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
+	public static ProfileGains kYawGains = new ProfileGains().f(.15);
 	public static double kDriveLinearPercentOutputLimit = 0.5;
 
 	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
@@ -66,8 +75,7 @@ public class DriveModule extends Loop {
 			CURRENT14,
 
 	};
-	
-	
+
 	private IDriveHardware mDriveHardware;
 	private Rotation2d mGyroOffset = new Rotation2d();
 
@@ -76,12 +84,14 @@ public class DriveModule extends Loop {
 	private double mTargetTrackingThrottle = 0;
 
 	private PIDController mTargetAngleLockPid;
-
+	private PIDController mYawPid;
+	private double mCurrentHeading;
+	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
 
-	public DriveModule()
-	{
+	public DriveModule() {
 		if(AbstractSystemSettingsUtils.isPracticeBot()) {
+
 		} else {
 			this.mDriveHardware = new NeoDriveHardware(kGearboxRatio);
 		}
@@ -95,8 +105,14 @@ public class DriveModule extends Loop {
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 		mTargetAngleLockPid.setSetpoint(0);
 		mTargetAngleLockPid.reset();
-		mDriveHardware.zero();
 
+		mYawPid = new PIDController(kYawGains,
+									-Settings.Drive.kMaxHeadingChange,
+									Settings.Drive.kMaxHeadingChange,
+									Settings.kControlLoopPeriod);
+		mYawPid.setOutputRange(-1, 1);
+
+		mDriveHardware.zero();
 	  	setDriveMessage(DriveMessage.kNeutral);
 	  	setDriveState(EDriveState.NORMAL);
 
@@ -105,13 +121,12 @@ public class DriveModule extends Loop {
 
 	@Override
 	public void readInputs(double pNow) {
-
 		Robot.DATA.drivetrain.set(LEFT_POS_INCHES, mDriveHardware.getLeftInches());
 		Robot.DATA.drivetrain.set(RIGHT_POS_INCHES, mDriveHardware.getRightInches());
-//		Robot.mData.drivetrain.set(EDriveData.LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
-//		Robot.mData.drivetrain.set(EDriveData.RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
-		Robot.DATA.drivetrain.set(LEFT_VEL_TICKS, (double)mDriveHardware.getLeftVelTicks());
-		Robot.DATA.drivetrain.set(RIGHT_VEL_TICKS, (double)mDriveHardware.getRightVelTicks());
+		Robot.DATA.drivetrain.set(LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
+		Robot.DATA.drivetrain.set(RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
+		Robot.DATA.drivetrain.set(LEFT_VEL_TICKS, mDriveHardware.getLeftVelTicks());
+		Robot.DATA.drivetrain.set(RIGHT_VEL_TICKS, mDriveHardware.getRightVelTicks());
 
 		Robot.DATA.drivetrain.set(LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
@@ -119,10 +134,19 @@ public class DriveModule extends Loop {
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
 		Robot.DATA.drivetrain.set(LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
-//
-//		mData.imu.set(EGyro.YAW_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
 
-//		SimpleNetworkTable.writeCodexToSmartDashboard(EDriveData.class, mData.drivetrain, mClock.getCurrentTime());
+		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
+
+		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
+		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
+
+		try {
+			mYawPid.setSetpoint(Robot.DATA.drivetrain.get(TURN) * Settings.Drive.kMaxHeadingChange);
+//			System.out.println(Robot.DATA.drivetrain.get(TURN));
+		} catch (NullPointerException ne) {
+			mYawPid.setSetpoint(0.0);
+//			System.out.println("0.0");
+		}
 	}
 
 	@Override
@@ -131,13 +155,19 @@ public class DriveModule extends Loop {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
-			mDriveHardware.set(mDriveMessage);
-		}
+			double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
+			double mThrottle = Robot.DATA.drivetrain.get(THROTTLE);
+			DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
+			SmartDashboard.putNumber("DESIRED YAW", (Robot.DATA.drivetrain.get(TURN) * Settings.Drive.kMaxHeadingChange));
+			SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
+			((NeoDriveHardware)mDriveHardware).setTarget(driveMessage.getLeftOutput() * Settings.Drive.kDriveTrainMaxVelocity, driveMessage.getRightOutput() * Settings.Drive.kDriveTrainMaxVelocity);//Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
+}
 
-		mPreviousTime = pNow;
-	}
-	
-	@Override
+		mPreviousHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
+				mPreviousTime = pNow;
+				}
+
+@Override
 	public void shutdown(double pNow) {
 		mDriveHardware.zero();
 	}

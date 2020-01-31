@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import us.ilite.common.lib.control.PIDGains;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.NetworkTablesConstantsBase;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 
@@ -42,11 +43,13 @@ public class Settings extends NetworkTablesConstantsBase {
             public static int kPCM = 20;
             public static int kPDP = 21;
             public static int kPigeon = 30;
+//            public static double kGyroCollisionThreshold = 0.0;
 
             public static  int kDriveLeftMaster = 1;
             public static int kDriveLeftMiddle = 3;
             public static  int kDriveRightMaster = 2;
             public static int kDriveRightMiddle = 4;
+
         }
 
         public static class Analog {
@@ -71,6 +74,10 @@ public class Settings extends NetworkTablesConstantsBase {
     // Drive Train Constants
     // =============================================================================
     public static class Drive {
+        public static double kDriveTrainMaxVelocity = 5676;
+
+        // TODO Find out what units this is in
+        public static double kMaxHeadingChange = 5;
     }
 
     public static class Input {
@@ -110,36 +117,5 @@ public class Settings extends NetworkTablesConstantsBase {
     public static final double kTargetAngleLockMinInput = -27;
     public static final double kTargetAngleLockMaxInput = 27;
     public static final double kTargetAngleLockFrictionFeedforward = 0.44 / 12;
-
-    // =============================================================================
-    // Target Constants
-    // Note: These constants need to be recalculated for the specific target geometry
-    // =============================================================================
-    // TODO These values are specific to the targets, not the camera, and may belong elsewhere
-    // The current target values assume the limelight processing stream is configured to target
-    // the bottom of the vision target
-    public enum VisionTarget {
-        Generic (10.0), // Used for testing new things
-        HatchPort(25.6875), // height of the bottom of the reflective tape in inches for the hatch port
-        CargoPort(33.3125), // height of the bottom of the reflective tape in inches for the cargo port
-        Ground(0.0), //The ground
-        CargoHeight(6.5d);//This may change, not sure what the correct value
-
-        private final double height;
-
-        VisionTarget( double height)  {
-            this.height = height;
-        }
-
-        /**
-         * @return the height
-         */
-        public double getHeight() {
-            return height;
-        }
-        /**
-         * @return the pipelineName
-         */
-    }
 
 }

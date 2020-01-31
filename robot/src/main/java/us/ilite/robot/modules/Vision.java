@@ -6,8 +6,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import us.ilite.common.Data;
 import static us.ilite.common.types.ERawLimelightData.*;
+
+import us.ilite.common.Field2020;
+import us.ilite.common.IFieldComponent;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.ETrackingType;
 import us.ilite.robot.Robot;
 
 import java.util.Optional;
@@ -18,7 +20,7 @@ public class Vision extends Module {
     private Limelight mLimelight;
     private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable("limelight");
     private Data mData;
-    private ETrackingType mTrackingType;
+    private IFieldComponent mTrackingType;
 
     private double lastXPosition = 0.0;
     private double lastYPosition = 0.0;
@@ -103,7 +105,7 @@ public class Vision extends Module {
     public void sortTrackingData() {
         Robot.DATA.selectedTarget.reset();
 
-        if (mTrackingType.equals(ETrackingType.BALL)) {
+        if (mTrackingType.equals(Field2020.FieldElement.POWER_CELL)) {
             mData.selectedTarget.set(ELimelightData.tv, mData.rawLimelight.get(tv));
             boolean targetValid = Robot.DATA.selectedTarget.isSet(ELimelightData.tv);
             if (targetValid) {
