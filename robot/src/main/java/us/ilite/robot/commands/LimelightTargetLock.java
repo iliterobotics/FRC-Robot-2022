@@ -2,8 +2,7 @@ package us.ilite.robot.commands;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import us.ilite.common.types.ETrackingType;
-import us.ilite.robot.modules.DriveModule;
+import us.ilite.common.IFieldComponent;
 import us.ilite.robot.modules.IThrottleProvider;
 import us.ilite.robot.modules.Limelight;
 
@@ -20,7 +19,7 @@ public class LimelightTargetLock extends TargetLock {
 //        mLog.error("STARTED LIMELIGHT TARGET LOCK");
 //    }
 
-    public LimelightTargetLock(Limelight pLimelight, double pAllowableError, ETrackingType pTrackingType, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
+    public LimelightTargetLock(Limelight pLimelight, double pAllowableError, IFieldComponent pTrackingType, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
         super(pAllowableError, pTrackingType, pLimelight, pThrottleProvider, pEndOnAlignment);
 
         this.mLimelight = pLimelight;

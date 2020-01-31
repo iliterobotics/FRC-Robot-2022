@@ -13,8 +13,7 @@ import java.util.function.Function;
 import com.flybotix.hfr.codex.Codex;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import us.ilite.common.config.Settings;
-import us.ilite.common.config.Settings.VisionTarget;
+import us.ilite.common.IFieldComponent;
 import us.ilite.common.types.ETargetingData;
 
 /**
@@ -73,8 +72,8 @@ public interface ITargetDataProvider {
      * @param target
      * @return Distance to target
      */
-    public default double calcTargetDistance( Settings.VisionTarget target ) {
-        return this.calcTargetDistance( target.getHeight() );
+    public default double calcTargetDistance( IFieldComponent target ) {
+        return this.calcTargetDistance( target.height() );
     }
 
 
@@ -116,7 +115,7 @@ public interface ITargetDataProvider {
         return approachAngle;
     }
 
-    public default Optional<Translation2d> calcTargetLocation(Settings.VisionTarget target) {
+    public default Optional<Translation2d> calcTargetLocation(IFieldComponent target) {
         return calcTargetLocation(target, this::calcTargetDistance, (v)->this.calcTargetApproachAngle());
     }
 
@@ -130,8 +129,8 @@ public interface ITargetDataProvider {
      * @return
      *  The target location. The optional will be empty if there was an error
      */
-    public default Optional<Translation2d>  calcTargetLocation( Settings.VisionTarget target,
-        Function<VisionTarget,Double>distanceCalculator, Function<Void,Double> approachAngleCalculator)
+    public default Optional<Translation2d>  calcTargetLocation( IFieldComponent target,
+        Function<IFieldComponent,Double>distanceCalculator, Function<Void,Double> approachAngleCalculator)
     {
         double distance = distanceCalculator.apply(target);
         if ( distance < 0.0 ) {

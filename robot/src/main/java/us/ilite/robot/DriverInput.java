@@ -6,10 +6,10 @@ import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.Data;
+import us.ilite.common.IFieldComponent;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ETrackingType;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
@@ -39,7 +39,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     protected Codex<Double, ELogitech310> mDriverInputCodex, mOperatorInputCodex;
 
-    private ETrackingType mLastTrackingType = null;
+    private IFieldComponent mLastTrackingType = null;
 
     public DriverInput(boolean pSimulated) {
 //        this.mTeleopCommandManager = pTeleopCommandManager;
