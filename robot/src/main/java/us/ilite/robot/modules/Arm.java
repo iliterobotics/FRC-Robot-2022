@@ -1,15 +1,19 @@
 package us.ilite.robot.modules;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel;
 import us.ilite.common.Data;
+import us.ilite.common.config.Settings;
 import us.ilite.common.types.EArmData;
 import us.ilite.robot.Robot;
+import us.ilite.robot.hardware.SparkMaxFactory;
 
 public class Arm extends Module {
     private CANSparkMax mNeoMotor;
     private Data mData;
     private EArmState mArmState;
     public Arm (Data pData){
+        mNeoMotor = SparkMaxFactory.createDefaultSparkMax(Settings.Arm.kArmNeoAddress , CANSparkMaxLowLevel.MotorType.kBrushless);
         this.mData = pData;
     }
     public enum EArmState{

@@ -64,6 +64,14 @@ public class Settings extends NetworkTablesConstantsBase {
         }
 
     }
+    public static class Arm {
+        // =============================================================================
+        // IMU Constants
+        // =============================================================================
+
+        public static int kArmNeoAddress = 16;
+
+    }
 
     //==============================================================================
     // Logging
