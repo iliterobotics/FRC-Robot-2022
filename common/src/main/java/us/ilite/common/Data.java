@@ -31,26 +31,36 @@ public class Data {
     public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
-    public Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
-    public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
+    public final Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
+    public final Codex<Double , EHangerModuleData> hanger = Codex.of.thisEnum(EHangerModuleData.class);
     public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
+    public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
     public final Codex<Double, EShooterSystemData> flywheel = Codex.of.thisEnum(EShooterSystemData.class);
     public final Codex<Double, EColorWheelData> colorwheel = Codex.of.thisEnum(EColorWheelData.class);
-//    public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
-    public final Codex<Double, EHangerData> hanger  = Codex.of.thisEnum(EHangerData.class);
 
 
     public final Codex[] mAllCodexes = new Codex[] {
-            imu, /*drivetrain,*/ driverinput, operatorinput, pdp, powercell /*limelight,*/
+            imu,
+            drivetrain,
+            driverinput,
+            operatorinput,
+            pdp,
+            powercell,
+            hanger,
+            limelight,
     };
 
     public final Codex[] mLoggedCodexes = new Codex[] {
-        imu, drivetrain, driverinput, /*operatorinput,*/  pdp, limelight, powercell
+            imu,
+            drivetrain,
+            driverinput,
+            operatorinput,
+            pdp,
+            powercell,
+            hanger,
+            limelight,
     };
 
-    public final Codex[] mDisplayedCodexes = new Codex[] {
-            imu, /*drivetrain,*/ driverinput, operatorinput, pdp
-    };
 
     //Stores writers per codex needed for CSV logging
     private List<CodexCsvLogger> mCodexCsvLoggers;

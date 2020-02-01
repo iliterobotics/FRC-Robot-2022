@@ -4,11 +4,13 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.HangerModule;
 import us.ilite.robot.modules.PowerCellModule;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
@@ -19,6 +21,7 @@ public class TestController extends AbstractController {
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
     private ILog mLog = Logger.createLog(this.getClass());
 
+    private HangerModule.EHangerState mHangerState;
 
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
@@ -32,7 +35,28 @@ public class TestController extends AbstractController {
         updateDrivetrain(pNow);
         updateFlywheel(pNow);
         updateIntake(pNow);
+        updateHanger(pNow);
 //        updateArm(pNow);
+    }
+    private void updateHanger(double pNow){
+        if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
+
+        }
+        else if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.RELEASE_HANG)){
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
+
+        }
+        switch (mHangerState){
+            case HANGING:
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
+            case NOT_HANGING:
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
+        }
     }
 
     void updateFlywheel(double pNow) {

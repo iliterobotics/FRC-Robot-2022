@@ -37,6 +37,8 @@ public class Settings extends NetworkTablesConstantsBase {
 
 
         public static class CAN {
+            public static int kHangerNeoID1;
+            public static int kHangerNeoID2;
             public static int kArmNEOAdress = 4;
             public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
             public static int kTalonOneID = 3; // Change later
