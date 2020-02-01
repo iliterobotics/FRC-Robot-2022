@@ -1,6 +1,5 @@
 package us.ilite.robot.modules;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.Joystick;
@@ -12,6 +11,7 @@ public class OperatorInput extends Module {
     protected static final double
             DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
     private ILog mLog = Logger.createLog(OperatorInput.class);
+
     private Joystick mDriverJoystick;
     private Joystick mOperatorJoystick;
 

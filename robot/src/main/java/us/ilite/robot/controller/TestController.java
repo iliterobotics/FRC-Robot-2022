@@ -11,9 +11,20 @@ import us.ilite.common.types.input.EInputScale;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.Limelight;
+import us.ilite.common.config.InputMap;
+import us.ilite.common.config.Settings;
+import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.EPowerCellData;
+import us.ilite.common.types.EShooterSystemData;
+import us.ilite.common.types.input.EInputScale;
+import us.ilite.robot.Robot;
+import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.HangerModule;
+import us.ilite.robot.modules.PowerCellModule;
 
-import static us.ilite.common.types.drive.EDriveData.*;
 import static us.ilite.common.config.InputMap.DRIVER.*;
+import static us.ilite.common.types.drive.EDriveData.THROTTLE;
+import static us.ilite.common.types.drive.EDriveData.TURN;
 
 public class TestController extends AbstractController {
 
@@ -22,12 +33,103 @@ public class TestController extends AbstractController {
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
     private double mLimelightZoomThreshold = 7.0;
 
-    public TestController() { ;
+    private HangerModule.EHangerState mHangerState;
+    private PowerCellModule.EIntakeState mIntakeState;
+    private PowerCellModule.EArmState mArmState;
+    private double mPreviousTime;
+
+    public TestController() {
     }
 
     public void update(double pNow) {
         updateLimelightTargetLock();
         updateDrivetrain(pNow);
+        updateFlywheel(pNow);
+        updateIntake(pNow);
+        updateHanger(pNow);
+//        updateArm(pNow);
+    }
+    private void updateHanger(double pNow){
+        if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
+
+        }
+        else if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.RELEASE_HANG)){
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
+
+        }
+        switch (mHangerState){
+            case HANGING:
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
+            case NOT_HANGING:
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
+        }
+    }
+
+    void updateFlywheel(double pNow) {
+//        if (!db.driverinput.isSet(InputMap.DRIVER.FLYWHEEL_AXIS) ) {
+//            mTurretMode = FlywheelModule.ETurretMode.LIMELIGHT;
+//            mHoodState = FlywheelModule.EHoodState.ADJUSTABLE;
+//            mAcceleratorState = FlywheelModule.EAcceleratorState.FEED;
+//            mShooterState = FlywheelModule.EShooterState.SHOOT;
+//        }
+//        else {
+//            mTurretMode = FlywheelModule.ETurretMode.GYRO;
+//            mAcceleratorState = FlywheelModule.EAcceleratorState.STOP;
+//            mShooterState = FlywheelModule.EShooterState.STOP;
+//            mHoodState = FlywheelModule.EHoodState.STATIONARY;
+//        }
+//
+//        switch(mAcceleratorState) {
+//            case FEED: db.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, FlywheelModule.kAcceleratorTargetVelocity);
+//                break;
+//            case STOP: db.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, 0.0);
+//                break;
+//        }
+//
+//        switch(mTurretMode) {
+//            case GYRO: db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-2 * mTurretGyro.getCompassHeading(), pNow - mPreviousTime));
+//                break;
+//            case LIMELIGHT:
+//                if ( db.limelight.isSet(ETargetingData.tx)) {
+//                    db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-10 * db.limelight.get(ETargetingData.tx), pNow - mPreviousTime));
+//                }
+//                break;
+//        }
+//
+//        switch(mShooterState) {
+//            case SHOOT:
+//                if ( db.limelight.isSet(ETargetingData.ty)) {
+//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooter.calcSpeedFromDistance(db.limelight.get(ETargetingData.calcDistToTarget)));
+//                }
+//                else {
+//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooterPid.calculate(Settings.ShooterSystem.kShooterTargetVelocity, 0.5));
+//                }
+//                break;
+//            case STOP: db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
+//                break;
+//        }
+//
+//        switch(mHoodState) {
+//            case STATIONARY: db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
+//                break;
+//            case ADJUSTABLE:
+//                if (db.limelight.isSet(ETargetingData.ty)) {
+//                    db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, mShooter.calcAngleFromDistance(db.limelight.get(ETargetingData.calcDistToTarget), db.limelight.get(ETargetingData.ty)));
+//                }
+//                else {
+//                    db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
+//                }
+//        }
+//        if ( db.attackoperatorinput.isSet(ELogitechAttack3.TRIGGER)) {
+//            mAccelerator.set(ControlMode.PercentOutput, db.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
+//        }
+        mPreviousTime = pNow;
+        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
 
     public void updateLimelightTargetLock() {
@@ -86,4 +188,48 @@ public class TestController extends AbstractController {
         db.drivetrain.set(TURN, rotate);
     }
 
+    private void updateIntake(double pNow) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
+            mLog.error("--------------INTAKE IS BEING PRESSED----------");
+            mIntakeState = PowerCellModule.EIntakeState.INTAKE;
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
+            mIntakeState = PowerCellModule.EIntakeState.REVERSE;
+        } else {
+            mIntakeState = PowerCellModule.EIntakeState.STOP;
+        }
+        switch (mIntakeState) {
+            case INTAKE:
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 1.0);
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 1.0);
+                db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 1.0);
+                break;
+            case REVERSE:
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , -1.0);
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , -1.0);
+                db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , -1.0);
+                break;
+            case STOP:
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 0.0);
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 0.0);
+                db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 0.0);
+                break;
+        }
+    }
+
+    public void updateArm(double pNow) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
+            mArmState = PowerCellModule.EArmState.ENGAGED;
+        } else {
+            mArmState = PowerCellModule.EArmState.DISENGAGED;
+        }
+        switch (mArmState) {
+            case ENGAGED:
+                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 1.0);
+                break;
+            case DISENGAGED:
+                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 0.0);
+                break;
+        }
+        //TODO default state
+    }
 }

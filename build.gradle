@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2020.2.1"
+    id "edu.wpi.first.GradleRIO" version "2020.2.1" //"2019.4.1"//"2020.2.1"
     id 'org.openjfx.javafxplugin' version '0.0.5' apply false
     id 'pmd'
 }
@@ -40,6 +40,7 @@ subprojects {
 
     dependencies {
         testCompile 'junit:junit:4.12'
+        testCompile "org.mockito:mockito-core:2.+"
     }
 
     test {

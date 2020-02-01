@@ -9,8 +9,10 @@ import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.config.InputMap;
 import us.ilite.robot.BaseTest;
+import us.ilite.robot.modules.PowerCellModule;
 
 public class DriveTrainUnitTest extends BaseTest {
+    private PowerCellModule mIntake;
 
     @Test
     public void testDrivetrainControl() {

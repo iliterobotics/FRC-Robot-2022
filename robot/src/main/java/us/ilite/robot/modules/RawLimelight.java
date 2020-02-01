@@ -51,17 +51,17 @@ public class RawLimelight extends Module implements ITargetDataProvider {
 
         if(targetValid) {
 
-            if(mVisionTarget != null) {
-
-                Robot.DATA.limelight.set(ELimelightData.targetOrdinal, (double)mVisionTarget.ordinal());
-                Robot.DATA.limelight.set(ELimelightData.calcDistToTarget, calcTargetDistance(mVisionTarget));
-                Robot.DATA.limelight.set(calcAngleToTarget, calcTargetApproachAngle());
-                Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
-                if(p.isPresent()) {
-                    Robot.DATA.limelight.set(ELimelightData.calcTargetX, p.get().getX());
-                    Robot.DATA.limelight.set(ELimelightData.calcTargetY, p.get().getY());
-                }
-            }
+//            if(mVisionTarget != null) {
+//
+//                Robot.DATA.limelight.set(ELimelightData.targetOrdinal, (double)mVisionTarget.ordinal());
+//                Robot.DATA.limelight.set(ELimelightData.calcDistToTarget, calcTargetDistance(mVisionTarget));
+//                Robot.DATA.limelight.set(calcAngleToTarget, calcTargetApproachAngle());
+//                Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
+//                if(p.isPresent()) {
+//                    Robot.DATA.limelight.set(ELimelightData.calcTargetX, p.get().getX());
+//                    Robot.DATA.limelight.set(ELimelightData.calcTargetY, p.get().getY());
+//                }
+//            }
         }
 
     }
