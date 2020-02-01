@@ -7,6 +7,7 @@ public enum EColorData implements CodexOf<Double> {
     SENSED_COLOR,
     POSITION_CONTROL_INPUT,
     ROTATION_CONTROL_INPUT,
+    FINISHED,
     COLOR_WHEEL_MOTOR_STATE;
 
 
@@ -23,13 +24,18 @@ public enum EColorData implements CodexOf<Double> {
         }
     }
 
+    public enum EIsFinished {
+        YES,
+        NO
+    }
+
     public enum EInput {
         POSITIVE,
-        NEGATIVE;
+        NEGATIVE
     }
     public enum EMotorState {
         ON,
-        OFF;
+        OFF
     }
 
 }

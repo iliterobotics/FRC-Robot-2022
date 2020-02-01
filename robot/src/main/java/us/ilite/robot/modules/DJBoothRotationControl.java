@@ -13,18 +13,17 @@ import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.sensor.EColorData;
 import us.ilite.robot.Robot;
-import us.ilite.robot.utils.ColorUtils;
 
 import static us.ilite.robot.utils.ColorUtils.*;
 
 public class DJBoothRotationControl extends Module {
 
     private ColorSensorV3 mColorSensorV3;
-    private VictorSPX victorSPX;
 
     private final ColorMatch mColorMatcher = new ColorMatch();
     private EColorData.EColor eCurrentColorState;
     private EColorData.EColor eLastColorState;
+    private EColorData.EInput eInputState;
     private int mColorChangeLocation;
     private int mInitialColorStateLocation;
     private final EColorData.EColor[] colorStates = {EColorData.EColor.RED, EColorData.EColor.YELLOW, EColorData.EColor.BLUE, EColorData.EColor.GREEN};
@@ -33,12 +32,11 @@ public class DJBoothRotationControl extends Module {
     private boolean mIsDone;
 
 
-    @Override
-    public void init(double pNow) {
-        I2C.Port i2cPort = I2C.Port.kOnboard;
-        mColorSensorV3 = new ColorSensorV3(i2cPort);
-        victorSPX = new VictorSPX( 12 );
-        victorSPX.set( ControlMode.PercentOutput, 0d );
+    //Build DJBoothRotationControl after building DJBoothPositionControl
+    public DJBoothRotationControl() {
+        mColorSensorV3 = DJBoothPositionControl.mColorSensorV3;
+//        victorSPX = new VictorSPX( 12 );
+//        victorSPX.set( ControlMode.PercentOutput, 0d );
 
         mColorMatcher.addColorMatch(kBlueTarget);
         mColorMatcher.addColorMatch(kGreenTarget);
@@ -47,14 +45,14 @@ public class DJBoothRotationControl extends Module {
 
         setColorState( mColorMatcher.matchClosestColor( mColorSensorV3.getColor() ).color );
         eLastColorState = eCurrentColorState;
+        eInputState = EColorData.EInput.NEGATIVE;
         mColorChangeLocation = getInitialStateLocation( eCurrentColorState );
     }
 
-    @Override
-    public boolean update(double pNow) {
+    public EColorData.EMotorState update() {
 
-        if ( EColorData.ROTATION_CONTROL_INPUT.equals( EColorData.EInput.POSITIVE ) ) {
-            if ( (mColorChangeLocation - mInitialColorStateLocation <= 32) && EColorData.ROTATION_CONTROL_INPUT.equals(EColorData.EInput.POSITIVE) ) {
+        if ( eInputState.equals( EColorData.EInput.POSITIVE ) ) {
+            if ( (mColorChangeLocation - mInitialColorStateLocation <= 32) && db.get(EColorData.ROTATION_CONTROL_INPUT).equals(EColorData.EInput.POSITIVE) ) {
 
                 Color mColor = mColorSensorV3.getColor();
                 ColorMatchResult match = mColorMatcher.matchClosestColor( mColor );
@@ -72,27 +70,20 @@ public class DJBoothRotationControl extends Module {
 //            String colorString = getColorStringForMatchResult(match);
 //            SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
 
-                setOutput( EColorData.EMotorState.ON );
                 mIsDone = false;
-                return false;
+                return EColorData.EMotorState.ON;
             }
             else if ( eMotorState == EColorData.EMotorState.ON ) {
                 mIsDone = true;
-                setOutput( EColorData.EMotorState.ON );
-                return true;
+                return EColorData.EMotorState.ON;
             }
             else {
                 mIsDone = false;
-                setOutput( EColorData.EMotorState.OFF );
-                return false;
+                return EColorData.EMotorState.OFF;
             }
         }
-        return true;
-    }
-
-    private void setOutput(EColorData.EMotorState pDesiredMotorState) {
-        Data mData = Robot.DATA;
-        mData.color.set( EColorData.COLOR_WHEEL_MOTOR_STATE, pDesiredMotorState.ordinal() );
+        reset();
+        return EColorData.EMotorState.OFF;
     }
 
     protected static String getColorStringForMatchResult(ColorMatchResult match) {
@@ -150,36 +141,39 @@ public class DJBoothRotationControl extends Module {
         }
     }
 
-    public Color updateColor() {
-        Color detectedColor = mColorSensorV3.getColor();
-        ColorMatchResult match = mColorMatcher.matchClosestColor( detectedColor );
+//    public Color updateColor() {
+//        Color detectedColor = mColorSensorV3.getColor();
+//        ColorMatchResult match = mColorMatcher.matchClosestColor( detectedColor );
+//        eLastColorState = eCurrentColorState;
+//        setColorState( detectedColor );
+//
+//        Data mData = Robot.DATA;
+//        if (match != null) {
+//            if (kBlueTarget.equals(match.color)) {
+//                mData.color.set( EColorData.SENSED_COLOR, (double)EColorData.EColor.BLUE.ordinal() );
+//                return kBlueTarget;
+//            } else if (kRedTarget.equals(match.color)) {
+//                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.RED.ordinal());
+//                return kRedTarget;
+//            } else if (kGreenTarget.equals(match.color)) {
+//                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.GREEN.ordinal());
+//                return kGreenTarget;
+//            } else if (kYellowTarget.equals(match.color)) {
+//                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.YELLOW.ordinal());
+//                return kYellowTarget;
+//            } else {
+//                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.NONE.ordinal());
+//                return null;
+//            }
+//        }
+//        return null;
+//    }
+
+    public void reset() {
+        setColorState( mColorMatcher.matchClosestColor( mColorSensorV3.getColor() ).color );
         eLastColorState = eCurrentColorState;
-        setColorState( detectedColor );
-
-        Data mData = Robot.DATA;
-        if (match != null) {
-            if (kBlueTarget.equals(match.color)) {
-                mData.color.set( EColorData.SENSED_COLOR, (double)EColorData.EColor.BLUE.ordinal() );
-                return kBlueTarget;
-            } else if (kRedTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.RED.ordinal());
-                return kRedTarget;
-            } else if (kGreenTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.GREEN.ordinal());
-                return kGreenTarget;
-            } else if (kYellowTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.YELLOW.ordinal());
-                return kYellowTarget;
-            } else {
-                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.NONE.ordinal());
-                return null;
-            }
-        }
-        return null;
-    }
-
-    public boolean isDone() {
-        return mIsDone;
+        eInputState = EColorData.EInput.NEGATIVE;
+        mColorChangeLocation = getInitialStateLocation( eCurrentColorState );
     }
 
     public void updateMotor( EColorData.EMotorState motorState ){
@@ -188,16 +182,17 @@ public class DJBoothRotationControl extends Module {
 
     @Override
     public void readInputs(double pNow) {
-
+        if ( db.color.get(EColorData.ROTATION_CONTROL_INPUT).equals((double)EColorData.EInput.POSITIVE.ordinal()) ) {
+            eInputState = EColorData.EInput.POSITIVE;
+        }
+        else {
+            eInputState = EColorData.EInput.NEGATIVE;
+        }
     }
 
     @Override
     public void setOutputs(double pNow) {
-
+        db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double)update().ordinal());
     }
 
-    @Override
-    public void shutdown(double pNow) {
-        victorSPX.set(ControlMode.PercentOutput, 0d);
-    }
 }

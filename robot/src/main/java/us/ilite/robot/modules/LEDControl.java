@@ -15,8 +15,8 @@ public class LEDControl extends Module {
     private Timer mBlinkTimer;
     private boolean mLedOn;
     private Message mCurrentMessage;
-    private DJBoothPositionControl mDjBoothPositionControl;
-    private DJBoothRotationControl mDjBoothRotationControl;
+//    private DJBoothPositionControl mDjBoothPositionControl;
+//    private DJBoothRotationControl mDjBoothRotationControl;
     
 //    private final Drive mDrive;
 //    private final Elevator mElevator;
@@ -131,9 +131,9 @@ public class LEDControl extends Module {
     }
 
 
-    public LEDControl(DJBoothPositionControl pDjBoothPositionControl, DJBoothRotationControl pDjBoothRotationControl ) {
-        this.mDjBoothPositionControl = pDjBoothPositionControl;
-        this.mDjBoothRotationControl = pDjBoothRotationControl;
+    public LEDControl(/*DJBoothPositionControl pDjBoothPositionControl, DJBoothRotationControl pDjBoothRotationControl */) {
+//        this.mDjBoothPositionControl = pDjBoothPositionControl;
+//        this.mDjBoothRotationControl = pDjBoothRotationControl;
 
         this.mCurrentMessage = Message.NONE;
         this.mLedOn = true;
@@ -173,27 +173,26 @@ public class LEDControl extends Module {
 //        if(mLimelight.getTracking() != ETrackingType.NONE) mCurrentMessage = Message.VISION_TRACKING;
 //
 
-        Color color = getColor( Robot.DATA.color.get(EColorData.SENSED_COLOR) );
-        boolean isPositionDone = mDjBoothPositionControl.isDone();
-        boolean isRotationDone = mDjBoothRotationControl.isDone();
+        Color color = getColor( db.color.get(EColorData.SENSED_COLOR) );
+        boolean isDone = db.color.get(EColorData.FINISHED);
 
 
-        if (color == kBlueTarget && !isPositionDone && !isRotationDone) {
+        if (color == kBlueTarget && !isDone) {
             mCurrentMessage = Message.ON_BLUE;
-        } else if (color == kRedTarget && !isPositionDone && !isRotationDone) {
+        } else if (color == kRedTarget && !isDone) {
             mCurrentMessage = Message.ON_RED;
-        } else if (color == kGreenTarget && !isPositionDone && !isRotationDone) {
+        } else if (color == kGreenTarget && !isDone) {
             mCurrentMessage = Message.ON_GREEN;
-        } else if (color == kYellowTarget && !isPositionDone && !isRotationDone) {
+        } else if (color == kYellowTarget && !isDone) {
             mCurrentMessage = Message.ON_YELLOW;
         }
-        else if (color == kBlueTarget && (isPositionDone || isRotationDone)) {
+        else if (color == kBlueTarget && isDone) {
             mCurrentMessage = Message.FINISHED_ON_BLUE;
-        } else if (color == kRedTarget && (isPositionDone || isRotationDone)) {
+        } else if (color == kRedTarget && isDone) {
             mCurrentMessage = Message.FINISHED_ON_RED;
-        } else if (color == kGreenTarget && (isPositionDone || isRotationDone)) {
+        } else if (color == kGreenTarget && isDone) {
             mCurrentMessage = Message.FINISHED_ON_GREEN;
-        } else if (color == kYellowTarget && (isPositionDone || isRotationDone)) {
+        } else if (color == kYellowTarget && isDone) {
             mCurrentMessage = Message.FINISHED_ON_YELLOW;
         }
 
@@ -231,7 +230,7 @@ public class LEDControl extends Module {
     }
 
     public Color getColor(double ordinal) {
-        double ordinalOfSensedColor = Robot.DATA.color.get( EColorData.SENSED_COLOR );
+        double ordinalOfSensedColor = db.color.get( EColorData.SENSED_COLOR );
         if (ordinalOfSensedColor == EColorData.EColor.RED.ordinal() ) {
             return kRedTarget;
         } else if (ordinalOfSensedColor == EColorData.EColor.BLUE.ordinal() ) {

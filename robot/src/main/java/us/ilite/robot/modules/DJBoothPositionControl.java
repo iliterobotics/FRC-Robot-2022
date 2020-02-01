@@ -19,7 +19,7 @@ import static us.ilite.robot.utils.ColorUtils.*;
 
 public class DJBoothPositionControl extends Module {
 
-    private ColorSensorV3 mColorSensorV3;
+    public static ColorSensorV3 mColorSensorV3;
     private final ColorMatch mColorMatcher = new ColorMatch();
     private EColorData.EColor eDesiredColorState;
     private EColorData.EColor eCurrentColorState;
@@ -49,20 +49,19 @@ public class DJBoothPositionControl extends Module {
         mColorMatcher.addColorMatch(kYellowTarget);
     }
 
-    public EColorData.EMotorState update(double pNow) {
+    public EColorData.EMotorState update() {
 
         if ( eInputState.equals(EColorData.EInput.POSITIVE) ) {
             if ( !mIsDone ) {
-                updateColor();
                 DriverStation.reportError( "Running Motor for Position Control", false );
 
-                Color detectedColor = mColorSensorV3.getColor();
+                Color detectedColor = getColor( Robot.DATA.color.get( EColorData.SENSED_COLOR ) );
                 ColorMatchResult match = mColorMatcher.matchClosestColor(detectedColor);
 //                if ( !mMightBeDone ) {
                 eLastColorState = eCurrentColorState;
 //                }
                 eCurrentColorState = getState( match.color );
-                SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
+//                SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
 
 //                if ( (!eLastColorState.equals( ColorState.BLUE ) && eDesiredColorState.equals(ColorState.GREEN)) && !eCurrentColorState.equals(ColorState.GREEN)) {
 //                    victorSPX.set(ControlMode.PercentOutput, Settings.kDJOutput );
@@ -104,11 +103,13 @@ public class DJBoothPositionControl extends Module {
                         return EColorData.EMotorState.ON;
                     }
                 }
+                mSolidStateCounter = 0;
             }
             mIsDone = true;
-            return true;
+            return EColorData.EMotorState.OFF;
         }
-        return true;
+        reset();
+        return EColorData.EMotorState.OFF;
     }
 
     protected static String getColorStringForMatchResult(ColorMatchResult match) {
@@ -149,58 +150,75 @@ public class DJBoothPositionControl extends Module {
         }
     }
 
+    public Color getColor( EColorData.EColor detectedColor ) {
+        if ( detectedColor != null ) {
+            if ( detectedColor.equals( EColorData.EColor.BLUE ) ) {
+                return kBlueTarget;
+            } else if ( detectedColor.equals( EColorData.EColor.RED ) ) {
+                return kRedTarget;
+            } else if ( detectedColor.equals( EColorData.EColor.GREEN ) ) {
+                return kGreenTarget;
+            } else if ( detectedColor.equals( EColorData.EColor.YELLOW ) ) {
+                return kYellowTarget;
+            }
+        }
+        return Color.kBlack;
+    }
+
     public Color updateColor() {
         ColorMatchResult match = mColorMatcher.matchClosestColor( mColorSensorV3.getColor() );
-        Data mData = Robot.DATA;
         if (match != null) {
             if (kBlueTarget.equals(match.color)) {
-                mData.color.set( EColorData.SENSED_COLOR, (double)EColorData.EColor.BLUE.ordinal() );
+                db.color.set( EColorData.SENSED_COLOR, (double)EColorData.EColor.BLUE.ordinal() );
                 return kBlueTarget;
             } else if (kRedTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.RED.ordinal());
+                db.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.RED.ordinal());
                 return kRedTarget;
             } else if (kGreenTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.GREEN.ordinal());
+                db.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.GREEN.ordinal());
                 return kGreenTarget;
             } else if (kYellowTarget.equals(match.color)) {
-                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.YELLOW.ordinal());
+                db.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.YELLOW.ordinal());
                 return kYellowTarget;
             } else {
-                mData.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.NONE.ordinal());
+                db.color.set(EColorData.SENSED_COLOR, (double)EColorData.EColor.NONE.ordinal());
                 return null;
             }
         }
         return null;
     }
 
-    public boolean isDone() {
-        return mIsDone;
-    }
-
-    public void updateMotor( EColorData.EMotorState motorState ){
-        eMotorState = motorState;
-    }
-
-    public void setDesiredColorState(EColorData.EColor pColorState ){
-        eDesiredColorState = pColorState;
-    }
-
     public void reset() {
-
+        mSolidStateCounter = 0;
+        eMotorState = EColorData.EMotorState.OFF;
+        eCurrentColorState = EColorData.EColor.NONE;
+        eLastColorState = EColorData.EColor.NONE;
+        eDesiredColorState = EColorData.EColor.NONE;
+        eInputState = EColorData.EInput.NEGATIVE;
+        mIsDone = false;
+        mMightBeDone = false;
     }
 
     @Override
     public void readInputs(double pNow) {
-
+        if ( db.color.get(EColorData.POSITION_CONTROL_INPUT).equals((double)EColorData.EInput.POSITIVE.ordinal()) ) {
+            eInputState = EColorData.EInput.POSITIVE;
+        }
+        else {
+            eInputState = EColorData.EInput.NEGATIVE;
+        }
     }
 
     @Override
     public void setOutputs(double pNow) {
-
+        updateColor();
+        db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, update() );
+        if (mIsDone) {
+            db.color.set(EColorData.FINISHED, EColorData.EIsFinished.YES );
+        }
+        else {
+            db.color.set(EColorData.FINISHED, EColorData.EIsFinished.YES );
+        }
     }
 
-    @Override
-    public void shutdown(double pNow) {
-        victorSPX.set(ControlMode.PercentOutput, 0d);
-    }
 }

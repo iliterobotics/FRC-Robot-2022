@@ -19,6 +19,8 @@ allprojects {
 
 }
 
+dependencies {
+}
 subprojects {
     apply plugin: "java"
     apply plugin: 'pmd'

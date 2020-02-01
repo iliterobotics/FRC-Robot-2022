@@ -42,6 +42,9 @@ public class Robot extends TimedRobot {
     private FlywheelPrototype mFlywheel;
     private OperatorInput mOI;
     private Limelight mLimelight;
+    private DJBoothRotationControl mDjBoothRotationControl;
+    private DJBoothPositionControl mDjBoothPositionControl;
+    private LEDControl mLedControl;
 
     private MatchMetadata mMatchMeta = null;
 
@@ -56,9 +59,12 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
-        mOI = new OperatorInput( new DJBoothRotationControl(), new DJBoothPositionControl());
+        mOI = new OperatorInput();
         mDrive = new DriveModule();
         mLimelight = new Limelight(DATA);
+        mDjBoothRotationControl = new DJBoothRotationControl();
+        mDjBoothPositionControl = new DJBoothPositionControl();
+        mLedControl = new LEDControl();
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -142,6 +148,9 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
         mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(DJBoothPositionControl);
+        mRunningModules.addModule(DJBoothRotationControl);
+        mRunningModules.addModule();
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
