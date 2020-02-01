@@ -48,4 +48,5 @@ subprojects {
             exceptionFormat "full"
         }
     }
+    
 }
