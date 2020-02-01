@@ -9,7 +9,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 
-import static us.ilite.common.types.sensor.EGyro.YAW_DEGREES;
+import static us.ilite.common.types.sensor.EGyro.HEADING_DEGREES;
 
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.hardware.ECommonControlMode;
@@ -71,7 +71,7 @@ public class DriveStraight implements ICommand {
         // Set target heading to current heading if setTargetHeading() wasn't called manually
         if(mTargetHeading == null) {
             // TODO - was this inverted?
-            mTargetHeading = Rotation2d.fromDegrees(mData.imu.get(YAW_DEGREES));
+            mTargetHeading = Rotation2d.fromDegrees(mData.imu.get(HEADING_DEGREES));
         }
         mInitialDistance = getAverageDriveDistance();
         mLastTime = pNow;
@@ -85,7 +85,7 @@ public class DriveStraight implements ICommand {
     @Override
     public boolean update(double pNow) {
 
-        double turn = mHeadingController.calculate(mData.imu.get(YAW_DEGREES), pNow - mLastTime);
+        double turn = mHeadingController.calculate(mData.imu.get(HEADING_DEGREES), pNow - mLastTime);
         // TODO - the units here are probably incorrect
         double throttle = mDistanceController.calculate(getAverageDriveDistance());
 
@@ -103,7 +103,7 @@ public class DriveStraight implements ICommand {
 
 //            Data.kSmartDashboard.putDouble("Angle Error", mHeadingController.getError());
 //            Data.kSmartDashboard.putDouble("PID Output", mHeadingController.getOutput());
-//            Data.kSmartDashboard.putDouble("Angle", mData.imu.get(EGyro.YAW_DEGREES));
+//            Data.kSmartDashboard.putDouble("Angle", mData.imu.get(EGyro.HEADING_DEGREES));
 //            Data.kSmartDashboard.putDouble("Target Angle", mTargetHeading.getDegrees());
 //            Data.kSmartDashboard.putDouble("Linear Output", linearOutput);
 //            Data.kSmartDashboard.putDouble("Distance Target", mDistanceToDrive);

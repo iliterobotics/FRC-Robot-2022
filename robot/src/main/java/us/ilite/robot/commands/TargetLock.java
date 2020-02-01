@@ -2,9 +2,9 @@ package us.ilite.robot.commands;
 
 import com.flybotix.hfr.codex.Codex;
 
+import us.ilite.common.IFieldComponent;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ETargetingData;
-import us.ilite.common.types.ETrackingType;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.IThrottleProvider;
@@ -20,7 +20,7 @@ public class TargetLock implements ICommand {
     private ITargetDataProvider mCamera;
     // Different throttle providers give us some control over behavior in autonomous
     private IThrottleProvider mTargetSearchThrottleProvider, mTargetLockThrottleProvider;
-    private ETrackingType mTrackingType;
+    private IFieldComponent mTrackingType;
 
     private double mAllowableError, mPreviousTime, mOutput = 0.0;
 
@@ -28,12 +28,11 @@ public class TargetLock implements ICommand {
     private int mAlignedCount = 0;
     private boolean mHasAcquiredTarget = false;
 
-    public TargetLock(DriveModule pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
-        this(pDrive, pAllowableError, pTrackingType, pCamera, pThrottleProvider, true);
+    public TargetLock(double pAllowableError, IFieldComponent pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
+        this(pAllowableError, pTrackingType, pCamera, pThrottleProvider, true);
     }
 
-    public TargetLock(DriveModule pDrive, double pAllowableError, ETrackingType pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
-        this.mDrive = pDrive;
+    public TargetLock(double pAllowableError, IFieldComponent pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
         this.mAllowableError = pAllowableError;
         this.mTrackingType = pTrackingType;
         this.mCamera = pCamera;
@@ -86,7 +85,6 @@ public class TargetLock implements ICommand {
 //                    ECommonControlMode.PERCENT_OUTPUT
 //                ).setNeutralMode(ECommonNeutralMode.BRAKE)
 //            );
-//
 //        }
 
         mPreviousTime = pNow;
