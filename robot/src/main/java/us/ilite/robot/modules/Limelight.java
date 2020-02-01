@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import us.ilite.common.Data;
-import us.ilite.common.config.Settings;
-import us.ilite.common.config.Settings.VisionTarget;
+import us.ilite.common.*;
+import us.ilite.common.config.*;
+//import us.ilite.common.config.Settings.VisionTarget;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.ETrackingType;

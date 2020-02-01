@@ -1,8 +1,10 @@
 package us.ilite.common;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
 
 public class CSVLoggerQueue {
-    public static Queue<Object> kCSVLoggingQueue = new ConcurrentLinkedQueue<>();
+    public static LinkedBlockingDeque<String> kCSVLoggerQueue = new LinkedBlockingDeque<>();
 }
