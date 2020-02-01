@@ -16,6 +16,8 @@ import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.controller.AbstractController;
+import us.ilite.robot.controller.BaseAutonController;
+import us.ilite.robot.controller.TeleopController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.GetLocalIP;
@@ -29,7 +31,7 @@ public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
     private Data mData;
-    private Limelight mLimelight = new Limelight(mData);
+    private Limelight mLimelight = new Limelight();
     private ModuleList mRunningModules = new ModuleList();
     private Clock mClock = new Clock();
     public static final Data DATA = new Data();
@@ -38,25 +40,26 @@ public class Robot extends TimedRobot {
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
-
     private FlywheelModule mShooter;
     private DriveModule mDrive;
     private OperatorInput mOI;
-    private DriverInput mDI;
 
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final TestController mTestController = new TestController(mShooter);
+    private final AbstractController mTestController = new TestController();
+    private final AbstractController mTeleopController = new TeleopController();
+    private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
 
 
     @Override
     public void robotInit() {
         mShooter = new FlywheelModule();
+        mDrive = new DriveModule();
+        mLimelight = new Limelight();
         mOI = new OperatorInput();
-        mDI = new DriverInput(mDrive, mShooter, mLimelight, DATA, false);
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -82,7 +85,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
 
         try {
-        } catch(Exception e) {
+        } catch (Exception e) {
             mLogger.exception(e);
         }
 
@@ -103,6 +106,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        mActiveController = mBaseAutonController;
     }
 
     @Override
@@ -112,6 +116,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        mActiveController = mTeleopController;
     }
 
     @Override
@@ -136,8 +141,8 @@ public class Robot extends TimedRobot {
         mActiveController = mTestController;
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mDI);
         mRunningModules.addModule(mShooter);
+        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
@@ -148,9 +153,9 @@ public class Robot extends TimedRobot {
         commonPeriodic();
     }
 
-    private void commonPeriodic() {
+    void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for(Codex c : DATA.mAllCodexes) {
+        for (Codex c : DATA.mAllCodexes) {
             c.reset();
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
@@ -196,23 +201,5 @@ public class Robot extends TimedRobot {
 
         return String.format("State: %s\tMode: %s\tTime: %s", mRobotEnabledDisabled, mRobotMode, mNow);
 
-    }
-
-    private class DSConnectInitThread implements Runnable {
-
-        @Override
-        public void run() {
-
-            while(!DriverStation.getInstance().isDSAttached()) {
-                try {
-                    mLogger.error("Waiting on Robot <--> DS Connection...");
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            List<String> ips = GetLocalIP.getAllIps();
-        }
     }
 }

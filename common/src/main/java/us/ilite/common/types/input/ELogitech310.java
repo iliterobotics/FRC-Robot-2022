@@ -73,4 +73,41 @@ public enum ELogitech310 implements CodexOf<Double> {
 	public static void map(Codex<Double, ELogitech310> pCodex, Joystick pJoystick, Double pRumbleValue) {
 		map(pCodex, pJoystick, pRumbleValue, false);
 	}
+
+	public boolean isAxis() {
+	    switch(this) {
+            case LEFT_X_AXIS:
+            case LEFT_Y_AXIS:
+            case RIGHT_X_AXIS:
+            case RIGHT_Y_AXIS:
+            case COMBINED_TRIGGER_AXIS:
+            case LEFT_TRIGGER_AXIS:
+            case RIGHT_TRIGGER_AXIS:
+            case RUMBLE:
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isButton() {
+        switch(this) {
+            case A_BTN:
+            case B_BTN:
+            case X_BTN:
+            case Y_BTN:
+            case L_BTN:
+            case R_BTN:
+            case BACK:
+            case START:
+            case LEFT_JOYSTICK_BTN:
+            case RIGHT_JOYSTICK_BTN:
+            case DPAD_RAW:
+            case DPAD_UP:
+            case DPAD_DOWN:
+            case DPAD_LEFT:
+            case DPAD_RIGHT:
+            return true;
+        }
+        return false;
+    }
 }

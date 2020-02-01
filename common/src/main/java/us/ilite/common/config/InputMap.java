@@ -1,6 +1,8 @@
 package us.ilite.common.config;
 
 
+import static us.ilite.common.types.input.ELogitech310.*;
+
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.input.ELogitechAttack3;
 
@@ -9,10 +11,9 @@ public class InputMap {
         public static final ELogitech310
         TURN_AXIS = ELogitech310.RIGHT_X_AXIS,
         THROTTLE_AXIS = ELogitech310.LEFT_Y_AXIS,
-        SUB_WARP_AXIS = ELogitech310.LEFT_TRIGGER_AXIS;
-
-        public static final ELogitechAttack3
-        FLYWHEEL_AXIS = ELogitechAttack3.Z_AXIS;
+        SUB_WARP_AXIS = ELogitech310.LEFT_TRIGGER_AXIS,
+        FLYWHEEL_AXIS = ELogitech310.LEFT_TRIGGER_AXIS
+                ;
     }
 
     public static class OPERATOR {

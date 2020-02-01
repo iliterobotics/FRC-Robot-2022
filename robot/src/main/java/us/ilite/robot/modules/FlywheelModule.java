@@ -2,37 +2,55 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.flybotix.hfr.util.log.ILog;
-import com.flybotix.hfr.util.log.Logger;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Servo;
-import us.ilite.common.config.InputMap;
+import us.ilite.common.Angle;
+import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
+import us.ilite.common.lib.control.PIDController;
+import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
-import us.ilite.common.types.ETrackingType;
-import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.input.ELogitechAttack3;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
 
 public class FlywheelModule extends Module {
+    public static int kMaxTalonVelocity = 1500; // probably needs readjustment
+    public static double kMaxNeoVelocity = 7500; // probably needs readjustments
+    public static final ProfileGains kTurretAngleLockGains = new ProfileGains().p(0.0005);
+    public static final ProfileGains kShooterGains = new ProfileGains().p(0.0005);
+
+    public static final double kShooterTargetVelocity = 1885;
+    public static final double kAcceleratorTargetVelocity = 0.5;
+    public static final double kAcceleratorThreshold = kShooterTargetVelocity / kMaxNeoVelocity;
+    private PigeonIMU mTurretGyro;
+    private PIDController mTurretPid;
+    private PIDController mShooterPid;
+
+    private FlywheelModule.EShooterState mShooterState = FlywheelModule.EShooterState.STOP; // FINISHED FOR NOW ( CHANGE TO TALONFX )
+    private FlywheelModule.EAcceleratorState mAcceleratorState = FlywheelModule.EAcceleratorState.STOP; // FINISHED FOR NOW ( CHANGE TO CANSPARKMAX )
+    private FlywheelModule.ETurretMode mTurretMode = FlywheelModule.ETurretMode.GYRO; // TEST IT WHEN LIMELIGHT MOVED AND GYRO IMPLEMENTED
+    private FlywheelModule.EHoodState mHoodState = FlywheelModule.EHoodState.STATIONARY; // TEST WHEN LIMELIGHT REMOUNTED
+
+    public static final double kBaseHoodAngle = 60;
     public CANSparkMax mShooter;
     private Servo mHoodAngler;
     private TalonSRX mTurret;
     private TalonSRX mAccelerator;
-    private ETrackingType mTrackingType = ETrackingType.NONE;
-    private ETurretMode mTurretMode = ETurretMode.GYRO;
 
     public FlywheelModule() {
-        mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.ShooterSystem.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mAccelerator = new TalonSRX(Settings.ShooterSystem.kAcceleratorID);
-        mHoodAngler = new Servo(Settings.ShooterSystem.kAnglerID);
-        mTurret = new TalonSRX(Settings.ShooterSystem.kTurretID);
+        mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mAccelerator = new TalonSRX(Settings.Hardware.CAN.kAcceleratorID);
+        mHoodAngler = new Servo(Settings.Hardware.CAN.kAnglerID);
+        mTurret = new TalonSRX(Settings.Hardware.CAN.kTurretID);
+        mTurretGyro = new PigeonIMU(Settings.Hardware.CAN.kTurretGyroID);
+//        mTurretPid = new PIDController(kTurretAngleLockGains, 0, 1, SeleLockGains, -1, 1, Settings.kControlLoopPeriod);
+//        mShooterPid = new PIDController(kShooterGains);
     }
 
     public enum EShooterState {
@@ -55,10 +73,17 @@ public class FlywheelModule extends Module {
         ADJUSTABLE
     }
 
-    public double calcSpeedFromDistance(double distance) { return 0.09 * Math.pow(distance, 2) + 8.0; } // Need recalculation
-    public double calcAngleFromDistance(double distance, double height) { return Math.atan(height / distance); }
+    public double calcSpeedFromDistance(Distance distance) {
+        return 0.09 * Math.pow(distance.inches(), 2) + 8.0;
+    } // Need recalculation
 
-    public boolean isMaxVelocity() { return mShooter.getEncoder().getVelocity() >= Settings.ShooterSystem.kAcceleratorThreshold; }
+    public Angle calcAngleFromDistance(Distance distance, Distance height) {
+        return Angle.fromDegrees(Math.atan(height.inches() / distance.inches()));
+    }
+
+    public boolean isMaxVelocity() {
+        return mShooter.getEncoder().getVelocity() >= kAcceleratorThreshold;
+    }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
@@ -70,15 +95,16 @@ public class FlywheelModule extends Module {
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mShooter.getEncoder().getVelocity());
 
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_LIMELIGHT_TARGET, (double) mTrackingType.ordinal());
-        if (Robot.DATA.limelight.isSet(ETargetingData.targetOrdinal)) {
-            Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_LIMELIGHT_TARGET, Robot.DATA.limelight.get(ETargetingData.targetOrdinal));
-        }
+        //TODO - move these lines to the controller
+//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_LIMELIGHT_TARGET, (double) mTrackingType.ordinal());
+//        if (Robot.DATA.limelight.isSet(ETargetingData.targetOrdinal)) {
+//            Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_LIMELIGHT_TARGET, Robot.DATA.limelight.get(ETargetingData.targetOrdinal));
+//        }
 
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0.0);
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY, (double) mTurret.getSelectedSensorVelocity());
 
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, kBaseHoodAngle);
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_HOOD_ANGLE, mHoodAngler.getAngle());
 
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY, 0.0);
@@ -97,9 +123,6 @@ public class FlywheelModule extends Module {
         }
         else {
             mAccelerator.set(ControlMode.PercentOutput, 0.0);
-        }
-        if ( Robot.DATA.attackoperatorinput.isSet(ELogitechAttack3.TRIGGER)) {
-            mAccelerator.set(ControlMode.PercentOutput, Robot.DATA.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
         }
         mHoodAngler.setAngle(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_HOOD_ANGLE));
         mShooter.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));

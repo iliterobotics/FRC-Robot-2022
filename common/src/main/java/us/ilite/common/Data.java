@@ -29,8 +29,6 @@ public class Data {
     public final Codex<Double, EGyro> imu = Codex.of.thisEnum(EGyro.class);
     public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
-    public final Codex<Double, ELogitechAttack3> attackdriverinput = Codex.of.thisEnum(ELogitechAttack3.class);
-    public final Codex<Double, ELogitechAttack3> attackoperatorinput = Codex.of.thisEnum(ELogitechAttack3.class);
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
     public final Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
 
