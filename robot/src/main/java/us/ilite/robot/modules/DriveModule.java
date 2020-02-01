@@ -151,6 +151,7 @@ public class DriveModule extends Module {
 		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
 
 		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
+		System.out.println("CURRENT HEADING:-------------------------------- " + mCurrentHeading);
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
 	}
 
@@ -181,8 +182,9 @@ public class DriveModule extends Module {
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
 				((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput());
 			}
-			mPreviousHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
+			mPreviousHeading = mDriveHardware.getImu().getHeading().getDegrees();//Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
 			mPreviousTime = pNow;
+			System.out.println("PREVIOUS HEADING: ------------------------- " + mPreviousHeading);
 		}
 	}
 
