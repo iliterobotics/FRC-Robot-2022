@@ -149,35 +149,4 @@ public class Settings extends NetworkTablesConstantsBase {
     public static final double kTargetAngleLockMaxInput = 27;
     public static final double kTargetAngleLockFrictionFeedforward = 0.44 / 12;
 
-    // =============================================================================
-    // Target Constants
-    // Note: These constants need to be recalculted for the specific target geometry
-    // =============================================================================
-    // TODO These values are specific to the targets, not the camera, and may belong elsewhere
-    // The current target values assume the limelight processing stream is configured to target
-    // the bottom of the vision target
-    public enum VisionTarget {
-        Generic (10.0), // Used for testing new things
-        HatchPort(25.6875), // height of the bottom of the reflective tape in inches for the hatch port
-        CargoPort(33.3125), // height of the bottom of the reflective tape in inches for the cargo port
-        Ground(0.0), //The ground
-        CargoHeight(6.5d);//This may change, not sure what the correct value
-
-        private final double height;
-
-        VisionTarget( double height)  {
-            this.height = height;
-        }
-
-        /**
-         * @return the height
-         */
-        public double getHeight() {
-            return height;
-        }
-        /**
-         * @return the pipelineName
-         */
-    }
-
 }

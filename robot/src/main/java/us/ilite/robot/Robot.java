@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
     private PowerCellModule mIntake = new PowerCellModule();
     private ModuleList mRunningModules = new ModuleList();
     private DriveModule mDrive = new DriveModule();
-    private Limelight mLimelight = new Limelight(DATA);
+    private Limelight mLimelight = new Limelight();
     private Clock mClock = new Clock();
     public static final Data DATA = new Data();
     private Timer initTimer = new Timer();
@@ -43,7 +43,6 @@ public class Robot extends TimedRobot {
 
     private FlywheelPrototype mFlywheel;
     private OperatorInput mOI;
-    private DriverInput mDriverInput = new DriverInput( mDrive , mLimelight , DATA ,  mIntake );
 
     private MatchMetadata mMatchMeta = null;
 
@@ -60,8 +59,8 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         mFlywheel = new FlywheelPrototype();
         mDrive = new DriveModule();
-        mLimelight = new Limelight(DATA);
         mIntake = new PowerCellModule();
+        mLimelight = new Limelight();
         mOI = new OperatorInput();
 
         //look for practice robot config:
@@ -120,7 +119,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         mActiveController = mTeleopController;
-        mRunningModules.addModule(mDriverInput);
         mRunningModules.addModule(mIntake);
         mLogger.error("kasdjdaksljsadl;kjfdas;ld");
     }
@@ -146,7 +144,6 @@ public class Robot extends TimedRobot {
     public void testInit() {
         mActiveController = mTestController;
         mRunningModules.clearModules();
-        mRunningModules.addModule(mDriverInput);
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFlywheel);
         mRunningModules.addModule(mDrive);
