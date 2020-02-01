@@ -14,7 +14,9 @@ public enum EDriveData implements CodexOf<Double> {
 
     // Commanded Outputs
     LEFT_DEMAND, RIGHT_DEMAND,
-    TURN, THROTTLE,
+    DESIRED_TURN, DESIRED_THROTTLE,
+    SHOULD_HOLD_POSITION,
+    //DESIRED_DRIVE_STATE,
 //    LEFT_ACCEL, RIGHT_ACCEL,
 //    LEFT_FEEDFORWARD, RIGHT_FEEDFORWARD,
 

@@ -19,18 +19,18 @@ public class DriveTrainUnitTest extends BaseTest {
         db.driverinput.set(InputMap.DRIVER.THROTTLE_AXIS, 0.0);
         db.driverinput.set(InputMap.DRIVER.TURN_AXIS, 1.0);
         TestController t = new TestController();
-        t.updateDrivetrain(0.0);
+        t.update(0.0);
         assertNormalizedInputs("0% throttle 100% turn");
 
 
         db.driverinput.set(InputMap.DRIVER.THROTTLE_AXIS, 1.0);
         db.driverinput.set(InputMap.DRIVER.TURN_AXIS, 1.0);
-        t.updateDrivetrain(0.0);
+        t.update(0.0);
         assertNormalizedInputs("100% throttle 100% turn");
 
         for(int i = 0; i < 100; i++) {
             randomizeAllInputs();
-            t.updateDrivetrain(0.0);
+            t.update(0.0);
             assertNormalizedInputs(
                     "THROTTLE-" + nf.format(db.driverinput.get(DRIVER.THROTTLE_AXIS)) +
                     "\tTURN-" + nf.format(db.driverinput.get(DRIVER.TURN_AXIS))
@@ -41,7 +41,7 @@ public class DriveTrainUnitTest extends BaseTest {
     private void assertNormalizedInputs(String pMessage) {
         Assert.assertTrue(
         "Normalized Driver Inputs not <= 1.0" + pMessage,
-                abs(db.drivetrain.get(THROTTLE)) + abs(db.drivetrain.get(TURN)) <= 1.0
+                abs(db.drivetrain.get(DESIRED_THROTTLE)) + abs(db.drivetrain.get(DESIRED_TURN)) <= 1.0
         );
     }
 
