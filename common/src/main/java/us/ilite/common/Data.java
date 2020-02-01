@@ -33,7 +33,7 @@ public class Data {
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
     public final Codex<Double, ELimelightData> limelight = Codex.of.thisEnum(ELimelightData.class);
     public final Codex<Double, ERawLimelightData> rawLimelight = Codex.of.thisEnum(ERawLimelightData.class);
-    public final Codex<Double, ELimelightData> selectedTarget = Codex.of.thisEnum(ELimelightData.class);
+    public final Codex<Double, ELimelightData> groundTracking = Codex.of.thisEnum(ELimelightData.class);
     public final Codex<Double , EHangerModuleData> hanger = Codex.of.thisEnum(EHangerModuleData.class);
     public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
     public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);

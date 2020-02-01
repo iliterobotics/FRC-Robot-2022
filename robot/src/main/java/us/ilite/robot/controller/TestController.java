@@ -36,7 +36,7 @@ public class TestController extends AbstractController {
     }
 
     public void update(double pNow) {
-        updateLimelightTargetLock();
+        updateLimelightTargetLock(pNow);
         updateDrivetrain(pNow);
         updateFlywheel(pNow);
         updateIntake(pNow);
@@ -126,22 +126,22 @@ public class TestController extends AbstractController {
         mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
 
-    public void updateLimelightTargetLock() {
+    public void updateLimelightTargetLock(double pNow) {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-            if (Robot.DATA.selectedTarget.get(ELimelightData.TY) != null) {
+            if (Robot.DATA.groundTracking.get(ELimelightData.TY) != null) {
                 SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
             }
             Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
-            if (Robot.DATA.selectedTarget.get(ELimelightData.TY) != null) {
-                if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
+            if (Robot.DATA.groundTracking.get(ELimelightData.TY) != null) {
+                if (Math.abs(Robot.DATA.groundTracking.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
                     Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET_ZOOM.id());
                     System.out.println("ZOOMING");
                 } else {
                     Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
                 }
             } else {
-                   Robot.DATA.selectedTarget.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
+                   Robot.DATA.groundTracking.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
             }
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
             Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL.id());
