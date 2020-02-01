@@ -28,33 +28,32 @@ public class Field2020 {
      */
     public enum FieldElement implements IFieldComponent {
 
-        TARGET(12d,1, true),
-        LINE(0d,5, false),
-        OUTER_GOAL(98.25, 0, false),
-        POWER_CELL(0.0, 0, false),
-        TARGET_ZOOM(0d, 2,false),
-        BALL(0d, 3, true),
-        BALL_DUAL(0d, 5, false),
-        BALL_TRI(0d,6,false);
+        TARGET(12d,1),
+        LINE(0d,5),
+        OUTER_GOAL(98.25, 0),
+        POWER_CELL(0.0, 0),
+        TARGET_ZOOM(0d, 2),
+        BALL(0d, 3),
+        BALL_DUAL(0d, 5),
+        BALL_TRI(0d,6);
 
         private final double height;
         private final int pipeline;
-        private final boolean led;
 
-        private FieldElement(double pHeight, int pPipeline, boolean pLED){
+        private FieldElement(double pHeight, int pPipeline){
             height = pHeight;
             pipeline = pPipeline;
-            led = pLED;
         }
 
         @Override
-        public double height() { return height;}
+        public double height() {
+            return height;
+        }
 
         @Override
-        public boolean led() {return led;}
-
-        @Override
-        public int pipeline() {return pipeline; }
+        public int pipeline() {
+            return pipeline;
+        }
 
         public int id() { return ordinal(); }
     }

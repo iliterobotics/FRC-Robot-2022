@@ -10,7 +10,7 @@ import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
 import java.util.Optional;
 
-import static us.ilite.common.types.ELimelightData.calcAngleToTarget;
+import static us.ilite.common.types.ELimelightData.CALC_ANGLE_TO_TARGET;
 
 public class RawLimelight extends Module implements ITargetDataProvider {
 
@@ -47,19 +47,19 @@ public class RawLimelight extends Module implements ITargetDataProvider {
     @Override
     public void readInputs(double pNow) {
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
-        Robot.DATA.limelight.set(ELimelightData.tv, targetValid ? 1.0d : null);
+        Robot.DATA.limelight.set(ELimelightData.TV, targetValid ? 1.0d : null);
 
         if(targetValid) {
 
             if(mVisionTarget != null) {
 
-                Robot.DATA.limelight.set(ELimelightData.targetOrdinal, (double)mVisionTarget.ordinal());
-                Robot.DATA.limelight.set(ELimelightData.calcDistToTarget, calcTargetDistance(mVisionTarget));
-                Robot.DATA.limelight.set(calcAngleToTarget, calcTargetApproachAngle());
+                Robot.DATA.limelight.set(ELimelightData.TARGET_ORDINAL, (double)mVisionTarget.ordinal());
+                Robot.DATA.limelight.set(ELimelightData.CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget));
+                Robot.DATA.limelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
                 Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
                 if(p.isPresent()) {
-                    Robot.DATA.limelight.set(ELimelightData.calcTargetX, p.get().getX());
-                    Robot.DATA.limelight.set(ELimelightData.calcTargetY, p.get().getY());
+                    Robot.DATA.limelight.set(ELimelightData.CALC_TARGET_X, p.get().getX());
+                    Robot.DATA.limelight.set(ELimelightData.CALC_TARGET_Y, p.get().getY());
                 }
             }
         }

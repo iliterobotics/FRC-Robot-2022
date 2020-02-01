@@ -42,7 +42,7 @@ public class DriveToVisionTarget implements ICommand {
     public void init(double pNow) {
         mHasAcquiredTarget = false;
         mHeadingController.reset();
-        mInitialTargetAngle = mData.limelight.get(ELimelightData.tx);
+        mInitialTargetAngle = mData.limelight.get(ELimelightData.TX);
     }
 
     @Override
@@ -51,13 +51,13 @@ public class DriveToVisionTarget implements ICommand {
         /*
          We either drove into the target and lost sight of it (meaning we're done) or we never had sight of it to begin with (in which case we quit)
          */
-        if(!mData.limelight.isSet(ELimelightData.tv)) {
+        if(!mData.limelight.isSet(ELimelightData.TV)) {
             return true;
         }
 
         // Target "distance" is just area - min_area, clamped to a maximum and minimum value
-        double distanceFromTarget = Utils.clamp(mData.limelight.get(ELimelightData.ta) - kMinTargetArea, kMinTargetArea, kMaxTargetArea);
-        double angleToTarget = mData.limelight.get(ELimelightData.tx);
+        double distanceFromTarget = Utils.clamp(mData.limelight.get(ELimelightData.TA) - kMinTargetArea, kMinTargetArea, kMaxTargetArea);
+        double angleToTarget = mData.limelight.get(ELimelightData.TX);
 
         // Only adjust target angle if we are far away
         if(distanceFromTarget < kAngleAdjustDistanceThreshold) {

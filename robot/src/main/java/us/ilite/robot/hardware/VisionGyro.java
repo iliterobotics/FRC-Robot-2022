@@ -51,7 +51,7 @@ public class VisionGyro extends IMU {
     }
 
     private Rotation2d getX() {
-        Double x = mTargetingData.get(ELimelightData.tx);
+        Double x = mTargetingData.get(ELimelightData.TX);
 
         if(x != null) {
             // Invert?
@@ -62,7 +62,7 @@ public class VisionGyro extends IMU {
     }
 
     private Rotation2d getY() {
-        Double y = mTargetingData.get(ELimelightData.ty);
+        Double y = mTargetingData.get(ELimelightData.TY);
 
         if(y != null) {
             return Rotation2d.fromDegrees(y);
