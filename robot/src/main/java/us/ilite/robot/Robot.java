@@ -32,7 +32,9 @@ public class Robot extends TimedRobot {
     private ILog mLogger = Logger.createLog(this.getClass());
     private Data mData;
     private Limelight mLimelight = new Limelight();
+    private PowerCellModule mIntake = new PowerCellModule();
     private ModuleList mRunningModules = new ModuleList();
+    private DriveModule mDrive = new DriveModule();
     private Clock mClock = new Clock();
     public static final Data DATA = new Data();
     private Timer initTimer = new Timer();
@@ -41,23 +43,25 @@ public class Robot extends TimedRobot {
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
     private FlywheelModule mShooter;
-    private DriveModule mDrive;
+
     private OperatorInput mOI;
 
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final AbstractController mTestController = new TestController();
     private final AbstractController mTeleopController = new TeleopController();
     private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
+    private final TestController mTestController = new TestController();
+   // private AbstractController mActiveController = null;
 
 
     @Override
     public void robotInit() {
         mShooter = new FlywheelModule();
         mDrive = new DriveModule();
+        mIntake = new PowerCellModule();
         mLimelight = new Limelight();
         mOI = new OperatorInput();
 
@@ -117,6 +121,8 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         mActiveController = mTeleopController;
+        mRunningModules.addModule(mIntake);
+        mLogger.error("kasdjdaksljsadl;kjfdas;ld");
     }
 
     @Override
@@ -129,7 +135,7 @@ public class Robot extends TimedRobot {
         mLogger.info("Disabled Initialization");
         mRunningModules.shutdown(mClock.getCurrentTime());
         mCSVLogger.stop(); // stop csv logging
-        mActiveController = null;
+      //  mActiveController = null;
     }
 
     @Override
@@ -143,6 +149,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mIntake);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
