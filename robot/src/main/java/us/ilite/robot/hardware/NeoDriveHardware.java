@@ -40,20 +40,16 @@ public class NeoDriveHardware implements IDriveHardware {
         configureMaster(mLeftMaster, true);
         configureMotor(mLeftMaster);
         configureMotor(mLeftMiddle);
-//        configureMotor(mLeftRear);
 
         configureMaster(mRightMaster, false);
         configureMotor(mRightMaster);
         configureMotor(mRightMiddle);
-//        configureMotor(mRightRear);
 
         mLeftMaster.setInverted(true);
         mLeftMiddle.setInverted(true);
-//        mLeftRear.setInverted(true);
 
         mRightMaster.setInverted(false);
         mRightMiddle.setInverted(false);
-//        mRightRear.setInverted(true);
 
         // Invert sensor readings by multiplying by 1 or -1
         mLeftMaster.getEncoder().setPositionConversionFactor(1.0 * kGearRatio);
@@ -62,10 +58,8 @@ public class NeoDriveHardware implements IDriveHardware {
         mRightMaster.getEncoder().setPositionConversionFactor(1.0 * kGearRatio);
         mRightMaster.getEncoder().setVelocityConversionFactor(1.0 * kGearRatio);
 
-
         reloadVelocityGains(mLeftMaster);
         reloadVelocityGains(mRightMaster);
-
     }
 
     @Override
@@ -208,8 +202,10 @@ public class NeoDriveHardware implements IDriveHardware {
         reloadVelocityGains(talon);
     }
 
-    private void configureAllForSmartMotion() {
-
+    private void configureAllForSmartMotion(CANSparkMax ... canSparkMaxes) {
+        for (CANSparkMax c : canSparkMaxes) {
+            configSparkForSmartMotion(c);
+        }
     }
 
     public double getLeftInches() {

@@ -33,7 +33,7 @@ public class DriveModule extends Module {
 	private final ILog mLogger = Logger.createLog(DriveModule.class);
 
 	public static double kGearboxRatio = (12.0 / 80.0) * (42.0 / 80.0);
-	public static double kClosedLoopVoltageRampRate = 0.0;
+	public static double kClosedLoopVoltageRampRate = 0.1 ;
 	public static double kOpenLoopVoltageRampRate = 0.1;
 	public static int kCurrentLimitAmps = 50;
 	public static int kCurrentLimitTriggerDurationMs = 100;
@@ -125,9 +125,9 @@ public class DriveModule extends Module {
 		mStartHoldingPosition = false;
 
 		mDriveHardware.zero();
+//		zero();
 	  	setDriveMessage(DriveMessage.kNeutral);
 	  	setDriveState(EDriveState.NORMAL);
-
 	}
 
 	@Override
@@ -146,14 +146,15 @@ public class DriveModule extends Module {
 		driveCodex.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 
 		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
+
 		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
 
 		try {
 			mYawPid.setSetpoint(driveCodex.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
 		} catch (NullPointerException ne) {
+			System.out.println("NULL");
 			mYawPid.setSetpoint(0.0);
-//			System.out.println("0.0");
 		}
 	}
 
@@ -170,26 +171,20 @@ public class DriveModule extends Module {
 					mHoldPositionPid.setSetpoint(driveCodex.get(LEFT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
-				if (Math.abs(driveCodex.get(LEFT_VEL_TICKS)) != 0.0 || Math.abs(driveCodex.get(RIGHT_VEL_TICKS)) != 0.0) {
-//					((NeoDriveHardware)mDriveHardware).setTarget(0.0, 0.0);
-//				} else {
-					if (Math.abs(driveCodex.get(LEFT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
-						double output = mHoldPositionPid.calculate(driveCodex.get(LEFT_POS_INCHES), pNow);
-						System.out.println("\nOUTPUT " + output + "\n");
-						((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
-					}
-//				}
-				} else {
-					mStartHoldingPosition = false;
-					double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-					double mThrottle = driveCodex.get(DESIRED_THROTTLE);
-					DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
-					SmartDashboard.putNumber("DESIRED YAW", (driveCodex.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange));
-					SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-					((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput()); //driveCodex.get(LEFT_DEMAND), driveCodex.get(RIGHT_DEMAND));
+				if (Math.abs(driveCodex.get(LEFT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
+					double output = mHoldPositionPid.calculate(driveCodex.get(LEFT_POS_INCHES), pNow);
+					((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
 				}
+			} else {
+				System.out.println("NOT HOLDING");;
+				mStartHoldingPosition = false;
+				double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
+				double mThrottle = driveCodex.get(DESIRED_THROTTLE);
+				DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
+				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
+				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
+				((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput());
 			}
-
 			mPreviousHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
 			mPreviousTime = pNow;
 		}
@@ -204,7 +199,6 @@ public class DriveModule extends Module {
 		switch(mDriveState) {
 			case PATH_FOLLOWING:
 			case TARGET_ANGLE_LOCK:
-
 				Codex<Double, ELimelightData> targetData = Robot.DATA.limelight;
 				double pidOutput;
 				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.get(TX) != null) {
@@ -216,7 +210,6 @@ public class DriveModule extends Module {
 					mDriveMessage = new DriveMessage().throttle(mTargetTrackingThrottle).turn(pidOutput).calculateCurvature();
 					// If we've already seen the target and lose tracking, exit.
 				}
-
 				break;
 			case NORMAL:
 				break;
@@ -256,7 +249,8 @@ public class DriveModule extends Module {
 
 
 	public synchronized void zero() {
-		mDriveHardware.zero();
+		driveCodex.set(DESIRED_THROTTLE, 0.0);
+		driveCodex.set(DESIRED_TURN, 0.0);
 	}
 
 	private void setDriveState(EDriveState pDriveState) {

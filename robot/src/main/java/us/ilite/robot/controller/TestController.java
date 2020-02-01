@@ -36,11 +36,11 @@ public class TestController extends AbstractController {
     }
 
     public void update(double pNow) {
-        updateLimelightTargetLock();
+//        updateLimelightTargetLock();
         updateDrivetrain(pNow);
-        updateFlywheel(pNow);
-        updateIntake(pNow);
-        updateHanger(pNow);
+//        updateFlywheel(pNow);
+//        updateIntake(pNow);
+//        updateHanger(pNow);
 //        updateArm(pNow);
     }
     private void updateHanger(double pNow){
@@ -165,7 +165,7 @@ public class TestController extends AbstractController {
     }
 
     void updateDrivetrain(double pNow) {
-        double throttle = db.driverinput.get(THROTTLE_AXIS);
+        double throttle = -db.driverinput.get(THROTTLE_AXIS);
         double rotate = db.driverinput.get(TURN_AXIS);
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
@@ -176,7 +176,7 @@ public class TestController extends AbstractController {
         if (throttle == 0.0 && rotate == 0.0) {
             db.drivetrain.set(DESIRED_THROTTLE, 0.0);
             db.drivetrain.set(DESIRED_TURN, 0.0);
-        } else {
+        } else {;
             db.drivetrain.set(SHOULD_HOLD_POSITION, 0.0);
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.03;
@@ -188,7 +188,8 @@ public class TestController extends AbstractController {
                 throttle *= Settings.Input.kSnailModePercentThrottleReduction;
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
             }
-            db.drivetrain.set(DESIRED_THROTTLE, -throttle);
+            System.out.println("SETTING DESIRED TURN");
+            db.drivetrain.set(DESIRED_THROTTLE, throttle);
             db.drivetrain.set(DESIRED_TURN, rotate);
         }
 
