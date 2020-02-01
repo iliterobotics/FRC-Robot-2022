@@ -156,7 +156,7 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs(double pNow) {
-		mHoldPosition = db.drivetrain.get(SHOULD_HOLD_POSITION) == 1.0;
+		mHoldPosition = false;//db.drivetrain.get(SHOULD_HOLD_POSITION) == 1.0;
 		if (mDriveState != EDriveState.NORMAL) {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
@@ -168,7 +168,7 @@ public class DriveModule extends Module {
 					mStartHoldingPosition = true;
 				}
 				if (Math.abs(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
-					double output = mHoldPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
+					double output = mHoldPositionPid.calculate(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES), pNow);
 					((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
 				}
 			} else {
