@@ -31,12 +31,12 @@ public class PowerCellModule extends Module {
     private CANSparkMax mArmMotor;
 
     //Beam Breakers
-    private DigitalBeamSensor mBeamBreaker1;
-    private DigitalBeamSensor mBeamBreaker2;
-    private DigitalBeamSensor mBeamBreaker3;
+//    private DigitalBeamSensor mBeamBreaker1;
+//    private DigitalBeamSensor mBeamBreaker2;
+//    private DigitalBeamSensor mBeamBreaker3;
 
     //Array of beam-breakers (Used when indexing PowerCells)
-    private DigitalBeamSensor[] mDigitalBeamSensors;
+    //private DigitalBeamSensor[] mDigitalBeamSensors;
 
     //Intake state
     private EIntakeState mIntakeState;
@@ -48,8 +48,8 @@ public class PowerCellModule extends Module {
     private int mGoalBeamCountBroken = 0;
     private int mBeamCountBroken = 0;
 
-    private CANEncoder mNeoEncoder;
-    private CANPIDController mCanController;
+//    private CANEncoder mNeoEncoder;
+//    private CANPIDController mCanController;
 
 
     private ILog mLog = Logger.createLog(this.getClass());
@@ -86,7 +86,8 @@ public class PowerCellModule extends Module {
     }
 
     public PowerCellModule() {
-
+        mIntakeState = EIntakeState.STOP;
+        mArmState = EArmState.DISENGAGED;
         mCANMotor = SparkMaxFactory.createDefaultSparkMax( Settings.PowerCellModule.kCANIntakeID ,
                 CANSparkMaxLowLevel.MotorType.kBrushless );
         mTalonOne = TalonSRXFactory.createDefaultTalon( Settings.PowerCellModule.kTalonOneID );
@@ -96,23 +97,23 @@ public class PowerCellModule extends Module {
         mArmMotor = SparkMaxFactory.createDefaultSparkMax( Settings.PowerCellModule.kArmNEOAdress ,
                 CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        mBeamBreaker1 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel1 );
-        mBeamBreaker2 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel2 );
-        mBeamBreaker3 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel3) ;
+//        mBeamBreaker1 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel1 );
+//        mBeamBreaker2 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel2 );
+//        mBeamBreaker3 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel3) ;
 
-        mDigitalBeamSensors = new DigitalBeamSensor[]{mBeamBreaker1, mBeamBreaker2, mBeamBreaker3};
-
-        mNeoEncoder = mCANMotor.getEncoder();
-        mCanController = mCANMotor.getPIDController();
+//        mDigitalBeamSensors = new DigitalBeamSensor[]{mBeamBreaker1, mBeamBreaker2, mBeamBreaker3};
+//
+//        mNeoEncoder = mCANMotor.getEncoder();
+//        mCanController = mCANMotor.getPIDController();
 
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        mCanController.setP(Settings.PowerCellModule.kPowerCellP);
-        mCanController.setI(Settings.PowerCellModule.kPowerCellI);
-        mCanController.setD(Settings.PowerCellModule.kPowerCellD);
-        mCanController.setFF(Settings.PowerCellModule.kPowerCellF);
+//        mCanController.setP(Settings.PowerCellModule.kPowerCellP);
+//        mCanController.setI(Settings.PowerCellModule.kPowerCellI);
+//        mCanController.setD(Settings.PowerCellModule.kPowerCellD);
+//        mCanController.setFF(Settings.PowerCellModule.kPowerCellF);
     }
 
     @Override
@@ -141,37 +142,20 @@ public class PowerCellModule extends Module {
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE , mArmMotor.getOutputCurrent() );
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE , (double)getArmState().ordinal());
 
-        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_0 , readBeamBreakerState(mBeamBreaker1.isBroken()));
-        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_1 , readBeamBreakerState(mBeamBreaker2.isBroken()));
-        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_2 , readBeamBreakerState(mBeamBreaker3.isBroken()));
+//        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_0 , readBeamBreakerState(mBeamBreaker1.isBroken()));
+//        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_1 , readBeamBreakerState(mBeamBreaker2.isBroken()));
+//        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_2 , readBeamBreakerState(mBeamBreaker3.isBroken()));
 
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mCANMotor.set(EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
-        mTalonOne.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
-        mTalonTwo.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
-        mTalonThree.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
+//        mCANMotor.set(EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
+//        mTalonOne.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
+//        mTalonTwo.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
+//        mTalonThree.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
 
-        switch (mIntakeState) {
-            case INTAKE:
-                mCANMotor.set( Settings.PowerCellModule.kIntakeCANPower);
-                mTalonOne.set(ControlMode.PercentOutput, Settings.PowerCellModule.kIntakeTalonPower);
-                mTalonTwo.set(ControlMode.PercentOutput, Settings.PowerCellModule.kIntakeTalonPower);
-                break;
-            case REVERSE:
-                mCANMotor.set( -Settings.PowerCellModule.kIntakeCANPower);
-                mTalonOne.set(ControlMode.PercentOutput, Settings.PowerCellModule.kIntakeTalonPower);
-                mTalonTwo.set(ControlMode.PercentOutput, Settings.PowerCellModule.kIntakeTalonPower);
-                break;
-            case STOP:
-                mCANMotor.set(Settings.PowerCellModule.kForStopCAN);
-                mTalonOne.set(ControlMode.PercentOutput, Settings.PowerCellModule.kForStopTalon);
-                mTalonTwo.set(ControlMode.PercentOutput, Settings.PowerCellModule.kForStopTalon);
-                break;
-        }
-
+        mCANMotor.set(1.0);
         switch (mArmState) {
             case ENGAGED:
                 mArmMotor.set( Settings.PowerCellModule.kArmCANPowerEngaged);
@@ -199,16 +183,16 @@ public class PowerCellModule extends Module {
         return this.mArmState;
     }
 
-    public void indexPowerCells() {
-        mLog.info("----------------INDEXING OF POWERCELLS HAS BEGUN------------------");
-        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().map(DigitalBeamSensor::isBroken).filter(e -> e).count();
-        if ( mBeamCountBroken < mGoalBeamCountBroken) {
-            setDesiredIntakeState(EIntakeState.INTAKE);
-        } else {
-            setDesiredIntakeState(EIntakeState.STOP);
-        }
-        mGoalBeamCountBroken = mBeamCountBroken + 1;
-    }
+//    public void indexPowerCells() {
+//        mLog.info("----------------INDEXING OF POWERCELLS HAS BEGUN------------------");
+//        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().map(DigitalBeamSensor::isBroken).filter(e -> e).count();
+//        if ( mBeamCountBroken < mGoalBeamCountBroken) {
+//            setDesiredIntakeState(EIntakeState.INTAKE);
+//        } else {
+//            setDesiredIntakeState(EIntakeState.STOP);
+//        }
+//        mGoalBeamCountBroken = mBeamCountBroken + 1;
+//    }
 //    public void startIntaking() {
 //        mCANMotor.set(1.0);
 //        mTalonOne.set(ControlMode.PercentOutput, 1d);

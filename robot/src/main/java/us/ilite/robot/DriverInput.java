@@ -46,6 +46,9 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         this.mLimelight = pLimelight;
         this.mData = pData;
         this.mIntake = pIntake;
+
+        mDriverJoystick = new Joystick(0);
+        mOperatorJoystick = new Joystick(1);
     }
 
 

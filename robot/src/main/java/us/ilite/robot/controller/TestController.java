@@ -19,9 +19,13 @@ public class TestController extends AbstractController {
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
 
     private PowerCellModule mIntake;
-    public TestController( PowerCellModule pIntake) {
+    private PowerCellModule.EIntakeState mIntakeState;
+    private PowerCellModule.EArmState mArmState;
+
+    public TestController(PowerCellModule pIntake) {
         this.mIntake = pIntake;
     }
+
     public void update(double pNow) {
         updateDrivetrain(pNow);
     }
@@ -47,28 +51,47 @@ public class TestController extends AbstractController {
     }
 
     private void updateIntake() {
-        if(Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT, (double) PowerCellModule.EIntakeState.INTAKE.ordinal());
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT, (double) PowerCellModule.EIntakeState.INTAKE.ordinal());
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT, (double) PowerCellModule.EIntakeState.INTAKE.ordinal());
+        if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
+            mIntakeState = PowerCellModule.EIntakeState.INTAKE;
         } else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
-//            mIntake.setDesiredIntakeState(PowerCellModule.EIntakeState.REVERSE);
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT, (double) PowerCellModule.EIntakeState.REVERSE.ordinal());
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT, (double) PowerCellModule.EIntakeState.REVERSE.ordinal());
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT, (double) PowerCellModule.EIntakeState.REVERSE.ordinal());
+            mIntakeState = PowerCellModule.EIntakeState.REVERSE;
         } else {
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT, (double) PowerCellModule.EIntakeState.STOP.ordinal());
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT, (double) PowerCellModule.EIntakeState.STOP.ordinal());
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT, (double) PowerCellModule.EIntakeState.STOP.ordinal());
+            mIntakeState = PowerCellModule.EIntakeState.STOP;
+        }
+        switch (mIntakeState) {
+            case INTAKE:
+               Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 1.0);
+               Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 1.0);
+               Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 1.0);
+               break;
+            case REVERSE:
+                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , -1.0);
+                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , -1.0);
+                Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , -1.0);
+                break;
+            case STOP:
+                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 0.0);
+                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 0.0);
+                Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 0.0);
+                break;
         }
     }
     public void updateArm() {
-        if(Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE, (double) PowerCellModule.EArmState.ENGAGED.ordinal());
+        if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
+            mArmState = PowerCellModule.EArmState.ENGAGED;
         } else {
-            Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE, (double) PowerCellModule.EArmState.DISENGAGED.ordinal());
+            mArmState = PowerCellModule.EArmState.DISENGAGED;
+        }
+        switch (mArmState) {
+            case ENGAGED:
+                Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 1.0);
+                break;
+            case DISENGAGED:
+                Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 0.0);
+                break;
         }
         //TODO default state
     }
 }
+
 
