@@ -118,28 +118,28 @@ public class PowerCellModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_TWO_POWER_PCT , (double) getIntakeState().ordinal());
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_TWO_POWER_PCT , mTalonTwo.getOutputCurrent());
+//        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_TWO_POWER_PCT , (double) getIntakeState().ordinal());
+        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_TWO_POWER_PCT , mTalonTwo.getStatorCurrent());
 
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , mTalonTwo.getOutputCurrent());
+//        Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , mTalonTwo.getStatorCurrent());
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , (double) getIntakeState().ordinal());
 
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_POWER_PCT , (double) getIntakeState().ordinal());
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_POWER_PCT , mTalonOne.getOutputCurrent());
+//        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_POWER_PCT , (double) getIntakeState().ordinal());
+        Robot.DATA.powercell.set(EPowerCellData.CURRENT_CONVEYOR_POWER_PCT , mTalonOne.getStatorCurrent());
 
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonOne.getOutputCurrent());
+//        Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , mTalonOne.getStatorCurrent());
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , (double) getIntakeState().ordinal());
 
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_SERIALIZER_POWER_PCT , (double) getIntakeState().ordinal());
+//        Robot.DATA.powercell.set(EPowerCellData.CURRENT_SERIALIZER_POWER_PCT , (double) getIntakeState().ordinal());
         Robot.DATA.powercell.set(EPowerCellData.CURRENT_SERIALIZER_POWER_PCT, mCANMotor.getOutputCurrent());
 
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT ,mCANMotor.getOutputCurrent() );
+//        Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT ,mCANMotor.getOutputCurrent() );
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , (double) getIntakeState().ordinal() );
 
         Robot.DATA.powercell.set(EPowerCellData.CURRENT_ARM_STATE , mArmMotor.getOutputCurrent() );
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_ARM_STATE , (double)getArmState().ordinal());
+//        Robot.DATA.powercell.set(EPowerCellData.CURRENT_ARM_STATE , (double)getArmState().ordinal());
 
-        Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE , mArmMotor.getOutputCurrent() );
+//        Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE , mArmMotor.getOutputCurrent() );
         Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE , (double)getArmState().ordinal());
 
 //        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_0 , readBeamBreakerState(mBeamBreaker1.isBroken()));
@@ -155,7 +155,8 @@ public class PowerCellModule extends Module {
 //        mTalonTwo.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
 //        mTalonThree.set(ControlMode.PercentOutput, EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
 
-        mCANMotor.set(1.0);
+
+//        mCANMotor.set(1.0);
         switch (mArmState) {
             case ENGAGED:
                 mArmMotor.set( Settings.PowerCellModule.kArmCANPowerEngaged);
@@ -169,10 +170,7 @@ public class PowerCellModule extends Module {
 
     @Override
     public void shutdown(double pNow) {
-       Robot.DATA.powercell.set(EIntakeState.STOP.ordinal() , 0.0);
-    }
-    public void setDesiredIntakeState(EIntakeState pDesiredState){
-        mIntakeState = pDesiredState;
+        mIntakeState = EIntakeState.STOP;
     }
 
     public EIntakeState getIntakeState(){

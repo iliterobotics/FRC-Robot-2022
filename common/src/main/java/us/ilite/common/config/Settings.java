@@ -30,9 +30,9 @@ public class Settings extends NetworkTablesConstantsBase {
         public static double kIntakeTalonPower = 1d;
         public static double kForStopTalon = 0d;
         public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
-        public static int kTalonOneID; // Change later
-        public static int kTalonTwoID; // Change later
-        public static int kTalonThreeID; // Change later
+        public static int kTalonOneID = 3; // Change later
+        public static int kTalonTwoID = 7; // Change later
+        public static int kTalonThreeID = 5; // Change later
         public static int kBeamChannel1; // Change later
         public static int kBeamChannel2; // Change later
         public static int kBeamChannel3; // Change later
@@ -43,7 +43,7 @@ public class Settings extends NetworkTablesConstantsBase {
         public static double kPowerCellI;
         public static double kPowerCellD;
         public static double kPowerCellF;
-        public static int kArmNEOAdress = 16;
+        public static int kArmNEOAdress = 4;
         public static double kArmCANPowerEngaged = 1.0;
         public static double kArmCANPowerDisengaged = 0.0;
 
@@ -93,7 +93,7 @@ public class Settings extends NetworkTablesConstantsBase {
         // IMU Constants
         // =============================================================================
 
-        public static int kArmNeoAddress = 16;
+//        public static int kArmNeoAddress = 16;
 
     }
 

@@ -144,7 +144,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
- //       mActiveController = mTestController;
+        mActiveController = mTestController;
         mRunningModules.clearModules();
         mRunningModules.addModule(mDriverInput);
         mRunningModules.addModule(mOI);
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
         mRunningModules.readInputs(mClock.getCurrentTime());
-     //   mActiveController.update(mClock.getCurrentTime());
+        mActiveController.update(mClock.getCurrentTime());
         mRunningModules.setOutputs(mClock.getCurrentTime());
 //        mData.sendCodicesToNetworkTables();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);

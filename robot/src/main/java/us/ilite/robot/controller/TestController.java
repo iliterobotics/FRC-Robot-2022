@@ -1,5 +1,7 @@
 package us.ilite.robot.controller;
 
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
@@ -21,13 +23,16 @@ public class TestController extends AbstractController {
     private PowerCellModule mIntake;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
+    private ILog mLog = Logger.createLog(this.getClass());
 
     public TestController(PowerCellModule pIntake) {
         this.mIntake = pIntake;
     }
 
     public void update(double pNow) {
-        updateDrivetrain(pNow);
+//        updateDrivetrain(pNow);
+        updateIntake(pNow);
+//        updateArm(pNow);
     }
 
     void updateDrivetrain(double pNow) {
@@ -46,12 +51,11 @@ public class TestController extends AbstractController {
         }
         db.drivetrain.set(THROTTLE, throttle);
         db.drivetrain.set(TURN, rotate);
-        updateIntake();
-        updateArm();
     }
 
-    private void updateIntake() {
+    private void updateIntake(double pNow) {
         if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
+            mLog.error("--------------INTAKE IS BEING PRESSED----------");
             mIntakeState = PowerCellModule.EIntakeState.INTAKE;
         } else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
             mIntakeState = PowerCellModule.EIntakeState.REVERSE;
@@ -76,7 +80,7 @@ public class TestController extends AbstractController {
                 break;
         }
     }
-    public void updateArm() {
+    public void updateArm(double pNow) {
         if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
             mArmState = PowerCellModule.EArmState.ENGAGED;
         } else {
