@@ -13,10 +13,9 @@ import us.ilite.common.types.ETrackingType;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
-import static us.ilite.robot.hardware.ECommonControlMode.*;
 
-import us.ilite.robot.commands.DJBoothPositionControl;
-import us.ilite.robot.commands.DJBoothRotationControl;
+import us.ilite.robot.modules.DJBoothPositionControl;
+import us.ilite.robot.modules.DJBoothRotationControl;
 import us.ilite.robot.modules.Module;
 import us.ilite.robot.modules.*;
 

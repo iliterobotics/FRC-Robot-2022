@@ -8,8 +8,6 @@ import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
-import us.ilite.robot.commands.DJBoothPositionControl;
-import us.ilite.robot.commands.DJBoothRotationControl;
 
 public class OperatorInput extends Module {
     protected static final double

@@ -14,19 +14,16 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.robot.commands.DJBoothPositionControl;
-import us.ilite.robot.commands.DJBoothRotationControl;
+import us.ilite.robot.modules.DJBoothPositionControl;
+import us.ilite.robot.modules.DJBoothRotationControl;
 import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.BaseAutonController;
 import us.ilite.robot.controller.TeleopController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
-import us.ilite.robot.hardware.GetLocalIP;
 import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
-
-import java.util.List;
 
 public class Robot extends TimedRobot {
 

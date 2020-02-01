@@ -4,7 +4,11 @@ import com.flybotix.hfr.codex.CodexOf;
 import edu.wpi.first.wpilibj.util.Color;
 
 public enum EColorData implements CodexOf<Double> {
-    SENSED_COLOR;
+    SENSED_COLOR,
+    POSITION_CONTROL_INPUT,
+    ROTATION_CONTROL_INPUT,
+    COLOR_WHEEL_MOTOR_STATE;
+
 
     public enum EColor {
         RED( new Color( 0.561, 0.232, 0.114 ) ),
@@ -17,6 +21,15 @@ public enum EColorData implements CodexOf<Double> {
         EColor(Color c) {
             color = c;
         }
+    }
+
+    public enum EInput {
+        POSITIVE,
+        NEGATIVE;
+    }
+    public enum EMotorState {
+        ON,
+        OFF;
     }
 
 }

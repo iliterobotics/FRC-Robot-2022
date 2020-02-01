@@ -1,4 +1,4 @@
-package us.ilite.robot.commands;
+package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -17,32 +17,21 @@ import us.ilite.robot.utils.ColorUtils;
 
 import static us.ilite.robot.utils.ColorUtils.*;
 
-public class DJBoothRotationControl implements ICommand {
+public class DJBoothRotationControl extends Module {
 
     private ColorSensorV3 mColorSensorV3;
     private VictorSPX victorSPX;
 
     private final ColorMatch mColorMatcher = new ColorMatch();
-    private ColorState eCurrentColorState;
-    private ColorState eLastColorState;
+    private EColorData.EColor eCurrentColorState;
+    private EColorData.EColor eLastColorState;
     private int mColorChangeLocation;
     private int mInitialColorStateLocation;
-    private final ColorState[] colorStates = {ColorState.RED, ColorState.YELLOW, ColorState.BLUE, ColorState.GREEN};
+    private final EColorData.EColor[] colorStates = {EColorData.EColor.RED, EColorData.EColor.YELLOW, EColorData.EColor.BLUE, EColorData.EColor.GREEN};
     private ILog mLog = Logger.createLog( this.getClass() );
-    private MotorState eMotorState;
+    private EColorData.EMotorState eMotorState;
     private boolean mIsDone;
 
-    public enum ColorState {
-        RED,
-        GREEN,
-        BLUE,
-        YELLOW;
-    }
-
-    public enum MotorState {
-        ON,
-        OFF;
-    }
 
     @Override
     public void init(double pNow) {
@@ -58,48 +47,52 @@ public class DJBoothRotationControl implements ICommand {
 
         setColorState( mColorMatcher.matchClosestColor( mColorSensorV3.getColor() ).color );
         eLastColorState = eCurrentColorState;
-        mColorChangeLocation = getInitialStateLocation( (ColorState) eCurrentColorState );
+        mColorChangeLocation = getInitialStateLocation( eCurrentColorState );
     }
 
     @Override
     public boolean update(double pNow) {
 
-        if ( (mColorChangeLocation - mInitialColorStateLocation <= 32) && eMotorState == MotorState.ON ) {
+        if ( EColorData.ROTATION_CONTROL_INPUT.equals( EColorData.EInput.POSITIVE ) ) {
+            if ( (mColorChangeLocation - mInitialColorStateLocation <= 32) && EColorData.ROTATION_CONTROL_INPUT.equals(EColorData.EInput.POSITIVE) ) {
 
-            Color mColor = mColorSensorV3.getColor();
-            updateColor();
-            ColorMatchResult match = mColorMatcher.matchClosestColor( mColor );
-            setColorState( match.color );
+                Color mColor = mColorSensorV3.getColor();
+                ColorMatchResult match = mColorMatcher.matchClosestColor( mColor );
+                setColorState( match.color );
 
-//        String colorString = getColorStringForMatchResult(match);
-//        SmartDashboard.putString( "Detected Color: ", colorString );
-            if ( eCurrentColorState != eLastColorState ) {
-                mColorChangeLocation++;
-            }
-            if ( colorStates[ mColorChangeLocation % colorStates.length ] != eCurrentColorState ) {
-                mLog.warn( "Issue with Detecting Color. Actual: " + colorStates[mColorChangeLocation] + "Detected: " + eLastColorState );
-                mColorChangeLocation--;
-                eCurrentColorState = getStateAtLocation( mColorChangeLocation );
-            }
+                if ( eCurrentColorState != eLastColorState ) {
+                    mColorChangeLocation++;
+                }
+                if ( colorStates[ mColorChangeLocation % colorStates.length ] != eCurrentColorState ) {
+                    mLog.warn( "Issue with Detecting Color. Actual: " + colorStates[mColorChangeLocation] + "Detected: " + eLastColorState );
+                    mColorChangeLocation--;
+                    eCurrentColorState = getStateAtLocation( mColorChangeLocation );
+                }
 
 //            String colorString = getColorStringForMatchResult(match);
 //            SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
 
+                setOutput( EColorData.EMotorState.ON );
+                mIsDone = false;
+                return false;
+            }
+            else if ( eMotorState == EColorData.EMotorState.ON ) {
+                mIsDone = true;
+                setOutput( EColorData.EMotorState.ON );
+                return true;
+            }
+            else {
+                mIsDone = false;
+                setOutput( EColorData.EMotorState.OFF );
+                return false;
+            }
+        }
+        return true;
+    }
 
-            victorSPX.set(ControlMode.PercentOutput, Settings.kDJOutput );
-            mIsDone = false;
-            return false;
-        }
-        else if ( eMotorState == MotorState.ON ) {
-            mIsDone = true;
-            victorSPX.set(ControlMode.PercentOutput, 0d);
-            return true;
-        }
-        else {
-            mIsDone = false;
-            victorSPX.set(ControlMode.PercentOutput, 0d);
-            return false;
-        }
+    private void setOutput(EColorData.EMotorState pDesiredMotorState) {
+        Data mData = Robot.DATA;
+        mData.color.set( EColorData.COLOR_WHEEL_MOTOR_STATE, pDesiredMotorState.ordinal() );
     }
 
     protected static String getColorStringForMatchResult(ColorMatchResult match) {
@@ -124,22 +117,21 @@ public class DJBoothRotationControl implements ICommand {
 
     public boolean setColorState( Color color ) {
         if (kBlueTarget.equals(color)) {
-            eCurrentColorState = ColorState.BLUE;
+            eCurrentColorState = EColorData.EColor.BLUE;
         } else if (kRedTarget.equals(color)) {
-            eCurrentColorState = ColorState.RED;
+            eCurrentColorState = EColorData.EColor.RED;
         } else if (kGreenTarget.equals(color)) {
-            eCurrentColorState = ColorState.GREEN;
+            eCurrentColorState = EColorData.EColor.GREEN;
         } else if (kYellowTarget.equals(color)) {
-            eCurrentColorState = ColorState.YELLOW;
-        }
-        else {
+            eCurrentColorState = EColorData.EColor.YELLOW;
+        } else {
             return false;
         }
         return true;
     }
 
-    private int getInitialStateLocation( ColorState colorState ){
-        switch ( colorState ) {
+    private int getInitialStateLocation( EColorData.EColor pColorState ){
+        switch ( pColorState ) {
             case RED: return 0;
             case YELLOW: return 1;
             case BLUE: return 2;
@@ -148,13 +140,13 @@ public class DJBoothRotationControl implements ICommand {
         }
     }
 
-    private ColorState getStateAtLocation( int i ) {
+    private EColorData.EColor getStateAtLocation( int i ) {
         switch ( i % colorStates.length ) {
-            case 0: return ColorState.RED;
-            case 1: return ColorState.YELLOW;
-            case 2: return ColorState.BLUE;
-            case 3: return ColorState.GREEN;
-            default: return null;
+            case 0: return EColorData.EColor.RED;
+            case 1: return EColorData.EColor.YELLOW;
+            case 2: return EColorData.EColor.BLUE;
+            case 3: return EColorData.EColor.GREEN;
+            default: return EColorData.EColor.NONE;
         }
     }
 
@@ -190,8 +182,18 @@ public class DJBoothRotationControl implements ICommand {
         return mIsDone;
     }
 
-    public void updateMotor( MotorState motorState ){
+    public void updateMotor( EColorData.EMotorState motorState ){
         eMotorState = motorState;
+    }
+
+    @Override
+    public void readInputs(double pNow) {
+
+    }
+
+    @Override
+    public void setOutputs(double pNow) {
+
     }
 
     @Override

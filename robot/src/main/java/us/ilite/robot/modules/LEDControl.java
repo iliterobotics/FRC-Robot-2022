@@ -6,8 +6,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.sensor.EColorData;
 import us.ilite.robot.Robot;
-import us.ilite.robot.commands.DJBoothPositionControl;
-import us.ilite.robot.commands.DJBoothRotationControl;
 
 import static us.ilite.robot.utils.ColorUtils.*;
 

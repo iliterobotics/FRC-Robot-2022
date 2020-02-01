@@ -1,4 +1,4 @@
-package us.ilite.robot.commands;
+package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -13,47 +13,33 @@ import us.ilite.common.Data;
 import us.ilite.common.config.*;
 import us.ilite.common.types.sensor.EColorData;
 import us.ilite.robot.Robot;
+import us.ilite.robot.commands.ICommand;
 
 import static us.ilite.robot.utils.ColorUtils.*;
 
-public class DJBoothPositionControl implements ICommand {
+public class DJBoothPositionControl extends Module {
 
     private ColorSensorV3 mColorSensorV3;
-    private VictorSPX victorSPX;
     private final ColorMatch mColorMatcher = new ColorMatch();
-    private ColorState eDesiredColorState;
-    private ColorState eCurrentColorState;
-    private ColorState eLastColorState;
+    private EColorData.EColor eDesiredColorState;
+    private EColorData.EColor eCurrentColorState;
+    private EColorData.EColor eLastColorState;
+    private EColorData.EInput eInputState;
     private int mSolidStateCounter;
-    private MotorState eMotorState;
+    private EColorData.EMotorState eMotorState;
     private boolean mIsDone;
     private boolean mMightBeDone;
 
-
-    public enum ColorState {
-        DEFAULT,
-        RED,
-        GREEN,
-        BLUE,
-        YELLOW;
-    }
-    public enum MotorState {
-        ON,
-        OFF;
-    }
-
-
-    @Override
-    public void init(double pNow) {
+    public DJBoothPositionControl () {
         I2C.Port i2cPort = I2C.Port.kOnboard;
         mColorSensorV3 = new ColorSensorV3(i2cPort);
 
-        victorSPX = new VictorSPX( 12 );
         mSolidStateCounter = 0;
-        eMotorState = MotorState.OFF;
-        eCurrentColorState = ColorState.DEFAULT;
-        eLastColorState = ColorState.DEFAULT;
-        eDesiredColorState = ColorState.DEFAULT;
+        eMotorState = EColorData.EMotorState.OFF;
+        eCurrentColorState = EColorData.EColor.NONE;
+        eLastColorState = EColorData.EColor.NONE;
+        eDesiredColorState = EColorData.EColor.NONE;
+        eInputState = EColorData.EInput.NEGATIVE;
         mIsDone = false;
         mMightBeDone = false;
 
@@ -63,19 +49,17 @@ public class DJBoothPositionControl implements ICommand {
         mColorMatcher.addColorMatch(kYellowTarget);
     }
 
-    @Override
-    public boolean update(double pNow) {
+    public EColorData.EMotorState update(double pNow) {
 
-        if ( !mIsDone ) {
-            updateColor();
-
-            if ( eMotorState.equals( MotorState.ON )) {
+        if ( eInputState.equals(EColorData.EInput.POSITIVE) ) {
+            if ( !mIsDone ) {
+                updateColor();
                 DriverStation.reportError( "Running Motor for Position Control", false );
 
                 Color detectedColor = mColorSensorV3.getColor();
                 ColorMatchResult match = mColorMatcher.matchClosestColor(detectedColor);
 //                if ( !mMightBeDone ) {
-                    eLastColorState = eCurrentColorState;
+                eLastColorState = eCurrentColorState;
 //                }
                 eCurrentColorState = getState( match.color );
                 SmartDashboard.putString( "Detected Color on Rotation: ", getColorStringForMatchResult( match ) );
@@ -109,25 +93,20 @@ public class DJBoothPositionControl implements ICommand {
 //                }
 //                else {
                 if (eCurrentColorState.equals(eDesiredColorState)) {
-
                     if ( mSolidStateCounter >= 5 ) {
-                        victorSPX.set(ControlMode.PercentOutput, 0d);
                         mSolidStateCounter++;
                         mIsDone = true;
 //                        mMightBeDone = false;
-                        return true;
+                        return EColorData.EMotorState.OFF;
                     }
                     else {
-                        victorSPX.set(ControlMode.PercentOutput, Settings.kDJOutput);
                         mSolidStateCounter++;
+                        return EColorData.EMotorState.ON;
                     }
-                    mIsDone = false;
-//                    mMightBeDone = true;
-                    return false;
                 }
             }
-            mIsDone = false;
-            return false;
+            mIsDone = true;
+            return true;
         }
         return true;
     }
@@ -152,21 +131,21 @@ public class DJBoothPositionControl implements ICommand {
         return colorString;
     }
 
-    public ColorState getState( Color c ) {
+    public EColorData.EColor getState(Color c ) {
         if ( c.equals( kBlueTarget ) ) {
-            return ColorState.BLUE;
+            return EColorData.EColor.BLUE;
         }
         else if ( c.equals( kRedTarget ) ) {
-            return ColorState.RED;
+            return EColorData.EColor.RED;
         }
         else if ( c.equals( kYellowTarget ) ) {
-            return ColorState.YELLOW;
+            return EColorData.EColor.YELLOW;
         }
         else if ( c.equals( kGreenTarget ) ) {
-            return ColorState.GREEN;
+            return EColorData.EColor.GREEN;
         }
         else {
-            return ColorState.DEFAULT;
+            return EColorData.EColor.NONE;
         }
     }
 
@@ -198,12 +177,26 @@ public class DJBoothPositionControl implements ICommand {
         return mIsDone;
     }
 
-    public void updateMotor( MotorState motorState ){
+    public void updateMotor( EColorData.EMotorState motorState ){
         eMotorState = motorState;
     }
 
-    public void setDesiredColorState( ColorState pColorState ){
+    public void setDesiredColorState(EColorData.EColor pColorState ){
         eDesiredColorState = pColorState;
+    }
+
+    public void reset() {
+
+    }
+
+    @Override
+    public void readInputs(double pNow) {
+
+    }
+
+    @Override
+    public void setOutputs(double pNow) {
+
     }
 
     @Override
