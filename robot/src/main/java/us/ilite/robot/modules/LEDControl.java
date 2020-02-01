@@ -3,11 +3,8 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.CANifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import us.ilite.common.config.Settings;
-import us.ilite.common.types.sensor.EColorData;
-import us.ilite.robot.Robot;
-
-import static us.ilite.robot.utils.ColorUtils.*;
+import us.ilite.common.types.EColorData;
+import static us.ilite.robot.modules.DJSpinnerModule.*;
 
 public class LEDControl extends Module {
 
@@ -173,26 +170,26 @@ public class LEDControl extends Module {
 //        if(mLimelight.getTracking() != ETrackingType.NONE) mCurrentMessage = Message.VISION_TRACKING;
 //
 
-        Color color = getColor( db.color.get(EColorData.SENSED_COLOR) );
-        boolean isDone = db.color.get(EColorData.FINISHED);
+        EColorMatch color = EColorMatch.values()[(int)(double)db.color.get(EColorData.SENSED_COLOR)];
+        boolean isDone = (EColorWheelState.valueOf(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE)) == EColorWheelState.OFF);
 
 
-        if (color == kBlueTarget && !isDone) {
+        if (color == EColorMatch.BLUE && !isDone) {
             mCurrentMessage = Message.ON_BLUE;
-        } else if (color == kRedTarget && !isDone) {
+        } else if (color == EColorMatch.RED && !isDone) {
             mCurrentMessage = Message.ON_RED;
-        } else if (color == kGreenTarget && !isDone) {
+        } else if (color == EColorMatch.GREEN && !isDone) {
             mCurrentMessage = Message.ON_GREEN;
-        } else if (color == kYellowTarget && !isDone) {
+        } else if (color == EColorMatch.YELLOW && !isDone) {
             mCurrentMessage = Message.ON_YELLOW;
         }
-        else if (color == kBlueTarget && isDone) {
+        else if (color == EColorMatch.BLUE && isDone) {
             mCurrentMessage = Message.FINISHED_ON_BLUE;
-        } else if (color == kRedTarget && isDone) {
+        } else if (color == EColorMatch.RED && isDone) {
             mCurrentMessage = Message.FINISHED_ON_RED;
-        } else if (color == kGreenTarget && isDone) {
+        } else if (color == EColorMatch.GREEN && isDone) {
             mCurrentMessage = Message.FINISHED_ON_GREEN;
-        } else if (color == kYellowTarget && isDone) {
+        } else if (color == EColorMatch.YELLOW && isDone) {
             mCurrentMessage = Message.FINISHED_ON_YELLOW;
         }
 
@@ -227,21 +224,6 @@ public class LEDControl extends Module {
         }
 
         controlLED(mCurrentMessage);
-    }
-
-    public Color getColor(double ordinal) {
-        double ordinalOfSensedColor = db.color.get( EColorData.SENSED_COLOR );
-        if (ordinalOfSensedColor == EColorData.EColor.RED.ordinal() ) {
-            return kRedTarget;
-        } else if (ordinalOfSensedColor == EColorData.EColor.BLUE.ordinal() ) {
-            return kBlueTarget;
-        } else if (ordinalOfSensedColor == EColorData.EColor.GREEN.ordinal() ) {
-            return kGreenTarget;
-        } else if (ordinalOfSensedColor == EColorData.EColor.BLUE.ordinal() ) {
-            return kBlueTarget;
-        } else {
-            return Color.kBlack;
-        }
     }
 
     public void controlLED(Message m)

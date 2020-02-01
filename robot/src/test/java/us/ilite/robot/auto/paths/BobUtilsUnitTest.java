@@ -7,12 +7,13 @@ import us.ilite.paths.Squiggle;
 import us.ilite.paths.UNIT_TEST_STRAIGHT_LINE;
 import us.ilite.paths.Wonky;
 import us.ilite.paths.Yoink;
+import us.ilite.robot.BaseTest;
 
 import static us.ilite.robot.auto.paths.BobUtils.*;
 
 import java.util.Arrays;
 
-public class BobUtilsUnitTest {
+public class BobUtilsUnitTest extends BaseTest {
     private static final Path UNIT_TEST_STRAIGHT_LINE = new UNIT_TEST_STRAIGHT_LINE();
     private static final Path SQUIGGLE = new Squiggle();
     private static final Path WONKY = new Wonky();

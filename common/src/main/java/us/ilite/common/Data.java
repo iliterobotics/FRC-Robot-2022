@@ -4,18 +4,18 @@ import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.util.Color;
-import us.ilite.common.io.CodexNetworkTables;
 import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
-import us.ilite.common.types.sensor.EColorData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Think of this class link an in-memory database optimized for 1 row.  If you need multiple rows, simply manage multiple
@@ -32,28 +32,40 @@ public class Data {
     public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
-    public final Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
-
-
+    public final Codex<Double, ELimelightData> limelight = Codex.of.thisEnum(ELimelightData.class);
+    public final Codex<Double, ERawLimelightData> rawLimelight = Codex.of.thisEnum(ERawLimelightData.class);
+    public final Codex<Double, ELimelightData> selectedTarget = Codex.of.thisEnum(ELimelightData.class);
+    public final Codex<Double , EHangerModuleData> hanger = Codex.of.thisEnum(EHangerModuleData.class);
     public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
-    public final Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
-    public final Codex<Double, EColorWheelData> colorwheel = Codex.of.thisEnum(EColorWheelData.class);
-    public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
-    public final Codex<Double, EHangerData> hanger = Codex.of.thisEnum(EHangerData.class);
+    public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
+    public final Codex<Double, EShooterSystemData> flywheel = Codex.of.thisEnum(EShooterSystemData.class);
     public final Codex<Double, EColorData> color = Codex.of.thisEnum(EColorData.class);
 
+    public Color DJ_COLOR = Color.kAzure;
 
     public final Codex[] mAllCodexes = new Codex[] {
-            imu, /*drivetrain,*/ driverinput, operatorinput, pdp, color /*limelight,*/
+            imu,
+            drivetrain,
+            driverinput,
+            operatorinput,
+            pdp,
+            powercell,
+            hanger,
+            limelight,
+            color,
     };
 
     public final Codex[] mLoggedCodexes = new Codex[] {
-        imu, drivetrain, driverinput, /*operatorinput,*/  pdp, limelight
+            imu,
+            drivetrain,
+            driverinput,
+            operatorinput,
+            pdp,
+            powercell,
+            hanger,
+            limelight,
     };
 
-    public final Codex[] mDisplayedCodexes = new Codex[] {
-            imu, /*drivetrain,*/ driverinput, operatorinput, pdp
-    };
 
     //Stores writers per codex needed for CSV logging
     private List<CodexCsvLogger> mCodexCsvLoggers;
