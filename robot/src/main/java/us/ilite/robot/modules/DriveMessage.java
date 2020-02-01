@@ -57,9 +57,8 @@ public class DriveMessage {
    * If isDirect() returns FALSE and the values are outside [-1 < value < 1], then call normalize().
    * @return expected right-side output
    */
-
   public double getRightOutput() {
-    if (mIsDirect) {
+    if(mIsDirect) {
       return mRightOutput;
     } else {
       return mThrottle - mTurn;

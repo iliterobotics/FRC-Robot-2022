@@ -14,8 +14,6 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 
-import us.ilite.robot.modules.DJBoothPositionControl;
-import us.ilite.robot.modules.DJBoothRotationControl;
 import us.ilite.robot.modules.Module;
 import us.ilite.robot.modules.*;
 
@@ -32,8 +30,6 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private CommandManager mAutonomousCommandManager;
     private Limelight mLimelight;
     private Data mData;
-    private DJBoothPositionControl mDjBoothPositionControl;
-    private DJBoothRotationControl mDjBoothRotationControl;
     private Timer mGroundCargoTimer = new Timer();
 
     private boolean mIsCargo = false;
@@ -67,8 +63,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
 
     @Override
     public void readInputs(double pNow) {
-        ELogitech310.map(mData.driverinput, mDriverJoystick);
-        ELogitech310.map(mData.operatorinput, mOperatorJoystick);
+        ELogitech310.map(Robot.DATA.driverinput, mDriverJoystick);
+        ELogitech310.map(Robot.DATA.operatorinput, mOperatorJoystick);
     }
 
     @Override
@@ -77,7 +73,6 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         If the driver started the commands that the superstructure is running and then released the button,
         stop running commands.
         */
-
         updateDriveTrain();
 
     }
