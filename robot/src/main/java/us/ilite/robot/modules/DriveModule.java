@@ -5,6 +5,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
@@ -14,6 +15,7 @@ import us.ilite.common.types.ELimelightData;
 import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -91,6 +93,7 @@ public class DriveModule extends Module {
 	private double mCurrentHeading;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
+	private Codex<Double, EDriveData> 
 
 	public DriveModule() {
 		if(AbstractSystemSettingsUtils.isPracticeBot()) {
