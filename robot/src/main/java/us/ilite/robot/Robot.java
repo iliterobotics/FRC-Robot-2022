@@ -14,38 +14,36 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.BaseAutonController;
 import us.ilite.robot.controller.TeleopController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
-import us.ilite.robot.hardware.GetLocalIP;
 import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
 
-import java.util.List;
-
 public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
-    private Data mData;
-    private Limelight mLimelight = new Limelight();
-    private PowerCellModule mIntake = new PowerCellModule();
-    private ModuleList mRunningModules = new ModuleList();
-    private DriveModule mDrive = new DriveModule();
-    private Clock mClock = new Clock();
-    private RawLimelight mRawLimelight;
     public static final Data DATA = new Data();
-    private Timer initTimer = new Timer();
+    private ModuleList mRunningModules = new ModuleList();
+    private Clock mClock = new Clock();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
+    private Timer initTimer = new Timer();
+
+    private Limelight mLimelight;
+    private PowerCellModule mIntake;
+    private DriveModule mDrive;
+    private RawLimelight mRawLimelight;
+    private DJSpinnerModule mDJSpinnerModule;
+    private OperatorInput mOI;
+    private LEDControl mLedControl;
+    private FlywheelModule mFlywheel;
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
-    private FlywheelModule mShooter;
 
-    private OperatorInput mOI;
 
     private MatchMetadata mMatchMeta = null;
 
@@ -55,19 +53,18 @@ public class Robot extends TimedRobot {
     private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
     private final TestController mTestController = new TestController();
-   // private AbstractController mActiveController = null;
 
 
     @Override
     public void robotInit() {
-        mShooter = new FlywheelModule();
-        mDrive = new DriveModule();
-        mIntake = new PowerCellModule();
-        mLimelight = new Limelight();
         mOI = new OperatorInput();
-        mLimelight = new Limelight();
-        mRawLimelight = new RawLimelight();
-
+//        mDrive = new DriveModule();
+//        mLedControl = new LEDControl();
+        mFlywheel = new FlywheelModule();
+//        mIntake = new PowerCellModule();
+//        mLimelight = new Limelight();
+//        mRawLimelight = new RawLimelight();
+//        mDJSpinnerModule = new DJSpinnerModule();
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -139,7 +136,7 @@ public class Robot extends TimedRobot {
         mLogger.info("Disabled Initialization");
         mRunningModules.shutdown(mClock.getCurrentTime());
         mCSVLogger.stop(); // stop csv logging
-      //  mActiveController = null;
+        mActiveController = null;
     }
 
     @Override
@@ -152,9 +149,10 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
-        mRunningModules.addModule(mShooter);
+        mRunningModules.addModule(mFlywheel);
 //        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mDJSpinnerModule);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
@@ -174,7 +172,6 @@ public class Robot extends TimedRobot {
         mRunningModules.readInputs(mClock.getCurrentTime());
         mActiveController.update(mClock.getCurrentTime());
         mRunningModules.setOutputs(mClock.getCurrentTime());
-//        Robot.DATA.sendCodicesToNetworkTables();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
     }
 

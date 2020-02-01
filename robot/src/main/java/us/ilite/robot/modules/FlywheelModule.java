@@ -1,11 +1,10 @@
 package us.ilite.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.Servo;
 import us.ilite.common.Angle;
 import us.ilite.common.Distance;
@@ -37,19 +36,21 @@ public class FlywheelModule extends Module {
     private FlywheelModule.EHoodState mHoodState = FlywheelModule.EHoodState.STATIONARY; // TEST WHEN LIMELIGHT REMOUNTED
 
     public static final double kBaseHoodAngle = 60;
-    public CANSparkMax mShooter;
+    public CANSparkMax mFlywheelMaster;
     private Servo mHoodAngler;
     private TalonSRX mTurret;
     private TalonSRX mAccelerator;
+    private CANEncoder mEncoder;
 
     public FlywheelModule() {
-        mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mFlywheelMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
         mAccelerator = new TalonSRX(Settings.Hardware.CAN.kAcceleratorID);
         mHoodAngler = new Servo(Settings.Hardware.CAN.kAnglerID);
         mTurret = new TalonSRX(Settings.Hardware.CAN.kTurretID);
         mTurretGyro = new PigeonIMU(Settings.Hardware.CAN.kTurretGyroID);
 //        mTurretPid = new PIDController(kTurretAngleLockGains, 0, 1, SeleLockGains, -1, 1, Settings.kControlLoopPeriod);
 //        mShooterPid = new PIDController(kShooterGains);
+        mEncoder = mFlywheelMaster.getEncoder();
     }
 
     public enum EShooterState {
@@ -81,7 +82,7 @@ public class FlywheelModule extends Module {
     }
 
     public boolean isMaxVelocity() {
-        return mShooter.getEncoder().getVelocity() >= kAcceleratorThreshold;
+        return mFlywheelMaster.getEncoder().getVelocity() >= kAcceleratorThreshold;
     }
 
     @Override
@@ -91,7 +92,7 @@ public class FlywheelModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mShooter.getEncoder().getVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mEncoder.getVelocity());
 
         //TODO - move these lines to the controller
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_LIMELIGHT_TARGET, (double) mTrackingType.ordinal());
@@ -100,11 +101,8 @@ public class FlywheelModule extends Module {
 //        }
 
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY, (double) mTurret.getSelectedSensorVelocity());
-
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_HOOD_ANGLE, mHoodAngler.getAngle());
-
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, (double)mAccelerator.getSelectedSensorVelocity());
-
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_MODE, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_MODE));
 
 
@@ -122,7 +120,7 @@ public class FlywheelModule extends Module {
 //        mShooter.getPIDController().setReference(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY), ControlType.kVelocity);
 //        mTurret.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY));
 //        mShooter.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
-        mShooter.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
+        mFlywheelMaster.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
     }
 
     @Override

@@ -3,6 +3,7 @@ package us.ilite.common;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
@@ -38,10 +39,9 @@ public class Data {
     public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
     public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
     public final Codex<Double, EShooterSystemData> flywheel = Codex.of.thisEnum(EShooterSystemData.class);
-    public final Codex<Double, EColorWheelData> colorwheel = Codex.of.thisEnum(EColorWheelData.class);
+    public final Codex<Double, EColorData> color = Codex.of.thisEnum(EColorData.class);
 
-
-
+    public Color DJ_COLOR = Color.kAzure;
 
     public final Codex[] mAllCodexes = new Codex[] {
             imu,
@@ -52,6 +52,7 @@ public class Data {
             powercell,
             hanger,
             limelight,
+            color,
     };
 
     public final Codex[] mLoggedCodexes = new Codex[] {

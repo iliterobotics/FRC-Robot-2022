@@ -1,21 +1,16 @@
 package us.ilite.robot.controller;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.control.PIDController;
+import us.ilite.common.types.*;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.*;
-import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.EPowerCellData;
-import us.ilite.common.types.EShooterSystemData;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
 import static us.ilite.common.types.drive.EDriveData.*;
@@ -25,9 +20,10 @@ public class TestController extends AbstractController {
     private ILog mLog = Logger.createLog(TestController.class);
     private Double mLastTrackingType;
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
+
     private double mLimelightZoomThreshold = 7.0;
 
-    private HangerModule.EHangerState mHangerState;
+    private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.NOT_HANGING;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
     private double mPreviousTime;
@@ -40,17 +36,15 @@ public class TestController extends AbstractController {
     public void update(double pNow) {
         System.out.println(db.driverinput);
         System.out.println(db.operatorinput);
-        if (db.driverinput.isSet(ELogitech310.A_BTN)) {
-            mLog.error("-------------------------------------------------- YEAH I EXIST");
-            db.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, 0.25);
-        }
-//        updateLimelightTargetLock();
-//        updateDrivetrain(pNow);
-//        updateFlywheel(pNow);
-//        updateIntake(pNow);
-//        updateHanger(pNow);
-//        updateArm(pNow);
+        updateLimelightTargetLock();
+        updateDrivetrain(pNow);
+        updateFlywheel(pNow);
+        updateIntake(pNow);
+        updateHanger(pNow);
+        updateDJBooth();
+        updateArm(pNow);
     }
+
     private void updateHanger(double pNow){
         if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
@@ -73,17 +67,26 @@ public class TestController extends AbstractController {
     }
 
     private void updateFlywheel(double pNow) {
-        if (!db.driverinput.isSet(InputMap.DRIVER.FLYWHEEL_AXIS) ) {
-//            mTurretMode = FlywheelModule.ETurretMode.LIMELIGHT;
-//            mHoodState = FlywheelModule.EHoodState.ADJUSTABLE;
-//            mAcceleratorState = FlywheelModule.EAcceleratorState.FEED;
-            mShooterState = FlywheelModule.EShooterState.SHOOT;
-        }
-        else {
-//            mTurretMode = FlywheelModule.ETurretMode.GYRO;
-//            mAcceleratorState = FlywheelModule.EAcceleratorState.STOP;
-            mShooterState = FlywheelModule.EShooterState.STOP;
-//            mHoodState = FlywheelModule.EHoodState.STATIONARY;
+//        if (!db.driverinput.isSet(InputMap.DRIVER.FLYWHEEL_AXIS) ) {
+////            mTurretMode = FlywheelModule.ETurretMode.LIMELIGHT;
+////            mHoodState = FlywheelModule.EHoodState.ADJUSTABLE;
+////            mAcceleratorState = FlywheelModule.EAcceleratorState.FEED;
+//            mShooterState = FlywheelModule.EShooterState.SHOOT;
+//        }
+//        else {
+////            mTurretMode = FlywheelModule.ETurretMode.GYRO;
+////            mAcceleratorState = FlywheelModule.EAcceleratorState.STOP;
+//            mShooterState = FlywheelModule.EShooterState.STOP;
+////            mHoodState = FlywheelModule.EHoodState.STATIONARY;
+//        }
+
+        System.out.println(db.flywheel);
+
+        if (db.driverinput.isSet(ELogitech310.A_BTN)) {
+            mLog.error("-------------------------------------------------- YEAH I EXIST");
+            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.25);
+        } else {
+            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
         }
 
 //        switch(mAcceleratorState) {
@@ -228,6 +231,63 @@ public class TestController extends AbstractController {
                 db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 0.0);
                 break;
         }
+    }
+
+
+
+    void updateDJBooth() {
+        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
+            int i = (int)(double)db.color.get(EColorData.SENSED_COLOR);
+            DJSpinnerModule.EColorMatch m = DJSpinnerModule.EColorMatch.values()[i];
+            if(m.color.equals(db.DJ_COLOR)) {
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
+            } else {
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.POSITION.ordinal());
+            }
+        }
+
+        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL)) {
+
+            if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.sTARGET_ROTATION_COUNT) {
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.OFF.ordinal());
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
+            } else {
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.ROTATION.ordinal());
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.power);
+            }
+        }
+
+
+
+//        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL) &&
+//                db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL) ) {
+//            db.color.set(EColorData.POSITION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
+//            db.color.set(EColorData.ROTATION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
+//        }
+//        else if (db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
+//            db.color.set(EColorData.POSITION_CONTROL_INPUT, (double)EColorData.EInput.POSITIVE.ordinal());
+//            if (db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE).equals(EColorData.EMotorState.ON.ordinal()) ) {
+//                mVictor.set(ControlMode.PercentOutput, Settings.kDJBoothOuput );
+//            }
+//            else {
+//                mVictor.set(ControlMode.PercentOutput, 0d );
+//            }
+//        }
+//        else if (db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL) ) {
+//            db.color.set(EColorData.ROTATION_CONTROL_INPUT, (double)EColorData.EInput.POSITIVE.ordinal());
+//            if (db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE).equals(EColorData.EMotorState.ON.ordinal()) ) {
+//                mVictor.set(ControlMode.PercentOutput, Settings.kDJBoothOuput );
+//            }
+//            else {
+//                mVictor.set(ControlMode.PercentOutput, 0d );
+//            }
+//        }
+//        else {
+//            db.color.set(EColorData.POSITION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
+//            db.color.set(EColorData.ROTATION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
+//        }
+
     }
 
     public void updateArm(double pNow) {
