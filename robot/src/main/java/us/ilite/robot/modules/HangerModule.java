@@ -26,8 +26,8 @@ public class HangerModule extends Module {
     public HangerModule(Data pData){
 
         this.mData = pData;
-        mHangerNeoOne = SparkMaxFactory.createDefaultSparkMax(Settings.kHangerNeoID1 , CANSparkMaxLowLevel.MotorType.kBrushless);
-        mHangerNeoTwo= SparkMaxFactory.createDefaultSparkMax(Settings.kHangerNeoID2 , CANSparkMaxLowLevel.MotorType.kBrushless);
+        mHangerNeoOne = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID1 , CANSparkMaxLowLevel.MotorType.kBrushless);
+        mHangerNeoTwo= SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID2 , CANSparkMaxLowLevel.MotorType.kBrushless);
         mHangerPID = new CANPIDController(mHangerNeoOne);
         mHangerPID2 = new CANPIDController(mHangerNeoTwo);
 
