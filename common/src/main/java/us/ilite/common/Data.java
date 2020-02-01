@@ -1,6 +1,8 @@
 package us.ilite.common;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.CodexOf;
+import com.flybotix.hfr.util.lang.EnumUtils;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.util.Color;
@@ -66,6 +68,20 @@ public class Data {
             limelight,
     };
 
+    public static <T extends Enum<T>, E extends Enum<E> & CodexOf<Double>> T valueOf(
+            Codex<Double, E> data, Class<T> pEnu, E pElement
+    ) {
+        if(data.isSet(pElement)) {
+            return EnumUtils.getEnums(pEnu, true).get((int) (double) data.get(pElement));
+        } else {
+            return null;
+        }
+    }
+
+    public static <T extends Enum<T>, E extends Enum<E> & CodexOf<Double>> void setState(
+            Codex<Double, E> data, E pElement, T pState) {
+        data.set(pElement, (double)pState.ordinal());
+    }
 
     //Stores writers per codex needed for CSV logging
     private List<CodexCsvLogger> mCodexCsvLoggers;
