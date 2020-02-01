@@ -5,6 +5,7 @@ import com.flybotix.hfr.codex.CodexOf;
 public enum EShooterSystemData implements CodexOf<Double> {
     CURRENT_FLYWHEEL_VELOCITY,
     TARGET_FLYWHEEL_VELOCITY,
+    DESIRED_FLYWHEEL_VELOCITY,
     CURRENT_LIMELIGHT_TARGET,
     TARGET_LIMELIGHT_TARGET,
     CURRENT_TURRET_VELOCITY,
