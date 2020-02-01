@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.Servo;
 import us.ilite.common.Angle;
 import us.ilite.common.Distance;
@@ -90,7 +91,6 @@ public class FlywheelModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mShooter.getEncoder().getVelocity());
 
         //TODO - move these lines to the controller
@@ -99,16 +99,12 @@ public class FlywheelModule extends Module {
 //            Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_LIMELIGHT_TARGET, Robot.DATA.limelight.get(ETargetingData.targetOrdinal));
 //        }
 
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0.0);
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY, (double) mTurret.getSelectedSensorVelocity());
 
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, kBaseHoodAngle);
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_HOOD_ANGLE, mHoodAngler.getAngle());
 
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY, 0.0);
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, (double)mAccelerator.getSelectedSensorVelocity());
 
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_MODE, (double) mTurretMode.ordinal());
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_MODE, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_MODE));
 
 
@@ -116,15 +112,17 @@ public class FlywheelModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        if ( isMaxVelocity() ) {
-            mAccelerator.set(ControlMode.PercentOutput, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY));
-        }
-        else {
-            mAccelerator.set(ControlMode.PercentOutput, 0.0);
-        }
-        mHoodAngler.setAngle(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_HOOD_ANGLE));
+//        if ( isMaxVelocity() ) {
+//            mAccelerator.set(ControlMode.PercentOutput, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY));
+//        }
+//        else {
+//            mAccelerator.set(ControlMode.PercentOutput, 0.0);
+//        }
+//        mHoodAngler.setAngle(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_HOOD_ANGLE));
+//        mShooter.getPIDController().setReference(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY), ControlType.kVelocity);
+//        mTurret.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY));
+//        mShooter.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
         mShooter.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
-        mTurret.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY));
     }
 
     @Override

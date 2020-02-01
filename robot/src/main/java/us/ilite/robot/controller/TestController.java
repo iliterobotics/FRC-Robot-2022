@@ -1,21 +1,21 @@
 package us.ilite.robot.controller;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
+import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.types.input.EInputScale;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.*;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.robot.modules.Limelight;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.EShooterSystemData;
-import us.ilite.robot.modules.HangerModule;
-import us.ilite.robot.modules.PowerCellModule;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
 import static us.ilite.common.types.drive.EDriveData.*;
@@ -32,15 +32,23 @@ public class TestController extends AbstractController {
     private PowerCellModule.EArmState mArmState;
     private double mPreviousTime;
 
+    private FlywheelModule.EShooterState mShooterState = FlywheelModule.EShooterState.STOP;
+
     public TestController() {
     }
 
     public void update(double pNow) {
-        updateLimelightTargetLock();
-        updateDrivetrain(pNow);
-        updateFlywheel(pNow);
-        updateIntake(pNow);
-        updateHanger(pNow);
+        System.out.println(db.driverinput);
+        System.out.println(db.operatorinput);
+        if (db.driverinput.isSet(ELogitech310.A_BTN)) {
+            mLog.error("-------------------------------------------------- YEAH I EXIST");
+            db.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, 0.25);
+        }
+//        updateLimelightTargetLock();
+//        updateDrivetrain(pNow);
+//        updateFlywheel(pNow);
+//        updateIntake(pNow);
+//        updateHanger(pNow);
 //        updateArm(pNow);
     }
     private void updateHanger(double pNow){
@@ -64,41 +72,41 @@ public class TestController extends AbstractController {
         }
     }
 
-    void updateFlywheel(double pNow) {
-//        if (!db.driverinput.isSet(InputMap.DRIVER.FLYWHEEL_AXIS) ) {
+    private void updateFlywheel(double pNow) {
+        if (!db.driverinput.isSet(InputMap.DRIVER.FLYWHEEL_AXIS) ) {
 //            mTurretMode = FlywheelModule.ETurretMode.LIMELIGHT;
 //            mHoodState = FlywheelModule.EHoodState.ADJUSTABLE;
 //            mAcceleratorState = FlywheelModule.EAcceleratorState.FEED;
-//            mShooterState = FlywheelModule.EShooterState.SHOOT;
-//        }
-//        else {
+            mShooterState = FlywheelModule.EShooterState.SHOOT;
+        }
+        else {
 //            mTurretMode = FlywheelModule.ETurretMode.GYRO;
 //            mAcceleratorState = FlywheelModule.EAcceleratorState.STOP;
-//            mShooterState = FlywheelModule.EShooterState.STOP;
+            mShooterState = FlywheelModule.EShooterState.STOP;
 //            mHoodState = FlywheelModule.EHoodState.STATIONARY;
-//        }
-//
+        }
+
 //        switch(mAcceleratorState) {
 //            case FEED: db.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, FlywheelModule.kAcceleratorTargetVelocity);
 //                break;
 //            case STOP: db.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, 0.0);
 //                break;
 //        }
-//
+
 //        switch(mTurretMode) {
 //            case GYRO: db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-2 * mTurretGyro.getCompassHeading(), pNow - mPreviousTime));
 //                break;
 //            case LIMELIGHT:
-//                if ( db.limelight.isSet(ETargetingData.tx)) {
+//                if ( db.limelight.isSet(ELimelightData.TX)) {
 //                    db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-10 * db.limelight.get(ETargetingData.tx), pNow - mPreviousTime));
 //                }
 //                break;
 //        }
-//
+
 //        switch(mShooterState) {
 //            case SHOOT:
-//                if ( db.limelight.isSet(ETargetingData.ty)) {
-//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooter.calcSpeedFromDistance(db.limelight.get(ETargetingData.calcDistToTarget)));
+//                if ( db.limelight.isSet(ELimelightData.TX)) {
+//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooter.calcSpeedFromDistance(db.limelight.get(ELimelightData.calcDistToTarget)));
 //                }
 //                else {
 //                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooterPid.calculate(Settings.ShooterSystem.kShooterTargetVelocity, 0.5));
@@ -107,7 +115,7 @@ public class TestController extends AbstractController {
 //            case STOP: db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
 //                break;
 //        }
-//
+
 //        switch(mHoodState) {
 //            case STATIONARY: db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
 //                break;
@@ -123,7 +131,7 @@ public class TestController extends AbstractController {
 //            mAccelerator.set(ControlMode.PercentOutput, db.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
 //        }
         mPreviousTime = pNow;
-        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
+//        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
 
     public void updateLimelightTargetLock() {
