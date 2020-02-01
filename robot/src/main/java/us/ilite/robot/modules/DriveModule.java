@@ -65,6 +65,11 @@ public class DriveModule extends Loop {
 	public static ProfileGains kYawGains = new ProfileGains().f(.15);
 	public static double kDriveLinearPercentOutputLimit = 0.5;
 
+	// =============================================================================
+	// Hold Gains
+	// =============================================================================
+	public static ProfileGains kHoldPositionGains = new ProfileGains().p(.05).d(.0079);
+
 	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
 			/* Left */
 			CURRENT1,
@@ -85,6 +90,9 @@ public class DriveModule extends Loop {
 
 	private PIDController mTargetAngleLockPid;
 	private PIDController mYawPid;
+	private PIDController mHoldPositionPid;
+	private boolean mHoldPosition;
+	private boolean mStartHoldingPosition;
 	private double mCurrentHeading;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
@@ -111,6 +119,13 @@ public class DriveModule extends Loop {
 									Settings.Drive.kMaxHeadingChange,
 									Settings.kControlLoopPeriod);
 		mYawPid.setOutputRange(-1, 1);
+
+		mHoldPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
+//		mHoldPositionPid.setOutputRange(-1, 1);
+		mHoldPositionPid.setSetpoint(0.0);
+
+		mHoldPosition = false;
+		mStartHoldingPosition = false;
 
 		mDriveHardware.zero();
 	  	setDriveMessage(DriveMessage.kNeutral);
@@ -151,21 +166,40 @@ public class DriveModule extends Loop {
 
 	@Override
 	public void setOutputs(double pNow) {
+		mHoldPosition = Robot.DATA.drivetrain.get(SHOULD_HOLD_POSITION) == 1.0;
         if(mDriveState != EDriveState.NORMAL) {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
-			double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-			double mThrottle = Robot.DATA.drivetrain.get(DESIRED_THROTTLE);
-			DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
-			SmartDashboard.putNumber("DESIRED YAW", (Robot.DATA.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange));
-			SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-			((NeoDriveHardware)mDriveHardware).setTarget(driveMessage.getLeftOutput() * Settings.Drive.kDriveTrainMaxVelocity, driveMessage.getRightOutput() * Settings.Drive.kDriveTrainMaxVelocity);//Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
-}
+        	if (mHoldPosition) {
+				System.out.println(Robot.DATA.drivetrain.get(LEFT_POS_INCHES));
+        		if (!mStartHoldingPosition) {
+					mHoldPositionPid.setSetpoint(Robot.DATA.drivetrain.get(LEFT_POS_INCHES));
+					mStartHoldingPosition = true;
+				}
+//				if (Robot.DATA.drivetrain.get(LEFT_VEL_TICKS) != 0.0 || Robot.DATA.drivetrain.get(RIGHT_VEL_TICKS) != 0.0) {
+//					((NeoDriveHardware)mDriveHardware).setTarget(0.0, 0.0);
+//				} else {
+					if (Math.abs(Robot.DATA.drivetrain.get(LEFT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
+						double output = mHoldPositionPid.calculate(Robot.DATA.drivetrain.get(LEFT_POS_INCHES), pNow);
+						System.out.println("\nOUTPUT " + output + "\n");
+						((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
+//					}
+				}
+			} else {
+        		mStartHoldingPosition = false;
+				double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
+				double mThrottle = Robot.DATA.drivetrain.get(DESIRED_THROTTLE);
+				DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
+				SmartDashboard.putNumber("DESIRED YAW", (Robot.DATA.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange));
+				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
+				((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput()); //Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
+			}
+		}
 
 		mPreviousHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
-				mPreviousTime = pNow;
-				}
+		mPreviousTime = pNow;
+	}
 
 @Override
 	public void shutdown(double pNow) {

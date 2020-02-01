@@ -74,7 +74,7 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         If the driver started the commands that the superstructure is running and then released the button,
         stop running commands.
         */
-        updateDriveTrain();
+//        updateDriveTrain();
 
 
     }
@@ -86,30 +86,26 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
 
-        if (throttle == 0.0 && rotate != 0.0) {
-            throttle += 0.01;
+        if (throttle == 0.0 && rotate == 0.0) {
+//            Robot.DATA.drivetrain.set(EDriveData.DESIRED_DRIVE_STATE, (double) EDriveState.HOLD.ordinal());
+
+        } else {
+//            Robot.DATA.drivetrain.set(EDriveData.DESIRED_DRIVE_STATE, (double) EDriveState.NORMAL.ordinal());
+            if (throttle == 0.0 && rotate != 0.0) {
+                throttle += 0.01;
+            }
+            //		    throttle = EInputScale.EXPONENTIAL.map(throttle, 2);
+            rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
+            rotate *= Settings.Input.kNormalPercentThrottleReduction;
+
+            if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.SUB_WARP_AXIS) && Robot.DATA.driverinput.get(InputMap.DRIVER.SUB_WARP_AXIS) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
+                throttle *= Settings.Input.kSnailModePercentThrottleReduction;
+                rotate *= Settings.Input.kSnailModePercentRotateReduction;
+            }
+
+            Robot.DATA.drivetrain.set(EDriveData.DESIRED_TURN, rotate);
+            Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE, throttle);
         }
-        //		    throttle = EInputScale.EXPONENTIAL.map(throttle, 2);
-        rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
-        rotate *= Settings.Input.kNormalPercentThrottleReduction;
-
-        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.SUB_WARP_AXIS) && Robot.DATA.driverinput.get(InputMap.DRIVER.SUB_WARP_AXIS) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
-            throttle *= Settings.Input.kSnailModePercentThrottleReduction;
-            rotate *= Settings.Input.kSnailModePercentRotateReduction;
-        }
-
-        Robot.DATA.drivetrain.set(EDriveData.DESIRED_TURN, rotate);
-        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE, throttle);
-
-//        DriveMessage driveMessage = new DriveMessage().throttle(throttle).turn(rotate).mode(PERCENT_OUTPUT).normalize();//.calculateCurvature();
-//        double leftSetpoint = driveMessage.getLeftOutput();
-//        double rightSetpoint = driveMessage.getRightOutput();
-//        leftSetpoint = Math.abs(leftSetpoint) > 0.01 ? leftSetpoint : 0.0; //Handling Deadband
-//        rightSetpoint = Math.abs(rightSetpoint) > 0.01 ? rightSetpoint : 0.0; //Handling Deadband
-//        Robot.DATA.drivetrain.set(EDriveData.LEFT_DEMAND, leftSetpoint * Settings.Drive.kDriveTrainMaxVelocity);
-//        Robot.DATA.drivetrain.set(EDriveData.RIGHT_DEMAND, rightSetpoint * Settings.Drive.kDriveTrainMaxVelocity);
-
-
 
     }
 

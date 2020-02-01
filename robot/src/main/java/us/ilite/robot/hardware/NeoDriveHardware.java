@@ -108,8 +108,8 @@ public class NeoDriveHardware implements IDriveHardware {
     }
 
     public void setTarget(double pLeftPercentMaxVelocity, double pRightPercentMaxVelocity) {
-        mLeftMaster.getPIDController().setReference(pLeftPercentMaxVelocity, ControlType.kVelocity, 1, 0);
-        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity, ControlType.kVelocity, 1, 0);
+        mLeftMaster.getPIDController().setReference(pLeftPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
+        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
     }
 
     /**

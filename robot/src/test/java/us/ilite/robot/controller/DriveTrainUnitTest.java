@@ -51,7 +51,7 @@ public class DriveTrainUnitTest {
 //        try {
             Assert.assertTrue(
                     "Normalized Driver Inputs not <= 1.0" + pMessage,
-                    abs(db.drivetrain.get(THROTTLE)) + abs(db.drivetrain.get(TURN)) <= 1.0
+                    abs(db.drivetrain.get(DESIRED_THROTTLE)) + abs(db.drivetrain.get(DESIRED_TURN)) <= 1.0
             );
 //        } catch(ComparisonFailure e) {
 //            System.out.println(e.getMessage());
