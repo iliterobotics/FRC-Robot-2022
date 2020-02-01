@@ -93,7 +93,7 @@ public class DriveModule extends Module {
 	private double mCurrentHeading;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
-	private Codex<Double, EDriveData> 
+	private Codex<Double, EDriveData> driveCodex = Robot.DATA.drivetrain;
 
 	public DriveModule() {
 		if(AbstractSystemSettingsUtils.isPracticeBot()) {
@@ -132,25 +132,25 @@ public class DriveModule extends Module {
 
 	@Override
 	public void readInputs(double pNow) {
-		Robot.DATA.drivetrain.set(LEFT_POS_INCHES, mDriveHardware.getLeftInches());
-		Robot.DATA.drivetrain.set(RIGHT_POS_INCHES, mDriveHardware.getRightInches());
-		Robot.DATA.drivetrain.set(LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
-		Robot.DATA.drivetrain.set(RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
-		Robot.DATA.drivetrain.set(LEFT_VEL_TICKS, mDriveHardware.getLeftVelTicks());
-		Robot.DATA.drivetrain.set(RIGHT_VEL_TICKS, mDriveHardware.getRightVelTicks());
-		Robot.DATA.drivetrain.set(LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
-		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
-		Robot.DATA.drivetrain.set(LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
-		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
-		Robot.DATA.drivetrain.set(LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
-		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
+		driveCodex.set(LEFT_POS_INCHES, mDriveHardware.getLeftInches());
+		driveCodex.set(RIGHT_POS_INCHES, mDriveHardware.getRightInches());
+		driveCodex.set(LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
+		driveCodex.set(RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
+		driveCodex.set(LEFT_VEL_TICKS, mDriveHardware.getLeftVelTicks());
+		driveCodex.set(RIGHT_VEL_TICKS, mDriveHardware.getRightVelTicks());
+		driveCodex.set(LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
+		driveCodex.set(RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
+		driveCodex.set(LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
+		driveCodex.set(RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
+		driveCodex.set(LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
+		driveCodex.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 
 		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
 		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
 
 		try {
-			mYawPid.setSetpoint(Robot.DATA.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
+			mYawPid.setSetpoint(driveCodex.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
 		} catch (NullPointerException ne) {
 			mYawPid.setSetpoint(0.0);
 //			System.out.println("0.0");
@@ -159,22 +159,22 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs(double pNow) {
-		mHoldPosition = Robot.DATA.drivetrain.get(SHOULD_HOLD_POSITION) == 1.0;
+		mHoldPosition = driveCodex.get(SHOULD_HOLD_POSITION) == 1.0;
 		if (mDriveState != EDriveState.NORMAL) {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
 			if (mHoldPosition) {
-				System.out.println(Robot.DATA.drivetrain.get(LEFT_POS_INCHES));
+				System.out.println(driveCodex.get(LEFT_POS_INCHES));
 				if (!mStartHoldingPosition) {
-					mHoldPositionPid.setSetpoint(Robot.DATA.drivetrain.get(LEFT_POS_INCHES));
+					mHoldPositionPid.setSetpoint(driveCodex.get(LEFT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
-				if (Math.abs(Robot.DATA.drivetrain.get(LEFT_VEL_TICKS)) != 0.0 || Math.abs(Robot.DATA.drivetrain.get(RIGHT_VEL_TICKS)) != 0.0) {
+				if (Math.abs(driveCodex.get(LEFT_VEL_TICKS)) != 0.0 || Math.abs(driveCodex.get(RIGHT_VEL_TICKS)) != 0.0) {
 //					((NeoDriveHardware)mDriveHardware).setTarget(0.0, 0.0);
 //				} else {
-					if (Math.abs(Robot.DATA.drivetrain.get(LEFT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
-						double output = mHoldPositionPid.calculate(Robot.DATA.drivetrain.get(LEFT_POS_INCHES), pNow);
+					if (Math.abs(driveCodex.get(LEFT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
+						double output = mHoldPositionPid.calculate(driveCodex.get(LEFT_POS_INCHES), pNow);
 						System.out.println("\nOUTPUT " + output + "\n");
 						((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
 					}
@@ -182,11 +182,11 @@ public class DriveModule extends Module {
 				} else {
 					mStartHoldingPosition = false;
 					double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-					double mThrottle = Robot.DATA.drivetrain.get(DESIRED_THROTTLE);
+					double mThrottle = driveCodex.get(DESIRED_THROTTLE);
 					DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
-					SmartDashboard.putNumber("DESIRED YAW", (Robot.DATA.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange));
+					SmartDashboard.putNumber("DESIRED YAW", (driveCodex.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange));
 					SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-					((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput()); //Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
+					((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput()); //driveCodex.get(LEFT_DEMAND), driveCodex.get(RIGHT_DEMAND));
 				}
 			}
 
