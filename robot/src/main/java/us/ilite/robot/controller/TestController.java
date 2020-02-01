@@ -20,10 +20,10 @@ public class TestController extends AbstractController {
     private PIDController mTurretPid;
     private PIDController mShooterPid;
 
-    private FlywheelModule.EShooterState mShooterState;
-    private FlywheelModule.EAcceleratorState mAcceleratorState;
-    private FlywheelModule.ETurretMode mTurretMode;
-    private FlywheelModule.EHoodState mHoodState;
+    private FlywheelModule.EShooterState mShooterState = FlywheelModule.EShooterState.STOP; // FINISHED FOR NOW ( CHANGE TO TALONFX )
+    private FlywheelModule.EAcceleratorState mAcceleratorState = FlywheelModule.EAcceleratorState.STOP; // FINISHED FOR NOW ( CHANGE TO CANSPARKMAX )
+    private FlywheelModule.ETurretMode mTurretMode = FlywheelModule.ETurretMode.GYRO; // TEST IT WHEN LIMELIGHT MOVED AND GYRO IMPLEMENTED
+    private FlywheelModule.EHoodState mHoodState = FlywheelModule.EHoodState.STATIONARY; // TEST WHEN LIMELIGHT REMOUNTED
 
     private double mPreviousTime;
 
@@ -35,7 +35,7 @@ public class TestController extends AbstractController {
     }
 
     public void update(double pNow) {
-        if (!Robot.DATA.driverinput.get(InputMap.OPERATOR.SHOOT).equals(0.0) ) {
+        if (!Robot.DATA.attackdriverinput.get(InputMap.DRIVER.FLYWHEEL_AXIS).equals(0.0) ) {
             mTurretMode = FlywheelModule.ETurretMode.LIMELIGHT;
             mHoodState = FlywheelModule.EHoodState.ADJUSTABLE;
             mAcceleratorState = FlywheelModule.EAcceleratorState.FEED;
@@ -67,11 +67,11 @@ public class TestController extends AbstractController {
 
         switch(mShooterState) {
             case SHOOT:
-                if ( Robot.DATA.limelight.isSet(ETargetingData.tx)) {
+                if ( Robot.DATA.limelight.isSet(ETargetingData.ty)) {
                     Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooter.calcSpeedFromDistance(Robot.DATA.limelight.get(ETargetingData.calcDistToTarget)));
                 }
                 else {
-                    Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooterPid.calculate(Settings.ShooterSystem.kShooterTargetVelocity, pNow - mPreviousTime));
+                    Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooterPid.calculate(Settings.ShooterSystem.kShooterTargetVelocity, 0.5));
                 }
                 break;
             case STOP: Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
@@ -90,10 +90,6 @@ public class TestController extends AbstractController {
                 }
         }
         mPreviousTime = pNow;
-
-        SmartDashboard.putNumber("Flywheel Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
-        SmartDashboard.putNumber("Turret Mode", Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_MODE));
-        SmartDashboard.putNumber("Accelerator Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY));
-        SmartDashboard.putNumber("Hood Angle", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_HOOD_ANGLE));
+        mLog.error("-------------------------------------------------------Flywheel Velocity: ", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
 }

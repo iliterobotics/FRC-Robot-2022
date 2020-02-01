@@ -15,6 +15,7 @@ import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 import static us.ilite.robot.hardware.ECommonControlMode.*;
 
+import us.ilite.common.types.input.ELogitechAttack3;
 import us.ilite.robot.modules.Module;
 import us.ilite.robot.modules.*;
 
@@ -38,6 +39,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     private boolean mIsCargo = false;
     private Joystick mDriverJoystick;
     private Joystick mOperatorJoystick;
+    private Joystick mAttackDriver;
+    private Joystick mAttackOperator;
 
     protected Codex<Double, ELogitech310> mDriverInputCodex, mOperatorInputCodex;
 
@@ -59,6 +62,8 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
         } else {
             this.mDriverJoystick = new Joystick(0);
             this.mOperatorJoystick = new Joystick(1);
+            this.mAttackDriver = new Joystick(2);
+            this.mAttackOperator = new Joystick(3);
         }
     }
 
@@ -72,21 +77,13 @@ public class DriverInput extends Module implements IThrottleProvider, ITurnProvi
     public void readInputs(double pNow) {
         ELogitech310.map(mData.driverinput, mDriverJoystick);
         ELogitech310.map(mData.operatorinput, mOperatorJoystick);
+        ELogitechAttack3.map(Robot.DATA.attackdriverinput, mAttackDriver);
+        ELogitechAttack3.map(Robot.DATA.attackoperatorinput, mAttackOperator);
     }
 
     @Override
     public void setOutputs(double pNow) {
-        updateShooter();
         updateDriveTrain();
-    }
-
-    private void updateShooter() {
-//        if (mDriverInputCodex.isSet(InputMap.DRIVER.SHOOT)) {
-//        }
-//        else {
-//            mShooter.setShooterState(FlywheelModule.EShooterState.STOP);
-//        }
-//        mShooter.isGyro = !mDriverInputCodex.isSet(InputMap.DRIVER.TARGET_LOCK);
     }
 
     private void updateDriveTrain() {

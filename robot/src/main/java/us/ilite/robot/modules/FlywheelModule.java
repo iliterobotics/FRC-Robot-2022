@@ -6,12 +6,16 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Servo;
+import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.ETrackingType;
+import us.ilite.common.types.input.ELogitech310;
+import us.ilite.common.types.input.ELogitechAttack3;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
@@ -93,6 +97,9 @@ public class FlywheelModule extends Module {
         }
         else {
             mAccelerator.set(ControlMode.PercentOutput, 0.0);
+        }
+        if ( Robot.DATA.attackoperatorinput.isSet(ELogitechAttack3.TRIGGER)) {
+            mAccelerator.set(ControlMode.PercentOutput, Robot.DATA.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
         }
         mHoodAngler.setAngle(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_HOOD_ANGLE));
         mShooter.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));

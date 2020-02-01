@@ -7,6 +7,7 @@ import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
+import us.ilite.common.types.input.ELogitechAttack3;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 
@@ -28,6 +29,8 @@ public class Data {
     public final Codex<Double, EGyro> imu = Codex.of.thisEnum(EGyro.class);
     public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
+    public final Codex<Double, ELogitechAttack3> attackdriverinput = Codex.of.thisEnum(ELogitechAttack3.class);
+    public final Codex<Double, ELogitechAttack3> attackoperatorinput = Codex.of.thisEnum(ELogitechAttack3.class);
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
     public final Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
 

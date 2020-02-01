@@ -2,6 +2,7 @@ package us.ilite.common.config;
 
 
 import us.ilite.common.types.input.ELogitech310;
+import us.ilite.common.types.input.ELogitechAttack3;
 
 public class InputMap {
     public static class DRIVER {
@@ -9,6 +10,9 @@ public class InputMap {
         TURN_AXIS = ELogitech310.RIGHT_X_AXIS,
         THROTTLE_AXIS = ELogitech310.LEFT_Y_AXIS,
         SUB_WARP_AXIS = ELogitech310.LEFT_TRIGGER_AXIS;
+
+        public static final ELogitechAttack3
+        FLYWHEEL_AXIS = ELogitechAttack3.Z_AXIS;
     }
 
     public static class OPERATOR {
