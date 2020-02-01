@@ -13,19 +13,17 @@ public class HangerModule extends Module {
 
     private CANSparkMax mHangerNeoOne;
     private CANSparkMax mHangerNeoTwo;
-    private Data mData;
 
     private EHangerState mHangerState;
     private CANPIDController mHangerPID;
     private CANPIDController mHangerPID2;
-    private double k_P;
-    private double k_I;
-    private double k_D;
+    private double k_P = 0.5; //Change later
+    private double k_I = 0.5; //Change later
+    private double k_D = 0.5; //Change later
 
 
-    public HangerModule(Data pData){
+    public HangerModule(){
 
-        this.mData = pData;
         mHangerNeoOne = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID1 , CANSparkMaxLowLevel.MotorType.kBrushless);
         mHangerNeoTwo= SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID2 , CANSparkMaxLowLevel.MotorType.kBrushless);
         mHangerPID = new CANPIDController(mHangerNeoOne);
@@ -48,17 +46,24 @@ public class HangerModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , (double) returnHangerState().ordinal() );
-        Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , (double) returnHangerState().ordinal() );
+//        Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , (double) returnHangerState().ordinal() );
+//        Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , (double) returnHangerState().ordinal() );
 
         Robot.DATA.hanger.set(EHangerModuleData.CURRENT_HANGER_POWER1 , mHangerNeoOne.getOutputCurrent());
         Robot.DATA.hanger.set(EHangerModuleData.CURRENT_HANGER_POWER2 , mHangerNeoTwo.getOutputCurrent());
     }
+    
+    public void modeInit(){
+        mHangerPID.setP(k_P);
+        mHangerPID.setP(k_I);
+        mHangerPID.setP(k_D);
+
+    }
 
     @Override
     public void setOutputs(double pNow) {
-        mHangerNeoOne.set(EHangerState.values()[mData.hanger.get(EHangerModuleData.DESIRED_HANGER_POWER1).intValue()].getPower());
-        mHangerNeoTwo.set(EHangerState.values()[mData.hanger.get(EHangerModuleData.DESIRED_HANGER_POWER2).intValue()].getPower());
+        mHangerNeoOne.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_HANGER_POWER1));
+        mHangerNeoTwo.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_HANGER_POWER2));
 
     }
 
