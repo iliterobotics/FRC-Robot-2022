@@ -27,13 +27,13 @@ public class TestController extends AbstractController {
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
 
-        db.drivetrain.set(SHOULD_HOLD_POSITION, 0.0);//(throttle == 0.0 && rotate == 0.0) ? 1.0 : 0.0);
+        db.drivetrain.set(SHOULD_HOLD_POSITION, (throttle == 0.0 && rotate == 0.0) ? 1.0 : 0.0);
 
-//        if (throttle == 0.0 && rotate == 0.0) {
-//            db.drivetrain.set(DESIRED_THROTTLE, 0.0);
-//            db.drivetrain.set(DESIRED_TURN, 0.0);
-//        } else {
-//            db.drivetrain.set(SHOULD_HOLD_POSITION, 0.0);
+        if (throttle == 0.0 && rotate == 0.0) {
+            db.drivetrain.set(DESIRED_THROTTLE, 0.0);
+            db.drivetrain.set(DESIRED_TURN, 0.0);
+        } else {
+            db.drivetrain.set(SHOULD_HOLD_POSITION, 0.0);
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.03;
             }
@@ -46,7 +46,7 @@ public class TestController extends AbstractController {
             }
             db.drivetrain.set(DESIRED_THROTTLE, -throttle);
             db.drivetrain.set(DESIRED_TURN, rotate);
-//        }
+        }
 
     }
 

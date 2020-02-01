@@ -68,7 +68,7 @@ public class DriveModule extends Loop {
 	// =============================================================================
 	// Hold Gains
 	// =============================================================================
-	public static ProfileGains kHoldPositionGains = new ProfileGains().p(.05).d(.0079);
+	public static ProfileGains kHoldPositionGains = new ProfileGains().p(.05).d(.00807);
 
 	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
 			/* Left */
@@ -177,15 +177,15 @@ public class DriveModule extends Loop {
 					mHoldPositionPid.setSetpoint(Robot.DATA.drivetrain.get(LEFT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
-//				if (Robot.DATA.drivetrain.get(LEFT_VEL_TICKS) != 0.0 || Robot.DATA.drivetrain.get(RIGHT_VEL_TICKS) != 0.0) {
+				if (Math.abs(Robot.DATA.drivetrain.get(LEFT_VEL_TICKS)) != 0.0 || Math.abs(Robot.DATA.drivetrain.get(RIGHT_VEL_TICKS)) != 0.0) {
 //					((NeoDriveHardware)mDriveHardware).setTarget(0.0, 0.0);
 //				} else {
 					if (Math.abs(Robot.DATA.drivetrain.get(LEFT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
 						double output = mHoldPositionPid.calculate(Robot.DATA.drivetrain.get(LEFT_POS_INCHES), pNow);
 						System.out.println("\nOUTPUT " + output + "\n");
 						((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
-//					}
-				}
+					}
+//				}
 			} else {
         		mStartHoldingPosition = false;
 				double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);

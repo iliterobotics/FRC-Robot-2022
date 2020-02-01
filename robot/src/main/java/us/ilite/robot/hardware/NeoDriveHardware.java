@@ -208,12 +208,17 @@ public class NeoDriveHardware implements IDriveHardware {
         reloadVelocityGains(talon);
     }
 
+    private void configureAllForSmartMotion() {
+
+    }
+
     public double getLeftInches() {
         return DriveModule.Conversions.ticksToInches(mLeftMaster.getEncoder().getPosition());
     }
 
     public double getRightInches() {
         return DriveModule.Conversions.ticksToInches(mRightMaster.getEncoder().getPosition());
+        
     }
 
     public double getLeftVelTicks() {
