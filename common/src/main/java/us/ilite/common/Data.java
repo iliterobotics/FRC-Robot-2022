@@ -6,7 +6,7 @@ import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.io.CodexNetworkTables;
 import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.types.EFlywheelData;
-import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.EHangerSystemData;
 import us.ilite.common.types.ETargetingData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
@@ -33,7 +33,7 @@ public class Data {
     public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
     public final Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
-    public final Codex<Double , EHangerModuleData> hanger = Codex.of.thisEnum(EHangerModuleData.class);
+    public final Codex<Double , EHangerSystemData> hanger = Codex.of.thisEnum(EHangerSystemData.class);
 
     public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
     public final Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
