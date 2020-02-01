@@ -1,5 +1,6 @@
 package us.ilite.robot.controller;
 
+import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
@@ -142,7 +143,7 @@ public class TestController extends AbstractController {
                     Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
                 }
             } else {
-                   Robot.DATA.selectedTarget.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
+                Robot.DATA.selectedTarget.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
             }
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
             Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL.id());
@@ -152,13 +153,13 @@ public class TestController extends AbstractController {
             Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_TRI.id());
         }
         else {
-                Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double)Limelight.NONE.id());
+            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double)Limelight.NONE.id());
 //            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
         }
         if (!(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()).equals(mLastTrackingType) )
                 && !(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) == Limelight.NONE.id())) {
-                mLog.error("Requesting command start");
-                mLog.error("Stopping teleop command queue");
+            mLog.error("Requesting command start");
+            mLog.error("Stopping teleop command queue");
 //            mTeleopCommandManager.stopRunningCommands(pNow);
 //            mTeleopCommandManager.startCommands(new LimelightTargetLock(mDrive, mLimelight, 2, mTrackingType, this, false).setStopWhenTargetLost(false));
         }
@@ -229,7 +230,25 @@ public class TestController extends AbstractController {
         if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
             int i = (int)(double)db.color.get(EColorData.SENSED_COLOR);
             DJSpinnerModule.EColorMatch m = DJSpinnerModule.EColorMatch.values()[i];
-            if(m.color.equals(db.DJ_COLOR)) {
+            Color DJ_COLOR = null;
+            switch (db.recieveColorFmsRelay()) {
+                case 'B':
+                    DJ_COLOR = DJSpinnerModule.EColorMatch.BLUE.color;
+                    break;
+                case 'G':
+                    DJ_COLOR = DJSpinnerModule.EColorMatch.GREEN.color;
+                    break;
+                case 'R':
+                    DJ_COLOR = DJSpinnerModule.EColorMatch.RED.color;
+                    break;
+                case 'Y':
+                    DJ_COLOR = DJSpinnerModule.EColorMatch.YELLOW.color;
+                    break;
+                default:
+                    DJ_COLOR = null;
+                    break;
+            }
+            if(m.color.equals(DJ_COLOR)) {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
             } else {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);

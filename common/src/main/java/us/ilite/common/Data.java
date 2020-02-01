@@ -3,6 +3,7 @@ package us.ilite.common;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.types.*;
@@ -25,6 +26,7 @@ import java.util.List;
 public class Data {
 
     private final ILog mLogger = Logger.createLog(Data.class);
+    public Color DJ_COLOR;
     
     //Add new codexes here as we need more
 
@@ -40,8 +42,6 @@ public class Data {
     public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
     public final Codex<Double, EShooterSystemData> flywheel = Codex.of.thisEnum(EShooterSystemData.class);
     public final Codex<Double, EColorData> color = Codex.of.thisEnum(EColorData.class);
-
-    public Color DJ_COLOR = Color.kAzure;
 
     public final Codex[] mAllCodexes = new Codex[] {
             imu,
@@ -127,4 +127,15 @@ public class Data {
             }
         }
     }
+
+    public char recieveColorFmsRelay() {
+        String gameData;
+        gameData = DriverStation.getInstance().getGameSpecificMessage();
+        if(gameData.length() > 0) {
+            return gameData.charAt(0);
+        } else {
+            return '\u1000';
+        }
+    }
+
 }
