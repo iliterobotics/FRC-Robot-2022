@@ -150,11 +150,11 @@ public class Robot extends TimedRobot {
     public void testInit() {
         mActiveController = mTestController;
         mRunningModules.clearModules();
-        mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mLimelight);
-        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
-        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mOI);
+//        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mIntake);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
