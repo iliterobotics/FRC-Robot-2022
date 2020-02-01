@@ -150,7 +150,7 @@ public class TalonSRXFactory {
 
         // victor.setControlFramePeriod(ControlFrame.Control_3_General, config.CONTROL_FRAME_PERIOD_MS);
 
-        return victor; 
+        return victor;
     }
 
     public static TalonSRX createTalon(int id, Configuration config) {

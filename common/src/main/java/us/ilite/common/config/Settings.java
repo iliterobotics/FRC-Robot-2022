@@ -1,6 +1,7 @@
 package us.ilite.common.config;
 
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.NetworkTablesConstantsBase;
 import us.ilite.common.lib.util.Units;
@@ -29,10 +30,6 @@ public class Settings extends NetworkTablesConstantsBase {
     public static class PowerCellModule {
         public static double kIntakeTalonPower = 1d;
         public static double kForStopTalon = 0d;
-        public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
-        public static int kTalonOneID = 3; // Change later
-        public static int kTalonTwoID = 7; // Change later
-        public static int kTalonThreeID = 5; // Change later
         public static int kBeamChannel1; // Change later
         public static int kBeamChannel2; // Change later
         public static int kBeamChannel3; // Change later
@@ -60,6 +57,15 @@ public class Settings extends NetworkTablesConstantsBase {
 
 
         public static class CAN {
+            public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
+            public static int kTalonOneID = 3; // Change later
+            public static int kTalonTwoID = 7; // Change later
+            public static int kTalonThreeID = 5; // Change later
+            public static final int kTurretGyroID = 1; // There isn't a gyro on the BunnyBot
+            public static final int kShooterID = 16; // BunnyBot Shooter
+            public static final int kAcceleratorID = 11; // BunnyBot Conveyor
+            public static final int kAnglerID = 9; // BunnyBot Catapult
+            public static final int kTurretID = 9; // BunnyBot Hopper
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
@@ -127,10 +133,6 @@ public class Settings extends NetworkTablesConstantsBase {
         public static int kJoystickPortOperator = 1;
         public static int kJoystickPortTester = 2;
     }
-
-    public static List<ELogitech310> kTeleopCommandTriggers = Arrays.asList(InputMap.DRIVER.TRACK_TARGET_BTN,
-                                                                            InputMap.DRIVER.TRACK_CARGO_BTN,
-                                                                            InputMap.DRIVER.TRACK_HATCH_BTN);
 
     public static List<ELogitech310> kAutonOverrideTriggers = Arrays.asList(InputMap.DRIVER.THROTTLE_AXIS,
                                                                             InputMap.DRIVER.TURN_AXIS);

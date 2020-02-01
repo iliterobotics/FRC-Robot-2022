@@ -88,11 +88,11 @@ public class PowerCellModule extends Module {
     public PowerCellModule() {
         mIntakeState = EIntakeState.STOP;
         mArmState = EArmState.DISENGAGED;
-        mCANMotor = SparkMaxFactory.createDefaultSparkMax( Settings.PowerCellModule.kCANIntakeID ,
+        mCANMotor = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kCANIntakeID ,
                 CANSparkMaxLowLevel.MotorType.kBrushless );
-        mTalonOne = TalonSRXFactory.createDefaultTalon( Settings.PowerCellModule.kTalonOneID );
-        mTalonTwo = TalonSRXFactory.createDefaultTalon( Settings.PowerCellModule.kTalonTwoID );
-        mTalonThree = TalonSRXFactory.createDefaultTalon( Settings.PowerCellModule.kTalonThreeID );
+        mTalonOne = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonOneID );
+        mTalonTwo = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonTwoID );
+        mTalonThree = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonThreeID );
 
         mArmMotor = SparkMaxFactory.createDefaultSparkMax( Settings.PowerCellModule.kArmNEOAdress ,
                 CANSparkMaxLowLevel.MotorType.kBrushless);

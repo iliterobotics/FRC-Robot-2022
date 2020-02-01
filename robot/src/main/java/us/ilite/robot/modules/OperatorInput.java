@@ -13,11 +13,8 @@ public class OperatorInput extends Module {
             DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
     private ILog mLog = Logger.createLog(OperatorInput.class);
 
-
     private Joystick mDriverJoystick;
     private Joystick mOperatorJoystick;
-
-
 
     protected Codex<Double, ELogitech310> mDriverInputCodex, mOperatorInputCodex;
 
