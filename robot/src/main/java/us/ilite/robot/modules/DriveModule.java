@@ -9,14 +9,11 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.lib.util.SimpleNetworkTable;
-import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ETargetingData;
-import static us.ilite.common.types.ETargetingData.*;
+import us.ilite.common.types.ELimelightData;
+import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -24,15 +21,13 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.*;
 import us.ilite.robot.loops.Loop;
 
-import java.io.OutputStream;
-
 /**
  * Class for running all drivetrain train control operations from both autonomous and
  * driver-control.
  * TODO Support for rotation trajectories
  * TODO Turn-to-heading with Motion Magic
  */
-public class DriveModule extends Loop {
+public class DriveModule extends Module {
 	private final ILog mLogger = Logger.createLog(DriveModule.class);
 
 	public static double kGearboxRatio = (12.0 / 80.0) * (42.0 / 80.0);
@@ -167,13 +162,13 @@ public class DriveModule extends Loop {
 	@Override
 	public void setOutputs(double pNow) {
 		mHoldPosition = Robot.DATA.drivetrain.get(SHOULD_HOLD_POSITION) == 1.0;
-        if(mDriveState != EDriveState.NORMAL) {
+		if (mDriveState != EDriveState.NORMAL) {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
-        	if (mHoldPosition) {
+			if (mHoldPosition) {
 				System.out.println(Robot.DATA.drivetrain.get(LEFT_POS_INCHES));
-        		if (!mStartHoldingPosition) {
+				if (!mStartHoldingPosition) {
 					mHoldPositionPid.setSetpoint(Robot.DATA.drivetrain.get(LEFT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
@@ -186,39 +181,38 @@ public class DriveModule extends Loop {
 						((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
 					}
 //				}
-			} else {
-        		mStartHoldingPosition = false;
-				double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-				double mThrottle = Robot.DATA.drivetrain.get(DESIRED_THROTTLE);
-				DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
-				SmartDashboard.putNumber("DESIRED YAW", (Robot.DATA.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange));
-				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-				((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput()); //Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
+				} else {
+					mStartHoldingPosition = false;
+					double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
+					double mThrottle = Robot.DATA.drivetrain.get(DESIRED_THROTTLE);
+					DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
+					SmartDashboard.putNumber("DESIRED YAW", (Robot.DATA.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange));
+					SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
+					((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput()); //Robot.DATA.drivetrain.get(LEFT_DEMAND), Robot.DATA.drivetrain.get(RIGHT_DEMAND));
+				}
 			}
-		}
 
-		mPreviousHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
-		mPreviousTime = pNow;
+			mPreviousHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
+			mPreviousTime = pNow;
+		}
 	}
 
-@Override
 	public void shutdown(double pNow) {
 		mDriveHardware.zero();
 	}
 
-	@Override
 	public void loop(double pNow) {
 //		mUpdateTimer.start();
 		switch(mDriveState) {
 			case PATH_FOLLOWING:
 			case TARGET_ANGLE_LOCK:
 
-				Codex<Double, ETargetingData> targetData = Robot.DATA.limelight;
+				Codex<Double, ELimelightData> targetData = Robot.DATA.limelight;
 				double pidOutput;
-				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(tv) && targetData.get(tx) != null) {
+				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.get(TX) != null) {
 
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(tx), pNow - mPreviousTime);
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 
 					mDriveMessage = new DriveMessage().throttle(mTargetTrackingThrottle).turn(pidOutput).calculateCurvature();

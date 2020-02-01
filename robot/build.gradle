@@ -119,4 +119,11 @@ tasks.withType(Test) {
             }
         }
     }
+
+    test {
+        useJUnit {
+            includeCategories 'us.ilite.CriticalTest'
+            excludeCategories 'us.ilite.RegularTest'
+        }
+    }
 }
