@@ -20,7 +20,6 @@ public class TestController extends AbstractController {
     private ILog mLog = Logger.createLog(this.getClass());
 
 
-    private PowerCellModule mIntake;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
 
@@ -37,7 +36,7 @@ public class TestController extends AbstractController {
     }
 
     void updateFlywheel(double pNow) {
-//        if (!Robot.DATA.driverinput.isSet(InputMap.DRIVER.FLYWHEEL_AXIS) ) {
+//        if (!db.driverinput.isSet(InputMap.DRIVER.FLYWHEEL_AXIS) ) {
 //            mTurretMode = FlywheelModule.ETurretMode.LIMELIGHT;
 //            mHoodState = FlywheelModule.EHoodState.ADJUSTABLE;
 //            mAcceleratorState = FlywheelModule.EAcceleratorState.FEED;
@@ -51,51 +50,51 @@ public class TestController extends AbstractController {
 //        }
 //
 //        switch(mAcceleratorState) {
-//            case FEED: Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, FlywheelModule.kAcceleratorTargetVelocity);
+//            case FEED: db.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, FlywheelModule.kAcceleratorTargetVelocity);
 //                break;
-//            case STOP: Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, 0.0);
+//            case STOP: db.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, 0.0);
 //                break;
 //        }
 //
 //        switch(mTurretMode) {
-//            case GYRO: Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-2 * mTurretGyro.getCompassHeading(), pNow - mPreviousTime));
+//            case GYRO: db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-2 * mTurretGyro.getCompassHeading(), pNow - mPreviousTime));
 //                break;
 //            case LIMELIGHT:
-//                if ( Robot.DATA.limelight.isSet(ETargetingData.tx)) {
-//                    Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-10 * Robot.DATA.limelight.get(ETargetingData.tx), pNow - mPreviousTime));
+//                if ( db.limelight.isSet(ETargetingData.tx)) {
+//                    db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-10 * db.limelight.get(ETargetingData.tx), pNow - mPreviousTime));
 //                }
 //                break;
 //        }
 //
 //        switch(mShooterState) {
 //            case SHOOT:
-//                if ( Robot.DATA.limelight.isSet(ETargetingData.ty)) {
-//                    Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooter.calcSpeedFromDistance(Robot.DATA.limelight.get(ETargetingData.calcDistToTarget)));
+//                if ( db.limelight.isSet(ETargetingData.ty)) {
+//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooter.calcSpeedFromDistance(db.limelight.get(ETargetingData.calcDistToTarget)));
 //                }
 //                else {
-//                    Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooterPid.calculate(Settings.ShooterSystem.kShooterTargetVelocity, 0.5));
+//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooterPid.calculate(Settings.ShooterSystem.kShooterTargetVelocity, 0.5));
 //                }
 //                break;
-//            case STOP: Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
+//            case STOP: db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
 //                break;
 //        }
 //
 //        switch(mHoodState) {
-//            case STATIONARY: Robot.DATA.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
+//            case STATIONARY: db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
 //                break;
 //            case ADJUSTABLE:
-//                if (Robot.DATA.limelight.isSet(ETargetingData.ty)) {
-//                    Robot.DATA.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, mShooter.calcAngleFromDistance(Robot.DATA.limelight.get(ETargetingData.calcDistToTarget), Robot.DATA.limelight.get(ETargetingData.ty)));
+//                if (db.limelight.isSet(ETargetingData.ty)) {
+//                    db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, mShooter.calcAngleFromDistance(db.limelight.get(ETargetingData.calcDistToTarget), db.limelight.get(ETargetingData.ty)));
 //                }
 //                else {
-//                    Robot.DATA.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
+//                    db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
 //                }
 //        }
-//        if ( Robot.DATA.attackoperatorinput.isSet(ELogitechAttack3.TRIGGER)) {
-//            mAccelerator.set(ControlMode.PercentOutput, Robot.DATA.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
+//        if ( db.attackoperatorinput.isSet(ELogitechAttack3.TRIGGER)) {
+//            mAccelerator.set(ControlMode.PercentOutput, db.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
 //        }
         mPreviousTime = pNow;
-        mLog.error("-------------------------------------------------------Flywheel Velocity: ", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
+        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
 
     void updateDrivetrain(double pNow) {
@@ -119,44 +118,45 @@ public class TestController extends AbstractController {
 
 
     private void updateIntake(double pNow) {
-        if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
             mLog.error("--------------INTAKE IS BEING PRESSED----------");
             mIntakeState = PowerCellModule.EIntakeState.INTAKE;
-        } else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
             mIntakeState = PowerCellModule.EIntakeState.REVERSE;
         } else {
             mIntakeState = PowerCellModule.EIntakeState.STOP;
         }
         switch (mIntakeState) {
             case INTAKE:
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 1.0);
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 1.0);
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 1.0);
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 1.0);
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 1.0);
+                db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 1.0);
                 break;
             case REVERSE:
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , -1.0);
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , -1.0);
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , -1.0);
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , -1.0);
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , -1.0);
+                db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , -1.0);
                 break;
             case STOP:
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 0.0);
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 0.0);
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 0.0);
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 0.0);
+                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 0.0);
+                db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 0.0);
                 break;
         }
     }
+
     public void updateArm(double pNow) {
-        if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
             mArmState = PowerCellModule.EArmState.ENGAGED;
         } else {
             mArmState = PowerCellModule.EArmState.DISENGAGED;
         }
         switch (mArmState) {
             case ENGAGED:
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 1.0);
+                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 1.0);
                 break;
             case DISENGAGED:
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 0.0);
+                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 0.0);
                 break;
         }
         //TODO default state

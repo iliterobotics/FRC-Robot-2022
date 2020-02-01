@@ -38,6 +38,17 @@ public class PowerCellModule extends Module {
     //Array of beam-breakers (Used when indexing PowerCells)
     //private DigitalBeamSensor[] mDigitalBeamSensors;
 
+    public static double kIntakeTalonPower = 1d;
+    public static double kForStopTalon = 0d;
+    public static double kIntakePower = 1.0;
+    public static double kForStop = 1.0;
+    public static double kPowerCellP;
+    public static double kPowerCellI;
+    public static double kPowerCellD;
+    public static double kPowerCellF;
+    public static double kWarnCurrentLimitThreshold = 30; //Tune this later
+    public static double kArmPowerEngaged = 1.0;
+    public static double kArmPowerDisengaged = 0.0;
     //Intake state
     private EIntakeState mIntakeState;
 
@@ -94,7 +105,7 @@ public class PowerCellModule extends Module {
         mTalonTwo = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonTwoID );
         mTalonThree = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonThreeID );
 
-        mArmMotor = SparkMaxFactory.createDefaultSparkMax( Settings.PowerCellModule.kArmNEOAdress ,
+        mArmMotor = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kArmNEOAdress ,
                 CANSparkMaxLowLevel.MotorType.kBrushless);
 
 //        mBeamBreaker1 = new DigitalBeamSensor( Settings.PowerCellModule.kBeamChannel1 );
@@ -159,10 +170,10 @@ public class PowerCellModule extends Module {
 //        mCANMotor.set(1.0);
         switch (mArmState) {
             case ENGAGED:
-                mArmMotor.set( Settings.PowerCellModule.kArmCANPowerEngaged);
+                mArmMotor.set( kArmPowerEngaged);
                 break;
             case DISENGAGED:
-                mArmMotor.set( -Settings.PowerCellModule.kArmCANPowerDisengaged);
+                mArmMotor.set( -kArmPowerDisengaged);
                 break;
         }
 
@@ -211,7 +222,7 @@ public class PowerCellModule extends Module {
     }
 
     public boolean isCurrentLimiting(){
-        return Robot.DATA.pdp.get(EPowerDistPanel.CURRENT5) > Settings.PowerCellModule.kWarnCurrentLimitThreshold;
+        return Robot.DATA.pdp.get(EPowerDistPanel.CURRENT5) > kWarnCurrentLimitThreshold;
     }
 
 
