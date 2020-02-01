@@ -134,40 +134,40 @@ public class TestController extends AbstractController {
 
     public void updateLimelightTargetLock() {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-            if (Robot.DATA.selectedTarget.get(ELimelightData.ty) != null) {
-                SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.calcDistToTarget));
+            if (Robot.DATA.selectedTarget.get(ELimelightData.TY) != null) {
+                SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
             }
-            Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) Field2020.FieldElement.TARGET.ordinal() );
+            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
-            if (Robot.DATA.selectedTarget.get(ELimelightData.ty) != null) {
-                if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.tx)) < mLimelightZoomThreshold) {
-                    Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) Field2020.FieldElement.TARGET_ZOOM.ordinal());
+            if (Robot.DATA.selectedTarget.get(ELimelightData.TY) != null) {
+                if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
+                    Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET_ZOOM.id());
                     System.out.println("ZOOMING");
                 } else {
-                    Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) Field2020.FieldElement.TARGET.ordinal() );
+                    Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
                 }
             } else {
-                   Robot.DATA.selectedTarget.set(ELimelightData.TRACKING_TYPE, (double) Field2020.FieldElement.TARGET.ordinal());
+                   Robot.DATA.selectedTarget.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
             }
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
-            Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) Field2020.FieldElement.BALL.ordinal());
+            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL.id());
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
-            Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) Field2020.FieldElement.BALL_DUAL.ordinal());
+            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_DUAL.id());
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
-            Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double) Field2020.FieldElement.BALL_TRI.ordinal());
+            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_TRI.id());
         }
         else {
-                Robot.DATA.limelight.set(ELimelightData.TRACKING_TYPE, (double)Limelight.NONE.id());
+                Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double)Limelight.NONE.id());
 //            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
         }
-        if (!(Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE.ordinal()).equals(mLastTrackingType) )
-                && !(Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE.ordinal()) == Limelight.NONE.id())) {
+        if (!(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()).equals(mLastTrackingType) )
+                && !(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) == Limelight.NONE.id())) {
                 mLog.error("Requesting command start");
                 mLog.error("Stopping teleop command queue");
 //            mTeleopCommandManager.stopRunningCommands(pNow);
 //            mTeleopCommandManager.startCommands(new LimelightTargetLock(mDrive, mLimelight, 2, mTrackingType, this, false).setStopWhenTargetLost(false));
         }
-        mLastTrackingType =  Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE.ordinal());
+        mLastTrackingType =  Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
 
     void updateDrivetrain(double pNow) {
@@ -177,7 +177,7 @@ public class TestController extends AbstractController {
         if (throttle == 0.0 && rotate != 0.0) {
             throttle += 0.03;
         }
-        var d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
+        DriveMessage d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
         throttle = d.getThrottle();
         rotate = d.getTurn();
         if (db.driverinput.isSet(SUB_WARP_AXIS) && db.driverinput.get(SUB_WARP_AXIS) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {

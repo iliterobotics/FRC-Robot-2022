@@ -2,7 +2,6 @@ package us.ilite.robot.modules;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import us.ilite.common.IFieldComponent;
 import us.ilite.common.types.ELimelightData;
 import static us.ilite.common.types.ERawLimelightData.*;
@@ -58,11 +57,10 @@ public class GroundTracking extends Module {
             Robot.DATA.rawLimelight.set(tvert1, mTable.getEntry("tvert1").getDouble(Double.NaN));
             Robot.DATA.rawLimelight.set(tvert2, mTable.getEntry("tvert2").getDouble(Double.NaN));
 
-            Robot.DATA.rawLimelight.set(targetOrdinal, Robot.DATA.limelight.get(ELimelightData.targetOrdinal));
-            Robot.DATA.rawLimelight.set(calcDistToTarget, Robot.DATA.limelight.get(ELimelightData.calcDistToTarget));
-            Robot.DATA.rawLimelight.set(calcAngleToTarget, Robot.DATA.limelight.get(ELimelightData.calcAngleToTarget));
+            Robot.DATA.rawLimelight.set(calcDistToTarget, Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
+            Robot.DATA.rawLimelight.set(calcAngleToTarget, Robot.DATA.limelight.get(ELimelightData.CALC_ANGLE_TO_TARGET));
 
-            if (Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE) != null) {
+            if (Robot.DATA.limelight.get(ELimelightData.TARGET_ID) != null) {
              //   Commented out for now until issue with enums isnt fixed
             //    Optional<Translation2d> p = Robot.DATA.limelight.get((Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE));
           //      if (p.isPresent()) {

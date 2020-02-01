@@ -18,16 +18,16 @@ public class WaitForVisionTarget implements ICommand {
 
     @Override
     public void init(double pNow) {
-        mLimelight.setTracking(null);
+//        mLimelight.setTracking(null);
     }
 
     @Override
     public boolean update(double pNow) {
 
         // If target is valid
-        if(mData.limelight.isSet(ELimelightData.tv)) {
+        if(mData.limelight.isSet(ELimelightData.TV)) {
             // If area above threshold exit command
-            if(mData.limelight.get(ELimelightData.ta) > mTargetAreaThreshold) {
+            if(mData.limelight.get(ELimelightData.TA) > mTargetAreaThreshold) {
                 return true;
             }
         }
@@ -37,6 +37,6 @@ public class WaitForVisionTarget implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-        mLimelight.setTracking(null);
+//        mLimelight.setTracking(null);
     }
 }

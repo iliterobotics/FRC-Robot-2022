@@ -61,7 +61,7 @@ public interface ITargetDataProvider {
         // called for the first time
 
         double d = (getCameraHeightIn() - targetHeight) / 
-            Math.tan( getCameraAngleDeg() - getTargetingData().get(ELimelightData.ty) ) -
+            Math.tan( getCameraAngleDeg() - getTargetingData().get(ELimelightData.TY) ) -
             getCameraToBumperIn();
 
         return d;
@@ -97,7 +97,7 @@ public interface ITargetDataProvider {
 
 
         // get the skew angle and figure out which conversion to use
-        double ts = getTargetingData().get(ELimelightData.ts);
+        double ts = getTargetingData().get(ELimelightData.TS);
 
         if ( ts <= 0.0 && ts > -45.0 ) {
             // left hand angle

@@ -60,18 +60,18 @@ public class TargetLock implements ICommand {
 
         mDrive.setTargetTrackingThrottle(mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
 
-        if(currentData != null && currentData.isSet(ELimelightData.tv) && currentData.get(ELimelightData.tx) != null) {
+        if(currentData != null && currentData.isSet(ELimelightData.TV) && currentData.get(ELimelightData.TX) != null) {
             mHasAcquiredTarget = true;
 
             mAlignedCount++;
-            if(mEndOnAlignment && Math.abs(currentData.get(ELimelightData.tx)) < mAllowableError && mAlignedCount > kAlignCount) {
+            if(mEndOnAlignment && Math.abs(currentData.get(ELimelightData.TX)) < mAllowableError && mAlignedCount > kAlignCount) {
                 System.out.println("FINISHED");
                 // Zero drivetrain outputs in shutdown()
                 return true;
             }
 
         // If we've already seen the target and lose tracking, exit.
-        } else if(mHasAcquiredTarget && !currentData.isSet(ELimelightData.tv)) {
+        } else if(mHasAcquiredTarget && !currentData.isSet(ELimelightData.TV)) {
             return true;
         }
 //        if(!mHasAcquiredTarget){
