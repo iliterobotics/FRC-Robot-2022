@@ -23,6 +23,8 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.*;
 import us.ilite.robot.loops.Loop;
 
+import java.util.Set;
+
 /**
  * Class for running all drivetrain train control operations from both autonomous and
  * driver-control.
@@ -93,7 +95,7 @@ public class DriveModule extends Module {
 	private double mCurrentHeading;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
-	private Codex<Double, EDriveData> driveCodex = Robot.DATA.drivetrain;
+//	private Codex<Double, EDriveData> db.drivetrain = Robot.DATA.drivetrain;
 
 	public DriveModule() {
 		if(AbstractSystemSettingsUtils.isPracticeBot()) {
@@ -125,61 +127,55 @@ public class DriveModule extends Module {
 		mStartHoldingPosition = false;
 
 		mDriveHardware.zero();
-//		zero();
 	  	setDriveMessage(DriveMessage.kNeutral);
 	  	setDriveState(EDriveState.NORMAL);
+	  	db.drivetrain.set(DESIRED_THROTTLE, 0.0);
+	  	db.drivetrain.set(DESIRED_TURN, 0.0);
 	}
 
 	@Override
 	public void readInputs(double pNow) {
-		driveCodex.set(LEFT_POS_INCHES, mDriveHardware.getLeftInches());
-		driveCodex.set(RIGHT_POS_INCHES, mDriveHardware.getRightInches());
-		driveCodex.set(LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
-		driveCodex.set(RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
-		driveCodex.set(LEFT_VEL_TICKS, mDriveHardware.getLeftVelTicks());
-		driveCodex.set(RIGHT_VEL_TICKS, mDriveHardware.getRightVelTicks());
-		driveCodex.set(LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
-		driveCodex.set(RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
-		driveCodex.set(LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
-		driveCodex.set(RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
-		driveCodex.set(LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
-		driveCodex.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
+		db.drivetrain.set(LEFT_POS_INCHES, mDriveHardware.getLeftInches());
+		db.drivetrain.set(RIGHT_POS_INCHES, mDriveHardware.getRightInches());
+		db.drivetrain.set(LEFT_VEL_IPS, mDriveHardware.getLeftVelInches());
+		db.drivetrain.set(RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
+		db.drivetrain.set(LEFT_VEL_TICKS, mDriveHardware.getLeftVelTicks());
+		db.drivetrain.set(RIGHT_VEL_TICKS, mDriveHardware.getRightVelTicks());
+		db.drivetrain.set(LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
+		db.drivetrain.set(RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
+		db.drivetrain.set(LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
+		db.drivetrain.set(RIGHT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
+		db.drivetrain.set(LEFT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
+		db.drivetrain.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 
 		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
 
 		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
-
-		try {
-			mYawPid.setSetpoint(driveCodex.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
-		} catch (NullPointerException ne) {
-			System.out.println("NULL");
-			mYawPid.setSetpoint(0.0);
-		}
 	}
 
 	@Override
 	public void setOutputs(double pNow) {
-		mHoldPosition = driveCodex.get(SHOULD_HOLD_POSITION) == 1.0;
+		mHoldPosition = db.drivetrain.get(SHOULD_HOLD_POSITION) == 1.0;
 		if (mDriveState != EDriveState.NORMAL) {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
 			if (mHoldPosition) {
-				System.out.println(driveCodex.get(LEFT_POS_INCHES));
+				System.out.println(db.drivetrain.get(RIGHT_POS_INCHES));//LEFT_POS_INCHES));
 				if (!mStartHoldingPosition) {
-					mHoldPositionPid.setSetpoint(driveCodex.get(LEFT_POS_INCHES));
+					mHoldPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));//LEFT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
-				if (Math.abs(driveCodex.get(LEFT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
-					double output = mHoldPositionPid.calculate(driveCodex.get(LEFT_POS_INCHES), pNow);
+				if (Math.abs(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
+					double output = mHoldPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
 					((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
 				}
 			} else {
-				System.out.println("NOT HOLDING");;
 				mStartHoldingPosition = false;
+				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
 				double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-				double mThrottle = driveCodex.get(DESIRED_THROTTLE);
+				double mThrottle = db.drivetrain.get(DESIRED_THROTTLE);
 				DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
@@ -249,8 +245,8 @@ public class DriveModule extends Module {
 
 
 	public synchronized void zero() {
-		driveCodex.set(DESIRED_THROTTLE, 0.0);
-		driveCodex.set(DESIRED_TURN, 0.0);
+		db.drivetrain.set(DESIRED_THROTTLE, 0.0);
+		db.drivetrain.set(DESIRED_TURN, 0.0);
 	}
 
 	private void setDriveState(EDriveState pDriveState) {

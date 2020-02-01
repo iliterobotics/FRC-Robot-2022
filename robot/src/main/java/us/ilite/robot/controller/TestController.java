@@ -188,7 +188,6 @@ public class TestController extends AbstractController {
                 throttle *= Settings.Input.kSnailModePercentThrottleReduction;
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
             }
-            System.out.println("SETTING DESIRED TURN");
             db.drivetrain.set(DESIRED_THROTTLE, throttle);
             db.drivetrain.set(DESIRED_TURN, rotate);
         }
