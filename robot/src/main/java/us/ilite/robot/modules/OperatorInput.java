@@ -18,6 +18,7 @@ public class OperatorInput extends Module {
     public OperatorInput() {
         mDriverJoystick = new Joystick(0);
         mOperatorJoystick = new Joystick(1);
+
     }
 
     @Override
