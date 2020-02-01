@@ -6,6 +6,7 @@ import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.io.CodexNetworkTables;
 import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.types.*;
+import us.ilite.common.lib.util.SimpleNetworkTable;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
@@ -30,21 +31,22 @@ public class Data {
     public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
     public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
-    public final Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
+    public Codex<Double, ETargetingData> limelight = Codex.of.thisEnum(ETargetingData.class);
+    public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
+    public Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
 
     public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
-    public final Codex<Double, EFlywheelData> flywheel = Codex.of.thisEnum(EFlywheelData.class);
     public final Codex<Double, EColorWheelData> colorwheel = Codex.of.thisEnum(EColorWheelData.class);
-    public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
-    public final Codex<Double, EHangerData> hanger = Codex.of.thisEnum(EHangerData.class);
+//    public final Codex<Double, EPowerCellData> powercells = Codex.of.thisEnum(EPowerCellData.class);
+    public final Codex<Double, EHangerData> hanger  = Codex.of.thisEnum(EHangerData.class);
 
 
     public final Codex[] mAllCodexes = new Codex[] {
-            imu, /*drivetrain,*/ driverinput, operatorinput, pdp, /*limelight,*/
+            imu, /*drivetrain,*/ driverinput, operatorinput, pdp, powercell /*limelight,*/
     };
 
     public final Codex[] mLoggedCodexes = new Codex[] {
-        imu, drivetrain, driverinput, /*operatorinput,*/  pdp, limelight
+        imu, drivetrain, driverinput, /*operatorinput,*/  pdp, limelight, powercell
     };
 
     public final Codex[] mDisplayedCodexes = new Codex[] {
