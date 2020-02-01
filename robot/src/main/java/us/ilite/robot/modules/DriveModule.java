@@ -116,9 +116,8 @@ public class DriveModule extends Module {
 		mYawPid.setOutputRange(-1, 1);
 
 		mHoldPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-//		mHoldPositionPid.setOutputRange(-1, 1);
+		mHoldPositionPid.setOutputRange(-1, 1);
 		mHoldPositionPid.setSetpoint(0.0);
-
 		mHoldPosition = false;
 		mStartHoldingPosition = false;
 
@@ -126,7 +125,6 @@ public class DriveModule extends Module {
 	  	setDriveMessage(DriveMessage.kNeutral);
 	  	setDriveState(EDriveState.NORMAL);
 
-//	  	startCsvLogging();
 	}
 
 	@Override
@@ -137,7 +135,6 @@ public class DriveModule extends Module {
 		Robot.DATA.drivetrain.set(RIGHT_VEL_IPS, mDriveHardware.getRightVelInches());
 		Robot.DATA.drivetrain.set(LEFT_VEL_TICKS, mDriveHardware.getLeftVelTicks());
 		Robot.DATA.drivetrain.set(RIGHT_VEL_TICKS, mDriveHardware.getRightVelTicks());
-
 		Robot.DATA.drivetrain.set(LEFT_MESSAGE_OUTPUT, mDriveMessage.getLeftOutput());
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_OUTPUT, mDriveMessage.getRightOutput());
 		Robot.DATA.drivetrain.set(LEFT_MESSAGE_CONTROL_MODE, (double)mDriveMessage.getMode().ordinal());
@@ -146,13 +143,11 @@ public class DriveModule extends Module {
 		Robot.DATA.drivetrain.set(RIGHT_MESSAGE_NEUTRAL_MODE, (double)mDriveMessage.getNeutral().ordinal());
 
 		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
-
 		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
 
 		try {
 			mYawPid.setSetpoint(Robot.DATA.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
-//			System.out.println(Robot.DATA.drivetrain.get(DESIRED_TURN));
 		} catch (NullPointerException ne) {
 			mYawPid.setSetpoint(0.0);
 //			System.out.println("0.0");

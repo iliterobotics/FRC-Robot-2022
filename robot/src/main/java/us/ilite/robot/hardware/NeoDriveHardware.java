@@ -218,7 +218,7 @@ public class NeoDriveHardware implements IDriveHardware {
 
     public double getRightInches() {
         return DriveModule.Conversions.ticksToInches(mRightMaster.getEncoder().getPosition());
-        
+
     }
 
     public double getLeftVelTicks() {
