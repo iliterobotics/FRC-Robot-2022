@@ -1,12 +1,7 @@
 package us.ilite.common.config;
 
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.NetworkTablesConstantsBase;
-import us.ilite.common.lib.util.Units;
-import us.ilite.common.types.input.ELogitech310;
-import us.ilite.common.types.sensor.EPowerDistPanel;
 
 import java.util.Arrays;
 import java.util.List;
@@ -119,11 +114,6 @@ public class Settings extends NetworkTablesConstantsBase {
         public static int kJoystickPortOperator = 1;
         public static int kJoystickPortTester = 2;
     }
-
-    public static List<ELogitech310> kAutonOverrideTriggers = Arrays.asList(InputMap.DRIVER.THROTTLE_AXIS,
-                                                                            InputMap.DRIVER.TURN_AXIS);
-    public static double kAutonOverrideAxisThreshold = 0.3;
-
 
     // =============================================================================
     // PID TargetLock constants

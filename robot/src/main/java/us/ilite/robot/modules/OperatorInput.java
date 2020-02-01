@@ -1,6 +1,5 @@
 package us.ilite.robot.modules;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.Joystick;
@@ -15,8 +14,6 @@ public class OperatorInput extends Module {
 
     private Joystick mDriverJoystick;
     private Joystick mOperatorJoystick;
-
-    protected Codex<Double, ELogitech310> mDriverInputCodex, mOperatorInputCodex;
 
     public OperatorInput() {
         mDriverJoystick = new Joystick(0);
@@ -37,13 +34,5 @@ public class OperatorInput extends Module {
     @Override
     public void setOutputs(double pNow) {
     }
-
-
-    @Override
-    public void shutdown(double pNow) {
-
-    }
-
-
 
 }

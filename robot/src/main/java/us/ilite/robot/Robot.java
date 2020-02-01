@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private DriveModule mDrive = new DriveModule();
     private Clock mClock = new Clock();
+    private RawLimelight mRawLimelight;
     public static final Data DATA = new Data();
     private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
@@ -64,6 +65,9 @@ public class Robot extends TimedRobot {
         mIntake = new PowerCellModule();
         mLimelight = new Limelight();
         mOI = new OperatorInput();
+        mLimelight = new Limelight();
+        mRawLimelight = new RawLimelight();
+
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -147,6 +151,7 @@ public class Robot extends TimedRobot {
         mActiveController = mTestController;
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
         mRunningModules.addModule(mIntake);

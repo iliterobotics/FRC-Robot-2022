@@ -13,8 +13,6 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ETargetingData;
-import us.ilite.common.types.input.ELogitechAttack3;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
