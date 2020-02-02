@@ -32,7 +32,8 @@ public class InputMap {
         public static  final ELogitech310
         OPERATOR_POSITION_CONTROL = ELogitech310.R_BTN,
         OPERATOR_ROTATION_CONTROL = ELogitech310.R_BTN,
-        SHOOT = ELogitech310.RIGHT_TRIGGER_AXIS,
+        SHOOT_FLYWHEEL = ELogitech310.RIGHT_TRIGGER_AXIS,
+        INVERSE_FLYWHEEL= ELogitech310.LEFT_TRIGGER_AXIS,
         LOCK_TARGET = ELogitech310.A_BTN,
         LOCK_CELL = ELogitech310.B_BTN,
         LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
