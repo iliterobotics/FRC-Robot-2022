@@ -179,8 +179,6 @@ public class DriveModule extends Module {
 				DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-//				System.out.println("LEFT vekcoutt --------------------- " + mDriveHardware.getLeftVelInches() + "\nRIGHT vekcokut ---------------vekcokut------ " + mDriveHardware.getRightVelInches() + "\n\n");
-				System.out.println("Lef );
 				((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput());
 			}
 			mPreviousHeading = mDriveHardware.getImu().getHeading().getDegrees();
