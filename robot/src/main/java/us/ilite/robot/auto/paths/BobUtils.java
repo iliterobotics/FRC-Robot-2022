@@ -14,6 +14,7 @@ import us.ilite.common.config.Settings;
 import static java.lang.Math.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +28,10 @@ public class BobUtils {
 
     public static double getMeters(Path pPath, Path.SegmentValue pKey, int i) {
         return pPath.getValue(i, pKey) * FEET_TO_METERS;
+    }
+
+    public static <T extends Path> List<Class<T>> getAvailablePathClasses() {
+        return null;
     }
 
     public static Map<String, Path> getAvailablePaths() {

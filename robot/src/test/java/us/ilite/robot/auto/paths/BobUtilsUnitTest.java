@@ -10,8 +10,10 @@ import us.ilite.paths.Yoink;
 import us.ilite.robot.BaseTest;
 
 import static us.ilite.robot.auto.paths.BobUtils.*;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class BobUtilsUnitTest extends BaseTest {
     private static final Path UNIT_TEST_STRAIGHT_LINE = new UNIT_TEST_STRAIGHT_LINE();
@@ -60,5 +62,12 @@ public class BobUtilsUnitTest extends BaseTest {
             System.out.println("Curvature @ " + i * 0.020d + " = " + c);
         }
 
+    }
+
+    @Test
+    public void test_getAvailablePathClasses() {
+        List<Class<Path>> availablePathClasses = getAvailablePathClasses();
+        assertNotNull(availablePathClasses);
+        assertFalse(availablePathClasses.isEmpty());
     }
 }
