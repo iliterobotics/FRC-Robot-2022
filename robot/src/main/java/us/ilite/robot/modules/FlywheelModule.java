@@ -81,7 +81,7 @@ public class FlywheelModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        desiredFlywheelVelocity = mShooterPID.calculate(kShooterTargetVelocity, pNow - mPreviousTime);
+//        desiredFlywheelVelocity = mShooterPID.calculate(kShooterTargetVelocity, pNow - mPreviousTime);
         if ( isMaxVelocity() ) {
 //            mAccelerator.set(ControlMode.PercentOutput, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY));
         }
@@ -90,7 +90,7 @@ public class FlywheelModule extends Module {
         }
         mFlywheelMaster.set(ControlMode.Velocity , Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
 //        mTurret.set(ControlMode.PercentOutput, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY));
-        mPreviousTime = pNow;
+//        mPreviousTime = pNow;
     }
 
     @Override
