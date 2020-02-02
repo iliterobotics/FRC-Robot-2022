@@ -202,8 +202,8 @@ public class DriveModule extends Module {
 				DriveMessage d = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+				mLeftCtrl.setReference(100, kVelocity, VELOCITY_PID_SLOT, 0);//d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+				mRightCtrl.setReference(100, kVelocity, VELOCITY_PID_SLOT, 0);//d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 				break;
 			case PERCENT_OUTPUT:
 				break;
