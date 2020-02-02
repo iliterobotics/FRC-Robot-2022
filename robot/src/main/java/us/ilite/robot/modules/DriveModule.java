@@ -127,7 +127,7 @@ public class DriveModule extends Module {
 
 		mDriveHardware.zero();
 	  	setDriveMessage(DriveMessage.kNeutral);
-	  	setDriveState(EDriveState.NORMAL);
+	  	mDriveState = EDriveState.NORMAL;
 	  	db.drivetrain.set(DESIRED_THROTTLE, 0.0);
 	  	db.drivetrain.set(DESIRED_TURN, 0.0);
 	}
@@ -227,30 +227,15 @@ public class DriveModule extends Module {
 	@Override
 	public boolean checkModule(double pNow) {
         return mDriveHardware.checkHardware();
-	}
-
-
-	public synchronized void zero() {
-		db.drivetrain.set(DESIRED_THROTTLE, 0.0);
-		db.drivetrain.set(DESIRED_TURN, 0.0);
-	}
-
-	private void setDriveState(EDriveState pDriveState) {
-		this.mDriveState = pDriveState;
-	}
+	} 
 
 	public synchronized void setDriveMessage(DriveMessage pDriveMessage) {
 		this.mDriveMessage = pDriveMessage;
 	}
 
-
 	public synchronized IDriveHardware getDriveHardware() {
 	    return mDriveHardware;
     }
-
-    public synchronized DriveMessage getDriveMessage() {
-		return mDriveMessage;
-	}
 
 	public boolean isCurrentLimiting() {
 		return EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots);
