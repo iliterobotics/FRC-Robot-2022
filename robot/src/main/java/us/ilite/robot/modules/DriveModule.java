@@ -1,6 +1,5 @@
 package us.ilite.robot.modules;
 
-import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
@@ -11,8 +10,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ELimelightData;
-import static us.ilite.common.types.ELimelightData.*;
+
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.sensor.EGyro;
@@ -87,7 +85,8 @@ public class DriveModule extends Module {
 
 	private PIDController mTargetAngleLockPid;
 	private PIDController mYawPid;
-	private PIDController mHoldPositionPid;
+	private PIDController mHoldLeftPositionPid;
+	private PIDController mHoldRightPositionPid;
 	private boolean mStartHoldingPosition;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
@@ -125,9 +124,12 @@ public class DriveModule extends Module {
 									Settings.kControlLoopPeriod);
 		mYawPid.setOutputRange(-1, 1);
 
-		mHoldPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-		mHoldPositionPid.setOutputRange(-1, 1);
-		mHoldPositionPid.setSetpoint(0.0);
+		mHoldLeftPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
+		mHoldLeftPositionPid.setOutputRange(-1, 1);
+		mHoldLeftPositionPid.setSetpoint(0.0);
+		mHoldRightPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
+		mHoldRightPositionPid.setOutputRange(-1, 1);
+		mHoldRightPositionPid.setSetpoint(0.0);
 		mStartHoldingPosition = false;
 		mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
 		mRightMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
@@ -178,13 +180,14 @@ public class DriveModule extends Module {
 		switch (mode) {
 			case HOLD:
 				if (!mStartHoldingPosition) {
-					mHoldPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));//LEFT_POS_INCHES));
+					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));//LEFT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
-				if (Math.abs(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
-					double output = mHoldPositionPid.calculate(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES), pNow);
-					mLeftCtrl.setReference(output * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-					mRightCtrl.setReference(output * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+				if (Math.abs(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES) - mHoldRightPositionPid.getSetpoint()) > .5) {
+					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
+					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
+					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 				}
 				break;
 			case VELOCITY:
