@@ -13,8 +13,8 @@ import static us.ilite.robot.auto.paths.BobUtils.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BobUtilsUnitTest extends BaseTest {
     private static final Path UNIT_TEST_STRAIGHT_LINE = new UNIT_TEST_STRAIGHT_LINE();
@@ -22,11 +22,20 @@ public class BobUtilsUnitTest extends BaseTest {
     private static final Path WONKY = new Wonky();
     private static final Path YOINK = new Yoink();
     private static final Path[] ANALYSIS_PATHS = new Path[] {
-        UNIT_TEST_STRAIGHT_LINE,
-        SQUIGGLE,
-        WONKY,
-        YOINK
+            UNIT_TEST_STRAIGHT_LINE,
+            SQUIGGLE,
+            WONKY,
+            YOINK
     };
+
+    private static final Set<Class<? extends Path>> PATH_CLASSES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            Loop.class,
+            OurTrench.class,
+            Squiggle.class,
+            UNIT_TEST_STRAIGHT_LINE.class,
+            Wonky.class,
+            Yoink.class
+    )));
 
     @Test
     public void testTotalTime() {
@@ -88,12 +97,24 @@ public class BobUtilsUnitTest extends BaseTest {
         assertNotNull(availablePathClasses);
         assertFalse(availablePathClasses.isEmpty());
 
-        assertTrue(availablePathClasses.contains(Loop.class));
-        assertTrue(availablePathClasses.contains(OurTrench.class));
-        assertTrue(availablePathClasses.contains(Squiggle.class));
-        assertTrue(availablePathClasses.contains(UNIT_TEST_STRAIGHT_LINE.class));
-        assertTrue(availablePathClasses.contains(Wonky.class));
-        assertTrue(availablePathClasses.contains(Yoink.class));
+        assertEquals(PATH_CLASSES.size(), availablePathClasses.size());
+        availablePathClasses.retainAll(PATH_CLASSES);
+        assertEquals(PATH_CLASSES.size(), availablePathClasses.size());
     }
+
+    @Test
+    @Category(CriticalTest.class)
+    public void test_getAvailablePaths() {
+        Map<String, Path> availablePaths = getAvailablePaths();
+        assertNotNull(availablePaths);
+        assertFalse(availablePaths.isEmpty());
+
+        Set<? extends Class<?>> loadedClasses = availablePaths.values().stream().map(Object::getClass).collect(Collectors.toSet());
+
+        assertEquals(PATH_CLASSES.size(), loadedClasses.size());
+        loadedClasses.retainAll(PATH_CLASSES);
+        assertEquals(PATH_CLASSES.size(), loadedClasses.size());
+    }
+
 
 }
