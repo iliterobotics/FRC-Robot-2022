@@ -14,7 +14,6 @@ import us.ilite.common.config.Settings;
 import static java.lang.Math.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,8 +29,12 @@ public class BobUtils {
         return pPath.getValue(i, pKey) * FEET_TO_METERS;
     }
 
-    public static <T extends Path> List<Class<T>> getAvailablePathClasses() {
-        return null;
+    public static Set<Class<? extends Path>> getAvailablePathClasses() {
+        Reflections reflections = new Reflections(Settings.AUTO_PATH_PACKAGE);
+        return getAvailablePathClasses(reflections);
+    }
+    static Set<Class<? extends Path>> getAvailablePathClasses(Reflections reflections) {
+        return reflections.getSubTypesOf(Path.class);
     }
 
     public static Map<String, Path> getAvailablePaths() {

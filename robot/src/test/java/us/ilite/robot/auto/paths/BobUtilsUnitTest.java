@@ -3,17 +3,21 @@ package us.ilite.robot.auto.paths;
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import us.ilite.CriticalTest;
 import us.ilite.paths.Squiggle;
 import us.ilite.paths.UNIT_TEST_STRAIGHT_LINE;
 import us.ilite.paths.Wonky;
 import us.ilite.paths.Yoink;
 import us.ilite.robot.BaseTest;
+import org.reflections.Reflections;
 
 import static us.ilite.robot.auto.paths.BobUtils.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class BobUtilsUnitTest extends BaseTest {
     private static final Path UNIT_TEST_STRAIGHT_LINE = new UNIT_TEST_STRAIGHT_LINE();
@@ -65,9 +69,11 @@ public class BobUtilsUnitTest extends BaseTest {
     }
 
     @Test
+    @Category(CriticalTest.class)
     public void test_getAvailablePathClasses() {
-        List<Class<Path>> availablePathClasses = getAvailablePathClasses();
+        Reflections reflection = mock(Reflections.class);
+        Set<Class<? extends Path>> availablePathClasses = getAvailablePathClasses(reflection);
         assertNotNull(availablePathClasses);
-        assertFalse(availablePathClasses.isEmpty());
+        assertTrue(availablePathClasses.isEmpty());
     }
 }
