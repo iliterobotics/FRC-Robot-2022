@@ -168,10 +168,10 @@ public class PowerCellModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        mSerializer.set(db.powercell.get(EPowerCellData.CURRENT_INTAKE_VELOCITY_FT_S));
-        mConveyorMotorHorizontal.set(ControlMode.Velocity, db.powercell.get(EPowerCellData.CURRENT_H_VELOCITY));
-        mConveyorMotorVertical.set(ControlMode.Velocity, db.powercell.get(EPowerCellData.CURRENT_V_VELOCITY));
-        mArmEncoder.setPosition(db.powercell.get(EPowerCellData.CURRENT_ARM_ANGLE));
+        mSerializer.set(db.powercell.get(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S));
+        mConveyorMotorHorizontal.set(ControlMode.Velocity, db.powercell.get(EPowerCellData.DESIRED_H_VELOCITY));
+        mConveyorMotorVertical.set(ControlMode.Velocity, db.powercell.get(EPowerCellData.DESIRED_V_VELOCITY));
+        mArmEncoder.setPosition(db.powercell.get(EPowerCellData.DESIRED_ARM_ANGLE));
 //        isCurrentLimiting();
 //        startIndexing();
     }

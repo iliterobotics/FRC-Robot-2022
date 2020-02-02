@@ -1,6 +1,6 @@
 package us.ilite.common.types;
 
-public enum EPowerCellData {
+import com.flybotix.hfr.codex.CodexOf;
 
 public enum EPowerCellData implements CodexOf<Double> {
 

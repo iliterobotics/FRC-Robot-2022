@@ -36,12 +36,12 @@ public class TestController extends AbstractController {
     }
 
     public void update(double pNow) {
-        updateLimelightTargetLock();
-        updateDrivetrain(pNow);
-        updateFlywheel(pNow);
+//        updateLimelightTargetLock();
+//        updateDrivetrain(pNow);
+//        updateFlywheel(pNow);
         updateIntake(pNow);
-        updateHanger(pNow);
-        updateDJBooth();
+//        updateHanger(pNow);
+//        updateDJBooth();
 //        updateArm(pNow);
     }
 
@@ -216,8 +216,8 @@ public class TestController extends AbstractController {
             db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
 
             if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.INDEXING.ordinal()) {
-                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
-                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, mIntakeState.getPower());
+                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, -mIntakeState.getPower());
+                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, -mIntakeState.getPower());
             }
 
             db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
@@ -225,14 +225,6 @@ public class TestController extends AbstractController {
         } else {
             mIntakeState = PowerCellModule.EIntakeState.STOP;
             mArmState = PowerCellModule.EArmState.DISENGAGED;
-
-            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
-
-            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.NOT_INDEXING.ordinal()) {
-                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
-                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, mIntakeState.getPower());
-            }
-
             db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
         }
 
@@ -250,30 +242,30 @@ public class TestController extends AbstractController {
 
 
 
-    void updateDJBooth() {
-        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
-            DJSpinnerModule.EColorMatch m =db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
-            if(m.color.equals(db.DJ_COLOR)) {
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
-            } else {
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.POSITION.ordinal());
-            }
-        }
-
-        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL)) {
-
-            if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.sTARGET_ROTATION_COUNT) {
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.OFF.ordinal());
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
-            } else {
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.ROTATION.ordinal());
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.power);
-            }
-        }
-
-
-
+//    void updateDJBooth() {
+//        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
+//            DJSpinnerModule.EColorMatch m =db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
+//            if(m.color.equals(db.DJ_COLOR)) {
+//                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
+//            } else {
+//                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);
+//                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.POSITION.ordinal());
+//            }
+//        }
+//
+//        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL)) {
+//
+//            if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.sTARGET_ROTATION_COUNT) {
+//                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.OFF.ordinal());
+//                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
+//            } else {
+//                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.ROTATION.ordinal());
+//                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.power);
+//            }
+//        }
+//
+//
+//
 //        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL) &&
 //                db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL) ) {
 //            db.color.set(EColorData.POSITION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
@@ -302,21 +294,21 @@ public class TestController extends AbstractController {
 //            db.color.set(EColorData.ROTATION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
 //        }
 
-    }
-
-    public void updateArm(double pNow) {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
-            mArmState = PowerCellModule.EArmState.ENGAGED;
-        } else {
-            mArmState = PowerCellModule.EArmState.DISENGAGED;
-        }
-        switch (mArmState) {
-                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 1.0);
-                break;
-            case DISENGAGED:
-                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 0.0);
-                break;
-        }
-        //TODO default state
-    }
+//    }
+//
+//    public void updateArm(double pNow) {
+//        if (db.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
+//            mArmState = PowerCellModule.EArmState.ENGAGED;
+//        } else {
+//            mArmState = PowerCellModule.EArmState.DISENGAGED;
+//        }
+//        switch (mArmState) {
+//                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 1.0);
+//                break;
+//            case DISENGAGED:
+//                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 0.0);
+//                break;
+//        }
+//        TODO default state
+//    }
 }
