@@ -157,7 +157,7 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs(double pNow) {
-		mHoldPosition = false;//db.drivetrain.get(SHOULD_HOLD_POSITION) == 1.0;
+		mHoldPosition = db.drivetrain.get(SHOULD_HOLD_POSITION) == 1.0;
 		if (mDriveState != EDriveState.NORMAL) {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
