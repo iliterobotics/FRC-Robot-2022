@@ -26,24 +26,30 @@ public class TestController extends AbstractController {
     private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.NOT_HANGING;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
+    private FlywheelModule mFlywheel = new FlywheelModule();
     private double mPreviousTime;
 
     public TestController() {
     }
 
     public void update(double pNow) {
-        System.out.println(db.driverinput);
-        System.out.println(db.operatorinput);
-        updateLimelightTargetLock();
-        updateDrivetrain(pNow);
-        updateFlywheel(pNow);
-        updateIntake(pNow);
-        updateHanger(pNow);
-        updateDJBooth();
-        updateArm(pNow);
+        if (db.driverinput.isSet(ELogitech310.A_BTN)) {
+            System.out.println(db.driverinput);
+            System.out.println(db.operatorinput);
+            mLog.error("-------------------------------------------------- YEAH I EXIST");
+            Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY , 0.07);
+            SmartDashboard.putNumber("current velocity of falcon" , Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
+        }
+//        updateLimelightTargetLock();
+//        updateDrivetrain(pNow);
+//        updateFlywheel(pNow);
+//        updateIntake(pNow);
+//        updateHanger(pNow);
+//        updateDJBooth();
+//        updateArm(pNow);
     }
 
-    private void updateHanger(double pNow){
+    private void updateHanger (double pNow ) {
         if (db.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
             db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
             db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
@@ -66,11 +72,11 @@ public class TestController extends AbstractController {
 
     private void updateFlywheel(double pNow) {
         if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
-            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.1);
-            db.flywheel.set(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY, 0.1);
+            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.5);
+            db.flywheel.set(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY, 0.5);
         } else {
-            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
-            db.flywheel.set(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY, 0.0);
+            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.5);
+            db.flywheel.set(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY, 0.5);
         }
 
         if (db.operatorinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS)) {
