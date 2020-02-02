@@ -1,19 +1,14 @@
 package us.ilite.robot.modules;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import us.ilite.common.Field2020;
 import us.ilite.common.IFieldComponent;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.targetData.ITargetDataProvider;
-
-import java.util.Optional;
 
 import static us.ilite.common.types.ERawLimelightData.*;
 
@@ -69,7 +64,7 @@ public class RawLimelight extends Module{
 
     @Override
     public void readInputs(double pNow) {
-        mVisionTarget = Field2020.FieldElement.values()[Robot.DATA.rawLimelight.get(TARGET_ID).intValue()];
+        mVisionTarget = Field2020.FieldElement.values()[(int) Robot.DATA.rawLimelight.get(TARGET_ID)];
 
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
         Robot.DATA.rawLimelight.set(TV, targetValid ? 1.0d : null);
@@ -128,21 +123,6 @@ public class RawLimelight extends Module{
         setStreamMode();
         setSnapshotMode();
         setPipeline();
-    }
-
-    @Override
-    public RobotCodex<ELimelightData> getTargetingData() {
-        return null;
-    }
-
-    @Override
-    public double getCameraHeightIn() {
-        return 0;
-    }
-
-    @Override
-    public double getCameraAngleDeg() {
-        return 0;
     }
 
     private void setPipeline() {
