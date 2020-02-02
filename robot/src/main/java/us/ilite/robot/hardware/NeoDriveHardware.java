@@ -46,7 +46,7 @@ public class NeoDriveHardware implements IDriveHardware {
         configureMotor(mRightMiddle);
 
         mLeftMaster.setInverted(true);
-        mLeftMiddle.setInverted(false);
+        mLeftMiddle.setInverted(true);
 
         mRightMaster.setInverted(false);
         mRightMiddle.setInverted(false);
