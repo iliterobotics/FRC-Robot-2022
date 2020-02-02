@@ -53,7 +53,7 @@ public class TargetLock implements ICommand {
         mAlignedCount = 0;
 
         Robot.DATA.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.TARGET_ANGLE_LOCK);
-        Robot.DATA.drivetrain.set(EDriveData.TARGET_TRACKING_THROTTLE, 0.0);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.0);
 
         this.mPreviousTime = pNow;
     }
@@ -62,7 +62,7 @@ public class TargetLock implements ICommand {
     public boolean update(double pNow) {
         RobotCodex<ELimelightData> currentData = mCamera.getTargetingData();
 
-        Robot.DATA.drivetrain.set(EDriveData.TARGET_TRACKING_THROTTLE, mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
 
         if(currentData != null && currentData.isSet(ELimelightData.TV) && currentData.isSet(ELimelightData.TX)) {
             mHasAcquiredTarget = true;
@@ -100,7 +100,6 @@ public class TargetLock implements ICommand {
     @Override
     public void shutdown(double pNow) {
         Robot.DATA.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.NORMAL);
-        mDrive.setDriveMessage(DriveMessage.kNeutral);
     }
 
     public TargetLock setTargetLockThrottleProvider(IThrottleProvider pThrottleProvider) {

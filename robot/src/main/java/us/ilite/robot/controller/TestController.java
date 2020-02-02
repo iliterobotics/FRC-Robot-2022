@@ -2,7 +2,6 @@ package us.ilite.robot.controller;
 
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
@@ -22,12 +21,11 @@ import static us.ilite.common.types.drive.EDriveData.*;
 public class TestController extends AbstractController {
 
     private ILog mLog = Logger.createLog(TestController.class);
-    private Double mLastTrackingType;
+    private Double mLastTrackingType = 0d;
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
 
     private double mLimelightZoomThreshold = 7.0;
 
-    private HangerModule.EHangerState mHangerState;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
     private double mPreviousTime;
@@ -36,16 +34,20 @@ public class TestController extends AbstractController {
     }
 
     public void update(double pNow) {
-//        updateLimelightTargetLock();
+        // =====================================
+        // DO NOT COMMENT THESE OUT
+        // =====================================
+        updateLimelightTargetLock();
         updateDrivetrain(pNow);
-//        updateFlywheel(pNow);
-//        updateIntake(pNow);
-//        updateHanger(pNow);
-//        updateDJBooth();
-//        updateArm(pNow);
+        updateFlywheel(pNow);
+        updateIntake(pNow);
+        updateHanger(pNow);
+        updateDJBooth();
+        updateArm(pNow);
     }
 
     private void updateHanger(double pNow){
+        HangerModule.EHangerState h = HangerModule.EHangerState.NOT_HANGING;
         if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
@@ -56,7 +58,7 @@ public class TestController extends AbstractController {
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
 
         }
-        switch (mHangerState){
+        switch (h){
             case HANGING:
                 Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
                 Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
@@ -173,16 +175,12 @@ public class TestController extends AbstractController {
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
 
-        db.drivetrain.set(SHOULD_HOLD_POSITION, (throttle == 0.0 && rotate == 0.0) ? 1.0 : 0.0);
-
-        if (db.drivetrain.get(DESIRED_CONTROL_MODE, DriveModule.EDriveControlMode.class) != DriveModule.EDriveControlMode.VELOCITY) {
-            db.drivetrain.set(DESIRED_CONTROL_MODE, DriveModule.EDriveControlMode.VELOCITY);
-        }
-        if (throttle == 0.0 && rotate == 0.0) {
-            db.drivetrain.set(DESIRED_THROTTLE, 0.0);
-            db.drivetrain.set(DESIRED_TURN, 0.0);
+        if(throttle == 0.0 && rotate == 0.0) {
+            db.drivetrain.set(DESIRED_STATE, EDriveState.HOLD);
+            db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
+            db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
         } else {
-            db.drivetrain.set(SHOULD_HOLD_POSITION, 0.0);
+            db.drivetrain.set(DESIRED_STATE, EDriveState.VELOCITY);
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.03;
             }
@@ -193,8 +191,8 @@ public class TestController extends AbstractController {
                 throttle *= Settings.Input.kSnailModePercentThrottleReduction;
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
             }
-            db.drivetrain.set(DESIRED_THROTTLE, throttle);
-            db.drivetrain.set(DESIRED_TURN, rotate);
+            db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
+            db.drivetrain.set(DESIRED_TURN_PCT, rotate);
         }
 
     }
@@ -231,8 +229,8 @@ public class TestController extends AbstractController {
 
     void updateDJBooth() {
         if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
-            DJSpinnerModule.EColorMatch m =db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
-            if(m.color.equals(db.DJ_COLOR)) {
+            DJSpinnerModule.EColorMatch m = db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
+            if(m != null && m.color.equals(db.DJ_COLOR)) {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
             } else {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);

@@ -25,6 +25,8 @@ public class Settings extends NetworkTablesConstantsBase {
 
     public static int sCODEX_COMMS_PORT = 5805;
 
+    public static final String AUTO_PATH_PACKAGE = "us.ilite.paths";
+
     // ================================
     // System ID's
     // ================================
@@ -50,15 +52,17 @@ public class Settings extends NetworkTablesConstantsBase {
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
-            public static int kPCM = 20;
-            public static int kPDP = 21;
-            public static int kPigeon = 30;
 //            public static double kGyroCollisionThreshold = 0.0;
 
+            // =============================================
+            // DO NOT CHANGE ANY OF THE FOLLOWING CAN ID's
+            // =============================================
+            public static int kPDP = 20;
+            public static int kPigeon = 21;
             public static  int kDriveLeftMaster = 1;
-            public static int kDriveLeftMiddle = 3;
-            public static  int kDriveRightMaster = 2;
-            public static int kDriveRightMiddle = 4;
+            public static int kDriveLeftFollower = 2;
+            public static  int kDriveRightMaster = 3;
+            public static int kDriveRightFollower = 4;
 
         }
 
@@ -85,20 +89,6 @@ public class Settings extends NetworkTablesConstantsBase {
 
 //        public static int kArmNeoAddress = 16;
 
-    }
-
-    //==============================================================================
-    // Logging
-    // =============================================================================
-
-    // =============================================================================
-    // Drive Train Constants
-    // =============================================================================
-    public static class Drive {
-        public static double kDriveTrainMaxVelocity = 5676;
-
-        // TODO Find out what units this is in
-        public static double kMaxHeadingChange = 5;
     }
 
     public static class Input {

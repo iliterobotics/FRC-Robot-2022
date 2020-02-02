@@ -6,7 +6,8 @@ import com.revrobotics.CANSparkMax;
 public enum ECommonNeutralMode {
 
     BRAKE(NeutralMode.Brake, CANSparkMax.IdleMode.kBrake),
-    COAST(NeutralMode.Coast, CANSparkMax.IdleMode.kCoast);
+    COAST(NeutralMode.Coast, CANSparkMax.IdleMode.kCoast),
+    HOLD_POSITION(NeutralMode.Brake, CANSparkMax.IdleMode.kBrake);
 
     public final NeutralMode kCtreNeutralMode;
     public final CANSparkMax.IdleMode kRevIdleMode;

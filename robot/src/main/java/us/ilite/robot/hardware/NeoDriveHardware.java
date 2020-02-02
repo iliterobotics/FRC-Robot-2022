@@ -1,6 +1,5 @@
 package us.ilite.robot.hardware;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANPIDController;
@@ -8,12 +7,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.util.Conversions;
-import us.ilite.common.types.drive.EDriveData;
-import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.DriveModule;
 
+@Deprecated
 public class NeoDriveHardware implements IDriveHardware {
 
     private final ILog mLogger = Logger.createLog(NeoDriveHardware.class);
@@ -102,8 +99,8 @@ public class NeoDriveHardware implements IDriveHardware {
     }
 
     public void setTarget(double pLeftPercentMaxVelocity, double pRightPercentMaxVelocity) {
-        mLeftMaster.getPIDController().setReference(pLeftPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
-        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
+//        mLeftMaster.getPIDController().setReference(pLeftPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
+//        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
         System.out.println("---------------------------- LEFT CURRENT: " +  mLeftMaster.getOutputCurrent() + "      ||||||||||     RIGHT CURRENT " + mRightMaster.getOutputCurrent() + "\n");
     }
 
@@ -196,7 +193,7 @@ public class NeoDriveHardware implements IDriveHardware {
         mLogger.info("Reloading gains for Talon ID ", pSparkMax.getDeviceId());
 
         CANPIDController sparkMaxPid = pSparkMax.getPIDController();
-        HardwareUtils.setGains(sparkMaxPid, DriveModule.kVelocityPID);
+        HardwareUtils.setGains(sparkMaxPid, DriveModule.vPID);
     }
 
     private void configSparkForSmartMotion(CANSparkMax talon) {
