@@ -13,6 +13,7 @@ import us.ilite.common.types.EMatchMode;
 
 import static us.ilite.common.types.drive.EDriveData.*;
 
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -67,7 +68,7 @@ public class DriveModule extends Module {
 	// =============================================================================
 	// Hold Gains
 	// =============================================================================
-	public static ProfileGains kHoldPositionGains = new ProfileGains().p(.05).d(.00807);
+	public static ProfileGains kHoldPositionGains = new ProfileGains().p(.001);//.d(.00807);
 
 	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
 			/* Left */
@@ -107,6 +108,8 @@ public class DriveModule extends Module {
 		mLeftCtrl = mLeftMaster.getPIDController();
 		mRightMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
 		mRightFollower = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kDriveRightFollower, mRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+		mRightMaster.setInverted(true);
+		mRightFollower.setInverted(true);
 		mRightEncoder = mLeftMaster.getEncoder();
 		mRightCtrl = mRightMaster.getPIDController();
 	}
@@ -140,7 +143,7 @@ public class DriveModule extends Module {
 		setPIDGains(mRightCtrl, vPID);
 		setPIDGains(mLeftCtrl, dPID);
 		setPIDGains(mRightCtrl, dPID);
-	  	mDriveState = EDriveState.NORMAL;
+	  	db.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.NORMAL);
 	  	db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
 	  	db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
 	}
@@ -202,8 +205,10 @@ public class DriveModule extends Module {
 				DriveMessage d = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-				mLeftCtrl.setReference(100, kVelocity, VELOCITY_PID_SLOT, 0);//d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-				mRightCtrl.setReference(100, kVelocity, VELOCITY_PID_SLOT, 0);//d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+//				mLeftCtrl.setReference(100, kVelocity, VELOCITY_PID_SLOT, 0);//d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+//				mRightCtrl.setReference(100, kVelocity, VELOCITY_PID_SLOT, 0);//d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+				mLeftMaster.set(.2);
+				mRightMaster.set(.2);
 				break;
 			case PERCENT_OUTPUT:
 				break;
