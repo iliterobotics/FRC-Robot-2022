@@ -86,7 +86,6 @@ public class DriveModule extends Module {
 
 	private EDriveState mDriveState;
 	private DriveMessage mDriveMessage;
-	private double mTargetTrackingThrottle = 0;
 
 	private PIDController mTargetAngleLockPid;
 	private PIDController mYawPid;
@@ -96,7 +95,6 @@ public class DriveModule extends Module {
 	private double mCurrentHeading;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
-//	private Codex<Double, EDriveData> db.drivetrain = Robot.DATA.drivetrain;
 
 	public DriveModule() {
 		if(AbstractSystemSettingsUtils.isPracticeBot()) {
@@ -153,6 +151,8 @@ public class DriveModule extends Module {
 
 		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
+
+
 	}
 
 	@Override
@@ -208,6 +208,7 @@ public class DriveModule extends Module {
 					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 
+					double mTargetTrackingThrottle = db.drivetrain.get(TARGET_TRACKING_THROTTLE);
 					mDriveMessage = new DriveMessage().throttle(mTargetTrackingThrottle).turn(pidOutput).calculateCurvature();
 					// If we've already seen the target and lose tracking, exit.
 				}
@@ -222,15 +223,6 @@ public class DriveModule extends Module {
 		mPreviousTime = pNow;
 //		mUpdateTimer.stop();
 	}
-	
-	public synchronized void setNormal() {
-		mDriveState = EDriveState.NORMAL;
-	}
-
-	public synchronized void setTargetTrackingThrottle(double pTargetTrackingThrottle) {
-		mTargetTrackingThrottle = pTargetTrackingThrottle;
-	}
-
 
 	@Override
 	public boolean checkModule(double pNow) {
