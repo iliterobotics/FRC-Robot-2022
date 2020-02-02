@@ -107,8 +107,8 @@ public class DriveModule extends Module {
 		mLeftEncoder = mLeftMaster.getEncoder();
 		mLeftCtrl = mLeftMaster.getPIDController();
 		mRightMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
-		mRightFollower = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kDriveRightFollower, mRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
-		mRightMaster.setInverted(true);
+		mRightFollower = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveRightFollower, CANSparkMaxLowLevel.MotorType.kBrushless);//SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kDriveRightFollower, mRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+		mRightMaster.setInverted(false);
 		mRightFollower.setInverted(true);
 		mRightEncoder = mLeftMaster.getEncoder();
 		mRightCtrl = mRightMaster.getPIDController();
@@ -205,10 +205,10 @@ public class DriveModule extends Module {
 				DriveMessage d = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity * 2, kVelocity, VELOCITY_PID_SLOT, 0);
-				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity * 2, kVelocity, VELOCITY_PID_SLOT, 0);
-//				mLeftMaster.set(.2);
-//				mRightMaster.set(.2);
+//				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity * 2, kVelocity, VELOCITY_PID_SLOT, 0);
+//				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity * 2, kVelocity, VELOCITY_PID_SLOT, 0);
+				mRightFollower.set(.2);
+				mRightMaster.set(.2);
 				break;
 			case PERCENT_OUTPUT:
 				break;
@@ -216,7 +216,8 @@ public class DriveModule extends Module {
 		mPreviousTime = pNow;
 		mPreviousHeading = db.imu.get(EGyro.HEADING_DEGREES);
 
-		System.out.println("||||||||||||||||||| LEFT CURRENT : " + mLeftMaster.getOutputCurrent() + " ||||||||||||||||||||| RIGHT CURRENT : " + mRightMaster.getOutputCurrent() + " ||||||||||||||||||||||||");
+//		System.out.println("||||||||||||||||||| LEFT CURRENT : " + mLeftMaster.getOutputCurrent() + " ||||||||||||||||||||| RIGHT CURRENT : " + mRightMaster.getOutputCurrent() + " ||||||||||||||||||||||||");
+		System.out.println(" ||||||||||||||||||||| RIGHT CURRENT MASTER : " + mRightMaster.getOutputCurrent() + " ||||||||||||||||||||||||" + " ||||||||||||||||||||| RIGHT REAR CURRENT : " + mRightFollower.getOutputCurrent() + " ||||||||||||||||||||||||");
 	}
 
 	public void loop(double pNow) {
