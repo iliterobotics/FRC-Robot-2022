@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class Settings extends NetworkTablesConstantsBase {
 
-    public static String kGroundLimelightNetworkTable = "groundlimelight";
-    public static String kFlywheelLimelightNetworkTable = "flywheellimelight";
+    public static String kGroundLimelightNetworkTable = "limelight-bottom";
+    public static String kFlywheelLimelightNetworkTable = "limelight-top";
 
     public static IFieldComponent kActiveTarget;
 
