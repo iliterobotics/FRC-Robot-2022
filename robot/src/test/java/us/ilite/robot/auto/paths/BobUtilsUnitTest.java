@@ -143,5 +143,13 @@ public class BobUtilsUnitTest extends BaseTest {
         assertEquals(PATH_CLASSES.size(), loadedClasses.size());
     }
 
+    @Test
+    @Category(CriticalTest.class)
+    public void test_showAutonPathsTotalTime() {
+        Map<String, Path> availablePaths = BobUtils.getAvailablePaths();
+        for(String path : availablePaths.keySet()) {
+            System.out.println("Path " + path + " has runtime of " + BobUtils.getPathTotalTime(availablePaths.get(path)));
+        }
+    }
 
 }
