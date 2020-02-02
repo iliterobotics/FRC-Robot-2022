@@ -76,4 +76,13 @@ public class BobUtilsUnitTest extends BaseTest {
         assertNotNull(availablePathClasses);
         assertTrue(availablePathClasses.isEmpty());
     }
+    @Test
+    @Category(CriticalTest.class)
+    public void test_getAvailablePathClasses_null() {
+        Reflections reflection = null;
+        Set<Class<? extends Path>> availablePathClasses = getAvailablePathClasses(reflection);
+        assertNotNull(availablePathClasses);
+        assertTrue(availablePathClasses.isEmpty());
+    }
+
 }

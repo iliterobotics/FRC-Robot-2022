@@ -13,6 +13,7 @@ import us.ilite.common.config.Settings;
 
 import static java.lang.Math.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class BobUtils {
         return getAvailablePathClasses(reflections);
     }
     static Set<Class<? extends Path>> getAvailablePathClasses(Reflections reflections) {
+        if(reflections == null) return Collections.emptySet();
         return reflections.getSubTypesOf(Path.class);
     }
 
