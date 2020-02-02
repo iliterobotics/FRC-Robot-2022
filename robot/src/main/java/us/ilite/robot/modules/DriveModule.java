@@ -1,6 +1,7 @@
 package us.ilite.robot.modules;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -207,9 +208,9 @@ public class DriveModule extends Module {
 			case PATH_FOLLOWING:
 			case TARGET_ANGLE_LOCK:
 
-				Codex<Double, ELimelightData> targetData = Robot.DATA.limelight;
+				RobotCodex<ELimelightData> targetData = Robot.DATA.limelight;
 				double pidOutput;
-				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.get(TX) != null) {
+				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
 
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
 					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);

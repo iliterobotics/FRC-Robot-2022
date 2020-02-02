@@ -1,5 +1,9 @@
 package us.ilite.robot.controller;
 
+import us.ilite.common.config.InputMap;
+import us.ilite.common.config.Settings;
+import us.ilite.common.types.input.EInputScale;
+import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -9,14 +13,11 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.*;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.robot.modules.Limelight;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.EShooterSystemData;
-import us.ilite.robot.modules.HangerModule;
-import us.ilite.robot.modules.PowerCellModule;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
 import static us.ilite.common.types.drive.EDriveData.*;
@@ -26,6 +27,7 @@ public class TestController extends AbstractController {
     private ILog mLog = Logger.createLog(TestController.class);
     private Double mLastTrackingType;
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
+
     private double mLimelightZoomThreshold = 7.0;
 
     private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.HANGING;
@@ -48,8 +50,10 @@ public class TestController extends AbstractController {
             db.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION1 , 1.0);
         }
         updateHanger(pNow);
+        updateDJBooth();
 //        updateArm(pNow);
     }
+
     private void updateHanger(double pNow){
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
             mLog.error("--------------------------HANGER---------------------");
@@ -134,12 +138,12 @@ public class TestController extends AbstractController {
 
     public void updateLimelightTargetLock() {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-            if (Robot.DATA.selectedTarget.get(ELimelightData.TY) != null) {
+            if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
                 SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
             }
             Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
-            if (Robot.DATA.selectedTarget.get(ELimelightData.TY) != null) {
+            if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
                 if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
                     Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET_ZOOM.id());
                     System.out.println("ZOOMING");
@@ -160,7 +164,7 @@ public class TestController extends AbstractController {
                 Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double)Limelight.NONE.id());
 //            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
         }
-        if (!(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()).equals(mLastTrackingType) )
+        if ((Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) != (mLastTrackingType) )
                 && !(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) == Limelight.NONE.id())) {
                 mLog.error("Requesting command start");
                 mLog.error("Stopping teleop command queue");
@@ -226,6 +230,62 @@ public class TestController extends AbstractController {
                 db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 0.0);
                 break;
         }
+    }
+
+
+
+    void updateDJBooth() {
+        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
+            DJSpinnerModule.EColorMatch m =db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
+            if(m.color.equals(db.DJ_COLOR)) {
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
+            } else {
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.POSITION.ordinal());
+            }
+        }
+
+        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL)) {
+
+            if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.sTARGET_ROTATION_COUNT) {
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.OFF.ordinal());
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
+            } else {
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.ROTATION.ordinal());
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.power);
+            }
+        }
+
+
+
+//        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL) &&
+//                db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL) ) {
+//            db.color.set(EColorData.POSITION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
+//            db.color.set(EColorData.ROTATION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
+//        }
+//        else if (db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
+//            db.color.set(EColorData.POSITION_CONTROL_INPUT, (double)EColorData.EInput.POSITIVE.ordinal());
+//            if (db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE).equals(EColorData.EMotorState.ON.ordinal()) ) {
+//                mVictor.set(ControlMode.PercentOutput, Settings.kDJBoothOuput );
+//            }
+//            else {
+//                mVictor.set(ControlMode.PercentOutput, 0d );
+//            }
+//        }
+//        else if (db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL) ) {
+//            db.color.set(EColorData.ROTATION_CONTROL_INPUT, (double)EColorData.EInput.POSITIVE.ordinal());
+//            if (db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE).equals(EColorData.EMotorState.ON.ordinal()) ) {
+//                mVictor.set(ControlMode.PercentOutput, Settings.kDJBoothOuput );
+//            }
+//            else {
+//                mVictor.set(ControlMode.PercentOutput, 0d );
+//            }
+//        }
+//        else {
+//            db.color.set(EColorData.POSITION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
+//            db.color.set(EColorData.ROTATION_CONTROL_INPUT, (double)EColorData.EInput.NEGATIVE.ordinal());
+//        }
+
     }
 
     public void updateArm(double pNow) {

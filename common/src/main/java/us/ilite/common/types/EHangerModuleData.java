@@ -1,8 +1,6 @@
 package us.ilite.common.types;
 
-import com.flybotix.hfr.codex.CodexOf;
-
-public enum EHangerModuleData  implements CodexOf<Double> {
+public enum EHangerModuleData {
 
     DESIRED_HANGER_POSITION1,
     DESIRED_HANGER_POSITION2,
