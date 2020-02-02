@@ -1,79 +1,82 @@
 package us.ilite.robot;
 
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.Notifier;
 import us.ilite.common.CSVLoggerQueue;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
+import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class CSVLogger implements Runnable {
+public class CSVLogger {
+    private ILog mLogger = Logger.createLog(this.getClass());
     private Notifier mLoggingNotifier;
     private Data mData;
-    private ScheduledExecutorService mExService;
-    private JFrame aFrame;
-    private JPanel myPanel;
-    private JTextField aField;
+    private static final ScheduledExecutorService mExService =
+            Executors.newSingleThreadScheduledExecutor((run)->new Thread(run, "My timer thread"));
+    private ScheduledFuture<?> scheduledFuture;
+    //    private JFrame aFrame;
+//    private JPanel myPanel;
+//    private JTextField aField;
 
     public CSVLogger( Data pData ) {
+        //mLogger.error("CHRIS: CSVLOGGER CONSTRUCTOR");
         mData = pData;
 //        mLoggingNotifier = new Notifier( this );
 
-        aFrame = new JFrame();
-        myPanel = new JPanel(new BorderLayout());
-        aField = new JTextField(100);
-        myPanel.add(aField, BorderLayout.NORTH);
+//        aFrame = new JFrame();
+//        myPanel = new JPanel(new BorderLayout());
+//        aField = new JTextField(100);
+//        myPanel.add(aField, BorderLayout.NORTH);
     }
 
-
-    @Override
-    public void run() {
-        mExService.scheduleAtFixedRate(()->{
-            System.out.println("Running time is: " + System.currentTimeMillis());
+    private void run() {
+        try {
+            //mLogger.error("CHRIS: RUN!!");
+            //System.out.println("Running time is: " + System.currentTimeMillis());
             List<String> kTempCSVLogs = new ArrayList<>();
-            System.out.println("Beginning to drain!");
+            //mLogger.error("Beginning to drain!");
             CSVLoggerQueue.kCSVLoggerQueue.drainTo(kTempCSVLogs);
-            System.out.println("Finished draining, got: " + kTempCSVLogs.size());
-
-//            aField.setText( stringThing( kTempCSVLogs ) );
+            //mLogger.error("Finished draining, got: " + kTempCSVLogs.size());
 
             if ( !kTempCSVLogs.isEmpty() ) {
                 try {
-                    File file = new File( "us/ilite/robot/logs.txt" );
-                    Files.write(file.toPath(), kTempCSVLogs);
+                    Path path = Paths.get(URI.create("file:///Users/jmz00/Git/Robotics/FileTest.java"));
+                    Files.write(path, kTempCSVLogs);
                 } catch ( Exception e ) {
                     e.printStackTrace();
                 }
             }
-
             //Okay, don't get too far ahead of yourself, uncomment this when ready
             //kTempCSVLogs.stream().forEach(CodexCsvLogger::log);
-        }, 5,5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-    public String stringThing( List<String> arr ) {
-        StringBuilder s = new StringBuilder();
-        for ( String temp : arr ) {
-            s.append(temp);
-        }
-        return s.toString();
-    }
 
     /**
      * Initiates the Executor Service
      */
     public void start() {
+        //mLogger.error("CHRIS: STARTING THE CSV LOGGER!!");
         mData.logFromCodexToCSVHeader();
-        mExService = Executors.newSingleThreadScheduledExecutor();
-        mExService.schedule( this , Settings.kSecondsToUpdateCSVLogger, TimeUnit.SECONDS);
+        //mLogger.error("CHRIS: BEGINNING TO SCHEDULE");
+
+        scheduledFuture = mExService.scheduleAtFixedRate(this::run, Settings.kSecondsToUpdateCSVLogger, Settings.kSecondsToUpdateCSVLogger, TimeUnit.SECONDS);
+//        mExService.scheduleWithFixedDelay( this , Settings.kSecondsToUpdateCSVLogger, Settings.kSecondsToUpdateCSVLogger, TimeUnit.SECONDS);
+        //mLogger.error("CHRIS: FINISHED TO SCHEDULE");
     }
 
     /**
@@ -81,7 +84,15 @@ public class CSVLogger implements Runnable {
      */
     public void stop() {
         try {
-            mExService.awaitTermination( Settings.kSecondsToUpdateCSVLogger, TimeUnit.SECONDS );
+            if(scheduledFuture != null) {
+                //mLogger.error("CHRIS: CANCELING!!");
+
+                scheduledFuture.cancel(true);
+                if(true) {
+                    throw new RuntimeException("Really?");
+                }
+                scheduledFuture = null;
+            }
         }
         catch ( Exception e ) {
             e.printStackTrace();

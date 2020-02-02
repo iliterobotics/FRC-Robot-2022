@@ -69,6 +69,7 @@ public class Robot extends TimedRobot {
         mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
 
+        //mLogger.error("CHRIS: INIT ME!!");
         mCSVLogger.start();
 
         //look for practice robot config:
@@ -140,7 +141,7 @@ public class Robot extends TimedRobot {
     public void disabledInit() {
         mLogger.info("Disabled Initialization");
         mRunningModules.shutdown(mClock.getCurrentTime());
-        mCSVLogger.stop(); // stop csv logging
+        //mCSVLogger.stop(); // stop csv logging
       //  mActiveController = null;
     }
 
