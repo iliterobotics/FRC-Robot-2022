@@ -5,10 +5,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import us.ilite.CriticalTest;
-import us.ilite.paths.Squiggle;
-import us.ilite.paths.UNIT_TEST_STRAIGHT_LINE;
-import us.ilite.paths.Wonky;
-import us.ilite.paths.Yoink;
+import us.ilite.paths.*;
 import us.ilite.robot.BaseTest;
 import org.reflections.Reflections;
 
@@ -83,6 +80,20 @@ public class BobUtilsUnitTest extends BaseTest {
         Set<Class<? extends Path>> availablePathClasses = getAvailablePathClasses(reflection);
         assertNotNull(availablePathClasses);
         assertTrue(availablePathClasses.isEmpty());
+    }
+    @Test
+    @Category(CriticalTest.class)
+    public void test_getAvailablePathClasses_realMethod() {
+        Set<Class<? extends Path>> availablePathClasses = getAvailablePathClasses();
+        assertNotNull(availablePathClasses);
+        assertFalse(availablePathClasses.isEmpty());
+
+        assertTrue(availablePathClasses.contains(Loop.class));
+        assertTrue(availablePathClasses.contains(OurTrench.class));
+        assertTrue(availablePathClasses.contains(Squiggle.class));
+        assertTrue(availablePathClasses.contains(UNIT_TEST_STRAIGHT_LINE.class));
+        assertTrue(availablePathClasses.contains(Wonky.class));
+        assertTrue(availablePathClasses.contains(Yoink.class));
     }
 
 }
