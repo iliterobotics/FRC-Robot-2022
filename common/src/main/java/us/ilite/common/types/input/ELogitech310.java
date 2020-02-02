@@ -41,7 +41,7 @@ public enum ELogitech310 implements CodexOf<Double> {
     public static void map(RobotCodex<ELogitech310> pCodex, Joystick pJoystick, Double pRumbleValue, boolean pHandleDeadband) {
         pCodex.reset();
         for(int i = 0 ; i < 10; i++) {
-          pCodex.set(i, pJoystick.getRawButton(i+1) ? 1d : null);
+          pCodex.set(i, pJoystick.getRawButton(i+1) ? 1d : 0d);
         }
 
         if(pHandleDeadband) {
