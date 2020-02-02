@@ -180,16 +180,20 @@ public class DriveModule extends Module {
 		switch (mode) {
 			case HOLD:
 				if (!mStartHoldingPosition) {
-					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));//LEFT_POS_INCHES));
+					mHoldLeftPositionPid.setSetpoint(db.drivetrain.get(LEFT_POS_INCHES));
+					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
-				if (Math.abs(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES) - mHoldRightPositionPid.getSetpoint()) > .5) {
+				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mHoldLeftPositionPid.getSetpoint()) > 1) {
 					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
-					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
 					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+				}
+				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mHoldRightPositionPid.getSetpoint()) > 1) {
+					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
 					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 				}
 				break;
+
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxHeadingChange);
