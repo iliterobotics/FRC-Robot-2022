@@ -2,7 +2,9 @@ package us.ilite.robot.modules;
 
 import java.util.Optional;
 
-import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.RobotCodex;
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 
@@ -71,7 +73,8 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     @Override
     public void readInputs(double pNow) {
-        mVisionTarget = Field2020.FieldElement.values()[Robot.DATA.limelight.get(TARGET_ID).intValue()];
+        mVisionTarget = Robot.DATA.limelight.get(TARGET_ID, Field2020.FieldElement.class);
+//        mVisionTarget = Field2020.FieldElement.values()[Robot.DATA.limelight.get(TARGET_ID).intValue()];
 
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
         Robot.DATA.limelight.set(TV, targetValid ? 1.0d : null);
@@ -137,7 +140,7 @@ public class Limelight extends Module implements ITargetDataProvider {
     }
 
     @Override
-    public Codex<Double, ELimelightData> getTargetingData() {
+    public RobotCodex<ELimelightData> getTargetingData() {
         return Robot.DATA.limelight;
     }
 

@@ -1,6 +1,7 @@
 package us.ilite.robot.modules;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -127,6 +128,21 @@ public class RawLimelight extends Module{
         setStreamMode();
         setSnapshotMode();
         setPipeline();
+    }
+
+    @Override
+    public RobotCodex<ELimelightData> getTargetingData() {
+        return null;
+    }
+
+    @Override
+    public double getCameraHeightIn() {
+        return 0;
+    }
+
+    @Override
+    public double getCameraAngleDeg() {
+        return 0;
     }
 
     private void setPipeline() {
