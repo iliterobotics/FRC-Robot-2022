@@ -193,9 +193,13 @@ public class DriveModule extends Module {
 
 	public void loop(double pNow) {
 //		mUpdateTimer.start();
+		mDriveState = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
 		switch(mDriveState) {
 			case PATH_FOLLOWING:
+				mDriveHardware.configureMode(ECommonControlMode.VELOCITY);
 			case TARGET_ANGLE_LOCK:
+				mDriveHardware.configureMode(ECommonControlMode.PERCENT_OUTPUT);
+				mDriveHardware.set(DriveMessage.kNeutral);
 				RobotCodex<ELimelightData> targetData = Robot.DATA.limelight;
 				double pidOutput;
 				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
@@ -218,18 +222,7 @@ public class DriveModule extends Module {
 		mPreviousTime = pNow;
 //		mUpdateTimer.stop();
 	}
-
-	public synchronized void setTargetAngleLock() {
-		mDriveState = EDriveState.TARGET_ANGLE_LOCK;
-		mDriveHardware.configureMode(ECommonControlMode.PERCENT_OUTPUT);
-		mDriveHardware.set(DriveMessage.kNeutral);
-	}
-
-	public synchronized void setPathFollowing() {
-		mDriveState = EDriveState.PATH_FOLLOWING;
-		mDriveHardware.configureMode(ECommonControlMode.VELOCITY);
-	}
-
+	
 	public synchronized void setNormal() {
 		mDriveState = EDriveState.NORMAL;
 	}

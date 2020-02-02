@@ -6,8 +6,11 @@ import com.flybotix.hfr.codex.RobotCodex;
 import us.ilite.common.IFieldComponent;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.EDriveState;
 import us.ilite.robot.modules.IThrottleProvider;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
@@ -49,7 +52,7 @@ public class TargetLock implements ICommand {
         mHasAcquiredTarget = false;
         mAlignedCount = 0;
 
-        mDrive.setTargetAngleLock();
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.TARGET_ANGLE_LOCK);
         mDrive.setTargetTrackingThrottle(0);
 
         this.mPreviousTime = pNow;
