@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
         mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
 
-        //mCSVLogger.start();
+        mCSVLogger.start();
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);

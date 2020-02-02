@@ -40,7 +40,6 @@ public class CodexCsvLogger {
     public static void log( String s ) {
         try {
             writer.append( s );
-            writer.newLine();
         } catch (IOException pE) {
             pE.printStackTrace();
         }
