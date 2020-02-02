@@ -31,11 +31,11 @@ public class NeoDriveHardware implements IDriveHardware {
         // mGyro = new NavX(SerialPort.Port.kMXP);
         mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
 
-        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mLeftMiddle = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kDriveLeftMiddle, mLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(7, CANSparkMaxLowLevel.MotorType.kBrushless);//Settings.Hardware.CAN.kDriveLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mLeftMiddle = SparkMaxFactory.createFollowerSparkMax(5, mLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);//Settings.Hardware.CAN.kDriveLeftMiddle, mLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        mRightMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mRightMiddle = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kDriveRightMiddle, mRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mRightMaster = SparkMaxFactory.createDefaultSparkMax(6, CANSparkMaxLowLevel.MotorType.kBrushless);//Settings.Hardware.CAN.kDriveRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mRightMiddle = SparkMaxFactory.createFollowerSparkMax(4, mRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);//Settings.Hardware.CAN.kDriveRightMiddle, mRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         configureMaster(mLeftMaster, true);
         configureMotor(mLeftMaster);
@@ -103,8 +103,7 @@ public class NeoDriveHardware implements IDriveHardware {
 
     public void setTarget(double pLeftPercentMaxVelocity, double pRightPercentMaxVelocity) {
         mLeftMaster.getPIDController().setReference(pLeftPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
-        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
-        System.out.println("LEFT vekcoutt --------------------- " + pLeftPercentMaxVelocity+ "\nRIGHT vekcokut --------------------- " + pRightPercentMaxVelocity + "\n\n");
+        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);s
     }
 
     /**
