@@ -45,22 +45,22 @@ public class TestController extends AbstractController {
     }
     private void updateHanger(double pNow){
         if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 1.0);
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 1.0);
 
         }
         else if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.RELEASE_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 0.0);
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 0.0);
 
         }
         switch (mHangerState){
             case HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 1.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 1.0);
             case NOT_HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 0.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 0.0);
         }
     }
 
