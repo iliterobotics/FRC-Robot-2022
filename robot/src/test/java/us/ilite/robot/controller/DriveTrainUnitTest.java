@@ -51,6 +51,8 @@ public class DriveTrainUnitTest extends BaseTest {
         Assert.assertTrue(db.drivetrain.isSet(DESIRED_TURN_PCT));
         Assert.assertTrue(db.drivetrain.isSet(DESIRED_THROTTLE_PCT));
         Assert.assertTrue(db.drivetrain.get(DESIRED_STATE, EDriveState.class) == EDriveState.VELOCITY);
+        System.out.println(db.drivetrain.getCSVHeader());
+        System.out.println(db.drivetrain);
     }
 
     private void assertNormalizedInputs(String pMessage) {
