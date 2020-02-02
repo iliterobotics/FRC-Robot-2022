@@ -1,5 +1,6 @@
 package us.ilite.robot.controller;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
@@ -248,7 +249,11 @@ public class TestController extends AbstractController {
                     DJ_COLOR = null;
                     break;
             }
-            if(m.color.equals(DJ_COLOR)) {
+            if ( DJ_COLOR == null ) {
+                DriverStation.reportError("NO FMS RELAY RECEIVED! SWITCHING TO MANUAL!", false );
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.POSITION.ordinal());
+            } else if (m.color.equals(DJ_COLOR)) {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
             } else {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);
