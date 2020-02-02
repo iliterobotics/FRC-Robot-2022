@@ -30,10 +30,10 @@ public class InputMap {
 
     public static class OPERATOR {
         public static final ELogitech310
-        SHOOT = ELogitech310.RIGHT_TRIGGER_AXIS,
-        LOCK_TARGET = ELogitech310.A_BTN,
-        LOCK_CELL = ELogitech310.B_BTN,
-        LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
+//        SHOOT = ELogitech310.RIGHT_TRIGGER_AXIS,
+//        LOCK_TARGET = ELogitech310.A_BTN,
+//        LOCK_CELL = ELogitech310.B_BTN,
+//        LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
         INTAKE = ELogitech310.X_BTN,
         REVERSE_INTAKE = ELogitech310.A_BTN,
         LOWER_ARM = ELogitech310.Y_BTN,

@@ -34,8 +34,8 @@ public class Settings extends NetworkTablesConstantsBase {
         public static class CAN {
             public static int kHangerNeoID1;
             public static int kHangerNeoID2;
-            public static int kArmNEOAdress = 4;
-            public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
+            public static int kArmNEOAdress = 16;
+            public static int kCANIntakeID = 4; // Change later // Using the bunny bots flywheel id for now
             public static int kTalonOneID = 3; // Change later
             public static int kTalonTwoID = 7; // Change later
             public static int kTalonThreeID = 5; // Change later
@@ -63,9 +63,9 @@ public class Settings extends NetworkTablesConstantsBase {
         }
 
         public static class DIO {
+            public static int kBeamChannel0; // Change later
             public static int kBeamChannel1; // Change later
             public static int kBeamChannel2; // Change later
-            public static int kBeamChannel3; // Change later
         }
 
         public static class PCM {

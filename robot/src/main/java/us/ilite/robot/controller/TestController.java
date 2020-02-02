@@ -8,14 +8,10 @@ import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.*;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.robot.modules.Limelight;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EPowerCellData;
-import us.ilite.common.types.EShooterSystemData;
-import us.ilite.robot.modules.HangerModule;
-import us.ilite.robot.modules.PowerCellModule;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
 import static us.ilite.common.types.drive.EDriveData.*;
@@ -27,9 +23,10 @@ public class TestController extends AbstractController {
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
     private double mLimelightZoomThreshold = 7.0;
 
-    private HangerModule.EHangerState mHangerState;
-    private PowerCellModule.EIntakeState mIntakeState;
-    private PowerCellModule.EArmState mArmState;
+    private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.NOT_HANGING;
+    private PowerCellModule.EIntakeState mIntakeState = PowerCellModule.EIntakeState.INTAKE;
+    private PowerCellModule.EArmState mArmState = PowerCellModule.EArmState.ENGAGED;
+    private PowerCellModule.EIndexingState mIndexingState;
     private double mPreviousTime;
 
     public TestController() {
@@ -122,8 +119,8 @@ public class TestController extends AbstractController {
 //        if ( db.attackoperatorinput.isSet(ELogitechAttack3.TRIGGER)) {
 //            mAccelerator.set(ControlMode.PercentOutput, db.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
 //        }
-        mPreviousTime = pNow;
-        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
+//        mPreviousTime = pNow;
+//        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
 
     public void updateLimelightTargetLock() {
@@ -196,46 +193,64 @@ public class TestController extends AbstractController {
 
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-            mLog.error("--------------INTAKE IS BEING PRESSED----------");
             mIntakeState = PowerCellModule.EIntakeState.INTAKE;
+            mArmState = PowerCellModule.EArmState.ENGAGED;
+
+            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
+
+            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.MOVING.ordinal()) {
+                db.powercell.set(EPowerCellData.DESIRED_H_POWER_PCT, mIntakeState.getPower());
+                db.powercell.set(EPowerCellData.DESIRED_V_POWER_PCT, mIntakeState.getPower());
+            }
+
+            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
+
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
             mIntakeState = PowerCellModule.EIntakeState.REVERSE;
+            mArmState = PowerCellModule.EArmState.ENGAGED;
+
+            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
+
+            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.MOVING.ordinal()) {
+                db.powercell.set(EPowerCellData.DESIRED_H_POWER_PCT, mIntakeState.getPower());
+                db.powercell.set(EPowerCellData.DESIRED_V_POWER_PCT, mIntakeState.getPower());
+            }
+
+            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
+
         } else {
             mIntakeState = PowerCellModule.EIntakeState.STOP;
+            mArmState = PowerCellModule.EArmState.DISENGAGED;
+
+            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
+
+            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.NOT_MOVING.ordinal()) {
+                db.powercell.set(EPowerCellData.DESIRED_H_POWER_PCT, mIntakeState.getPower());
+                db.powercell.set(EPowerCellData.DESIRED_V_POWER_PCT, mIntakeState.getPower());
+            }
+
+            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
         }
-        switch (mIntakeState) {
-            case INTAKE:
-                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 1.0);
-                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 1.0);
-                db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 1.0);
-                break;
-            case REVERSE:
-                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , -1.0);
-                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , -1.0);
-                db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , -1.0);
-                break;
-            case STOP:
-                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_POWER_PCT , 0.0);
-                db.powercell.set(EPowerCellData.DESIRED_CONVEYOR_TWO_POWER_PCT , 0.0);
-                db.powercell.set(EPowerCellData.DESIRED_SERLIALIZER_POWER_PCT , 0.0);
-                break;
-        }
+
+        //Testing if statement
+
+//        if(db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
+//            mLog.error("-------------------------------------------------------ispressed---------------");
+//            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, 0.25);
+//        } else {
+//            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, 0.0);
+//        }
+
+
     }
 
-    public void updateArm(double pNow) {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
-            mArmState = PowerCellModule.EArmState.ENGAGED;
-        } else {
-            mArmState = PowerCellModule.EArmState.DISENGAGED;
-        }
-        switch (mArmState) {
-            case ENGAGED:
-                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 1.0);
-                break;
-            case DISENGAGED:
-                db.powercell.set(EPowerCellData.DESIRED_ARM_STATE , 0.0);
-                break;
-        }
-        //TODO default state
-    }
+//    Arm is in intake update
+//    public void updateArm(double pNow) {
+//        if(db.operatorinput.isSet(InputMap.OPERATOR.HIGHER_ARM)) {
+//            mLog.error("-------------------------------------------------------ispressed---------------");
+//            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, 0.25);
+//        } else {
+//            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, 0.0);
+//        }
+//    }
 }
