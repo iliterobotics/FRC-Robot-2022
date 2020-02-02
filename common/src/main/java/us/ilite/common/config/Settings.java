@@ -62,6 +62,7 @@ public class Settings extends NetworkTablesConstantsBase {
             public static  int kDriveRightMaster = 2;
             public static int kDriveRightMiddle = 4;
 
+            public static int kFlywheelNeoAddress = 16;
         }
 
         public static class Analog {

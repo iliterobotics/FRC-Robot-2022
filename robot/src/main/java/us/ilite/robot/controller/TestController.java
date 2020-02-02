@@ -79,18 +79,18 @@ public class TestController extends AbstractController {
             System.out.println(db.driverinput);
             System.out.println(db.operatorinput);
             mLog.error("-------------------------------------------------- YEAH I EXIST");
-            Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY , 1700);
+            Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY , FlywheelModule.EFlywheelState.SHOOTING);
             SmartDashboard.putNumber("current velocity of falcon" , Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
         }
         else if (db.driverinput.isSet(InputMap.OPERATOR.INVERSE_FLYWHEEL)){
             System.out.println(db.driverinput);
             System.out.println(db.operatorinput);
             mLog.error("-------------------------------------------------- YEAH I EXIST");
-            Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY , -1700);
+            Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY , FlywheelModule.EFlywheelState.REVERSE);
             SmartDashboard.putNumber("current velocity of falcon" , Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
         }
         else{
-            Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY , 0.0);
+            Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY , 0.0);
         }
 //    //
     }

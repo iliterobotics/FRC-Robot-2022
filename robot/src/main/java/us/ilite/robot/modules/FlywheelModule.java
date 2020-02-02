@@ -22,22 +22,33 @@ import us.ilite.robot.hardware.TalonSRXFactory;
 
 
 public class FlywheelModule extends Module {
-    public static final double kAcceleratorThreshold = 0.14;
+   // public static final double kAcceleratorThreshold = 0.14;
 
-    private final PIDGains kShooterGains = new PIDGains( 0.0005 ,0 , 0);
-    private double mPreviousTime;
-
+    private TalonSRX mFlywheelFeederOne;
     private TalonFX mFlywheelMaster;
-    private TalonSRX mFlywheelFeeder;
+    private TalonSRX mFlywheelFeederTwo;
+    private Servo mServo;
+    //Add SparkMax later
     private PigeonIMU mTurretGyro;
-
-    private PIDController mShooterPIDMaster;
-    private PIDController mShooterPIDFeeder;
 
     public FlywheelModule() {
         mFlywheelMaster = new TalonFX(50);
-        mFlywheelFeeder = TalonSRXFactory.createPermanentSlaveTalon(51 , 50);
+        mFlywheelFeederTwo = TalonSRXFactory.createPermanentSlaveTalon(51 , 50);
+        mFlywheelFeederOne= TalonSRXFactory.createPermanentSlaveTalon(Settings.Hardware.CAN.kShooterID , 50);
         mTurretGyro = new PigeonIMU(Settings.Hardware.CAN.kPigeonIDForFlywheel);
+    }
+    public enum EFlywheelState{
+        SHOOTING(1700),
+        REVERSE(-1700),
+        STOP(0);
+
+        double velocity;
+        EFlywheelState(double velocity){
+            this.velocity = velocity;
+        }
+    }
+    public enum EHoodState{
+        //TODO find the states of this
     }
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
@@ -47,14 +58,16 @@ public class FlywheelModule extends Module {
     @Override
     public void readInputs(double pNow) {
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mFlywheelMaster.getSelectedSensorVelocity());
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FEEDER_VELOCITY , mFlywheelFeeder.getSelectedSensorVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FEEDER_VELOCITY , mFlywheelFeederOne.getSelectedSensorVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FEEDER_VELOCITY , mFlywheelFeederTwo.getSelectedSensorVelocity());
 
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mFlywheelMaster.set(ControlMode.Velocity , Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
-        mFlywheelFeeder.set(ControlMode.PercentOutput, Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FEEDER_VELOCITY ) );
+        mFlywheelMaster.set(ControlMode.Velocity , Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
+        mFlywheelFeederOne.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY ) );
+        mFlywheelFeederTwo.set(ControlMode.Velocity , Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
     }
 
 
