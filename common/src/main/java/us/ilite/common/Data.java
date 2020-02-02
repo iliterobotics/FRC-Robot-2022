@@ -1,8 +1,9 @@
 package us.ilite.common;
 
-import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
@@ -27,23 +28,34 @@ public class Data {
     
     //Add new codexes here as we need more
 
-    public final Codex<Double, EGyro> imu = Codex.of.thisEnum(EGyro.class);
-    public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
-    public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
-    public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
-    public final Codex<Double, ELimelightData> limelight = Codex.of.thisEnum(ELimelightData.class);
-    public final Codex<Double, ERawLimelightData> rawLimelight = Codex.of.thisEnum(ERawLimelightData.class);
-    public final Codex<Double, ELimelightData> selectedTarget = Codex.of.thisEnum(ELimelightData.class);
-    public final Codex<Double , EHangerModuleData> hanger = Codex.of.thisEnum(EHangerModuleData.class);
-    public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
-    public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
-    public final Codex<Double, EShooterSystemData> flywheel = Codex.of.thisEnum(EShooterSystemData.class);
-    public final Codex<Double, EColorWheelData> colorwheel = Codex.of.thisEnum(EColorWheelData.class);
+    public final RobotCodex<EGyro> imu = new RobotCodex(0d, EGyro.class);
+    public final RobotCodex<ELogitech310> driverinput = new RobotCodex(0d, ELogitech310.class);
+    public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(0d, ELogitech310.class);
+    public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(0d, EPowerDistPanel.class);
+    public final RobotCodex<ELimelightData> limelight = new RobotCodex(0d, ELimelightData.class);
+    public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(0d, ERawLimelightData.class);
+    public final RobotCodex<ELimelightData> selectedTarget = new RobotCodex(0d, ELimelightData.class);
+    public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(0d, EHangerModuleData.class);
+    public final RobotCodex<EDriveData> drivetrain = new RobotCodex(0d, EDriveData.class);
+    public final RobotCodex<EPowerCellData> powercell = new RobotCodex(0d, EPowerCellData.class);
+    public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(0d, EShooterSystemData.class);
+    public final RobotCodex<EColorData> color = new RobotCodex(0d, EColorData.class);
 
+    public Color DJ_COLOR = Color.kAzure;
 
+    public final RobotCodex[] mAllCodexes = new RobotCodex[] {
+            imu,
+            drivetrain,
+            driverinput,
+            operatorinput,
+            pdp,
+            powercell,
+            hanger,
+            limelight,
+            color,
+    };
 
-
-    public final Codex[] mAllCodexes = new Codex[] {
+    public final RobotCodex[] mLoggedCodexes = new RobotCodex[] {
             imu,
             drivetrain,
             driverinput,
@@ -53,18 +65,6 @@ public class Data {
             hanger,
             limelight,
     };
-
-    public final Codex[] mLoggedCodexes = new Codex[] {
-            imu,
-            drivetrain,
-            driverinput,
-            operatorinput,
-            pdp,
-            powercell,
-            hanger,
-            limelight,
-    };
-
 
     //Stores writers per codex needed for CSV logging
     private List<CodexCsvLogger> mCodexCsvLoggers;

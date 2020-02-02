@@ -3,6 +3,7 @@ package us.ilite.robot;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.ICodexTimeProvider;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -20,32 +21,31 @@ import us.ilite.robot.controller.BaseAutonController;
 import us.ilite.robot.controller.TeleopController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
-import us.ilite.robot.hardware.GetLocalIP;
 import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
 
-import java.util.List;
-
 public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
-    private Data mData;
-    private Limelight mLimelight = new Limelight();
-    private PowerCellModule mIntake = new PowerCellModule();
-    private ModuleList mRunningModules = new ModuleList();
-    private DriveModule mDrive = new DriveModule();
-    private Clock mClock = new Clock();
-    private RawLimelight mRawLimelight;
     public static final Data DATA = new Data();
-    private Timer initTimer = new Timer();
+    private ModuleList mRunningModules = new ModuleList();
+    private Clock mClock = new Clock();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
+
+    private Limelight mLimelight;
+    private PowerCellModule mIntake;
+    private DriveModule mDrive;
+    private RawLimelight mRawLimelight;
+    private Timer initTimer = new Timer();
+    private DJSpinnerModule mDJSpinnerModule;
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
     private FlywheelModule mShooter;
 
     private OperatorInput mOI;
+    private LEDControl mLedControl;
 
     private MatchMetadata mMatchMeta = null;
 
@@ -55,19 +55,18 @@ public class Robot extends TimedRobot {
     private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
     private final TestController mTestController = new TestController();
-   // private AbstractController mActiveController = null;
 
 
     @Override
     public void robotInit() {
-        mShooter = new FlywheelModule();
+        mOI = new OperatorInput();
         mDrive = new DriveModule();
+        mLedControl = new LEDControl();
+        mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
         mLimelight = new Limelight();
-        mOI = new OperatorInput();
-        mLimelight = new Limelight();
         mRawLimelight = new RawLimelight();
-
+        mDJSpinnerModule = new DJSpinnerModule();
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -154,6 +153,8 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
 //        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mDJSpinnerModule);
         mRunningModules.addModule(mIntake);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
@@ -167,7 +168,7 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for (Codex c : DATA.mAllCodexes) {
+        for (RobotCodex c : DATA.mAllCodexes) {
             c.reset();
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
@@ -182,7 +183,7 @@ public class Robot extends TimedRobot {
         if (mMatchMeta == null) {
             mMatchMeta = new MatchMetadata();
             int gid = mMatchMeta.hash;
-            for (Codex c : DATA.mAllCodexes) {
+            for (RobotCodex c : DATA.mAllCodexes) {
                 c.meta().setGlobalId(gid);
             }
         }

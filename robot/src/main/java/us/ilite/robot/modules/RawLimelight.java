@@ -1,6 +1,7 @@
 package us.ilite.robot.modules;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -72,7 +73,7 @@ public class RawLimelight extends Module implements ITargetDataProvider {
     }
 
     @Override
-    public Codex<Double, ELimelightData> getTargetingData() {
+    public RobotCodex<ELimelightData> getTargetingData() {
         return null;
     }
 

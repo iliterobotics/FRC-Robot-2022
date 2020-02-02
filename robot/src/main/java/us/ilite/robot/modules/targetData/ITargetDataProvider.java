@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import com.flybotix.hfr.codex.Codex;
 
+import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.IFieldComponent;
@@ -20,7 +21,7 @@ import us.ilite.common.IFieldComponent;
  * Add your docs here.
  */
 public interface ITargetDataProvider {
-    public Codex<Double,ELimelightData> getTargetingData();
+    public RobotCodex<ELimelightData> getTargetingData();
 
     public double getCameraHeightIn();
 

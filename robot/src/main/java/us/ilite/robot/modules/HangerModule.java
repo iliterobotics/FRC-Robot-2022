@@ -57,8 +57,10 @@ public class HangerModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        mHangerNeoOne.set(EHangerState.values()[mData.hanger.get(EHangerModuleData.DESIRED_HANGER_POWER1).intValue()].getPower());
-        mHangerNeoTwo.set(EHangerState.values()[mData.hanger.get(EHangerModuleData.DESIRED_HANGER_POWER2).intValue()].getPower());
+        mHangerNeoOne.set(db.hanger.get(EHangerModuleData.CURRENT_HANGER_POWER1, EHangerState.class).getPower());
+        mHangerNeoTwo.set(db.hanger.get(EHangerModuleData.DESIRED_HANGER_POWER2, EHangerState.class).getPower());
+//        mHangerNeoOne.set(EHangerState.values()[mData.hanger.get(EHangerModuleData.DESIRED_HANGER_POWER1).intValue()].getPower());
+//        mHangerNeoTwo.set(EHangerState.values()[mData.hanger.get(EHangerModuleData.DESIRED_HANGER_POWER2).intValue()].getPower());
 
     }
 
