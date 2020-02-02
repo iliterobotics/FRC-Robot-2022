@@ -63,9 +63,9 @@ public class Settings extends NetworkTablesConstantsBase {
         }
 
         public static class DIO {
-            public static int kBeamChannel0; // Change later
-            public static int kBeamChannel1; // Change later
-            public static int kBeamChannel2; // Change later
+            public static int kBeamChannel1 = 1; // Change later
+            public static int kBeamChannel2 = 2; // Change later
+            public static int kBeamChannel3 = 3; // Change later
         }
 
         public static class PCM {

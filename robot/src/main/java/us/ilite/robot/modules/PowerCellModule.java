@@ -8,6 +8,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EPowerCellData;
@@ -22,25 +23,27 @@ import java.util.List;
 public class PowerCellModule extends Module {
 
     //Change in drivetrain velocity to control intake speed
-    public static Double kDeltaIntakeVel = 0d;
+    public static double kDeltaIntakeVel = 0d;
+    private Data db = Robot.DATA;
 
-    private final CANPIDController mCanController;
+    private CANPIDController mCanController;
 
     // Intake Motors
-    private CANSparkMax mIntakeMotor;
-    private TalonSRX mConveyorMotorH;
-    private TalonSRX mConveyorMotorV;
+    private CANSparkMax mSerializer;
+    private TalonSRX mConveyorMotorHorizontal;
+    private TalonSRX mConveyorMotorVertical;
 
     //Arm
     private CANSparkMax mArmMotor;
 
 //    Beam Breakers
-//    private DigitalBeamSensor mBeamBreaker0;
-//    private DigitalBeamSensor mBeamBreaker1;
-//    private DigitalBeamSensor mBeamBreaker2;
+    private DigitalBeamSensor mBeamBreaker1;
+    private DigitalBeamSensor mBeamBreaker2;
+    private DigitalBeamSensor mBeamBreaker3;
 
-    //Array of beam-breakers (Used when indexing PowerCells)
-    private DigitalBeamSensor[] mDigitalBeamSensors;
+
+
+    ////////////////////Constants\\\\\\\\\\\\\\\\\\\
 
     public static double kIntakeTalonPower = 1d;
     public static double kForStopTalon = 0d;
@@ -63,6 +66,8 @@ public class PowerCellModule extends Module {
     //For indexing
     private int mGoalBeamCountBroken = 0;
     private int mBeamCountBroken = 0;
+    //Array of beam-breakers (Used when indexing PowerCells)
+    private DigitalBeamSensor[] mDigitalBeamSensors;
 
 
     private ILog mLog = Logger.createLog(this.getClass());
@@ -76,14 +81,14 @@ public class PowerCellModule extends Module {
         STOP (0.0),
         REVERSE (-1.0);
 
-        double power;
+        double pPower;
 
-        EIntakeState (double power) {
-            this.power = power;
+        EIntakeState (double pPower) {
+            this.pPower = pPower;
         }
 
         public double getPower() {
-            return power;
+            return pPower;
         }
     }
 
@@ -104,8 +109,8 @@ public class PowerCellModule extends Module {
     }
 
     public enum EIndexingState {
-        MOVING (1.0),
-        NOT_MOVING(0.0);
+        INDEXING (1.0),
+        NOT_INDEXING(0.0);
 
         double power;
 
@@ -117,22 +122,22 @@ public class PowerCellModule extends Module {
     public PowerCellModule() {
         mIntakeState = EIntakeState.STOP;
         mArmState = EArmState.DISENGAGED;
-        mIndexingState = EIndexingState.NOT_MOVING;
+        mIndexingState = EIndexingState.NOT_INDEXING;
 
-        mIntakeMotor = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kCANIntakeID , CANSparkMaxLowLevel.MotorType.kBrushless );
-        mConveyorMotorH = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonOneID );
-        mConveyorMotorV = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonTwoID );
+        mSerializer = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kCANIntakeID , CANSparkMaxLowLevel.MotorType.kBrushless );
+        mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonOneID );
+        mConveyorMotorVertical = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonTwoID );
 
         mArmMotor = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kArmNEOAdress , CANSparkMaxLowLevel.MotorType.kBrushless);
 
-//        mBeamBreaker0 = new DigitalBeamSensor( Settings.Hardware.DIO.kBeamChannel0 );
 //        mBeamBreaker1 = new DigitalBeamSensor( Settings.Hardware.DIO.kBeamChannel1 );
 //        mBeamBreaker2 = new DigitalBeamSensor( Settings.Hardware.DIO.kBeamChannel2 );
-//        mDigitalBeamSensors = new DigitalBeamSensor[]{mBeamBreaker0, mBeamBreaker1, mBeamBreaker2};
+//        mBeamBreaker3 = new DigitalBeamSensor( Settings.Hardware.DIO.kBeamChannel3 );
+//        mDigitalBeamSensors = new DigitalBeamSensor[]{mBeamBreaker1, mBeamBreaker2, mBeamBreaker3};
 
-        mCanController = mIntakeMotor.getPIDController();
+        mCanController = mSerializer.getPIDController();
 
-        mIntakeEncoder = mIntakeMotor.getEncoder();
+        mIntakeEncoder = mSerializer.getEncoder();
         mArmEncoder = mArmMotor.getEncoder();
 
     }
@@ -147,46 +152,35 @@ public class PowerCellModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-//        mIntakeState = EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.DESIRED_INTAKE_STATE).intValue()];
+//        mIntakeState = EIntakeState.values()[db.powercell.get(EPowerCellData.DESIRED_INTAKE_STATE).intValue()];
 
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_INTAKE_POWER_PCT, mIntakeMotor.getOutputCurrent());
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_INTAKE_VELOCITY_FT_S, mIntakeEncoder.getVelocity());
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , mArmEncoder.getPosition());
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_H_POWER_PCT, mConveyorMotorH.getStatorCurrent());
-        Robot.DATA.powercell.set(EPowerCellData.CURRENT_V_POWER_PCT, mConveyorMotorV.getStatorCurrent());
-//        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_0 , readBeamBreakerState(mBeamBreaker0.isBroken()));
-//        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_1 , readBeamBreakerState(mBeamBreaker1.isBroken()));
-//        Robot.DATA.powercell.set(EPowerCellData.BREAK_SENSOR_2 , readBeamBreakerState(mBeamBreaker2.isBroken()));
+        db.powercell.set(EPowerCellData.CURRENT_INTAKE_VELOCITY, mSerializer.getOutputCurrent());
+        db.powercell.set(EPowerCellData.CURRENT_INTAKE_VELOCITY_FT_S, mIntakeEncoder.getVelocity());
+        db.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , mArmEncoder.getPosition());
+        db.powercell.set(EPowerCellData.CURRENT_H_VELOCITY, mConveyorMotorHorizontal.getStatorCurrent());
+        db.powercell.set(EPowerCellData.CURRENT_V_VELOCITY, mConveyorMotorVertical.getStatorCurrent());
+//        db.powercell.set(EPowerCellData.BREAK_SENSOR_0_STATE , readBeamBreakerState(mBeamBreaker1.isBroken()));
+//        db.powercell.set(EPowerCellData.BREAK_SENSOR_1_STATE , readBeamBreakerState(mBeamBreaker1.isBroken()));
+//        db.powercell.set(EPowerCellData.BREAK_SENSOR_2_STATE , readBeamBreakerState(mBeamBreaker2.isBroken()));
 
         //TODO Determine Indexer State
     }
 
     @Override
     public void setOutputs(double pNow) {
-//        mCANMotor.set(EIntakeState.values()[Robot.DATA.powercell.get(EPowerCellData.CURRENT_POWERCELL_STATE).intValue()].getPower());
-
-        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().map(DigitalBeamSensor::isBroken).filter(e -> e).count();
-        //TODO determine V_Motor and H_Motor specifics with Beam breaker
-        if ( mBeamCountBroken < mGoalBeamCountBroken) {
-            mConveyorMotorH.set( ControlMode.Velocity, Robot.DATA.powercell.get(EPowerCellData.CURRENT_INTAKE_VELOCITY_FT_S) );
-        } else {
-            mConveyorMotorH.set( ControlMode.Velocity, 0.0 );
-        }
-
-//        mIntakeMotor.set(Robot.DATA.powercell.get(EPowerCellData.DESIRED_INTAKE_POWER_PCT));
-        mIntakeMotor.set(Robot.DATA.powercell.get(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S));
-        mConveyorMotorH.set(ControlMode.PercentOutput, Robot.DATA.powercell.get(EPowerCellData.DESIRED_H_POWER_PCT));
-        mConveyorMotorV.set(ControlMode.PercentOutput, Robot.DATA.powercell.get(EPowerCellData.DESIRED_H_POWER_PCT));
-        mArmEncoder.setPosition(Robot.DATA.powercell.get(EPowerCellData.DESIRED_ARM_ANGLE));
-
-//        mGoalBeamCountBroken = mBeamCountBroken + 1;
+        mSerializer.set(db.powercell.get(EPowerCellData.CURRENT_INTAKE_VELOCITY_FT_S));
+        mConveyorMotorHorizontal.set(ControlMode.Velocity, db.powercell.get(EPowerCellData.CURRENT_H_VELOCITY));
+        mConveyorMotorVertical.set(ControlMode.Velocity, db.powercell.get(EPowerCellData.CURRENT_V_VELOCITY));
+        mArmEncoder.setPosition(db.powercell.get(EPowerCellData.CURRENT_ARM_ANGLE));
+//        isCurrentLimiting();
+//        startIndexing();
     }
 
     @Override
     public void shutdown(double pNow) {
         mIntakeState = EIntakeState.STOP;
         mArmState = EArmState.DISENGAGED;
-        mIndexingState = EIndexingState.NOT_MOVING;
+        mIndexingState = EIndexingState.NOT_INDEXING;
     }
 
     private double readBeamBreakerState(boolean isBroken){
@@ -197,8 +191,16 @@ public class PowerCellModule extends Module {
     }
 
     public boolean isCurrentLimiting(){
-        return Robot.DATA.pdp.get(EPowerDistPanel.CURRENT5) > kWarnCurrentLimitThreshold;
+        return db.pdp.get(EPowerDistPanel.CURRENT5) > kWarnCurrentLimitThreshold;
     }
-
-
+    public void startIndexing() {
+        //TODO determine V_Motor and H_Motor specifics with Beam breaker
+        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().map(DigitalBeamSensor::isBroken).filter(e -> e).count();
+        if ( mBeamCountBroken < mGoalBeamCountBroken) {
+            mConveyorMotorHorizontal.set( ControlMode.Velocity, db.powercell.get(EPowerCellData.CURRENT_INTAKE_VELOCITY_FT_S) );
+        } else {
+            mConveyorMotorHorizontal.set( ControlMode.Velocity, 0.0 );
+        }
+        mGoalBeamCountBroken = mBeamCountBroken + 1;
+    }
 }

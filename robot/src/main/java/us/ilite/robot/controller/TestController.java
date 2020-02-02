@@ -198,11 +198,10 @@ public class TestController extends AbstractController {
 
             db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
 
-            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.MOVING.ordinal()) {
-                db.powercell.set(EPowerCellData.DESIRED_H_POWER_PCT, mIntakeState.getPower());
-                db.powercell.set(EPowerCellData.DESIRED_V_POWER_PCT, mIntakeState.getPower());
+            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.INDEXING.ordinal()) {
+                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
+                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, mIntakeState.getPower());
             }
-
             db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
 
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
@@ -211,9 +210,9 @@ public class TestController extends AbstractController {
 
             db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
 
-            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.MOVING.ordinal()) {
-                db.powercell.set(EPowerCellData.DESIRED_H_POWER_PCT, mIntakeState.getPower());
-                db.powercell.set(EPowerCellData.DESIRED_V_POWER_PCT, mIntakeState.getPower());
+            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.INDEXING.ordinal()) {
+                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
+                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, mIntakeState.getPower());
             }
 
             db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
@@ -224,9 +223,9 @@ public class TestController extends AbstractController {
 
             db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
 
-            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.NOT_MOVING.ordinal()) {
-                db.powercell.set(EPowerCellData.DESIRED_H_POWER_PCT, mIntakeState.getPower());
-                db.powercell.set(EPowerCellData.DESIRED_V_POWER_PCT, mIntakeState.getPower());
+            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.NOT_INDEXING.ordinal()) {
+                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
+                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, mIntakeState.getPower());
             }
 
             db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
