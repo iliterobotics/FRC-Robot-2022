@@ -74,6 +74,11 @@ public class BobUtilsUnitTest extends BaseTest {
 
     }
 
+    /**
+     * Method to test the method {@link BobUtils#getAvailablePathClasses(Reflections)}
+     * with a mocked {@link Reflections}. This test will ensure that a reflections that
+     * returns an empty set causes the method being tested to return an empty set.
+     */
     @Test
     @Category(CriticalTest.class)
     public void test_getAvailablePathClasses() {
@@ -82,6 +87,12 @@ public class BobUtilsUnitTest extends BaseTest {
         assertNotNull(availablePathClasses);
         assertTrue(availablePathClasses.isEmpty());
     }
+
+    /**
+     * Method to test the method {@link BobUtils#getAvailablePathClasses(Reflections)}
+     * with null {@link Reflections}. When passed a null, the method should return an
+     * empty set
+     */
     @Test
     @Category(CriticalTest.class)
     public void test_getAvailablePathClasses_null() {
@@ -90,6 +101,14 @@ public class BobUtilsUnitTest extends BaseTest {
         assertNotNull(availablePathClasses);
         assertTrue(availablePathClasses.isEmpty());
     }
+
+    /**
+     * Method to test the method {@link BobUtils#getAvailablePathClasses()} to
+     * ensure that it returns all of the classes that actually extend {@link Path}
+     *
+     * Note: If a new {@link Path} class is added, this method will fail as the
+     * {@link BobUtilsUnitTest#PATH_CLASSES} does not have the new Path class
+     */
     @Test
     @Category(CriticalTest.class)
     public void test_getAvailablePathClasses_realMethod() {
@@ -102,6 +121,14 @@ public class BobUtilsUnitTest extends BaseTest {
         assertEquals(PATH_CLASSES.size(), availablePathClasses.size());
     }
 
+    /**
+     * Method to test the method {@link BobUtils#getAvailablePaths()} to
+     * ensure that it returns all of the Path objects that actually extend {@link Path}
+     * are instantiated and returned in the Map
+     *
+     * Note: If a new {@link Path} class is added, this method will fail as the
+     * {@link BobUtilsUnitTest#PATH_CLASSES} does not have the new Path class
+     */
     @Test
     @Category(CriticalTest.class)
     public void test_getAvailablePaths() {
