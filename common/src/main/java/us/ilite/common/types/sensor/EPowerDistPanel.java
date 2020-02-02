@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexOf;
 
+import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 
 public enum EPowerDistPanel implements CodexOf<Double> {
@@ -88,7 +89,7 @@ public enum EPowerDistPanel implements CodexOf<Double> {
     pCodex.set(TEMPERATURE, pPDP.getTemperature());
   }
 
-  public static boolean isAboveCurrentThreshold(double pCurrentThreshold, Codex<Double, EPowerDistPanel> pPdpCodex, EPowerDistPanel ... pPdpSlots) {
+  public static boolean isAboveCurrentThreshold(double pCurrentThreshold, RobotCodex<EPowerDistPanel> pPdpCodex, EPowerDistPanel ... pPdpSlots) {
       boolean isCurrentLimiting = false;
       for(EPowerDistPanel slot : pPdpSlots) {
         if(pPdpCodex.get(slot) >= pCurrentThreshold) isCurrentLimiting = true;
