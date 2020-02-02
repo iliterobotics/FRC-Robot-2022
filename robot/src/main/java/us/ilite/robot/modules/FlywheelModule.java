@@ -18,10 +18,11 @@ import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
+import us.ilite.robot.hardware.TalonSRXFactory;
 
 
 public class FlywheelModule extends Module {
-    public static final double kAcceleratorThreshold = 0.15;
+    public static final double kAcceleratorThreshold = 0.14;
 
     private final PIDGains kShooterGains = new PIDGains( 0.0005 ,0 , 0);
     private double mPreviousTime;
@@ -35,7 +36,7 @@ public class FlywheelModule extends Module {
 
     public FlywheelModule() {
         mFlywheelMaster = new TalonFX(50);
-        mFlywheelFeeder = new TalonSRX( 51);
+        mFlywheelFeeder = TalonSRXFactory.createPermanentSlaveTalon(51 , 50);
         mTurretGyro = new PigeonIMU(Settings.Hardware.CAN.kPigeonIDForFlywheel);
     }
     @Override
