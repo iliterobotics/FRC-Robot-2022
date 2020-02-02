@@ -13,6 +13,7 @@ import us.ilite.common.config.Settings;
 
 import static java.lang.Math.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,20 +41,22 @@ public class BobUtils {
     }
 
     public static Map<String, Path> getAvailablePaths() {
-
-        Reflections reflections = new Reflections(Settings.AUTO_PATH_PACKAGE);
-        Set<Class<? extends Path>> allClasses = reflections.getSubTypesOf(Path.class);
+        Set<Class<? extends Path>> allClasses = getAvailablePathClasses();
         Map<String, Path> availablePaths = new HashMap<>();
         for(Class<?> c : allClasses) {
             System.out.println("===> Found Path: " + c.getSimpleName());
             try {
-                Path p = (Path) BobUtils.class.getClassLoader().loadClass(c.getName()).newInstance();
+                Path p = (Path) BobUtils.class.getClassLoader().loadClass(c.getName()).getDeclaredConstructor().newInstance();
                 availablePaths.put(c.getSimpleName(), p);
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
