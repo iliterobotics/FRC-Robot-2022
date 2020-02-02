@@ -22,41 +22,22 @@ import us.ilite.robot.hardware.SparkMaxFactory;
 
 public class FlywheelModule extends Module {
     public static final double kAcceleratorThreshold = 0.15;
-    private PigeonIMU mTurretGyro;
 
     private final PIDGains kShooterGains = new PIDGains( 0.0005 ,0 , 0);
     private double mPreviousTime;
 
-    public CANSparkMax mFlywheelMasterOld;
-    private Servo mHoodAngler;
-    private TalonSRX mTurret;
-    private TalonSRX mAccelerator;
     private TalonFX mFlywheelMaster;
-//    private CANEncoder mShooterEncoder;
+    private TalonSRX mFlywheelFeeder;
+    private PigeonIMU mTurretGyro;
 
-    private PIDController mShooterPID;
-
-    private double desiredFlywheelVelocity = 0;
-    private double kShooterTargetVelocity = 1885;
+    private PIDController mShooterPIDMaster;
+    private PIDController mShooterPIDFeeder;
 
     public FlywheelModule() {
-//        mFlywheelMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
-//        mAccelerator = new TalonSRX(Settings.Hardware.CAN.kAcceleratorID);
-//        mHoodAngler = new Servo(Settings.Hardware.CAN.kAnglerID);
-//        mTurret = new TalonSRX(Settings.Hardware.CAN.kTurretID);
-//        mTurretGyro = new PigeonIMU(Settings.Hardware.CAN.kTurretGyroID);
-//        mShooterEncoder = mFlywheelMaster.getEncoder();
-//        mShooterPID = new PIDController(kShooterGains, 0, 0.5, 0);
         mFlywheelMaster = new TalonFX(50);
+        mFlywheelFeeder = new TalonSRX( 51);
+        mTurretGyro = new PigeonIMU(Settings.Hardware.CAN.kPigeonIDForFlywheel);
     }
-    public Angle calcAngleFromDistance(Distance distance, Distance height) {
-        return Angle.fromDegrees(Math.atan(height.inches() / distance.inches()));
-    }
-
-    public boolean isMaxVelocity() {
-        return mFlywheelMaster.getSelectedSensorVelocity() >= kAcceleratorThreshold;
-    }
-
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
 
@@ -64,40 +45,21 @@ public class FlywheelModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        mFlywheelMaster.set(ControlMode.Velocity , 0.07);
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, 0.07);
-//        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY, (double) mTurret.getSelectedSensorVelocity());
-//        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_HOOD_ANGLE, mHoodAngler.getAngle());
-//        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, (double)mAccelerator.getSelectedSensorVelocity());
-//        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_MODE, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_MODE));
-//        Robot.DATA.flywheel.set(EShooterSystemData.DESIRED_FLYWHEEL_VELOCITY, desiredFlywheelVelocity);
-
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mFlywheelMaster.getSelectedSensorVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FEEDER_VELOCITY , mFlywheelFeeder.getSelectedSensorVelocity());
 
     }
 
     @Override
     public void setOutputs(double pNow) {
-//        desiredFlywheelVelocity = mShooterPID.calculate(kShooterTargetVelocity, pNow - mPreviousTime);
-//        if ( isMaxVelocity() ) {
-//            mAccelerator.set(ControlMode.PercentOutput, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_ACCELERATOR_VELOCITY));
-//        }
-//        else {
-//            mAccelerator.set(ControlMode.PercentOutput, 0.0);
-//        }
-//        mFlywheelMaster.set(ControlMode.Velocity , 0.07);
-//        mTurret.set(ControlMode.PercentOutput, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY));
-//        mPreviousTime = pNow;
-          setPowerToMotors();
+        mFlywheelMaster.set(ControlMode.Velocity , Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
+        mFlywheelFeeder.set(ControlMode.PercentOutput, Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FEEDER_VELOCITY ) );
     }
 
 
     @Override
     public void shutdown(double pNow) {
 
-    }
-    public void setPowerToMotors(){
-        System.out.println("0000000000000000000000000000000000000000000");
-        mFlywheelMaster.set(ControlMode.PercentOutput , 0.05);
     }
 
 }

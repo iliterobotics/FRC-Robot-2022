@@ -53,6 +53,8 @@ public class Settings extends NetworkTablesConstantsBase {
             public static int kPCM = 20;
             public static int kPDP = 21;
             public static int kPigeon = 30;
+            public static int kPigeonIDForFlywheel;
+
 //            public static double kGyroCollisionThreshold = 0.0;
 
             public static  int kDriveLeftMaster = 1;
