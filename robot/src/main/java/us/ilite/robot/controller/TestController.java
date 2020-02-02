@@ -27,7 +27,7 @@ public class TestController extends AbstractController {
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
     private double mLimelightZoomThreshold = 7.0;
 
-    private HangerModule.EHangerState mHangerState;
+    private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.HANGING;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
     private double mPreviousTime;
@@ -37,7 +37,7 @@ public class TestController extends AbstractController {
 
     public void update(double pNow) {
         updateLimelightTargetLock();
-        updateDrivetrain(pNow);
+//        updateDrivetrain(pNow);
         updateFlywheel(pNow);
         updateIntake(pNow);
         updateHanger(pNow);
@@ -45,15 +45,14 @@ public class TestController extends AbstractController {
     }
     private void updateHanger(double pNow){
         if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 1.0);
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 1.0);
-
-        }
-        else if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.RELEASE_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 0.0);
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 0.0);
-
-        }
+            mLog.error("--------------------------HANGER---------------------");
+        db.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION1,
+                db.hanger.get(EHangerModuleData.DESIRED_HANGER_POSITION1));
+       // db.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION2, -0.5);
+    } else {
+        db.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1, 0.0);
+        db.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2, 0.0);
+    }
         switch (mHangerState){
             case HANGING:
                 Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 1.0);
