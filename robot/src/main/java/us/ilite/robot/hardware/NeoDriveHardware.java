@@ -49,7 +49,7 @@ public class NeoDriveHardware implements IDriveHardware {
         mLeftMiddle.setInverted(true);
 
         mRightMaster.setInverted(false);
-        mRightMiddle.setInverted(false);
+        mRightMiddle.setInverted(true);
 
         // Invert sensor readings by multiplying by 1 or -1
         mLeftMaster.getEncoder().setPositionConversionFactor(1.0 * kGearRatio);
@@ -103,7 +103,8 @@ public class NeoDriveHardware implements IDriveHardware {
 
     public void setTarget(double pLeftPercentMaxVelocity, double pRightPercentMaxVelocity) {
         mLeftMaster.getPIDController().setReference(pLeftPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
-        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);s
+        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
+        System.out.println("---------------------------- LEFT CURRENT: " +  mLeftMaster.getOutputCurrent() + "      ||||||||||     RIGHT CURRENT " + mRightMaster.getOutputCurrent() + "\n");
     }
 
     /**
