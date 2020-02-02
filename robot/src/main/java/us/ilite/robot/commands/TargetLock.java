@@ -2,6 +2,7 @@ package us.ilite.robot.commands;
 
 import com.flybotix.hfr.codex.Codex;
 
+import com.flybotix.hfr.codex.RobotCodex;
 import us.ilite.common.IFieldComponent;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
@@ -56,11 +57,11 @@ public class TargetLock implements ICommand {
 
     @Override
     public boolean update(double pNow) {
-        Codex<Double, ELimelightData> currentData = mCamera.getTargetingData();
+        RobotCodex<ELimelightData> currentData = mCamera.getTargetingData();
 
         mDrive.setTargetTrackingThrottle(mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
 
-        if(currentData != null && currentData.isSet(ELimelightData.TV) && currentData.get(ELimelightData.TX) != null) {
+        if(currentData != null && currentData.isSet(ELimelightData.TV) && currentData.isSet(ELimelightData.TX)) {
             mHasAcquiredTarget = true;
 
             mAlignedCount++;

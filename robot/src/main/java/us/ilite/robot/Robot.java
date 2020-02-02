@@ -3,6 +3,7 @@ package us.ilite.robot;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.ICodexTimeProvider;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -165,7 +166,7 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for (Codex c : DATA.mAllCodexes) {
+        for (RobotCodex c : DATA.mAllCodexes) {
             c.reset();
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
@@ -179,7 +180,7 @@ public class Robot extends TimedRobot {
         if (mMatchMeta == null) {
             mMatchMeta = new MatchMetadata();
             int gid = mMatchMeta.hash;
-            for (Codex c : DATA.mAllCodexes) {
+            for (RobotCodex c : DATA.mAllCodexes) {
                 c.meta().setGlobalId(gid);
             }
         }

@@ -1,8 +1,6 @@
 package us.ilite.common.types;
 
-import com.flybotix.hfr.codex.CodexOf;
-
-public enum EShooterSystemData implements CodexOf<Double> {
+public enum EShooterSystemData {
     CURRENT_FLYWHEEL_VELOCITY,
     TARGET_FLYWHEEL_VELOCITY,
     DESIRED_FLYWHEEL_VELOCITY,
