@@ -7,6 +7,7 @@ import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.common.types.ELimelightData;
@@ -36,15 +37,21 @@ public class TestController extends AbstractController {
     }
 
     public void update(double pNow) {
-        updateLimelightTargetLock();
-//        updateDrivetrain(pNow);
-        updateFlywheel(pNow);
-        updateIntake(pNow);
+//        updateLimelightTargetLock();
+////        updateDrivetrain(pNow);
+//        updateFlywheel(pNow);
+//        updateIntake(pNow);
+        mLog.error("___()()()()()()()()()()()()()()___");
+        System.out.println(db.driverinput);
+        if (db.driverinput.isSet(ELogitech310.Y_BTN) ){
+            mLog.error("I EXIST------------------------------------");
+            db.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION1 , 1.0);
+        }
         updateHanger(pNow);
 //        updateArm(pNow);
     }
     private void updateHanger(double pNow){
-        if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
+        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
             mLog.error("--------------------------HANGER---------------------");
         db.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION1,
                 db.hanger.get(EHangerModuleData.DESIRED_HANGER_POSITION1));

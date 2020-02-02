@@ -31,7 +31,9 @@ public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
     private Data mData;
+
     private Limelight mLimelight = new Limelight();
+    private HangerModule mHanger = new HangerModule();
     private PowerCellModule mIntake = new PowerCellModule();
     private ModuleList mRunningModules = new ModuleList();
     private DriveModule mDrive = new DriveModule();
@@ -63,7 +65,6 @@ public class Robot extends TimedRobot {
         mShooter = new FlywheelModule();
         mDrive = new DriveModule();
         mIntake = new PowerCellModule();
-        mLimelight = new Limelight();
         mOI = new OperatorInput();
         mLimelight = new Limelight();
         mRawLimelight = new RawLimelight();
@@ -150,11 +151,11 @@ public class Robot extends TimedRobot {
     public void testInit() {
         mActiveController = mTestController;
         mRunningModules.clearModules();
-//        mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
 //        mRunningModules.addModule(mDrive);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mHanger);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
