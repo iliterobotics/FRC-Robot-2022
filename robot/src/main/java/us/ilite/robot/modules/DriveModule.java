@@ -173,6 +173,7 @@ public class DriveModule extends Module {
 					((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
 				}
 			} else {
+				System.out.println("Trying to set output1233333333333333333333333333333333333");
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
 				double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
