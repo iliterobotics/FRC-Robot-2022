@@ -1,16 +1,21 @@
 package us.ilite.robot.auto.paths;
 
 import com.team2363.commands.HelixFollower;
-import com.team319.trajectory.Path;
 
 import static com.team319.trajectory.Path.SegmentValue.*;
+
+import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import org.reflections.Reflections;
+import us.ilite.common.config.Settings;
+
 import static java.lang.Math.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class BobUtils {
 
@@ -22,6 +27,28 @@ public class BobUtils {
 
     public static double getMeters(Path pPath, Path.SegmentValue pKey, int i) {
         return pPath.getValue(i, pKey) * FEET_TO_METERS;
+    }
+
+    public static Map<String, Path> getAvailablePaths() {
+
+        Reflections reflections = new Reflections(Settings.AUTO_PATH_PACKAGE);
+        Set<Class<? extends Path>> allClasses = reflections.getSubTypesOf(Path.class);
+        Map<String, Path> availablePaths = new HashMap<>();
+        for(Class<?> c : allClasses) {
+            System.out.println("===> Found Path: " + c.getSimpleName());
+            try {
+                Path p = (Path) BobUtils.class.getClassLoader().loadClass(c.getName()).newInstance();
+                availablePaths.put(c.getSimpleName(), p);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return availablePaths;
     }
 
     /**

@@ -4,7 +4,8 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import us.ilite.common.Data;
+import us.ilite.common.Angle;
+import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
@@ -12,7 +13,10 @@ import us.ilite.common.lib.control.ProfileGains;
 import static us.ilite.common.types.sensor.EGyro.HEADING_DEGREES;
 
 import us.ilite.common.types.drive.EDriveData;
+import static us.ilite.common.types.drive.EDriveData.*;
+import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.ECommonControlMode;
+import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.DriveMessage;
 
@@ -24,15 +28,10 @@ import us.ilite.robot.modules.DriveMessage;
  */
 public class DriveStraight implements ICommand {
 
-    private final ILog mLog = Logger.createLog(DriveStraight.class);
-
-    private final DriveModule mDrive;
-    private final Data mData;
-
     private final EDriveControlMode mDriveControlMode;
 
-    private double mDistanceToDrive;
-    private double mInitialDistance;
+    private Distance mDistanceToDrive;
+    private Distance mInitialDistance;
     private Rotation2d mTargetHeading = null;
 
     private double mDrivePercentOutput = 0.3;
@@ -40,16 +39,15 @@ public class DriveStraight implements ICommand {
     private double mRampDistance = 120.0;
     private double mLastTime = 0.0;
     private double mStartTime = 0.0;
-    private PIDController mHeadingController = new PIDController(DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
+    private PIDController mHeadingController = new PIDController(
+            DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
 
     private ProfiledPIDController mDistanceController = DriveModule.kDistancePID.generateController();
 
-    public DriveStraight(DriveModule pDrive, Data pData, EDriveControlMode pDriveControlMode, double pDistanceToDrive) {
-        mDrive = pDrive;
-        mData = pData;
+    public DriveStraight(EDriveControlMode pDriveControlMode, Distance pDistanceToDrive) {
         mDistanceToDrive = pDistanceToDrive;
         mDriveControlMode = pDriveControlMode;
-        mDistanceController.setGoal(mDistanceToDrive);
+        mDistanceController.setGoal(mDistanceToDrive.inches());
     }
 
     /**
@@ -58,9 +56,7 @@ public class DriveStraight implements ICommand {
     public enum EDriveControlMode {
         MOTION_MAGIC(ECommonControlMode.MOTION_PROFILE),
         PERCENT_OUTPUT(ECommonControlMode.PERCENT_OUTPUT);
-
         public final ECommonControlMode kMotorControlMode;
-
         EDriveControlMode(ECommonControlMode pMotorControlMode) {
             kMotorControlMode = pMotorControlMode;
         }
@@ -71,7 +67,7 @@ public class DriveStraight implements ICommand {
         // Set target heading to current heading if setTargetHeading() wasn't called manually
         if(mTargetHeading == null) {
             // TODO - was this inverted?
-            mTargetHeading = Rotation2d.fromDegrees(mData.imu.get(HEADING_DEGREES));
+            mTargetHeading = Rotation2d.fromDegrees(Robot.DATA.imu.get(HEADING_DEGREES));
         }
         mInitialDistance = getAverageDriveDistance();
         mLastTime = pNow;
@@ -85,33 +81,25 @@ public class DriveStraight implements ICommand {
     @Override
     public boolean update(double pNow) {
 
-        double turn = mHeadingController.calculate(mData.imu.get(HEADING_DEGREES), pNow - mLastTime);
+        double turn = mHeadingController.calculate(getHeading().degrees(), pNow - mLastTime);
         // TODO - the units here are probably incorrect
-        double throttle = mDistanceController.calculate(getAverageDriveDistance());
+        double throttle = mDistanceController.calculate(getAverageDriveDistance().inches());
 
         if(mDistanceController.atSetpoint()) {
-
-            // Stop drivebase
-            mDrive.setDriveMessage(DriveMessage.kNeutral);
-
-            mLastTime = pNow;
             return true;
         } else {
-            DriveMessage driveMessage = new DriveMessage().throttle(throttle).turn(turn).normalize();
-            mDrive.setDriveMessage(driveMessage);
+            DriveMessage d = new DriveMessage().throttle(throttle).turn(turn).normalize();
+            Robot.DATA.drivetrain.set(DESIRED_NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
+            Robot.DATA.drivetrain.set(DESIRED_THROTTLE, d.getThrottle());
+            Robot.DATA.drivetrain.set(DESIRED_TURN, d.getTurn());
             mLastTime = pNow;
-
-//            Data.kSmartDashboard.putDouble("Angle Error", mHeadingController.getError());
-//            Data.kSmartDashboard.putDouble("PID Output", mHeadingController.getOutput());
-//            Data.kSmartDashboard.putDouble("Angle", mData.imu.get(EGyro.HEADING_DEGREES));
-//            Data.kSmartDashboard.putDouble("Target Angle", mTargetHeading.getDegrees());
-//            Data.kSmartDashboard.putDouble("Linear Output", linearOutput);
-//            Data.kSmartDashboard.putDouble("Distance Target", mDistanceToDrive);
-//            Data.kSmartDashboard.putDouble("Distance Error", distanceError);
-
             return false;
         }
 
+    }
+
+    protected Angle getHeading() {
+        return Angle.fromDegrees(Robot.DATA.imu.get(HEADING_DEGREES));
     }
 
     @Override
@@ -119,15 +107,17 @@ public class DriveStraight implements ICommand {
 
     }
 
-    private double getAverageDriveDistance() {
-        return (mData.drivetrain.get(EDriveData.LEFT_POS_INCHES) + mData.drivetrain.get(EDriveData.RIGHT_POS_INCHES)) / 2.0;
+    private Distance getAverageDriveDistance() {
+        return Distance.fromInches(
+                        Robot.DATA.drivetrain.get(LEFT_POS_INCHES) +
+                        Robot.DATA.drivetrain.get(RIGHT_POS_INCHES) / 2.0);
     }
 
-    private double getAverageDistanceTraveled() {
-        return getAverageDriveDistance() - mInitialDistance;
+    private Distance getAverageDistanceTraveled() {
+        return Distance.fromInches(getAverageDriveDistance().inches() - mInitialDistance.inches());
     }
 
-    public DriveStraight setDistanceToDrive(double pDistanceToDrive) {
+    public DriveStraight setDistanceToDrive(Distance pDistanceToDrive) {
         mDistanceToDrive = pDistanceToDrive;
         return this;
     }
