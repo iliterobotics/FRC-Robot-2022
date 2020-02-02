@@ -2,6 +2,7 @@ package us.ilite.robot.controller;
 
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
@@ -174,10 +175,13 @@ public class TestController extends AbstractController {
 
         db.drivetrain.set(SHOULD_HOLD_POSITION, (throttle == 0.0 && rotate == 0.0) ? 1.0 : 0.0);
 
+        if (db.drivetrain.get(DESIRED_CONTROL_MODE, DriveModule.EDriveControlMode.class) != DriveModule.EDriveControlMode.VELOCITY) {
+            db.drivetrain.set(DESIRED_CONTROL_MODE, DriveModule.EDriveControlMode.VELOCITY);
+        }
         if (throttle == 0.0 && rotate == 0.0) {
             db.drivetrain.set(DESIRED_THROTTLE, 0.0);
             db.drivetrain.set(DESIRED_TURN, 0.0);
-        } else {;
+        } else {
             db.drivetrain.set(SHOULD_HOLD_POSITION, 0.0);
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.03;

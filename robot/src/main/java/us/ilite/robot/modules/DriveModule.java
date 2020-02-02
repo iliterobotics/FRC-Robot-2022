@@ -85,6 +85,7 @@ public class DriveModule extends Module {
 	private Rotation2d mGyroOffset = new Rotation2d();
 
 	private EDriveState mDriveState;
+	private EDriveControlMode mDriveControlMode;
 	private DriveMessage mDriveMessage;
 
 	private PIDController mTargetAngleLockPid;
@@ -95,6 +96,11 @@ public class DriveModule extends Module {
 	private double mCurrentHeading;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
+
+	public enum EDriveControlMode {
+		VELOCITY,
+		PERCENT_OUTPUT
+	}
 
 	public DriveModule() {
 		if(AbstractSystemSettingsUtils.isPracticeBot()) {
@@ -157,30 +163,36 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs(double pNow) {
+		mDriveControlMode = db.drivetrain.get(DESIRED_CONTROL_MODE, EDriveControlMode.class);
 		mHoldPosition = db.drivetrain.get(SHOULD_HOLD_POSITION) == 1.0;
 		if (mDriveState != EDriveState.NORMAL) {
 			mLogger.error("Invalid drivetrain state - maybe you meant to run this a high frequency?");
 			mDriveState = EDriveState.NORMAL;
 		} else {
-			if (mHoldPosition) {
-				System.out.println(db.drivetrain.get(RIGHT_POS_INCHES));//LEFT_POS_INCHES));
-				if (!mStartHoldingPosition) {
-					mHoldPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));//LEFT_POS_INCHES));
-					mStartHoldingPosition = true;
-				}
-				if (Math.abs(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
-					double output = mHoldPositionPid.calculate(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES), pNow);
-					((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
-				}
-			} else {
-				mStartHoldingPosition = false;
-				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
-				double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-				double mThrottle = db.drivetrain.get(DESIRED_THROTTLE);
-				DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
-				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
-				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-				((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput());
+			switch (mDriveControlMode) {
+				case VELOCITY:
+					if (mHoldPosition) {
+						System.out.println(db.drivetrain.get(RIGHT_POS_INCHES));//LEFT_POS_INCHES));
+						if (!mStartHoldingPosition) {
+							mHoldPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));//LEFT_POS_INCHES));
+							mStartHoldingPosition = true;
+						}
+						if (Math.abs(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES) - mHoldPositionPid.getSetpoint()) > .5) {
+							double output = mHoldPositionPid.calculate(db.drivetrain.get(/*LEFT_POS_INCHES*/ RIGHT_POS_INCHES), pNow);
+							((NeoDriveHardware) mDriveHardware).set(new DriveMessage().throttle(output));
+						}
+					} else {
+						mStartHoldingPosition = false;
+						mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN) * Settings.Drive.kMaxHeadingChange);
+						double mTurn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
+						double mThrottle = db.drivetrain.get(DESIRED_THROTTLE);
+						DriveMessage driveMessage = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
+						SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
+						SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
+						((NeoDriveHardware) mDriveHardware).setTarget(driveMessage.getLeftOutput(), driveMessage.getRightOutput());
+					}
+				case PERCENT_OUTPUT:
+					mDriveHardware.set(mDriveMessage);
 			}
 			mPreviousHeading = mDriveHardware.getImu().getHeading().getDegrees();
 			mPreviousTime = pNow;
@@ -227,10 +239,18 @@ public class DriveModule extends Module {
 	@Override
 	public boolean checkModule(double pNow) {
         return mDriveHardware.checkHardware();
-	} 
+	}
 
 	public synchronized void setDriveMessage(DriveMessage pDriveMessage) {
 		this.mDriveMessage = pDriveMessage;
+	}
+
+	public DriveMessage grabFromCodex() {
+		double turn = db.drivetrain.get(DM_TURN);
+		double throttle = db.drivetrain.get(DM_THROTTLE);
+		double leftOutput = db.drivetrain.get(DM_LEFT_OUTPUT);
+		double rightOuptut = db.drivetrain.get(DM_RIGHT_OUTPUT);
+		double isDirect = 
 	}
 
 	public synchronized IDriveHardware getDriveHardware() {
