@@ -6,15 +6,17 @@ import com.flybotix.hfr.codex.ICodexTimeProvider;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.*;
+import us.ilite.common.CSVLoggerQueue;
+import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
-import us.ilite.common.config.*;
+import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.BaseAutonController;
 import us.ilite.robot.controller.TeleopController;
@@ -22,7 +24,7 @@ import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
 
-import static us.ilite.common.types.EMatchMode.*;
+import static us.ilite.common.types.EMatchMode.TEST;
 
 public class Robot extends TimedRobot {
 
@@ -67,7 +69,7 @@ public class Robot extends TimedRobot {
         mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
 
-        mCSVLogger.start();
+        //mCSVLogger.start();
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -169,6 +171,7 @@ public class Robot extends TimedRobot {
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
         for (Codex c : DATA.mAllCodexes) {
+            CSVLoggerQueue.kCSVLoggerQueue.add( c.toCSV() );
             c.reset();
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);

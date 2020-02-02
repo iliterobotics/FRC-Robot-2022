@@ -111,19 +111,19 @@ public class Data {
             mCodexCsvLoggers.forEach(c -> c.writeHeader());
 //        }
     }
-    public void logFromCodexToCSVLog() {
-        // Check that the USB drivetrain is still plugged in
-//        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
-            mCodexCsvLoggers.forEach(c -> c.writeAllLines());
-//        }
-    }
+//    public void logFromCodexToCSVLog() {
+//        // Check that the USB drivetrain is still plugged in
+////        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
+//            mCodexCsvLoggers.forEach(c -> c.writeAllLines());
+////        }
+//    }
 
-    /**
-     * Closes all the writers in mNetworkTableWriters
-     */
-    public void closeWriters() {
-        mCodexCsvLoggers.forEach(c -> c.closeWriter());
-    }
+//    /**
+//     * Closes all the writers in mNetworkTableWriters
+//     */
+//    public void closeWriters() {
+//        mCodexCsvLoggers.forEach(c -> c.closeWriter());
+//    }
 
     /**
      * Makes the log file if it doesn't already exist
