@@ -187,11 +187,11 @@ public class DriveModule extends Module {
 					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
-				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mHoldLeftPositionPid.getSetpoint()) > 1) {
+				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mHoldLeftPositionPid.getSetpoint()) > .5) {
 					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
 					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 				}
-				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mHoldRightPositionPid.getSetpoint()) > 1) {
+				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mHoldRightPositionPid.getSetpoint()) > .5) {
 					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
 					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 				}
@@ -205,16 +205,18 @@ public class DriveModule extends Module {
 				DriveMessage d = new DriveMessage().turn(mTurn).throttle(mThrottle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-//				mLeftCtrl.setReference(100, kVelocity, VELOCITY_PID_SLOT, 0);//d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				mRightCtrl.setReference(100, kVelocity, VELOCITY_PID_SLOT, 0);//d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-				mLeftMaster.set(.2);
-				mRightMaster.set(.2);
+				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity * 2, kVelocity, VELOCITY_PID_SLOT, 0);
+				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity * 2, kVelocity, VELOCITY_PID_SLOT, 0);
+//				mLeftMaster.set(.2);
+//				mRightMaster.set(.2);
 				break;
 			case PERCENT_OUTPUT:
 				break;
 		}
 		mPreviousTime = pNow;
 		mPreviousHeading = db.imu.get(EGyro.HEADING_DEGREES);
+
+		System.out.println("||||||||||||||||||| LEFT CURRENT : " + mLeftMaster.getOutputCurrent() + " ||||||||||||||||||||| RIGHT CURRENT : " + mRightMaster.getOutputCurrent() + " ||||||||||||||||||||||||");
 	}
 
 	public void loop(double pNow) {
