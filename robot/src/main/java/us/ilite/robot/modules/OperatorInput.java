@@ -1,6 +1,7 @@
 package us.ilite.robot.modules;
 
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.lang.EnumUtils;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -41,7 +42,7 @@ public class OperatorInput extends Module {
     @Override
     public void setOutputs(double pNow) {
         if (mMode == EMatchMode.TEST) {
-            for(Codex c : Robot.DATA.mLoggedCodexes) {
+            for(RobotCodex c : Robot.DATA.mLoggedCodexes) {
                 String codex = c.meta().getEnum().getSimpleName();
                 List<Enum<?>> enums = EnumUtils.getEnums(c.meta().getEnum(), true);
                 for(int i = 0; i < enums.size(); i++) {

@@ -1,10 +1,7 @@
 
 package us.ilite.common.types;
 
-
-import com.flybotix.hfr.codex.CodexOf;
-
-public enum ELimelightData implements CodexOf<Double> {
+public enum ELimelightData {
     //  Limelight target values
     TV,         // Whether the limelight has any valid targets (0 or 1)
     TX,         // Horizontal Offset From Crosshair To Target (LL1: -27 degrees to 27 degrees | LL2: -29.8 to 29.8 degrees)

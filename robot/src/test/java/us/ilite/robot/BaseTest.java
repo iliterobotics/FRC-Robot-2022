@@ -1,14 +1,13 @@
 package us.ilite.robot;
 
-import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.RobotCodex;
 import us.ilite.common.Data;
 import us.ilite.common.types.input.ELogitech310;
 
-import java.lang.annotation.ElementType;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import static java.lang.Math.*;
+import static java.lang.Math.random;
 
 public class BaseTest {
 
@@ -27,7 +26,7 @@ public class BaseTest {
         }
     }
 
-    private final void setInputToRandom(Codex<Double, ELogitech310> pOI, ELogitech310 pInput) {
+    private final void setInputToRandom(RobotCodex<ELogitech310> pOI, ELogitech310 pInput) {
         if(pInput.isAxis()) {
             pOI.set(pInput, random() * random() > 0.5 ? 1d : -1d);
         } else {

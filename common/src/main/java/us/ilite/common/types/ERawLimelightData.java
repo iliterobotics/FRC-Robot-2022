@@ -1,8 +1,6 @@
 package us.ilite.common.types;
 
-import com.flybotix.hfr.codex.CodexOf;
-
-public enum ERawLimelightData implements CodexOf<Double> {
+public enum ERawLimelightData{
     // TODO - document what these values represent
     tv,
     tx,
