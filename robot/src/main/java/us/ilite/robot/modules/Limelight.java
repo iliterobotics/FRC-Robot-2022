@@ -10,31 +10,39 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import us.ilite.common.*;
-import us.ilite.common.config.*;
-//import us.ilite.common.config.Settings.VisionTarget;
-import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ETargetingData;
-import us.ilite.common.types.ETrackingType;
+import us.ilite.common.Field2020;
 
-import static us.ilite.common.types.ETargetingData.*;
+import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.ELimelightData;
+import us.ilite.common.IFieldComponent;
+import static us.ilite.common.types.ELimelightData.*;
+
 
 import us.ilite.robot.Robot;
-import us.ilite.robot.loops.Loop;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
-public class Limelight extends Loop implements ITargetDataProvider {
+public class Limelight extends Module implements ITargetDataProvider {
+    public static final IFieldComponent NONE = new IFieldComponent() {
+        public int id() {return -1;}
+        public double height() {return 0;}
+        public int pipeline() {return 0;}
+        public String toString() { return "NONE"; }
+    };
 
     private final ILog mLog = Logger.createLog(Limelight.class);
     private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable("limelight");
 
+
     // =============================================================================
     // LimeLight Camera Constants
-    // Note: These constants need to be recalculted for a specific robot geometry
+    // Note: These constants need to be recalculated for a specific robot geometry
     // =============================================================================
     public static double kHeightIn = 58.0;
     public static double kToBumperIn = 10.0;
     public static double kAngleDeg = 28.55;
+
+    public static double llFOVVertical = 49.7;
+    public static double llFOVHorizontal = 59.6;
 
     // Left angle coefficients for angle = a + bx + cx^2
     //    a	0.856905324060421
@@ -52,42 +60,40 @@ public class Limelight extends Loop implements ITargetDataProvider {
     public static double kRightBCoeff = -4.53956454545558;
     public static double kRightCCoeff = -0.0437470770400814;
 
-    private ETrackingType mTrackingType = null;
-    private VisionTarget mVisionTarget = null;
+    protected IFieldComponent mVisionTarget = null;
 
-    public Limelight(Data pData) {
-
+    public Limelight() {
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        setTracking(ETrackingType.NONE);
+        setTracking(NONE);
     }
 
     @Override
     public void readInputs(double pNow) {
+        mVisionTarget = Field2020.FieldElement.values()[Robot.DATA.limelight.get(TARGET_ID).intValue()];
+
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
-        Robot.DATA.limelight.set(ETargetingData.tv, targetValid ? 1.0d : null);
+        Robot.DATA.limelight.set(TV, targetValid ? 1.0d : null);
 
         if(targetValid) {
-            Robot.DATA.limelight.set(ETargetingData.tx, mTable.getEntry("tx").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.ty,mTable.getEntry("ty").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.ta,mTable.getEntry("ta").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.ts,mTable.getEntry("ts").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.tl,mTable.getEntry("tl").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.tshort,mTable.getEntry("tshort").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.tlong,mTable.getEntry("tlong").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(ETargetingData.thoriz,mTable.getEntry("thoriz").getDouble(Double.NaN));
-            Robot. DATA.limelight.set(ETargetingData.tvert,mTable.getEntry("tvert").getDouble(Double.NaN));
-            if(mVisionTarget != null) {
-
-                Robot.DATA.limelight.set(ETargetingData.targetOrdinal, (double)mVisionTarget.ordinal());
-                Robot.DATA.limelight.set(ETargetingData.calcDistToTarget, calcTargetDistance(mVisionTarget));
-                Robot.DATA.limelight.set(calcAngleToTarget, calcTargetApproachAngle());
+            Robot.DATA.limelight.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(TA,mTable.getEntry("ta").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(TSHORT,mTable.getEntry("tshort").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
+            Robot. DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
+            if(mVisionTarget.equals(NONE)) {
+                Robot.DATA.limelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget.height()));
+                Robot.DATA.limelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
                 Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
                 if(p.isPresent()) {
-                    Robot.DATA.limelight.set(ETargetingData.calcTargetX, p.get().getX());
-                    Robot.DATA.limelight.set(ETargetingData.calcTargetY, p.get().getY());
+                    Robot.DATA.limelight.set(CALC_TARGET_X, p.get().getX());
+                    Robot.DATA.limelight.set(CALC_TARGET_Y, p.get().getY());
                 }
             }
         }
@@ -95,18 +101,10 @@ public class Limelight extends Loop implements ITargetDataProvider {
 
     @Override
     public void setOutputs(double pNow) {
-
-        mLog.error("Current Tracking Type: " + (mTrackingType == null ? "Null" : mTrackingType.name()));
-        if(mTrackingType != null) {
-            setLedMode(mTrackingType.getLedOn() ? LedMode.LED_ON : LedMode.LED_OFF);
-            setPipeline(mTrackingType.getPipeline());
-        } else {
-            setTracking(ETrackingType.NONE);
-        }
-    }
-
-    public void loop(double pNow) {
-        setOutputs(pNow);
+        setLedMode();
+        setCamMode();
+        setStreamMode();
+        setSnapshotMode();
     }
 
     @Override
@@ -114,62 +112,43 @@ public class Limelight extends Loop implements ITargetDataProvider {
 
     }
 
-    public enum LedMode {
-        NO_CHANGE,
-        LED_OFF,
-        LED_BLINK,
-        LED_ON;
-    }
-
-    public enum Stream {
-        STANDARD,
-        PIP_MAIN,
-        PIP_SECONDARY;
-    }
-
-    public void setVisionTarget(VisionTarget pVisionTarget) {
-        mVisionTarget = pVisionTarget;
-        // TODO reconcile pipeline
-    }
-
-    public void setTracking(ETrackingType pTrackingType) {
-        mLog.error("SET TRACKING TYPE: " + pTrackingType.name());
-        mTrackingType = pTrackingType;
-        // TODO - reconcile pipeline
-    }
-    
-    public ETrackingType getTracking() {
-        return this.mTrackingType;
-    }
-
-    public void setCamMode(boolean pMode) {
-        mTable.getEntry("camMode").setBoolean(pMode);
-    }
-
-    public void setLedMode(LedMode pMode) {
-        mTable.getEntry("ledMode").setNumber(pMode.ordinal());
-    }
-
-    public void setPipeline(int pipeline) {
+    private void setPipeline(int pipeline) {
         mTable.getEntry("pipeline").setNumber(pipeline);
     }
 
-    public void setSnapshot(boolean snapshot) {
-        mTable.getEntry("snapshot").setBoolean(snapshot);
+    private void setTracking(IFieldComponent pFieldElement) {
+        mVisionTarget = pFieldElement;
     }
 
-    public void setStream(Stream stream) { 
-        mTable.getEntry("stream").setNumber(stream.ordinal());
+    private void setLedMode() {
+        if (!Robot.DATA.limelight.get(DESIRED_LED_MODE).equals(Robot.DATA.limelight.get(CURRENT_LED_MODE))) {
+            mTable.getEntry("ledMode").setNumber(Robot.DATA.limelight.get(DESIRED_LED_MODE));
+        }
+    }
+    private void setCamMode() {
+        if (!Robot.DATA.limelight.get(DESIRED_CAM_MODE).equals(Robot.DATA.limelight.get(CURRENT_CAM_MODE))) {
+            mTable.getEntry("camMode").setNumber(Robot.DATA.limelight.get(DESIRED_CAM_MODE));
+        }
     }
 
+    private void setStreamMode() {
+        if (!Robot.DATA.limelight.get(DESIRED_STREAM_MODE).equals(Robot.DATA.limelight.get(CURRENT_STREAM_MODE))) {
+            mTable.getEntry("stream").setNumber(Robot.DATA.limelight.get(DESIRED_STREAM_MODE));
+        }
+    }
 
-    @Override
+    private void setSnapshotMode() {
+        if (!Robot.DATA.limelight.get(DESIRED_SNAPSHOT_MODE).equals(Robot.DATA.limelight.get(CURRENT_SNAPSHOT_MODE))) {
+            mTable.getEntry("snapshot").setNumber(Robot.DATA.limelight.get(DESIRED_SNAPSHOT_MODE));
+        }
+    }
+
     public String toString() {
         return Robot.DATA.limelight.toCSV();
     }
 
     @Override
-    public Codex<Double, ETargetingData> getTargetingData() {
+    public Codex<Double, ELimelightData> getTargetingData() {
         return Robot.DATA.limelight;
     }
 

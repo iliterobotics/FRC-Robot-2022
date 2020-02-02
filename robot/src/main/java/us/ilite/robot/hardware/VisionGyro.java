@@ -4,13 +4,13 @@ import com.flybotix.hfr.codex.Codex;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 import us.ilite.common.Data;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ELimelightData;
 
 public class VisionGyro extends IMU {
 
     private static final double[] kCollisionGains = {1.0};
 
-    private Codex<Double, ETargetingData> mTargetingData;
+    private Codex<Double, ELimelightData> mTargetingData;
     private Rotation2d mGyroOffsetX = new Rotation2d();
     private Rotation2d mGyroOffsetY = new Rotation2d();
 
@@ -51,7 +51,7 @@ public class VisionGyro extends IMU {
     }
 
     private Rotation2d getX() {
-        Double x = mTargetingData.get(ETargetingData.tx);
+        Double x = mTargetingData.get(ELimelightData.TX);
 
         if(x != null) {
             // Invert?
@@ -62,7 +62,7 @@ public class VisionGyro extends IMU {
     }
 
     private Rotation2d getY() {
-        Double y = mTargetingData.get(ETargetingData.ty);
+        Double y = mTargetingData.get(ELimelightData.TY);
 
         if(y != null) {
             return Rotation2d.fromDegrees(y);
