@@ -129,12 +129,12 @@ public class TestController extends AbstractController {
 
     public void updateLimelightTargetLock() {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-            if (Robot.DATA.selectedTarget.get(ELimelightData.TY) != null) {
+            if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
                 SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
             }
             Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
-            if (Robot.DATA.selectedTarget.get(ELimelightData.TY) != null) {
+            if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
                 if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
                     Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET_ZOOM.id());
                     System.out.println("ZOOMING");
@@ -155,7 +155,7 @@ public class TestController extends AbstractController {
                 Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double)Limelight.NONE.id());
 //            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
         }
-        if (!(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()).equals(mLastTrackingType) )
+        if ((Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) != (mLastTrackingType) )
                 && !(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) == Limelight.NONE.id())) {
                 mLog.error("Requesting command start");
                 mLog.error("Stopping teleop command queue");
@@ -227,8 +227,7 @@ public class TestController extends AbstractController {
 
     void updateDJBooth() {
         if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
-            int i = (int)(double)db.color.get(EColorData.SENSED_COLOR);
-            DJSpinnerModule.EColorMatch m = DJSpinnerModule.EColorMatch.values()[i];
+            DJSpinnerModule.EColorMatch m =db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
             if(m.color.equals(db.DJ_COLOR)) {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
             } else {
