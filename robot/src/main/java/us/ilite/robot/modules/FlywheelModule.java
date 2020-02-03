@@ -2,11 +2,13 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.*;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Talon;
 import us.ilite.common.Angle;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
@@ -24,18 +26,25 @@ import us.ilite.robot.hardware.TalonSRXFactory;
 public class FlywheelModule extends Module {
    // public static final double kAcceleratorThreshold = 0.14;
 
-    private TalonSRX mFlywheelFeederOne;
-    private TalonFX mFlywheelMaster;
-    private TalonSRX mFlywheelFeederTwo;
+    private CANSparkMax mFlywheelFeeder;
+    private CANSparkMax mTurret;
+    private TalonFX mFlywheelMasterOne;
+    private TalonFX mFlywheelMasterTwo;
     private Servo mServo;
+
+    private CANEncoder mTurretEncoder;
+    private CANEncoder mFeederEncoder;
     //Add SparkMax later
     private PigeonIMU mTurretGyro;
 
     public FlywheelModule() {
-        mFlywheelMaster = new TalonFX(50);
-        mFlywheelFeederTwo = TalonSRXFactory.createPermanentSlaveTalon(51 , 50);
-        mFlywheelFeederOne= TalonSRXFactory.createPermanentSlaveTalon(Settings.Hardware.CAN.kShooterID , 50);
+        mFlywheelMasterOne = new TalonFX(50);
+        mFlywheelMasterTwo = new TalonFX(51);
+        mFlywheelFeeder = SparkMaxFactory.createDefaultSparkMax(5 , CANSparkMaxLowLevel.MotorType.kBrushless);
+        mTurret = SparkMaxFactory.createDefaultSparkMax(16 , CANSparkMaxLowLevel.MotorType.kBrushless);
         mTurretGyro = new PigeonIMU(Settings.Hardware.CAN.kPigeonIDForFlywheel);
+        mFeederEncoder = mFlywheelFeeder.getEncoder();
+        mTurretEncoder = mTurret.getEncoder();
     }
     public enum EFlywheelState{
         SHOOTING(1700),
@@ -57,17 +66,19 @@ public class FlywheelModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mFlywheelMaster.getSelectedSensorVelocity());
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FEEDER_VELOCITY , mFlywheelFeederOne.getSelectedSensorVelocity());
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FEEDER_VELOCITY , mFlywheelFeederTwo.getSelectedSensorVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mFlywheelMasterOne.getSelectedSensorVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY , mFlywheelMasterTwo.getSelectedSensorVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FEEDER_VELOCITY , mFeederEncoder.getVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY , mTurretEncoder.getVelocity());
 
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mFlywheelMaster.set(ControlMode.Velocity , Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
-        mFlywheelFeederOne.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY ) );
-        mFlywheelFeederTwo.set(ControlMode.Velocity , Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
+        mFlywheelMasterOne.set(ControlMode.Velocity , Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
+        mFlywheelMasterTwo.set(ControlMode.Velocity , Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
+        mFlywheelFeeder.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY ) );
+        mTurret.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY));
     }
 
 
