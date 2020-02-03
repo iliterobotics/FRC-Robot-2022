@@ -25,5 +25,5 @@ pluginManagement {
         }
     }
 }
-
+rootProject.name = 'FRC-Robot-2020'
 include "common", "robot", "bob"

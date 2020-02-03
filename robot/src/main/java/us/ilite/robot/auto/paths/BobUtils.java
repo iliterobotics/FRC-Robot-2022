@@ -13,6 +13,8 @@ import us.ilite.common.config.Settings;
 
 import static java.lang.Math.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -29,21 +31,60 @@ public class BobUtils {
         return pPath.getValue(i, pKey) * FEET_TO_METERS;
     }
 
-    public static Map<String, Path> getAvailablePaths() {
-
+    /**
+     * Method used to scan for classess that extend {@link Path} in
+     * the {@link Settings#AUTO_PATH_PACKAGE}
+     * @return
+     *  A set containing all of the {@link Class} that extend path in the {@link Settings#AUTO_PATH_PACKAGE}
+     *  If no classes are found, this method will return an empty set
+     */
+    public static Set<Class<? extends Path>> getAvailablePathClasses() {
         Reflections reflections = new Reflections(Settings.AUTO_PATH_PACKAGE);
-        Set<Class<? extends Path>> allClasses = reflections.getSubTypesOf(Path.class);
+        return getAvailablePathClasses(reflections);
+    }
+
+    /**
+     * Method used to scan for classess that extend {@link Path}
+     * @param reflections
+     *  The reflections class used to lookup the classes. If this is null, the
+     *  method will return an empty set.
+     * @return
+     *  A set containing all of the {@link Class} that extend path, as defined
+     *  by the passed in reflections. If reflections is null or no classes are
+     *  found, this method will return an empty set
+     */
+    static Set<Class<? extends Path>> getAvailablePathClasses(Reflections reflections) {
+        if(reflections == null) return Collections.emptySet();
+        return reflections.getSubTypesOf(Path.class);
+    }
+
+    /**
+     * Method to locate all of the classes that extend {@link Path} and reside
+     * in the {@link Settings#AUTO_PATH_PACKAGE}. Once all of the classes are found,
+     * this method will instantiate all of the classes and put them in a map, where the
+     * key is the classes's simple name and the constructed object.
+     *
+     * @return
+     * A map that contains the Path class's simple name to the instantiation of the Path class.
+     * If there are no classes that extend Path, this method will return an empty map.
+     */
+    public static Map<String, Path> getAvailablePaths() {
+        Set<Class<? extends Path>> allClasses = getAvailablePathClasses();
         Map<String, Path> availablePaths = new HashMap<>();
         for(Class<?> c : allClasses) {
             System.out.println("===> Found Path: " + c.getSimpleName());
             try {
-                Path p = (Path) BobUtils.class.getClassLoader().loadClass(c.getName()).newInstance();
+                Path p = (Path) BobUtils.class.getClassLoader().loadClass(c.getName()).getDeclaredConstructor().newInstance();
                 availablePaths.put(c.getSimpleName(), p);
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
