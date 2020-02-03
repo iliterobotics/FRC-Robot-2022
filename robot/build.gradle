@@ -52,7 +52,7 @@ def includeDesktopSupport = true
 dependencies {
 
     compile project(':common')
-    implementation 'com.github.flybotix:highfrequencyrobots:2020.2.1'
+    implementation 'com.github.flybotix:highfrequencyrobots:2020.2.2'
     compile 'com.github.Team319:BobTrajectory:master-SNAPSHOT'
     compile 'com.github.TripleHelixProgramming:HelixUtilities:2020-SNAPSHOT'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
