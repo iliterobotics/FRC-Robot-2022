@@ -28,7 +28,7 @@ import static us.ilite.common.types.EMatchMode.*;
 public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
-    private Data mData;
+    public static final Data DATA = new Data();
 
     private Limelight mLimelight = new Limelight();
     private HangerModule mHanger = new HangerModule();
@@ -38,8 +38,6 @@ public class Robot extends TimedRobot {
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
 
-    private Limelight mLimelight;
-    private PowerCellModule mIntake;
     private DriveModule mDrive;
     private RawLimelight mRawLimelight;
     private Timer initTimer = new Timer();
