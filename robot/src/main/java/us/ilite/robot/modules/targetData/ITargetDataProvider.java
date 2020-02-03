@@ -12,16 +12,16 @@ import java.util.function.Function;
 
 import com.flybotix.hfr.codex.Codex;
 
+import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import us.ilite.common.config.Settings;
-import us.ilite.common.config.Settings.VisionTarget;
-import us.ilite.common.types.ETargetingData;
+import us.ilite.common.types.ELimelightData;
+import us.ilite.common.IFieldComponent;
 
 /**
  * Add your docs here.
  */
 public interface ITargetDataProvider {
-    public Codex<Double,ETargetingData> getTargetingData();
+    public RobotCodex<ELimelightData> getTargetingData();
 
     public double getCameraHeightIn();
 
@@ -62,7 +62,7 @@ public interface ITargetDataProvider {
         // called for the first time
 
         double d = (getCameraHeightIn() - targetHeight) / 
-            Math.tan( getCameraAngleDeg() - getTargetingData().get(ETargetingData.ty) ) - 
+            Math.tan( getCameraAngleDeg() - getTargetingData().get(ELimelightData.TY) ) -
             getCameraToBumperIn();
 
         return d;
@@ -73,8 +73,8 @@ public interface ITargetDataProvider {
      * @param target
      * @return Distance to target
      */
-    public default double calcTargetDistance( Settings.VisionTarget target ) {
-        return this.calcTargetDistance( target.getHeight() );
+    public default double calcTargetDistance( IFieldComponent target ) {
+        return this.calcTargetDistance( target.height() );
     }
 
 
@@ -98,7 +98,7 @@ public interface ITargetDataProvider {
 
 
         // get the skew angle and figure out which conversion to use
-        double ts = getTargetingData().get(ETargetingData.ts);
+        double ts = getTargetingData().get(ELimelightData.TS);
 
         if ( ts <= 0.0 && ts > -45.0 ) {
             // left hand angle
@@ -116,7 +116,7 @@ public interface ITargetDataProvider {
         return approachAngle;
     }
 
-    public default Optional<Translation2d> calcTargetLocation(Settings.VisionTarget target) {
+    public default Optional<Translation2d> calcTargetLocation(IFieldComponent target) {
         return calcTargetLocation(target, this::calcTargetDistance, (v)->this.calcTargetApproachAngle());
     }
 
@@ -130,8 +130,8 @@ public interface ITargetDataProvider {
      * @return
      *  The target location. The optional will be empty if there was an error
      */
-    public default Optional<Translation2d>  calcTargetLocation( Settings.VisionTarget target,
-        Function<VisionTarget,Double>distanceCalculator, Function<Void,Double> approachAngleCalculator)
+    public default Optional<Translation2d>  calcTargetLocation( IFieldComponent target,
+        Function<IFieldComponent,Double>distanceCalculator, Function<Void,Double> approachAngleCalculator)
     {
         double distance = distanceCalculator.apply(target);
         if ( distance < 0.0 ) {

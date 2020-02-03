@@ -81,7 +81,7 @@ public class TurnToDegree implements ICommand {
 
   private Rotation2d getYaw() {
     // TODO - was this inverted?
-    return Rotation2d.fromDegrees( mData.imu.get( EGyro.YAW_DEGREES ) );
+    return Rotation2d.fromDegrees( mData.imu.get( EGyro.HEADING_DEGREES ) );
   }
   
   @Override

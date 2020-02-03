@@ -1,7 +1,10 @@
 package us.ilite.robot.controller;
 
+import us.ilite.common.*;
+import us.ilite.robot.Robot;
 
 public abstract class AbstractController {
+    protected final Data db = Robot.DATA;
 
     public AbstractController(){
 

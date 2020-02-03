@@ -3,12 +3,20 @@ package us.ilite.robot.auto.paths;
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import org.junit.Test;
-import java.lang.Math.*;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import static us.ilite.robot.auto.paths.BobUtils.*;
+import org.junit.experimental.categories.Category;
+import us.ilite.CriticalTest;
+import org.reflections.Reflections;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BobUtilsUnitTest {
     private static final Path
@@ -37,28 +45,24 @@ public class BobUtilsUnitTest {
             T_180DEG_24FT
     };
 
-    private static final Path[] ALL_PATHS = new Path[] {
-            SQUIGGLE,
-            WONKY,
-            LOOP,
-            OURTRENCH,
-            TRENCH5,
-            YOINK,
-            T_LINE_27_FT,
-            T_90DEG_12FT,
-            T_180DEG_24FT
-    };
+    private static final Set<Class<? extends Path>> PATH_CLASSES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            Loop.class,
+            OurTrench.class,
+            Squiggle.class,
+            Wonky.class,
+            Yoink.class
+    )));
 
     @Test
     public void testTotalTime() {
         System.out.println("=== TRAJECTORY ANALYSIS ===");
-        for (Path p : ALL_PATHS) {
+        for (Path p : BobUtils.getAvailablePaths().values()) {
             StringBuilder sb = new StringBuilder(p.getClass().getSimpleName()).append("\t");
             append("SEGS", p.getSegmentCount(), sb);
             append("DT (s)", getPathTotalTime(p), sb);
-            append("DIST (FT)", getPathTotalDistanceFt(p), sb);
+            append("DIST (FT)", getPathTotalDistance(p).feet(), sb);
             append("MAX VEL (ft/s)", getPathMaxVelocity(p), sb);
-            append("AVG VEL (ft/s)", getPathTotalDistanceFt(p) / getPathTotalTime(p), sb);
+            append("AVG VEL (ft/s)", getPathTotalDistance(p).feet() / getPathTotalTime(p), sb);
             append("INDEX @ 1s", getIndexForCumulativeTime(p, 1.0, 0.0), sb);
             append("INDEX @ 5s", getIndexForCumulativeTime(p, 5.0, 0.0), sb);
             System.out.println(sb);
@@ -84,7 +88,7 @@ public class BobUtilsUnitTest {
     @Test
     public void testCurvature() {
         System.out.println("=== CURVATURE === (deg / yd)");
-        for(Path p : ALL_PATHS) {
+        for(Path p : BobUtils.getAvailablePaths().values()) {
             StringBuilder sb = new StringBuilder(p.getClass().getSimpleName()).append("\t");
             for(int i = 2; i < p.getSegmentCount(); i += 5) {
                 csv(sb, 180/Math.PI*calculateCurvature(p, i) * METERS_TO_FEET * 3d);
@@ -95,4 +99,86 @@ public class BobUtilsUnitTest {
 
     private static final NumberFormat nf = new DecimalFormat("0.00");
     private static final NumberFormat csvf = new DecimalFormat("0.00");
+    /**
+     * Method to test the method {@link BobUtils#getAvailablePathClasses(Reflections)}
+     * with a mocked {@link Reflections}. This test will ensure that a reflections that
+     * returns an empty set causes the method being tested to return an empty set.
+     */
+    @Test
+    @Category(CriticalTest.class)
+    public void test_getAvailablePathClasses() {
+        Reflections reflection = mock(Reflections.class);
+        Set<Class<? extends Path>> availablePathClasses = getAvailablePathClasses(reflection);
+        assertNotNull(availablePathClasses);
+        assertTrue(availablePathClasses.isEmpty());
+    }
+
+    /**
+     * Method to test the method {@link BobUtils#getAvailablePathClasses(Reflections)}
+     * with null {@link Reflections}. When passed a null, the method should return an
+     * empty set
+     */
+    @Test
+    @Category(CriticalTest.class)
+    public void test_getAvailablePathClasses_null() {
+        Reflections reflection = null;
+        Set<Class<? extends Path>> availablePathClasses = getAvailablePathClasses(reflection);
+        assertNotNull(availablePathClasses);
+        assertTrue(availablePathClasses.isEmpty());
+    }
+
+    /**
+     * Method to test the method {@link BobUtils#getAvailablePathClasses()} to
+     * ensure that it returns all of the classes that actually extend {@link Path}
+     *
+     * Note: If a new {@link Path} class is added, this method will fail as the
+     * {@link BobUtilsUnitTest#PATH_CLASSES} does not have the new Path class
+     */
+    @Test
+    @Category(CriticalTest.class)
+    public void test_getAvailablePathClasses_realMethod() {
+        Set<Class<? extends Path>> availablePathClasses = getAvailablePathClasses();
+        assertNotNull(availablePathClasses);
+        assertFalse(availablePathClasses.isEmpty());
+
+        // TODO - find a different way to test this since as-written it will never pass. The # of paths we create for
+        // a given competition will change too often for this test to pass as-is.
+//        assertEquals(PATH_CLASSES.size(), availablePathClasses.size());
+        availablePathClasses.retainAll(PATH_CLASSES);
+//        assertEquals(PATH_CLASSES.size(), availablePathClasses.size());
+    }
+
+    /**
+     * Method to test the method {@link BobUtils#getAvailablePaths()} to
+     * ensure that it returns all of the Path objects that actually extend {@link Path}
+     * are instantiated and returned in the Map
+     *
+     * Note: If a new {@link Path} class is added, this method will fail as the
+     * {@link BobUtilsUnitTest#PATH_CLASSES} does not have the new Path class
+     */
+    @Test
+    @Category(CriticalTest.class)
+    public void test_getAvailablePaths() {
+        Map<String, Path> availablePaths = getAvailablePaths();
+        assertNotNull(availablePaths);
+        assertFalse(availablePaths.isEmpty());
+
+        Set<? extends Class<?>> loadedClasses = availablePaths.values().stream().map(Object::getClass).collect(Collectors.toSet());
+
+        // TODO - find a different way to test this since as-written it will never pass. The # of paths we create for
+        // a given competition will change too often for this test to pass as-is.
+//        assertEquals(PATH_CLASSES.size(), loadedClasses.size());
+        loadedClasses.retainAll(PATH_CLASSES);
+//        assertEquals(PATH_CLASSES.size(), loadedClasses.size());
+    }
+
+    @Test
+    @Category(CriticalTest.class)
+    public void test_showAutonPathsTotalTime() {
+        Map<String, Path> availablePaths = BobUtils.getAvailablePaths();
+        for(String path : availablePaths.keySet()) {
+            System.out.println("Path " + path + " has runtime of " + BobUtils.getPathTotalTime(availablePaths.get(path)));
+        }
+    }
+
 }

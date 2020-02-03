@@ -2,7 +2,10 @@ package us.ilite.common.types.input;
 
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexOf;
+import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.Joystick;
+
+import java.awt.*;
 
 
 public enum ELogitech310 implements CodexOf<Double> {
@@ -31,14 +34,14 @@ public enum ELogitech310 implements CodexOf<Double> {
     RIGHT_TRIGGER_AXIS,
     RUMBLE;
 
-	public static void map(Codex<Double, ELogitech310> pCodex, Joystick pJoystick) {
-		map(pCodex, pJoystick, null);
+	public static void map(RobotCodex<ELogitech310> pCodex, Joystick pJoystick) {
+		map(pCodex, pJoystick, 0d);
 	}
   
-    public static void map(Codex<Double, ELogitech310> pCodex, Joystick pJoystick, Double pRumbleValue, boolean pHandleDeadband) {
+    public static void map(RobotCodex<ELogitech310> pCodex, Joystick pJoystick, double pRumbleValue, boolean pHandleDeadband) {
         pCodex.reset();
         for(int i = 0 ; i < 10; i++) {
-          pCodex.set(i, pJoystick.getRawButton(i+1) ? 1d : null);
+          pCodex.set(i, pJoystick.getRawButton(i+1) ? 1d : 0d);
         }
 
         if(pHandleDeadband) {
@@ -70,7 +73,44 @@ public enum ELogitech310 implements CodexOf<Double> {
         }
     }
 	
-	public static void map(Codex<Double, ELogitech310> pCodex, Joystick pJoystick, Double pRumbleValue) {
+	public static void map(RobotCodex<ELogitech310> pCodex, Joystick pJoystick, double pRumbleValue) {
 		map(pCodex, pJoystick, pRumbleValue, false);
 	}
+
+	public boolean isAxis() {
+	    switch(this) {
+            case LEFT_X_AXIS:
+            case LEFT_Y_AXIS:
+            case RIGHT_X_AXIS:
+            case RIGHT_Y_AXIS:
+            case COMBINED_TRIGGER_AXIS:
+            case LEFT_TRIGGER_AXIS:
+            case RIGHT_TRIGGER_AXIS:
+            case RUMBLE:
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isButton() {
+        switch(this) {
+            case A_BTN:
+            case B_BTN:
+            case X_BTN:
+            case Y_BTN:
+            case L_BTN:
+            case R_BTN:
+            case BACK:
+            case START:
+            case LEFT_JOYSTICK_BTN:
+            case RIGHT_JOYSTICK_BTN:
+            case DPAD_RAW:
+            case DPAD_UP:
+            case DPAD_DOWN:
+            case DPAD_LEFT:
+            case DPAD_RIGHT:
+            return true;
+        }
+        return false;
+    }
 }

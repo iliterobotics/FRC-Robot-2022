@@ -1,6 +1,8 @@
 package us.ilite.robot.modules;
 
+import us.ilite.common.Data;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.robot.Robot;
 
 /**
  * The Module class defines how code written to control a specific subsystem (shooter, elevator, arm, etc.).
@@ -8,6 +10,8 @@ import us.ilite.common.types.EMatchMode;
  * All methods are passed a time, which is expected to be consistent between all modules updated in the same [mode]Periodic() call.
  */
 public abstract class Module {
+
+    protected final Data db = Robot.DATA;
 
     /*
     Although the Clock class removes the need for the now parameter, we will keep it since it may be useful to have

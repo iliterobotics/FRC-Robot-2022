@@ -3,6 +3,7 @@ package us.ilite.robot;
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.ICodexTimeProvider;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -14,46 +15,58 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.controller.AbstractController;
+import us.ilite.robot.controller.BaseAutonController;
+import us.ilite.robot.controller.TeleopController;
 import us.ilite.robot.controller.TestController;
 import us.ilite.robot.hardware.Clock;
-import us.ilite.robot.hardware.GetLocalIP;
-import us.ilite.robot.modules.FlywheelPrototype;
-import us.ilite.robot.modules.ModuleList;
-import us.ilite.robot.modules.OperatorInput;
+import us.ilite.robot.modules.*;
 
 import static us.ilite.common.types.EMatchMode.*;
-
-import java.util.List;
 
 public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
-
+    public static final Data DATA = new Data();
     private ModuleList mRunningModules = new ModuleList();
     private Clock mClock = new Clock();
-    public static final Data DATA = new Data();
-    private Timer initTimer = new Timer();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
 
-    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
+    private Limelight mLimelight;
+    private PowerCellModule mIntake;
+    private DriveModule mDrive;
+    private RawLimelight mRawLimelight;
+    private Timer initTimer = new Timer();
+    private DJSpinnerModule mDJSpinnerModule;
 
-    private FlywheelPrototype mFlywheel;
+    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
+    private FlywheelModule mShooter;
+
     private OperatorInput mOI;
+    private LEDControl mLedControl;
 
     private MatchMetadata mMatchMeta = null;
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final TestController mTestController = new TestController();
+    private final AbstractController mTeleopController = new TeleopController();
+    private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
+    private final TestController mTestController = new TestController();
 
 
     @Override
     public void robotInit() {
-        mFlywheel = new FlywheelPrototype();
         mOI = new OperatorInput();
+        mDrive = new DriveModule();
+        mLedControl = new LEDControl();
+        mShooter = new FlywheelModule();
+        mIntake = new PowerCellModule();
+        mLimelight = new Limelight();
+        mRawLimelight = new RawLimelight();
+        mDJSpinnerModule = new DJSpinnerModule();
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -79,7 +92,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
 
         try {
-        } catch(Exception e) {
+        } catch (Exception e) {
             mLogger.exception(e);
         }
 
@@ -100,6 +113,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        mActiveController = mBaseAutonController;
     }
 
     @Override
@@ -109,6 +123,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        mActiveController = mTeleopController;
+        mRunningModules.addModule(mIntake);
+        mLogger.error("kasdjdaksljsadl;kjfdas;ld");
     }
 
     @Override
@@ -121,7 +138,7 @@ public class Robot extends TimedRobot {
         mLogger.info("Disabled Initialization");
         mRunningModules.shutdown(mClock.getCurrentTime());
         mCSVLogger.stop(); // stop csv logging
-        mActiveController = null;
+      //  mActiveController = null;
     }
 
     @Override
@@ -132,8 +149,12 @@ public class Robot extends TimedRobot {
     public void testInit() {
         mActiveController = mTestController;
         mRunningModules.clearModules();
-        mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mFlywheel);
+//        mRunningModules.addModule(mOI);
+//        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mDJSpinnerModule);
         mRunningModules.modeInit(TEST, mClock.getCurrentTime());
         mRunningModules.readInputs(mClock.getCurrentTime());
         mRunningModules.checkModule(mClock.getCurrentTime());
@@ -144,16 +165,16 @@ public class Robot extends TimedRobot {
         commonPeriodic();
     }
 
-    private void commonPeriodic() {
+    void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for(Codex c : DATA.mAllCodexes) {
+        for (RobotCodex c : DATA.mAllCodexes) {
             c.reset();
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
         mRunningModules.readInputs(mClock.getCurrentTime());
         mActiveController.update(mClock.getCurrentTime());
         mRunningModules.setOutputs(mClock.getCurrentTime());
-//        mData.sendCodicesToNetworkTables();
+//        Robot.DATA.sendCodicesToNetworkTables();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
     }
 
@@ -161,7 +182,7 @@ public class Robot extends TimedRobot {
         if (mMatchMeta == null) {
             mMatchMeta = new MatchMetadata();
             int gid = mMatchMeta.hash;
-            for (Codex c : DATA.mAllCodexes) {
+            for (RobotCodex c : DATA.mAllCodexes) {
                 c.meta().setGlobalId(gid);
             }
         }
@@ -192,23 +213,5 @@ public class Robot extends TimedRobot {
 
         return String.format("State: %s\tMode: %s\tTime: %s", mRobotEnabledDisabled, mRobotMode, mNow);
 
-    }
-
-    private class DSConnectInitThread implements Runnable {
-
-        @Override
-        public void run() {
-
-            while(!DriverStation.getInstance().isDSAttached()) {
-                try {
-                    mLogger.error("Waiting on Robot <--> DS Connection...");
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            List<String> ips = GetLocalIP.getAllIps();
-        }
     }
 }
