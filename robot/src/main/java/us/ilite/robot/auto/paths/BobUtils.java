@@ -4,11 +4,13 @@ import com.team2363.commands.HelixFollower;
 
 import static com.team319.trajectory.Path.SegmentValue.*;
 
+import edu.wpi.first.wpilibj.controller.PIDController;
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import org.reflections.Reflections;
+import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
 
 import static java.lang.Math.*;
@@ -21,14 +23,14 @@ import java.util.Set;
 
 public class BobUtils {
 
-    private static final double FEET_TO_METERS = 0.3048;
-    private static final double METERS_TO_FEET = 1/FEET_TO_METERS;
+    static final double FEET_TO_METERS = 0.3048;
+    static final double METERS_TO_FEET = 1/FEET_TO_METERS;
 
     private static final Map<String, Double> mMaxTimeCache = new HashMap<>();
     private HelixFollower hf;
 
     public static double getMeters(Path pPath, Path.SegmentValue pKey, int i) {
-        return pPath.getValue(i, pKey) * FEET_TO_METERS;
+        return Distance.fromFeet(pPath.getValue(i, pKey)).meters();
     }
 
     /**
@@ -100,16 +102,29 @@ public class BobUtils {
     public static double calculateCurvature(Path pPath, int i) {
         // https://www.math24.net/curvature-radius/
         // https://math.dartmouth.edu/~m8f19/lectures/m8f19curvature.pdf
-        double xprime = (getMeters(pPath, X, i) - getMeters(pPath, X, i-1))/pPath.getValue(i, TIME_STAMP);
-        double xprime2 = (getMeters(pPath, X, i) - getMeters(pPath, X, i-2))/(pPath.getValue(i, TIME_STAMP)*2);
-        double yprime = (getMeters(pPath, Y, i) - getMeters(pPath, Y, i-1))/pPath.getValue(i, TIME_STAMP);
-        double yprime2 = (getMeters(pPath, Y, i) - getMeters(pPath, Y, i-2))/(pPath.getValue(i, TIME_STAMP)*2);
+        // Ref edu.wpi.first.wpilibj.spline.Spline
+        double dt = pPath.getValue(i, TIME_STAMP);
+        double dx = (getMeters(pPath, X, i) - getMeters(pPath, X, i-1))/dt/dt;
+        double ddx = (getMeters(pPath, X, i) - getMeters(pPath, X, i-2))/dt/dt;
+        double dy = (getMeters(pPath, Y, i) - getMeters(pPath, Y, i-1))/dt/dt;
+        double ddy = (getMeters(pPath, Y, i) - getMeters(pPath, Y, i-2))/dt/dt;
 
-        double result = abs(xprime*yprime2 - yprime*xprime2) / pow(abs(pow(xprime, 2.0) + pow(yprime, 2.0)), 1.5);
+//        double result = abs(dx*ddy - dy*ddx) / pow(abs(pow(dx, 2.0) + pow(dy, 2.0)), 1.5);
 
+        double result = (dx * ddy - ddx * dy) / ((dx * dx + dy * dy) * Math.hypot(dx, dy));
+        if(result == Double.NaN) {
+            result = 0d;
+        }
         return result;
     }
 
+    /**
+     * Gets a WPILib based Trajectory State from the target path at the target time.
+     * @param pPath
+     * @param pNow
+     * @param pPathStartTimestamp
+     * @return
+     */
     public static Trajectory.State sample(Path pPath, double pNow, double pPathStartTimestamp) {
         int i = getIndexForCumulativeTime(pPath, pNow, pPathStartTimestamp);
         if(i == -1) return null;
@@ -155,6 +170,11 @@ public class BobUtils {
         return (int)(dt / 0.020);
     }
 
+    /**
+     * Return the max speed of the path in feet/sec
+     * @param pPath
+     * @return
+     */
     public static double getPathMaxVelocity(Path pPath) {
         double velocity = 0;
         for (int i = 0; i < pPath.getSegmentCount(); i++) {
@@ -180,5 +200,30 @@ public class BobUtils {
         }
         mMaxTimeCache.put(key, time);
         return time;
+    }
+
+    public static Distance getPathTotalDistance(Path pPath) {
+        double d = 0;
+        for (int i = 1; i < pPath.getSegmentCount(); i++) {
+            d += calculateDistance(
+                    pPath.getValue(i-1, X),
+                    pPath.getValue(i-1, Y),
+                    pPath.getValue(i, X),
+                    pPath.getValue(i, Y)
+            );
+        }
+        return Distance.fromFeet(d);
+    }
+
+    /**
+     * Calculates distance via pythagorean theorem. Unit-agnostic, but it does assume all inputs have identical units.
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @return
+     */
+    private static double calculateDistance(double x1, double y1, double x2, double y2) {
+        return sqrt(pow(x2-x1,2) + pow(y2-y1,2));
     }
 }
