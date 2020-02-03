@@ -57,21 +57,12 @@ public class TestController extends AbstractController {
     private void updateHanger(double pNow){
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
             mLog.error("--------------------------HANGER---------------------");
-        db.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION1,
-                db.hanger.get(EHangerModuleData.DESIRED_HANGER_POSITION1));
-       // db.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION2, -0.5);
-    } else {
+            db.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION1, 1.0);
+            db.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION2, 1.0);
+        } else {
         db.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1, 0.0);
         db.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2, 0.0);
     }
-        switch (mHangerState){
-            case HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 1.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 1.0);
-            case NOT_HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 0.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 0.0);
-        }
     }
 
     void updateFlywheel(double pNow) {

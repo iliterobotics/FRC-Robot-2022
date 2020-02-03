@@ -67,14 +67,15 @@ public class HangerModule extends Module {
     }
     public enum EHangerState {
         HANGING(1.0),
-        NOT_HANGING(0.0);
+        NOT_HANGING(0.0),
+        REVERSE(-1.0);
 
-        private double power;
-        EHangerState(double power){
-            this.power = power;
+        private double position;
+        EHangerState(double position){
+            this.position = position;
         }
         private double getPower(){
-            return this.power;
+            return this.position;
         }
 
     }
@@ -97,6 +98,15 @@ public class HangerModule extends Module {
     public void setOutputs(double pNow) {
         mHangerNeoOne.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_HANGER_POSITION1));
         mHangerNeoTwo.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_HANGER_POSITION2));
+
+        switch (mHangerState){
+            case HANGING:
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 1.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 1.0);
+            case NOT_HANGING:
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 0.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 0.0);
+        }
 
     }
 
