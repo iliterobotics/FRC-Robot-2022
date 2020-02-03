@@ -27,15 +27,13 @@ public class BobUtilsUnitTest {
             WONKY = new Wonky(),
             YOINK = new Yoink(),
             LOOP = new Loop(),
-            OURTRENCH = new OurTrench(),
-            TRENCH5 = new Trench5()
+            OURTRENCH = new OurTrench()
     ;
     private static final Path[] ANALYSIS_PATHS = new Path[] {
             SQUIGGLE,
             WONKY,
             LOOP,
             OURTRENCH,
-            TRENCH5,
             YOINK,
     };
 
