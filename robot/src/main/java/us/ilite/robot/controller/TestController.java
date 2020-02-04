@@ -1,5 +1,9 @@
 package us.ilite.robot.controller;
 
+import com.flybotix.hfr.codex.RobotCodex;
+import com.flybotix.hfr.util.lang.EnumUtils;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
@@ -15,32 +19,46 @@ import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.EShooterSystemData;
 
+import java.util.List;
+
 import static us.ilite.common.config.InputMap.DRIVER.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 public class TestController extends AbstractController {
 
     private ILog mLog = Logger.createLog(TestController.class);
-    private Double mLastTrackingType;
+    private Double mLastTrackingType = 0d;
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
 
     private double mLimelightZoomThreshold = 7.0;
 
-    private HangerModule.EHangerState mHangerState;
+    private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.NOT_HANGING;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
     private double mPreviousTime;
 
     public TestController() {
+        for(String key : db.mMappedCodex.keySet()) {
+            ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
+            List<Enum<?>> enums =  EnumUtils.getEnums(db.mMappedCodex.get(key).meta().getEnum(), true);
+            enums.stream().forEach(
+                    e -> {
+                        tab.addNumber(e.name(), ()->db.mMappedCodex.get(key).get(e));
+                    }
+            );
+        }
     }
 
-    public void update(double pNow) {
-        updateLimelightTargetLock();
-        updateDrivetrain(pNow);
-        updateFlywheel(pNow);
-        updateIntake(pNow);
-        updateHanger(pNow);
-        updateDJBooth();
+    protected void updateImpl(double pNow) {
+        // ========================================
+        // DO NOT COMMENT OUT THESE METHOD CALLS
+        // ========================================
+        Robot.CLOCK.report("updateLimelightTargetLock", t->updateLimelightTargetLock());
+        Robot.CLOCK.report("updateDrivetrain", t->updateDrivetrain(pNow));
+        Robot.CLOCK.report("updateFlywheel", t->updateFlywheel(pNow));
+        Robot.CLOCK.report("updateIntake", t->updateIntake(pNow));
+        Robot.CLOCK.report("updateHanger", t->updateHanger(pNow));
+        Robot.CLOCK.report("updateDJBooth", t->updateDJBooth());
 //        updateArm(pNow);
     }
 
@@ -124,7 +142,6 @@ public class TestController extends AbstractController {
 //            mAccelerator.set(ControlMode.PercentOutput, db.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
 //        }
         mPreviousTime = pNow;
-        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
 
     public void updateLimelightTargetLock() {

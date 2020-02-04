@@ -4,6 +4,12 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.IFieldComponent;
+import us.ilite.robot.Robot;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author Stephen Welch
@@ -88,6 +94,13 @@ public class Clock {
 
     private static double getRobotTime() {
         return Timer.getFPGATimestamp();
+    }
+
+    public void report(String pName, Consumer<Void> pTodo) {
+        double start = Timer.getFPGATimestamp();
+        pTodo.accept(null);
+        double end = Timer.getFPGATimestamp();
+        SmartDashboard.putNumber(pName, end-start);
     }
 
 }

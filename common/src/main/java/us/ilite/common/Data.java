@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Think of this class link an in-memory database optimized for 1 row.  If you need multiple rows, simply manage multiple
@@ -55,6 +57,8 @@ public class Data {
             color,
     };
 
+    public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
+
     public final RobotCodex[] mLoggedCodexes = new RobotCodex[] {
             imu,
             drivetrain,
@@ -76,6 +80,9 @@ public class Data {
     public Data(boolean pLogging) {
         if(pLogging) {
             initParsers();
+        }
+        for(RobotCodex rc : mAllCodexes) {
+            mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
         }
     }
 
