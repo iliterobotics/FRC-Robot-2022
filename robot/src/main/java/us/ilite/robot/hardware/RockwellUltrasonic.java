@@ -1,9 +1,8 @@
 package us.ilite.robot.hardware;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import us.ilite.robot.commands.IAbsoluteDistanceProvider;
 
-public class RockwellUltrasonic implements IAbsoluteDistanceProvider
+public class RockwellUltrasonic
 {
 
     private static final double kMinMeasuringDistance = 1.75;

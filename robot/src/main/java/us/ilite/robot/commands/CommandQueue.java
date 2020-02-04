@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+@Deprecated
 public class CommandQueue implements ICommand {
 
     private ILog mLogger = Logger.createLog(CommandQueue.class);

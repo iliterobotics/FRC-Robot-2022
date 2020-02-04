@@ -12,6 +12,7 @@ import us.ilite.robot.modules.targetData.ITargetDataProvider;
 /**
  * Untested. Should turn more aggressively when further away from the target.
  */
+@Deprecated
 public class DriveToVisionTarget implements ICommand {
 
     private static final double kMaxTargetAngle = 27.0;

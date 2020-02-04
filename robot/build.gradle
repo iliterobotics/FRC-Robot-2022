@@ -44,7 +44,7 @@ deploy {
     }
 }
 // Set this to true to enable desktop support.
-def includeDesktopSupport = false
+def includeDesktopSupport = true
 
 
 // Defining my dependencies. In this case, WPILib (+ friends), CTRE Toolsuite (Talon SRX)
@@ -57,9 +57,9 @@ dependencies {
     compile 'com.github.TripleHelixProgramming:HelixUtilities:2020-SNAPSHOT'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
     implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.5'
-    implementation wpi.deps.wpilib()
-    compile wpi.deps.wpilib()
-    
+
+    compile 'org.reflections:reflections:0.9.12'
+
     testCompile "org.mockito:mockito-core:2.+"
 
     //The following code is used to get the native code to work on a desktop.
@@ -70,7 +70,13 @@ dependencies {
     implementation wpi.deps.vendor.java()
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
+
     testImplementation 'junit:junit:4.12'
+
+    // Enable simulation gui support. Must check the box in vscode to enable support
+    // upon debugging
+    simulation wpi.deps.sim.gui(wpi.platforms.desktop, false)
+
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
