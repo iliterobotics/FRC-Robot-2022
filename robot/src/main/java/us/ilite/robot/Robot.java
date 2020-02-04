@@ -31,7 +31,8 @@ public class Robot extends TimedRobot {
 
     private ILog mLogger = Logger.createLog(this.getClass());
     public static final Data DATA = new Data();
-    public static final Clock CLOCK = new Clock().simulated();
+    public static final Clock CLOCK = (RobotBase.isReal() ? new Clock() : new Clock().simulated());
+    public static final boolean IS_SIMULATED = RobotBase.isSimulation();
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();

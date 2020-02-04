@@ -16,7 +16,9 @@ import us.ilite.robot.controller.TestController;
 public class RobotUnitTest extends BaseTest{
 
     @Test
+    @Category(CriticalTest.class)
     public void testTestController() {
+        commonAssertions(new TestController());
     }
     @Test
     @Category(RegularTest.class)
@@ -25,21 +27,11 @@ public class RobotUnitTest extends BaseTest{
     }
 
     @Test
-    @Category(CriticalTest.class)
+    @Category(RegularTest.class)
     public void testCodexValueOf() {
         TestController t = new TestController();
         randomizeAllInputs();
-        System.out.println("Adding tab & #");
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        inst.addConnectionListener(ev -> System.out.println("CONNECTED"), true);
-        inst.startClient("localhost");
-        NetworkTable table = inst.getTable("datatable");
-        NetworkTableEntry e = table.getEntry("TESTING A THING");
-        e.setDouble(200d);
-        Shuffleboard.getTab("TEST").addNumber("TESTING A THING", () -> 1000d);
-//        e.setDouble(100d);
-        SmartDashboard.putNumber("TESTING A THING", 100d);
-        Shuffleboard.update();
+        System.out.println(db.driverinput.toString());
     }
 
 }
