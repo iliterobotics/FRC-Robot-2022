@@ -67,10 +67,9 @@ public class FlywheelModule extends Module {
     @Override
     public void readInputs(double pNow) {
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mFlywheelMasterOne.getSelectedSensorVelocity());
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY , mFlywheelMasterTwo.getSelectedSensorVelocity());
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FEEDER_VELOCITY , mFeederEncoder.getVelocity());
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY , mTurretEncoder.getVelocity());
-
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_SERVO_ANGLE, mServo.getAngle());
     }
 
     @Override

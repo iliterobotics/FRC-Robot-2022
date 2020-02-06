@@ -9,6 +9,8 @@ public enum EShooterSystemData {
 
     CURRENT_TURRET_VELOCITY,
     TARGET_TURRET_VELOCITY,
-    ;
+
+    CURRENT_SERVO_ANGLE,
+    TARGET_SERVO_ANGLE;
 
 }
