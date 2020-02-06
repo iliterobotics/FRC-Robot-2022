@@ -112,6 +112,16 @@ public class DriveModule extends Module {
 		mRightFollower.setInverted(true);
 		mRightEncoder = mLeftMaster.getEncoder();
 		mRightCtrl = mRightMaster.getPIDController();
+
+		setPIDGains(mLeftCtrl, vPID);
+		setPIDGains(mRightCtrl, vPID);
+		setPIDGains(mLeftCtrl, dPID);
+		setPIDGains(mRightCtrl, dPID);
+		mLeftMaster.burnFlash();
+		mLeftFollower.burnFlash();
+		mRightMaster.burnFlash();
+		mRightFollower.burnFlash();
+
 	}
 
 	@Override

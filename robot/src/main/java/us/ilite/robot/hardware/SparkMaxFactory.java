@@ -17,7 +17,6 @@ public class SparkMaxFactory {
         public int CAN_TIMEOUT = 100;
         public int CONTROL_FRAME_PERIOD = 10;
         public IdleMode IDLE_MODE = IdleMode.kBrake;
-        public boolean IS_INVERTED = false;
         public int STATUS_0_PERIOD_MS = 10;
         public int STATUS_1_PERIOD_MS = 20;
         public int STATUS_2_PERIOD_MS = 50;
@@ -49,7 +48,6 @@ public class SparkMaxFactory {
         spark.setCANTimeout(pConfiguration.CAN_TIMEOUT);
 //        spark.setControlFramePeriod(pConfiguration.CONTROL_FRAME_PERIOD);
         spark.setIdleMode(pConfiguration.IDLE_MODE);
-        spark.setInverted(pConfiguration.IS_INVERTED);
         spark.setPeriodicFramePeriod(PeriodicFrame.kStatus0, pConfiguration.STATUS_0_PERIOD_MS);
         spark.setPeriodicFramePeriod(PeriodicFrame.kStatus1, pConfiguration.STATUS_1_PERIOD_MS);
         spark.setPeriodicFramePeriod(PeriodicFrame.kStatus2, pConfiguration.STATUS_2_PERIOD_MS);
