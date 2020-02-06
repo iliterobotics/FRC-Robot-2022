@@ -25,7 +25,7 @@ public class Settings extends NetworkTablesConstantsBase {
 
     public static int sCODEX_COMMS_PORT = 5805;
 
-    public static final String AUTO_PATH_PACKAGE = "us.ilite.paths";
+    public static final String AUTO_PATH_PACKAGE = "us.ilite.robot.auto.paths";
 
     // ================================
     // System ID's
