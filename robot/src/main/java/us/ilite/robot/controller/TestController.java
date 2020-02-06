@@ -72,17 +72,18 @@ public class TestController extends AbstractController {
     }
 
     private void updateHanger(double pNow){
-        if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
+        HangerModule.EHangerState h = HangerModule.EHangerState.NOT_HANGING;
+        if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)){
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
 
         }
-        else if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.RELEASE_HANG)){
+        else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.RELEASE_HANG)){
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
 
         }
-        switch (mHangerState){
+        switch (h){
             case HANGING:
                 Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
                 Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
@@ -151,6 +152,7 @@ public class TestController extends AbstractController {
 //            mAccelerator.set(ControlMode.PercentOutput, db.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
 //        }
         mPreviousTime = pNow;
+//        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
 
     public void updateLimelightTargetLock() {
@@ -192,19 +194,18 @@ public class TestController extends AbstractController {
     }
 
     void updateDrivetrain(double pNow) {
-        double throttle = db.driverinput.get(THROTTLE_AXIS);
+        double throttle = -db.driverinput.get(THROTTLE_AXIS);
         double rotate = db.driverinput.get(TURN_AXIS);
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
 
-        db.drivetrain.set(SHOULD_HOLD_POSITION, (throttle == 0.0 && rotate == 0.0) ? 1.0 : 0.0);
-
-        if (throttle == 0.0 && rotate == 0.0) {
-            db.drivetrain.set(DESIRED_THROTTLE, 0.0);
-            db.drivetrain.set(DESIRED_TURN, 0.0);
+        if(throttle == 0.0 && rotate == 0.0) {
+            db.drivetrain.set(DESIRED_STATE, EDriveState.VELOCITY);//HOLD);
+            db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
+            db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
         } else {
-            db.drivetrain.set(SHOULD_HOLD_POSITION, 0.0);
+            db.drivetrain.set(DESIRED_STATE, EDriveState.VELOCITY);
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.03;
             }
@@ -215,15 +216,14 @@ public class TestController extends AbstractController {
                 throttle *= Settings.Input.kSnailModePercentThrottleReduction;
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
             }
-            db.drivetrain.set(DESIRED_THROTTLE, -throttle);
-            db.drivetrain.set(DESIRED_TURN, rotate);
+            db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
+            db.drivetrain.set(DESIRED_TURN_PCT, rotate);
         }
 
     }
 
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-            mLog.error("--------------INTAKE IS BEING PRESSED----------");
             mIntakeState = PowerCellModule.EIntakeState.INTAKE;
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
             mIntakeState = PowerCellModule.EIntakeState.REVERSE;
@@ -253,8 +253,8 @@ public class TestController extends AbstractController {
 
     void updateDJBooth() {
         if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
-            DJSpinnerModule.EColorMatch m =db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
-            if(m.color.equals(db.DJ_COLOR)) {
+            DJSpinnerModule.EColorMatch m = db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
+            if(m != null && m.color.equals(db.DJ_COLOR)) {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
             } else {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);
