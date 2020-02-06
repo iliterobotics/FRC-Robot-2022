@@ -26,7 +26,7 @@ public class PowerCellModule extends Module {
     public static double kDeltaIntakeVel = 0d;
     private Data db = Robot.DATA;
 
-    private CANPIDController mCanController;
+    private CANPIDController mArmController;
 
     // Intake Motors
     private CANSparkMax mSerializer;
@@ -135,7 +135,7 @@ public class PowerCellModule extends Module {
 //        mBeamBreaker3 = new DigitalBeamSensor( Settings.Hardware.DIO.kBeamChannel3 );
 //        mDigitalBeamSensors = new DigitalBeamSensor[]{mBeamBreaker1, mBeamBreaker2, mBeamBreaker3};
 
-        mCanController = mSerializer.getPIDController();
+        mArmController = mSerializer.getPIDController();
 
         mIntakeEncoder = mSerializer.getEncoder();
         mArmEncoder = mArmMotor.getEncoder();
@@ -144,10 +144,10 @@ public class PowerCellModule extends Module {
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        mCanController.setP(kPowerCellP);
-        mCanController.setI(kPowerCellI);
-        mCanController.setD(kPowerCellD);
-        mCanController.setFF(kPowerCellF);
+        mArmController.setP(kPowerCellP);
+        mArmController.setI(kPowerCellI);
+        mArmController.setD(kPowerCellD);
+        mArmController.setFF(kPowerCellF);
     }
 
     @Override
@@ -168,6 +168,7 @@ public class PowerCellModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
+        mLog.info("POWERCELL BEING CALLED");
         mSerializer.set(db.powercell.get(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S));
         mConveyorMotorHorizontal.set(ControlMode.Velocity, db.powercell.get(EPowerCellData.DESIRED_H_VELOCITY));
         mConveyorMotorVertical.set(ControlMode.Velocity, db.powercell.get(EPowerCellData.DESIRED_V_VELOCITY));
