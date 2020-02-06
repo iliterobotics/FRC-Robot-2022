@@ -37,24 +37,22 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
-
-    private Limelight mLimelight;
-    private PowerCellModule mIntake;
-    private DriveModule mDrive;
-    private RawLimelight mRawLimelight;
     private Timer initTimer = new Timer();
+
+    private DriveModule mDrive;
+    private Limelight mLimelight;
+//    private PowerCellModule mIntake;
+    private RawLimelight mRawLimelight;
     private DJSpinnerModule mDJSpinnerModule;
     private SimulationModule mSimulation;
-
-    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
     private FlywheelModule mShooter;
+
+//    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private OperatorInput mOI;
     private LEDControl mLedControl;
 
     private MatchMetadata mMatchMeta = null;
-
-    private PerfTimer mClockUpdateTimer = new PerfTimer();
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
     private final AbstractController mBaseAutonController = new BaseAutonController();
@@ -64,13 +62,16 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        // Init the actual robot
+        initTimer.reset();
+        initTimer.start();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
         mLedControl = new LEDControl();
         mShooter = new FlywheelModule();
-        mIntake = new PowerCellModule();
+//        mIntake = new PowerCellModule();
         mLimelight = new Limelight();
         mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
@@ -81,13 +82,10 @@ public class Robot extends TimedRobot {
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
 
-        // Init the actual robot
-        initTimer.reset();
-        initTimer.start();
         Logger.setLevel(ELevel.WARN);
         mLogger.info("Starting Robot Initialization...");
 
-        mSettings.writeToNetworkTables();
+//        mSettings.writeToNetworkTables();
 
 //        new Thread(new DSConnectInitThread()).start();
         // Init static variables and get singleton instances first
@@ -143,7 +141,6 @@ public class Robot extends TimedRobot {
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
-        mRunningModules.addModule(mIntake);
     }
 
     @Override
@@ -164,6 +161,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
+        mOI.readInputs(0d);
     }
 
     @Override
@@ -181,9 +179,9 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mDJSpinnerModule);
+//        mRunningModules.addModule(mDJSpinnerModule);
         if(IS_SIMULATED) {
-            mRunningModules.addModule(mSimulation);
+//            mRunningModules.addModule(mSimulation);
         }
         mRunningModules.modeInit(TEST, CLOCK.getCurrentTime());
         mRunningModules.checkModule(CLOCK.getCurrentTime());

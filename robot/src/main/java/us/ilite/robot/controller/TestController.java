@@ -68,17 +68,17 @@ public class TestController extends AbstractController {
         Robot.CLOCK.report("updateIntake", t->updateIntake(pNow));
         Robot.CLOCK.report("updateHanger", t->updateHanger(pNow));
         Robot.CLOCK.report("updateDJBooth", t->updateDJBooth());
-        updateArm(pNow);
+//        updateArm(pNow);
     }
 
     private void updateHanger(double pNow){
         HangerModule.EHangerState h = HangerModule.EHangerState.NOT_HANGING;
-        if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
+        if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)){
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
 
         }
-        else if (Robot.DATA.operatorinput.isSet(InputMap.DRIVER.RELEASE_HANG)){
+        else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.RELEASE_HANG)){
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
 
@@ -224,7 +224,6 @@ public class TestController extends AbstractController {
 
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-            mLog.error("--------------INTAKE IS BEING PRESSED----------");
             mIntakeState = PowerCellModule.EIntakeState.INTAKE;
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
             mIntakeState = PowerCellModule.EIntakeState.REVERSE;

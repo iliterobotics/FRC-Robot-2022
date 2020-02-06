@@ -25,6 +25,13 @@ public class OperatorInput extends Module {
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
+
+        if(mDriverJoystick.getType() == null) {
+            System.err.println("======= DRIVER JOYSTICK IS NOT PLUGGED IN =======");
+        }
+        if(mOperatorJoystick.getType() == null) {
+            System.err.println("======= OPERATOR JOYSTICK IS NOT PLUGGED IN =======");
+        }
         mMode = pMode;
     }
 
