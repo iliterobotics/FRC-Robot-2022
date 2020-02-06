@@ -3,9 +3,8 @@ package us.ilite.robot.modules;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.robot.Robot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,12 +21,21 @@ public class ModuleList extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        mModules.forEach(module -> module.readInputs(pNow));
+        if(Robot.mode() == EMatchMode.TEST) {
+            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.readInputs(pNow)));
+        } else {
+            mModules.forEach(module -> module.readInputs(pNow));
+        }
+
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mModules.forEach(module -> module.setOutputs(pNow));
+        if(Robot.mode() == EMatchMode.TEST) {
+            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.setOutputs(pNow)));
+        } else {
+            mModules.forEach(module -> module.setOutputs(pNow));
+        }
     }
 
     @Override

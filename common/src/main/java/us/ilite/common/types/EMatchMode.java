@@ -5,5 +5,6 @@ public enum EMatchMode {
     TELEOPERATED,
     DISABLED,
     TEST,
+    INITIALIZING,
     DEMO
 }
