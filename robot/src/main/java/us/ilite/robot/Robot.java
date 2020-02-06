@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.CSVLoggerQueue;
 import us.ilite.common.Data;
+import us.ilite.common.Log;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.PerfTimer;
@@ -69,7 +70,6 @@ public class Robot extends TimedRobot {
         mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
 
-        //mLogger.error("CHRIS: INIT ME!!");
         mCSVLogger.start();
 
         //look for practice robot config:
@@ -172,9 +172,10 @@ public class Robot extends TimedRobot {
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
         for (Codex c : DATA.mAllCodexes) {
-            CSVLoggerQueue.kCSVLoggerQueue.add( c.toCSV() );
+            CSVLoggerQueue.kCSVLoggerQueue.add( new Log( c.meta().toString(),c.toCSV()) );
             c.reset();
         }
+
 //        EPowerDistPanel.map(mData.pdp, pdp);
         mRunningModules.readInputs(mClock.getCurrentTime());
         mActiveController.update(mClock.getCurrentTime());

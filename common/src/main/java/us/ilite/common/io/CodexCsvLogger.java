@@ -40,6 +40,7 @@ public class CodexCsvLogger {
     public static void log( String s ) {
         try {
             writer.append( s );
+            writer.newLine();
         } catch (IOException pE) {
             pE.printStackTrace();
         }
@@ -48,13 +49,11 @@ public class CodexCsvLogger {
     public void writeHeader() {
         CSVLoggerQueue.kCSVLoggerQueue.add(mCodex.getCSVHeader());
     }
-//
+
 //    public void writeAllLines() {
 //        try {
-//            while ( !CSVLoggerQueue.kCSVLoggerQueue.isEmpty() ) {
-//                writer.append(mCodex.toCSV());
-//                writer.newLine();
-//            }
+//            writer.append(mCodex.toCSV());
+//            writer.newLine();
 //        } catch (IOException pE) {
 //            pE.printStackTrace();
 //        }

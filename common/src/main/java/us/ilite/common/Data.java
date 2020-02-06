@@ -101,8 +101,8 @@ public class Data {
     }
 
     private void initParsers() {
-
         mCodexCsvLoggers = new ArrayList<>();
+        for(Codex c : mLoggedCodexes) mCodexCsvLoggers.add(new CodexCsvLogger( c ));
     }
 
     public void logFromCodexToCSVHeader() {
@@ -111,12 +111,12 @@ public class Data {
             mCodexCsvLoggers.forEach(c -> c.writeHeader());
 //        }
     }
-//    public void logFromCodexToCSVLog() {
-//        // Check that the USB drivetrain is still plugged in
-////        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
-//            mCodexCsvLoggers.forEach(c -> c.writeAllLines());
-////        }
-//    }
+    public void logFromCodexToCSVLog( String pLog ) {
+        // Check that the USB drivetrain is still plugged in
+//        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
+          CodexCsvLogger.log( pLog );
+//        }
+    }
 
 //    /**
 //     * Closes all the writers in mNetworkTableWriters
