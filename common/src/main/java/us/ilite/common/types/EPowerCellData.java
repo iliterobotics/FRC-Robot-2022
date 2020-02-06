@@ -3,6 +3,7 @@ package us.ilite.common.types;
 import com.flybotix.hfr.codex.CodexOf;
 
 public enum EPowerCellData implements CodexOf<Double> {
+    UNUSED,
 
     BREAK_SENSOR_0_STATE,
     BREAK_SENSOR_1_STATE,

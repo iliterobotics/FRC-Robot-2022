@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Think of this class link an in-memory database optimized for 1 row.  If you need multiple rows, simply manage multiple
@@ -28,18 +30,19 @@ public class Data {
     
     //Add new codexes here as we need more
 
-    public final RobotCodex<EGyro> imu = new RobotCodex(0d, EGyro.class);
-    public final RobotCodex<ELogitech310> driverinput = new RobotCodex(0d, ELogitech310.class);
-    public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(0d, ELogitech310.class);
-    public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(0d, EPowerDistPanel.class);
-    public final RobotCodex<ELimelightData> limelight = new RobotCodex(0d, ELimelightData.class);
-    public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(0d, ERawLimelightData.class);
-    public final RobotCodex<ELimelightData> selectedTarget = new RobotCodex(0d, ELimelightData.class);
-    public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(0d, EHangerModuleData.class);
-    public final RobotCodex<EDriveData> drivetrain = new RobotCodex(0d, EDriveData.class);
-    public final RobotCodex<EPowerCellData> powercell = new RobotCodex(0d, EPowerCellData.class);
-    public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(0d, EShooterSystemData.class);
-    public final RobotCodex<EColorData> color = new RobotCodex(0d, EColorData.class);
+    public static final double NULL_CODEX_VALUE = Double.NEGATIVE_INFINITY;
+    public final RobotCodex<EGyro> imu = new RobotCodex(Double.NaN, EGyro.class);
+    public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
+    public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
+    public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
+    public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
+    public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
+    public final RobotCodex<ELimelightData> selectedTarget = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
+    public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
+    public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
+    public final RobotCodex<EPowerCellData> powercell = new RobotCodex(NULL_CODEX_VALUE, EPowerCellData.class);
+    public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(NULL_CODEX_VALUE, EShooterSystemData.class);
+    public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
 
     public Color DJ_COLOR = Color.kAzure;
 
@@ -54,6 +57,8 @@ public class Data {
             limelight,
             color,
     };
+
+    public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
 
     public final RobotCodex[] mLoggedCodexes = new RobotCodex[] {
             imu,
@@ -76,6 +81,9 @@ public class Data {
     public Data(boolean pLogging) {
         if(pLogging) {
             initParsers();
+        }
+        for(RobotCodex rc : mAllCodexes) {
+            mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
         }
     }
 
