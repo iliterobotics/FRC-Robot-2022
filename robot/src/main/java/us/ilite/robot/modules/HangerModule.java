@@ -20,7 +20,7 @@ public class HangerModule extends Module {
     private CANPIDController mHangerPID2;
 
     private CANEncoder mHangerEncoderOne;
-    private CANEncoder mHangerEncoderTwo;
+//    private CANEncoder mHangerEncoderTwo; O
 
     //PID Constants, to be used if needed
     private double k_P = 0.5; //Change later, tune this
@@ -34,7 +34,7 @@ public class HangerModule extends Module {
 
         mHangerNeoOne = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID1 ,
                 CANSparkMaxLowLevel.MotorType.kBrushless);
-        mHangerNeoTwo = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID2 ,
+        mHangerNeoTwo = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kHangerNeoID2 , mHangerNeoOne,
                 CANSparkMaxLowLevel.MotorType.kBrushless);
 
         mHangerPID = new CANPIDController(mHangerNeoOne);
@@ -60,7 +60,6 @@ public class HangerModule extends Module {
         mHangerNeoTwo.burnFlash();
 
         mHangerEncoderOne = mHangerNeoOne.getEncoder();
-        mHangerEncoderTwo = mHangerNeoTwo.getEncoder();
 
         zeroTheEncoders();
 
@@ -85,8 +84,7 @@ public class HangerModule extends Module {
 //        Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , (double) returnHangerState().ordinal() );
 //        Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , (double) returnHangerState().ordinal() );
 
-        Robot.DATA.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION1 , mHangerNeoOne.getOutputCurrent());
-        Robot.DATA.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION2 , mHangerNeoTwo.getOutputCurrent());
+        Robot.DATA.hanger.set(EHangerModuleData.CURRENT_HANGER_POSITION , mHangerNeoOne.getOutputCurrent());
     }
     
     public void modeInit(){
@@ -96,17 +94,13 @@ public class HangerModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        mHangerNeoOne.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_HANGER_POSITION1));
-        mHangerNeoTwo.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_HANGER_POSITION2));
-
         switch (mHangerState){
             case HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 1.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 1.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION , 1.0);
             case NOT_HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION1 , 0.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION2 , 0.0);
+                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION , 0.0);
         }
+        mHangerNeoOne.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_HANGER_POSITION));
 
     }
 
@@ -120,11 +114,11 @@ public class HangerModule extends Module {
     }
     public boolean isCurrentLimiting(){
         return Robot.DATA.pdp.get(EPowerDistPanel.CURRENT9) > kHangerWarnCurrentLimitThreshold;
+        //Will change the PDP location of the current
     }
 
     public void zeroTheEncoders(){
         mHangerEncoderOne.setPosition(0);
-        mHangerEncoderTwo.setPosition(0);
         Robot.DATA.hanger.set(EHangerModuleData.CURRENT_ENCODER_TICKS, 0.0);
     }
 
