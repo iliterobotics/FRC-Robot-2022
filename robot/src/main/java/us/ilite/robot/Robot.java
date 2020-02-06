@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
     private RawLimelight mRawLimelight;
     private Timer initTimer = new Timer();
     private DJSpinnerModule mDJSpinnerModule;
+    private SimulationModule mSimulation;
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
     private FlywheelModule mShooter;
@@ -55,7 +56,7 @@ public class Robot extends TimedRobot {
 
     private PerfTimer mClockUpdateTimer = new PerfTimer();
 
-    private final AbstractController mTeleopController = new TeleopController();
+    private final AbstractController mTeleopController = TeleopController.getInstance();
     private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
     private TestController mTestController;
@@ -73,6 +74,9 @@ public class Robot extends TimedRobot {
         mLimelight = new Limelight();
         mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
+        if(IS_SIMULATED) {
+            mSimulation = new SimulationModule();
+        }
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -166,11 +170,12 @@ public class Robot extends TimedRobot {
     @Override
     public void testInit() {
         if(mTestController == null) {
-             mTestController = new TestController();
+             mTestController = TestController.getInstance();
         }
         MODE = TEST;
         mActiveController = mTestController;
         mActiveController.setEnabled(true);
+
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
@@ -178,6 +183,9 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mDrive);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDJSpinnerModule);
+        if(IS_SIMULATED) {
+            mRunningModules.addModule(mSimulation);
+        }
         mRunningModules.modeInit(TEST, CLOCK.getCurrentTime());
         mRunningModules.checkModule(CLOCK.getCurrentTime());
     }

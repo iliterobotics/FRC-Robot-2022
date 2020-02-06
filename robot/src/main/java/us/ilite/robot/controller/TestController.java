@@ -37,7 +37,16 @@ public class TestController extends AbstractController {
     private PowerCellModule.EArmState mArmState;
     private double mPreviousTime;
 
-    public TestController() {
+    private static TestController INSTANCE;
+
+    public static TestController getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE = new TestController();
+        }
+        return INSTANCE;
+    }
+
+    private TestController() {
         for(String key : db.mMappedCodex.keySet()) {
             ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
             List<Enum<?>> enums =  EnumUtils.getEnums(db.mMappedCodex.get(key).meta().getEnum(), true);

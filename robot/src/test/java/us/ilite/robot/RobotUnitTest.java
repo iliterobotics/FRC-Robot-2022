@@ -1,5 +1,7 @@
 package us.ilite.robot;
 
+import com.flybotix.hfr.codex.RobotCodex;
+import com.flybotix.hfr.util.lang.EnumUtils;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -12,13 +14,15 @@ import us.ilite.CriticalTest;
 import us.ilite.RegularTest;
 import us.ilite.robot.controller.TestController;
 
+import java.util.List;
+
 @Category(CriticalTest.class)
 public class RobotUnitTest extends BaseTest{
 
     @Test
     @Category(CriticalTest.class)
     public void testTestController() {
-        commonAssertions(new TestController());
+        commonAssertions(TestController.getInstance());
     }
     @Test
     @Category(RegularTest.class)
@@ -27,11 +31,12 @@ public class RobotUnitTest extends BaseTest{
     }
 
     @Test
-    @Category(RegularTest.class)
-    public void testCodexValueOf() {
-        TestController t = new TestController();
+    @Category(CriticalTest.class)
+    public void testUnusedCodex() {
+        TestController t = TestController.getInstance();
         randomizeAllInputs();
-        System.out.println(db.driverinput.toString());
+        t.update(0d);
+        System.out.println(t.getUnusedCodexReport());
     }
 
 }
