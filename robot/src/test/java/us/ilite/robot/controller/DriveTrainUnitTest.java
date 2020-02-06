@@ -18,7 +18,7 @@ public class DriveTrainUnitTest extends BaseTest {
     public void testDrivetrainControl() {
         db.driverinput.set(InputMap.DRIVER.THROTTLE_AXIS, 0.0);
         db.driverinput.set(InputMap.DRIVER.TURN_AXIS, 1.0);
-        TestController t = new TestController();
+        TestController t = TestController.getInstance();
         t.update(0.0);
         assertNormalizedInputs("0% throttle 100% turn");
 
