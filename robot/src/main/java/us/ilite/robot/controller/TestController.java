@@ -66,7 +66,7 @@ public class TestController extends AbstractController {
         // ========================================
         Robot.CLOCK.report("updateLimelightTargetLock", t->updateLimelightTargetLock());
         Robot.CLOCK.report("updateDrivetrain", t->updateDrivetrain(pNow));
-        Robot.CLOCK.report("updateFlywheel", t->updateFlywheel(pNow));
+        Robot.CLOCK.report("updateFlywheel", t->updateFlywheel());
         Robot.CLOCK.report("updateIntake", t->updateIntake(pNow));
         Robot.CLOCK.report("updateHanger", t->updateHanger(pNow));
         Robot.CLOCK.report("updateDJBooth", t->updateDJBooth());
@@ -94,67 +94,16 @@ public class TestController extends AbstractController {
         }
     }
 
-    void updateFlywheel(double pNow) {
-//        if (!db.driverinput.isSet(InputMap.DRIVER.FLYWHEEL_AXIS) ) {
-//            mTurretMode = FlywheelModule.ETurretMode.LIMELIGHT;
-//            mHoodState = FlywheelModule.EHoodState.ADJUSTABLE;
-//            mAcceleratorState = FlywheelModule.EAcceleratorState.FEED;
-//            mShooterState = FlywheelModule.EShooterState.SHOOT;
-//        }
-//        else {
-//            mTurretMode = FlywheelModule.ETurretMode.GYRO;
-//            mAcceleratorState = FlywheelModule.EAcceleratorState.STOP;
-//            mShooterState = FlywheelModule.EShooterState.STOP;
-//            mHoodState = FlywheelModule.EHoodState.STATIONARY;
-//        }
-//
-//        switch(mAcceleratorState) {
-//            case FEED: db.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, FlywheelModule.kAcceleratorTargetVelocity);
-//                break;
-//            case STOP: db.flywheel.set(EShooterSystemData.CURRENT_ACCELERATOR_VELOCITY, 0.0);
-//                break;
-//        }
-//
-//        switch(mTurretMode) {
-//            case GYRO: db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-2 * mTurretGyro.getCompassHeading(), pNow - mPreviousTime));
-//                break;
-//            case LIMELIGHT:
-//                if ( db.limelight.isSet(ETargetingData.tx)) {
-//                    db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, mTurretPid.calculate(-10 * db.limelight.get(ETargetingData.tx), pNow - mPreviousTime));
-//                }
-//                break;
-//        }
-//
-//        switch(mShooterState) {
-//            case SHOOT:
-//                if ( db.limelight.isSet(ETargetingData.ty)) {
-//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooter.calcSpeedFromDistance(db.limelight.get(ETargetingData.calcDistToTarget)));
-//                }
-//                else {
-//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, mShooterPid.calculate(Settings.ShooterSystem.kShooterTargetVelocity, 0.5));
-//                }
-//                break;
-//            case STOP: db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
-//                break;
-//        }
-//
-//        switch(mHoodState) {
-//            case STATIONARY: db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
-//                break;
-//            case ADJUSTABLE:
-//                if (db.limelight.isSet(ETargetingData.ty)) {
-//                    db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, mShooter.calcAngleFromDistance(db.limelight.get(ETargetingData.calcDistToTarget), db.limelight.get(ETargetingData.ty)));
-//                }
-//                else {
-//                    db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, Settings.ShooterSystem.kBaseHoodAngle);
-//                }
-//        }
-//        if ( db.attackoperatorinput.isSet(ELogitechAttack3.TRIGGER)) {
-//            mAccelerator.set(ControlMode.PercentOutput, db.attackoperatorinput.get(ELogitechAttack3.TRIGGER));
-//        }
-        mPreviousTime = pNow;
+    private void updateFlywheel() {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
+            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED);
+        }
+        else {
+            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
+        }
+        db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, Robot.DATA.flywheel.get(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE));
     }
-
+    
     public void updateLimelightTargetLock() {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
             if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
