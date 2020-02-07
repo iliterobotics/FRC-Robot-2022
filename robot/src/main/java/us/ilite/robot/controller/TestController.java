@@ -4,6 +4,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.lang.EnumUtils;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
@@ -12,6 +13,10 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
+import us.ilite.common.config.InputMap;
+import us.ilite.common.config.Settings;
+import us.ilite.common.types.input.EInputScale;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.*;
 import us.ilite.common.types.ELimelightData;
@@ -32,7 +37,6 @@ public class TestController extends AbstractController {
 
     private double mLimelightZoomThreshold = 7.0;
 
-    private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.NOT_HANGING;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
     private double mPreviousTime;
@@ -72,25 +76,13 @@ public class TestController extends AbstractController {
     }
 
     private void updateHanger(double pNow){
-        HangerModule.EHangerState h = HangerModule.EHangerState.NOT_HANGING;
-        if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
+        if(db.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)){
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION , 17.0);
+        }
+        else {
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 0.0);
+        }
 
-        }
-        else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.RELEASE_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
-
-        }
-        switch (h){
-            case HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
-            case NOT_HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
-        }
     }
 
     void updateFlywheel(double pNow) {

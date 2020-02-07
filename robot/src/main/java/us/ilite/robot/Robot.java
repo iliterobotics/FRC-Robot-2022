@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
+    private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
@@ -178,6 +179,8 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
         if(IS_SIMULATED) {
