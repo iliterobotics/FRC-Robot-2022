@@ -1,4 +1,4 @@
-package us.ilite.paths;
+package us.ilite.robot.auto.paths;
 
 import com.team319.trajectory.Path;
 

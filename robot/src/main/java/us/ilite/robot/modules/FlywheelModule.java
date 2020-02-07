@@ -44,7 +44,7 @@ public class FlywheelModule extends Module {
     public FlywheelModule() {
         mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
         mAccelerator = new TalonSRX(Settings.Hardware.CAN.kAcceleratorID);
-        mHoodAngler = new Servo(Settings.Hardware.CAN.kAnglerID);
+        mHoodAngler = new Servo(Settings.Hardware.DIO.kAnglerID);
         mTurret = new TalonSRX(Settings.Hardware.CAN.kTurretID);
         mTurretGyro = new PigeonIMU(Settings.Hardware.CAN.kTurretGyroID);
 //        mTurretPid = new PIDController(kTurretAngleLockGains, 0, 1, SeleLockGains, -1, 1, Settings.kControlLoopPeriod);

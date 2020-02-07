@@ -1,8 +1,6 @@
 package us.ilite.common;
 
-import com.flybotix.hfr.codex.Codex;
-import com.flybotix.hfr.codex.CodexOf;
-import com.flybotix.hfr.util.lang.EnumUtils;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.util.Color;
@@ -17,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Think of this class link an in-memory database optimized for 1 row.  If you need multiple rows, simply manage multiple
@@ -30,22 +30,23 @@ public class Data {
     
     //Add new codexes here as we need more
 
-    public final Codex<Double, EGyro> imu = Codex.of.thisEnum(EGyro.class);
-    public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
-    public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
-    public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
-    public final Codex<Double, ELimelightData> limelight = Codex.of.thisEnum(ELimelightData.class);
-    public final Codex<Double, ERawLimelightData> rawLimelight = Codex.of.thisEnum(ERawLimelightData.class);
-    public final Codex<Double, ELimelightData> selectedTarget = Codex.of.thisEnum(ELimelightData.class);
-    public final Codex<Double , EHangerModuleData> hanger = Codex.of.thisEnum(EHangerModuleData.class);
-    public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
-    public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
-    public final Codex<Double, EShooterSystemData> flywheel = Codex.of.thisEnum(EShooterSystemData.class);
-    public final Codex<Double, EColorData> color = Codex.of.thisEnum(EColorData.class);
+    public static final double NULL_CODEX_VALUE = Double.NEGATIVE_INFINITY;
+    public final RobotCodex<EGyro> imu = new RobotCodex(Double.NaN, EGyro.class);
+    public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
+    public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
+    public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
+    public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
+    public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
+    public final RobotCodex<ELimelightData> selectedTarget = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
+    public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
+    public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
+    public final RobotCodex<EPowerCellData> powercell = new RobotCodex(NULL_CODEX_VALUE, EPowerCellData.class);
+    public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(NULL_CODEX_VALUE, EShooterSystemData.class);
+    public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
 
     public Color DJ_COLOR = Color.kAzure;
 
-    public final Codex[] mAllCodexes = new Codex[] {
+    public final RobotCodex[] mAllCodexes = new RobotCodex[] {
             imu,
             drivetrain,
             driverinput,
@@ -57,7 +58,9 @@ public class Data {
             color,
     };
 
-    public final Codex[] mLoggedCodexes = new Codex[] {
+    public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
+
+    public final RobotCodex[] mLoggedCodexes = new RobotCodex[] {
             imu,
             drivetrain,
             driverinput,
@@ -67,21 +70,6 @@ public class Data {
             hanger,
             limelight,
     };
-
-    public static <T extends Enum<T>, E extends Enum<E> & CodexOf<Double>> T valueOf(
-            Codex<Double, E> data, Class<T> pEnu, E pElement
-    ) {
-        if(data.isSet(pElement)) {
-            return EnumUtils.getEnums(pEnu, true).get((int) (double) data.get(pElement));
-        } else {
-            return null;
-        }
-    }
-
-    public static <T extends Enum<T>, E extends Enum<E> & CodexOf<Double>> void setState(
-            Codex<Double, E> data, E pElement, T pState) {
-        data.set(pElement, (double)pState.ordinal());
-    }
 
     //Stores writers per codex needed for CSV logging
     private List<CodexCsvLogger> mCodexCsvLoggers;
@@ -93,6 +81,9 @@ public class Data {
     public Data(boolean pLogging) {
         if(pLogging) {
             initParsers();
+        }
+        for(RobotCodex rc : mAllCodexes) {
+            mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
         }
     }
 
