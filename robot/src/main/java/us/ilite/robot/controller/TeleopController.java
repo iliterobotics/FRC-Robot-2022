@@ -1,6 +1,6 @@
 package us.ilite.robot.controller;
 
-public class TeleopController extends AbstractController {
+public class TeleopController extends BaseManualController {
 
     private static TeleopController INSTANCE;
 
@@ -17,6 +17,6 @@ public class TeleopController extends AbstractController {
 
     @Override
     protected void updateImpl(double pNow) {
-
+        super.updateDrivetrain(pNow);
     }
 }
