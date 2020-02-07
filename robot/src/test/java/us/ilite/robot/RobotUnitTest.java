@@ -56,6 +56,7 @@ public class RobotUnitTest extends BaseTest{
         Assert.assertTrue("Left Y Axis should NOT have a value: ", db.driverinput.isNull(ELogitech310.LEFT_Y_AXIS));
         db.driverinput.reset();
         Assert.assertTrue("B_BTN should be null after reset: ", db.driverinput.isNull(ELogitech310.B_BTN));
+        Assert.assertTrue("Left X Axis should NOT have a value after reset: ", db.driverinput.isNull(ELogitech310.LEFT_X_AXIS));
         Assert.assertTrue("Left Y Axis should NOT have a value after reset: ", db.driverinput.isNull(ELogitech310.LEFT_Y_AXIS));
     }
 }
