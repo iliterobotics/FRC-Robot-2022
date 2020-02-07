@@ -17,7 +17,6 @@ public class HangerModule extends Module {
 
     private EHangerState mHangerState;
     private CANPIDController mHangerPID;
-    private CANPIDController mHangerPID2;
 
     private CANEncoder mHangerEncoderOne;
 //    private CANEncoder mHangerEncoderTwo; O
@@ -38,7 +37,6 @@ public class HangerModule extends Module {
                 CANSparkMaxLowLevel.MotorType.kBrushless);
 
         mHangerPID = new CANPIDController(mHangerNeoOne);
-        mHangerPID2 = new CANPIDController(mHangerNeoTwo);
 
         mHangerNeoTwo.follow(mHangerNeoOne , true);
 
@@ -46,12 +44,7 @@ public class HangerModule extends Module {
         mHangerPID.setP(k_I);
         mHangerPID.setP(k_D);
         mHangerPID.setP(k_FF);
-
-        mHangerPID2.setP(k_P);
-        mHangerPID2.setP(k_I);
-        mHangerPID2.setP(k_D);
-        mHangerPID2.setP(k_FF);
-
+        
 
         mHangerNeoOne.setIdleMode(CANSparkMax.IdleMode.kBrake);
         mHangerNeoOne.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -66,7 +59,7 @@ public class HangerModule extends Module {
     }
     public enum EHangerState {
         HANGING(1.0),
-        NOT_HANGING(0.0),
+        BRAKE (0.0),
         REVERSE(-1.0);
 
         private double position;
@@ -97,7 +90,7 @@ public class HangerModule extends Module {
         switch (mHangerState){
             case HANGING:
                 Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION , 1.0);
-            case NOT_HANGING:
+            case BRAKE:
                 Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POSITION , 0.0);
         }
         mHangerNeoOne.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_HANGER_POSITION));
@@ -113,7 +106,7 @@ public class HangerModule extends Module {
         mHangerState = desiredState;
     }
     public boolean isCurrentLimiting(){
-        return Robot.DATA.pdp.get(EPowerDistPanel.CURRENT9) > kHangerWarnCurrentLimitThreshold;
+        return mHangerNeoOne.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold;
         //Will change the PDP location of the current
     }
 
