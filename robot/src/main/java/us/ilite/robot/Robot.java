@@ -1,12 +1,12 @@
 package us.ilite.robot;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.ICodexTimeProvider;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -200,8 +200,8 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for (RobotCodex c : DATA.mAllCodexes) {
-            CSVLoggerQueue.kCSVLoggerQueue.add( new Log( c.meta().toString(),c.toCSV()) );
+        for (RobotCodex c : DATA.mLoggedCodexes ) {
+            CSVLoggerQueue.kCSVLoggerQueue.add( new Log( c.meta().getEnum().getSimpleName(), c.toCSV()) );
             c.reset();
         }
 

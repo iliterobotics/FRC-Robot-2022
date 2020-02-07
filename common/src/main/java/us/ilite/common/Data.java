@@ -93,7 +93,7 @@ public class Data {
 
     private void initParsers() {
         mCodexCsvLoggers = new ArrayList<>();
-        for(Codex c : mLoggedCodexes) mCodexCsvLoggers.add(new CodexCsvLogger( c ));
+        for(RobotCodex c : mLoggedCodexes) mCodexCsvLoggers.add(new CodexCsvLogger( c ));
     }
 
     public void logFromCodexToCSVHeader() {
@@ -102,19 +102,23 @@ public class Data {
             mCodexCsvLoggers.forEach(c -> c.writeHeader());
 //        }
     }
-    public void logFromCodexToCSVLog( String pLog ) {
+    public void logFromCodexToCSVLog( Log pLog ) {
         // Check that the USB drivetrain is still plugged in
 //        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
-          CodexCsvLogger.log( pLog );
+          for ( CodexCsvLogger c : mCodexCsvLoggers ) {
+              if ( c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName().equals(pLog.getmCodexIdentifier()) ) {
+                  c.log( pLog.getmLogData() );
+              }
+          }
 //        }
     }
 
-//    /**
-//     * Closes all the writers in mNetworkTableWriters
-//     */
-//    public void closeWriters() {
-//        mCodexCsvLoggers.forEach(c -> c.closeWriter());
-//    }
+    /**
+     * Closes all the writers in mNetworkTableWriters
+     */
+    public void closeWriters() {
+        mCodexCsvLoggers.forEach(c -> c.closeWriter());
+    }
 
     /**
      * Makes the log file if it doesn't already exist

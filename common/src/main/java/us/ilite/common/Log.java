@@ -3,14 +3,19 @@ package us.ilite.common;
 import java.util.Objects;
 
 public class Log {
-    private Class<Enum> mCodexIdentifier;
-    private String mData;
+    private String mCodexIdentifier;
+    private String mLogData;
+
+    public Log(String pCodexIdentifier, String pLogData) {
+        mCodexIdentifier = pCodexIdentifier;
+        mLogData = pLogData;
+    }
 
     @Override
     public String toString() {
         return "Log{" +
-                "mCodexIdentifier='" + mCodexIdentifier + '\'' +
-                ", mData='" + mData + '\'' +
+                "mCodexIdentifier=" + mCodexIdentifier +
+                ", mData='" + mLogData + '\'' +
                 '}';
     }
 
@@ -20,32 +25,20 @@ public class Log {
         if (o == null || getClass() != o.getClass()) return false;
         Log log = (Log) o;
         return Objects.equals(mCodexIdentifier, log.mCodexIdentifier) &&
-                Objects.equals(mData, log.mData);
+                Objects.equals(mLogData, log.mLogData);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mCodexIdentifier, mData);
+        return Objects.hash(mCodexIdentifier, mLogData);
     }
 
     public String getmCodexIdentifier() {
         return mCodexIdentifier;
     }
 
-    public void setmCodexIdentifier(String mCodexIdentifier) {
-        this.mCodexIdentifier = mCodexIdentifier;
+    public String getmLogData() {
+        return mLogData;
     }
 
-    public String getmData() {
-        return mData;
-    }
-
-    public void setmData(String mData) {
-        this.mData = mData;
-    }
-
-    public Log(String mCodexIdentifier, String mData) {
-        this.mCodexIdentifier = mCodexIdentifier;
-        this.mData = mData;
-    }
 }

@@ -4,6 +4,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.CSVLoggerQueue;
 import us.ilite.common.Data;
+import us.ilite.common.Log;
 import us.ilite.common.config.Settings;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class CSVLogger {
     private void run() {
         try {
             //System.out.println("Running time is: " + System.currentTimeMillis());
-            ArrayList<String> kTempCSVLogs = new ArrayList<>();
+            ArrayList<Log> kTempCSVLogs = new ArrayList<>();
             //mLogger.error("Beginning to drain!");
             CSVLoggerQueue.kCSVLoggerQueue.drainTo(kTempCSVLogs);
            mLogger.error("Finished draining, got: " + kTempCSVLogs.size());
@@ -40,8 +41,8 @@ public class CSVLogger {
 //                }
 //            }
 
-            for ( String logline : kTempCSVLogs ) {
-                mData.logFromCodexToCSVLog( logline );
+            for ( Log log : kTempCSVLogs ) {
+                mData.logFromCodexToCSVLog( log );
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,6 +66,7 @@ public class CSVLogger {
     public void stop() {
 
         scheduledFuture.cancel(true);
+        Robot.DATA.closeWriters();
 //        try {
 //            if(scheduledFuture != null) {
 //                scheduledFuture.cancel(true);

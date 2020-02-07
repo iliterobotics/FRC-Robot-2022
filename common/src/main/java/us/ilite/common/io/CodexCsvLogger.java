@@ -1,11 +1,13 @@
 package us.ilite.common.io;
 
-import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.CodexMetadata;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import us.ilite.common.CSVLoggerQueue;
 import us.ilite.common.Data;
+import us.ilite.common.Log;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,10 +24,10 @@ public class CodexCsvLogger {
 
     private final ILog mLog = Logger.createLog(CodexCsvLogger.class);
 
-    private Codex<?, ?> mCodex;
+    private RobotCodex<?> mCodex;
     private static BufferedWriter writer;
 
-    public CodexCsvLogger(Codex<?, ?> pCodex ) {
+    public CodexCsvLogger(RobotCodex<?> pCodex) {
         mCodex = pCodex;
 
         File file = file();
@@ -37,7 +39,7 @@ public class CodexCsvLogger {
         }
     }
 
-    public static void log( String s ) {
+    public void log( String s ) {
         try {
             writer.append( s );
             writer.newLine();
@@ -47,7 +49,11 @@ public class CodexCsvLogger {
     }
 
     public void writeHeader() {
-        CSVLoggerQueue.kCSVLoggerQueue.add(mCodex.getCSVHeader());
+        CSVLoggerQueue.kCSVLoggerQueue.add( new Log( mCodex.meta().getEnum().getSimpleName(), mCodex.getCSVHeader() ) );
+    }
+
+    public CodexMetadata<?> getMetaDataOfAssociatedCodex() {
+        return mCodex.meta();
     }
 
 //    public void writeAllLines() {
@@ -88,14 +94,14 @@ public class CodexCsvLogger {
 
         return file;
     }
-//
-//    public void closeWriter() {
-//        try {
-//            writer.flush();
-//            writer.close();
-//        } catch (IOException pE) {
-//            pE.printStackTrace();
-//        }
-//    }
+
+    public void closeWriter() {
+        try {
+            writer.flush();
+            writer.close();
+        } catch (IOException pE) {
+            pE.printStackTrace();
+        }
+    }
 
 }
