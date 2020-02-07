@@ -47,6 +47,7 @@ public abstract  class IMU {
     case ROLL:
       return getRoll();
     case YAW:
+      return getYaw();
     default:
       return getYaw();
     }

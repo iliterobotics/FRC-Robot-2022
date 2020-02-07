@@ -74,7 +74,7 @@ public class DJSpinnerModule extends Module {
         }
     }
 
-    private final VictorSPX mVictor = new VictorSPX( Settings.kDJBoothTalonId );
+    private final VictorSPX mVictor = new VictorSPX( Settings.Hardware.CAN.kDJBoothTalonId );
 
     private ColorSensorV3 mColorSensorV3;
     private final ColorMatch mColorMatcher = new ColorMatch();
