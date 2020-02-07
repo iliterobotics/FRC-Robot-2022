@@ -13,7 +13,6 @@ import us.ilite.common.types.EMatchMode;
 
 import static us.ilite.common.types.drive.EDriveData.*;
 
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -30,8 +29,8 @@ public class DriveModule extends Module {
 	private final ILog mLogger = Logger.createLog(DriveModule.class);
 	public static double kDriveTrainMaxVelocity = 5676;
 
-	// TODO Find out what units this is in
-	public static double kMaxHeadingChange = 5;
+	// This is approx 290 Degrees per cycle
+	public static double kMaxDegreesPerCycle = 5;
 
 	public static double kGearboxRatio = (12.0 / 80.0) * (42.0 / 80.0);
 	public static double kClosedLoopVoltageRampRate = 0.1 ;
@@ -65,6 +64,7 @@ public class DriveModule extends Module {
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kYawGains = new ProfileGains().f(.15);
 	public static double kDriveLinearPercentOutputLimit = 0.5;
+	public IMU mGyro;
 
 	// =============================================================================
 	// Hold Gains
@@ -120,6 +120,8 @@ public class DriveModule extends Module {
 		mRightCtrl = mRightMaster.getPIDController();
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
+		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
+
 
 		setPIDGains(mLeftCtrl, vPID);
 		setPIDGains(mRightCtrl, vPID);
@@ -140,8 +142,8 @@ public class DriveModule extends Module {
 //		mTargetAngleLockPid.reset();
 
 		mYawPid = new PIDController(kYawGains,
-									-kMaxHeadingChange,
-									kMaxHeadingChange,
+									-kMaxDegreesPerCycle,
+				kMaxDegreesPerCycle,
 									Settings.kControlLoopPeriod);
 		mYawPid.setOutputRange(-1, 1);
 
@@ -174,6 +176,7 @@ public class DriveModule extends Module {
 
 	@Override
 	public void readInputs(double pNow) {
+		mGyro.update(pNow);
 		db.drivetrain.set(LEFT_POS_INCHES, Conversions.ticksToInches(mLeftEncoder.getPosition()));
 		db.drivetrain.set(LEFT_VEL_IPS, Conversions.ticksToInches(mLeftEncoder.getVelocity()));
 		db.drivetrain.set(LEFT_VEL_TICKS, mLeftEncoder.getVelocity());
@@ -184,11 +187,12 @@ public class DriveModule extends Module {
 		db.drivetrain.set(RIGHT_CURRENT, mRightMaster.getOutputCurrent());
 		db.drivetrain.set(IS_CURRENT_LIMITING, EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots));
 
-//		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
+
+		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, -mGyro.getHeading().getDegrees());
 
 //		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
-//		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
-
+		Robot.DATA.imu.set(EGyro.YAW_DEGREES, -mGyro.getYaw());
+		db.imu.set(EGyro.YAW_OMEGA_DEGREES, ( mGyro.getYaw() - mPreviousHeading ) / ( pNow - mPreviousTime ) );
 
 	}
 
@@ -214,7 +218,7 @@ public class DriveModule extends Module {
 
 			case VELOCITY:
 				mStartHoldingPosition = false;
-				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxHeadingChange);
+				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
 //				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
 				double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 				double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
