@@ -36,7 +36,6 @@ public class TestController extends AbstractController {
 
     private double mLimelightZoomThreshold = 7.0;
 
-    private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.NOT_HANGING;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
     private double mPreviousTime;
@@ -76,26 +75,7 @@ public class TestController extends AbstractController {
     }
 
     private void updateHanger(double pNow){
-        HangerModule.EHangerState h = HangerModule.EHangerState.NOT_HANGING;
-        if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
 
-        }
-        else if (Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.RELEASE_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
-
-        }
-        switch (h){
-            case HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
-            case NOT_HANGING:
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
-                Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
-        }
-    }
     }
 
     void updateFlywheel(double pNow) {
