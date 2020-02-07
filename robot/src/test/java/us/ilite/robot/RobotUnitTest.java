@@ -45,9 +45,17 @@ public class RobotUnitTest extends BaseTest{
     @Test
     @Category(CriticalTest.class)
     public void testCodexSet() {
-        db.driverinput.set(ELogitech310.A_BTN, 1.0);
         db.driverinput.set(ELogitech310.B_BTN, Data.NULL_CODEX_VALUE);
-        Assert.assertTrue("A_BTN should be set: ", db.driverinput.isSet(ELogitech310.A_BTN));
         Assert.assertTrue("B_BTN should be null: ", db.driverinput.isNull(ELogitech310.B_BTN));
+        db.driverinput.reset();
+        Assert.assertTrue("B_BTN should be null after reset: ", db.driverinput.isNull(ELogitech310.B_BTN));
+        db.driverinput.set(ELogitech310.A_BTN, 1.0);
+        Assert.assertTrue("A_BTN should be set: ", db.driverinput.isSet(ELogitech310.A_BTN));
+        db.driverinput.set(ELogitech310.LEFT_X_AXIS, 0.5);
+        Assert.assertTrue("Left X Axis should have a value: ", db.driverinput.isSet(ELogitech310.LEFT_X_AXIS));
+        Assert.assertTrue("Left Y Axis should NOT have a value: ", db.driverinput.isNull(ELogitech310.LEFT_Y_AXIS));
+        db.driverinput.reset();
+        Assert.assertTrue("B_BTN should be null after reset: ", db.driverinput.isNull(ELogitech310.B_BTN));
+        Assert.assertTrue("Left Y Axis should NOT have a value after reset: ", db.driverinput.isNull(ELogitech310.LEFT_Y_AXIS));
     }
 }
