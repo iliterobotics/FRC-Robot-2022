@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
 
 import static us.ilite.common.types.drive.EDriveData.*;
@@ -30,7 +31,7 @@ public class DriveModule extends Module {
 	public static double kDriveTrainMaxVelocity = 5676;
 
 	// This is approx 290 Degrees per cycle
-	public static double kMaxDegreesPerCycle = 5;
+	public static double kMaxDegreesPerCycle = Units.radians_to_degrees(5);
 
 	public static double kGearboxRatio = (12.0 / 80.0) * (42.0 / 80.0);
 	public static double kClosedLoopVoltageRampRate = 0.1 ;
@@ -192,7 +193,7 @@ public class DriveModule extends Module {
 
 //		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
 		Robot.DATA.imu.set(EGyro.YAW_DEGREES, -mGyro.getYaw());
-		db.imu.set(EGyro.YAW_OMEGA_DEGREES, ( mGyro.getYaw() - mPreviousHeading ) / ( pNow - mPreviousTime ) );
+		db.imu.set(EGyro.YAW_OMEGA_DEGREES, ( (-mGyro.getYaw())	 - mPreviousHeading ) / ( pNow - mPreviousTime ) );
 
 	}
 
