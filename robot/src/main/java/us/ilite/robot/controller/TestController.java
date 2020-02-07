@@ -4,6 +4,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.lang.EnumUtils;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
@@ -75,6 +76,12 @@ public class TestController extends AbstractController {
     }
 
     private void updateHanger(double pNow){
+        if(db.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)){
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION , 17.0);
+        }
+        else {
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 0.0);
+        }
 
     }
 
