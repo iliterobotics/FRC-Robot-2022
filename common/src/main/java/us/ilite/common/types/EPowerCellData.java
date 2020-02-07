@@ -1,7 +1,7 @@
 package us.ilite.common.types;
 
 public enum EPowerCellData {
-
+    UNUSED,
     BREAK_SENSOR_0,
     BREAK_SENSOR_1,
     BREAK_SENSOR_2,

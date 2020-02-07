@@ -20,3 +20,8 @@ IF you installed WPILib, edit your `.bashrc` file, usually located in your home 
 ```
 export JAVA_HOME='/c/Users/Public/wpilib/2020/jdk/bin'
 ```
+To start the WPILib sim and see ShuffleBoard results:
+1. Install WPILib. You do not need to install VSCode, but you DO need WPILib. You do not need the FRC Driver's Station.
+2. Compile your code
+3. `./gradlew ShuffleBoard simulateJava` (note you can also set these up in IntelliJ to run it from there)
+4. IF for some reason the sim does not start, but a command prompt appears, in that command prompt type `robot\build\gra`, hit `[TAB]` so the file auto-completes, then hit `[ENTER]`

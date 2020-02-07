@@ -13,7 +13,7 @@ import java.util.List;
  *  - Driver Input
  *  - Field element locations & vision target heights
  */
-public class Settings extends NetworkTablesConstantsBase {
+public class Settings {
 
     public static double kControlLoopPeriod = 0.01; // seconds
     public static double kCSVLoggingPeriod = 0.02;  // seconds
@@ -21,7 +21,6 @@ public class Settings extends NetworkTablesConstantsBase {
     public static double kNetworkTableUpdateRate = 0.01;
 
     public static double kDJOutput = .25;
-    public static int kDJBoothTalonId = 12;
 
     public static int sCODEX_COMMS_PORT = 5805;
 
@@ -37,30 +36,32 @@ public class Settings extends NetworkTablesConstantsBase {
 
 
         public static class CAN {
-            public static int kHangerNeoID1;
-            public static int kHangerNeoID2;
-            public static int kArmNEOAdress = 4;
-            public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
-            public static int kTalonOneID = 3; // Change later
-            public static int kTalonTwoID = 7; // Change later
-            public static int kTalonThreeID = 5; // Change later
-            public static final int kTurretGyroID = 1; // There isn't a gyro on the BunnyBot
-            public static final int kShooterID = 16; // BunnyBot Shooter
-            public static final int kAcceleratorID = 11; // BunnyBot Conveyor
-            public static final int kAnglerID = 9; // BunnyBot Catapult
-            public static final int kTurretID = 9; // BunnyBot Hopper
+            public static int kDJBoothTalonId = 72;
+            public static int kHangerNeoID1 = 70;
+            public static int kHangerNeoID2 = 71;
+            public static int kArmNEOAdress = 64;
+            public static int kCANIntakeID = 66; // Change later // Using the bunny bots flywheel id for now
+            public static int kTalonOneID = 63; // Change later
+            public static int kTalonTwoID = 67; // Change later
+            public static int kTalonThreeID = 65; // Change later
+            public static final int kTurretGyroID = 61; // There isn't a gyro on the BunnyBot
+            public static final int kShooterID = 66; // BunnyBot Shooter
+            public static final int kAcceleratorID = 61; // BunnyBot Conveyor
+            public static final int kTurretID = 69; // BunnyBot Hopper
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
-            public static int kPCM = 20;
-            public static int kPDP = 21;
-            public static int kPigeon = 30;
 //            public static double kGyroCollisionThreshold = 0.0;
 
+            // =============================================
+            // DO NOT CHANGE ANY OF THE FOLLOWING CAN ID's
+            // =============================================
+            public static int kPDP = 20;
+            public static int kPigeon = 21;
             public static  int kDriveLeftMaster = 1;
-            public static int kDriveLeftMiddle = 3;
-            public static  int kDriveRightMaster = 2;
-            public static int kDriveRightMiddle = 4;
+            public static int kDriveLeftFollower = 2;
+            public static  int kDriveRightMaster = 3;
+            public static int kDriveRightFollower = 4;
 
         }
 
@@ -71,6 +72,7 @@ public class Settings extends NetworkTablesConstantsBase {
             public static int kBeamChannel1; // Change later
             public static int kBeamChannel2; // Change later
             public static int kBeamChannel3; // Change later
+            public static final int kAnglerID = 8; // BunnyBot Catapult
         }
 
         public static class PCM {
@@ -87,20 +89,6 @@ public class Settings extends NetworkTablesConstantsBase {
 
 //        public static int kArmNeoAddress = 16;
 
-    }
-
-    //==============================================================================
-    // Logging
-    // =============================================================================
-
-    // =============================================================================
-    // Drive Train Constants
-    // =============================================================================
-    public static class Drive {
-        public static double kDriveTrainMaxVelocity = 5676;
-
-        // TODO Find out what units this is in
-        public static double kMaxHeadingChange = 5;
     }
 
     public static class Input {
