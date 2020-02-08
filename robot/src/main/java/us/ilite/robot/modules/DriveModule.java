@@ -121,6 +121,8 @@ public class DriveModule extends Module {
 		mRightFollower.follow(mRightMaster);
 		mRightEncoder = mLeftMaster.getEncoder();
 		mRightCtrl = mRightMaster.getPIDController();
+		mLeftMaster.setInverted(true);
+		mLeftFollower.setInverted(true);
 //		mRightMaster.setInverted(true);
 //		mRightFollower.setInverted(true);
 		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
@@ -146,7 +148,7 @@ public class DriveModule extends Module {
 
 		mYawPid = new PIDController(kYawGains,
 									-kMaxDegreesPerCycle,
-				kMaxDegreesPerCycle,
+									kMaxDegreesPerCycle,
 									Settings.kControlLoopPeriod);
 		mYawPid.setOutputRange(-1, 1);
 
@@ -237,8 +239,8 @@ public class DriveModule extends Module {
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
-				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-//				double turn = db.drivetrain.get(DESIRED_TURN_PCT);
+//				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
+				double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 				double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
