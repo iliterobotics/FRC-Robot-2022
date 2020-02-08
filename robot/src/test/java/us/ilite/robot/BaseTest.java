@@ -2,9 +2,11 @@ package us.ilite.robot;
 
 import com.flybotix.hfr.codex.RobotCodex;
 import org.junit.Assert;
+import org.junit.Test;
 import us.ilite.common.Data;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.AbstractController;
+import us.ilite.robot.controller.TestController;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -18,6 +20,10 @@ public class BaseTest {
 
     protected static final NumberFormat nf = new DecimalFormat("0.00");
     protected static final Data db = Robot.DATA;
+    protected static final TestController ctrl = TestController.getInstance();
+    static{
+        ctrl.setEnabled(true);
+    }
 
     protected final void randomizeDriverInputs() {
         for(ELogitech310 input : ELogitech310.values()) {
