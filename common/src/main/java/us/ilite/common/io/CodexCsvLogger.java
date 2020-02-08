@@ -49,7 +49,7 @@ public class CodexCsvLogger {
     }
 
     public void writeHeader() {
-        CSVLoggerQueue.kCSVLoggerQueue.add( new Log( mCodex.meta().getEnum().getSimpleName(), mCodex.getCSVHeader() ) );
+        CSVLoggerQueue.kCSVLoggerQueue.add( new Log( mCodex.meta().getEnum().getSimpleName(), mCodex.getCSVHeader(), mCodex.meta().gid() ) );
     }
 
     public CodexMetadata<?> getMetaDataOfAssociatedCodex() {
@@ -83,12 +83,32 @@ public class CodexCsvLogger {
             eventName =  new SimpleDateFormat("MM-dd-YYYY_HH-mm-ss").format(Calendar.getInstance().getTime());
         }
 
-        File file = new File(String.format( dir + LOG_PATH_FORMAT,
-                            eventName,
-                            mCodex.meta().getEnum().getSimpleName(),
-                            DriverStation.getInstance().getMatchType().name(),
-                            Integer.toString(DriverStation.getInstance().getMatchNumber())
-                            ));
+        File file = null;
+        if ( mCodex.meta().getEnum().getSimpleName().equals("ELogitech310")) {
+            if ( mCodex.meta().gid() == 123 ) {
+                file = new File(String.format( dir + LOG_PATH_FORMAT,
+                        eventName,
+                        "DriverInput",
+                        DriverStation.getInstance().getMatchType().name(),
+                        Integer.toString(DriverStation.getInstance().getMatchNumber())
+                ));
+            } else {
+                file = new File(String.format( dir + LOG_PATH_FORMAT,
+                        eventName,
+                        "OperatorInput",
+                        DriverStation.getInstance().getMatchType().name(),
+                        Integer.toString(DriverStation.getInstance().getMatchNumber())
+                ));
+            }
+        }
+        else {
+            file = new File(String.format( dir + LOG_PATH_FORMAT,
+                    eventName,
+                    mCodex.meta().getEnum().getSimpleName(),
+                    DriverStation.getInstance().getMatchType().name(),
+                    Integer.toString(DriverStation.getInstance().getMatchNumber())
+            ));
+        }
 
         mLog.error("Creating log file at ", file.toPath());
 

@@ -80,6 +80,8 @@ public class Data {
      */
     public Data(boolean pLogging) {
         if(pLogging) {
+            driverinput.meta().setGlobalId( 123 );
+            operatorinput.meta().setGlobalId( 124 );
             initParsers();
         }
         for(RobotCodex rc : mAllCodexes) {
@@ -108,6 +110,23 @@ public class Data {
           for ( CodexCsvLogger c : mCodexCsvLoggers ) {
               if ( c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName().equals(pLog.getmCodexIdentifier()) ) {
 //                  mLogger.error("Saving to: " + c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName() + "   File" );
+                  if ( c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName().equals( "ELogitech310" ) ) {
+                      if ( pLog.getmGlobalId() == driverinput.meta().gid() ) {
+                          for (CodexCsvLogger d : mCodexCsvLoggers) {
+                              if ( d.getMetaDataOfAssociatedCodex().gid() == driverinput.meta().gid() ) {
+                                  d.log( pLog.getmLogData() );
+                              }
+                          }
+                      }
+                      else {
+                          for (CodexCsvLogger o : mCodexCsvLoggers) {
+                              if ( o.getMetaDataOfAssociatedCodex().gid() == operatorinput.meta().gid() ) {
+                                  o.log( pLog.getmLogData() );
+                              }
+                          }
+                      }
+                      return;
+                  }
                   c.log( pLog.getmLogData() );
               }
           }

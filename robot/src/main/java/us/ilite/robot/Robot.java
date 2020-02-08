@@ -201,7 +201,7 @@ public class Robot extends TimedRobot {
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
         for (RobotCodex c : DATA.mLoggedCodexes ) {
-            CSVLoggerQueue.kCSVLoggerQueue.add( new Log( c.meta().getEnum().getSimpleName(), c.toCSV()) );
+            CSVLoggerQueue.kCSVLoggerQueue.add( new Log( c.meta().getEnum().getSimpleName(), c.toCSV(), c.meta().gid()) );
             c.reset();
         }
 
@@ -218,7 +218,9 @@ public class Robot extends TimedRobot {
             mMatchMeta = new MatchMetadata();
             int gid = mMatchMeta.hash;
             for (RobotCodex c : DATA.mAllCodexes) {
-                c.meta().setGlobalId(gid);
+                if ( !c.meta().getEnum().getSimpleName().equals("ELogitech310")) {
+                    c.meta().setGlobalId(gid);
+                }
             }
         }
     }

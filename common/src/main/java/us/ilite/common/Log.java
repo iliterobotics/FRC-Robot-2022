@@ -5,10 +5,20 @@ import java.util.Objects;
 public class Log {
     private String mCodexIdentifier;
     private String mLogData;
+    private int mGlobalId;
 
-    public Log(String pCodexIdentifier, String pLogData) {
+    public int getmGlobalId() {
+        return mGlobalId;
+    }
+
+    public void setmGlobalId(int mGlobalId) {
+        this.mGlobalId = mGlobalId;
+    }
+
+    public Log(String pCodexIdentifier, String pLogData, int pGlobalId) {
         mCodexIdentifier = pCodexIdentifier;
         mLogData = pLogData;
+        mGlobalId = pGlobalId;
     }
 
     @Override
