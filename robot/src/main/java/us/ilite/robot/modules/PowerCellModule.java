@@ -118,13 +118,13 @@ public class PowerCellModule extends Module {
     }
 
     public enum EIndexingState {
-        BROKEN (1.0),
-        NOT_BROKEN(0.0);
+        BROKEN (true),
+        NOT_BROKEN(false);
 
-        double power;
+        boolean broken;
 
-        EIndexingState(double power) {
-            this.power = power;
+        EIndexingState(boolean broken) {
+            this.broken = broken;
         }
     }
 
@@ -177,6 +177,14 @@ public class PowerCellModule extends Module {
         db.powercell.set(EPowerCellData.BREAK_SENSOR_2_STATE, (mBeamBreaker2.isBroken()));
         db.powercell.set(EPowerCellData.BREAK_SENSOR_3_STATE, (mBeamBreaker3.isBroken()));
 
+        db.powercell.set(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN, List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count());
+        if(db.powercell.get(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN) >= 3.0){
+            db.powercell.set(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN , (db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN )) + 1)  ;
+        }
+        else{
+            db.powercell.set(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN , 3)  ;
+        }
+
         //TODO Determine Indexer State
     }
 
@@ -186,7 +194,6 @@ public class PowerCellModule extends Module {
         mConveyorMotorHorizontal.set(ControlMode.PercentOutput, db.powercell.get(EPowerCellData.DESIRED_H_VELOCITY));
         mConveyorMotorVertical.set(ControlMode.PercentOutput, db.powercell.get(EPowerCellData.DESIRED_V_VELOCITY));
         mArmEncoder.setPosition(db.powercell.get(EPowerCellData.DESIRED_ARM_ANGLE));
-        startIndexing();
     }
 
     @Override
@@ -202,7 +209,8 @@ public class PowerCellModule extends Module {
 
     public void startIndexing() {
         //TODO determine V_Motor and H_Motor specifics with Beam breaker
-        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().filter(DigitalBeamSensor::isBroken).count();
+        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count();
+
         SmartDashboard.putNumber("BeamCountBroken" , mBeamCountBroken);
         SmartDashboard.putNumber("BeamCountBrokenGoal" , mGoalBeamCountBroken);
 
