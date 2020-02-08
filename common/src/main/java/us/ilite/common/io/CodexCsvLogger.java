@@ -25,7 +25,7 @@ public class CodexCsvLogger {
     private final ILog mLog = Logger.createLog(CodexCsvLogger.class);
 
     private RobotCodex<?> mCodex;
-    private static BufferedWriter writer;
+    private BufferedWriter writer;
 
     public CodexCsvLogger(RobotCodex<?> pCodex) {
         mCodex = pCodex;

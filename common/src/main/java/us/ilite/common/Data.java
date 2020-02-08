@@ -107,6 +107,7 @@ public class Data {
 //        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
           for ( CodexCsvLogger c : mCodexCsvLoggers ) {
               if ( c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName().equals(pLog.getmCodexIdentifier()) ) {
+//                  mLogger.error("Saving to: " + c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName() + "   File" );
                   c.log( pLog.getmLogData() );
               }
           }
