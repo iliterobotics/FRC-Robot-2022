@@ -33,7 +33,7 @@ public abstract class BaseManualController extends AbstractController {
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.01;
             }
-            var d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
+            DriveMessage d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
             throttle = d.getThrottle();
             rotate = d.getTurn();
             if (db.driverinput.isSet(SUB_WARP_AXIS) && db.driverinput.get(SUB_WARP_AXIS) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {

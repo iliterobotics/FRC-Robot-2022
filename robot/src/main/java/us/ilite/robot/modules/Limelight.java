@@ -2,7 +2,6 @@ package us.ilite.robot.modules;
 
 import java.util.Optional;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -12,6 +11,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import us.ilite.common.Field2020;
+import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.IFieldComponent;
@@ -21,6 +21,9 @@ import static us.ilite.common.types.ELimelightData.*;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
+/**
+ * A module for interfacing with the Goal Limelight
+ */
 public class Limelight extends Module implements ITargetDataProvider {
     public static final IFieldComponent NONE = new IFieldComponent() {
         public int id() {return -1;}
@@ -29,17 +32,13 @@ public class Limelight extends Module implements ITargetDataProvider {
         public String toString() { return "NONE"; }
     };
 
-    private final ILog mLog = Logger.createLog(Limelight.class);
-    private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable("limelight");
-
-
     // =============================================================================
     // LimeLight Camera Constants
     // Note: These constants need to be recalculated for a specific robot geometry
     // =============================================================================
-    public static double kHeightIn = 58.0;
-    public static double kToBumperIn = 10.0;
-    public static double kAngleDeg = 28.55;
+    public static double kHeightIn = 0.0;   //TODO These constants need to be remeasured
+    public static double kToBumperIn = 0.0;
+    public static double kAngleDeg = 0.0;
 
     public static double llFOVVertical = 49.7;
     public static double llFOVHorizontal = 59.6;
@@ -60,14 +59,16 @@ public class Limelight extends Module implements ITargetDataProvider {
     public static double kRightBCoeff = -4.53956454545558;
     public static double kRightCCoeff = -0.0437470770400814;
 
-    protected IFieldComponent mVisionTarget = null;
+    private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable(Settings.kFlywheelLimelightNetworkTable);
+
+    protected IFieldComponent mVisionTarget;
 
     public Limelight() {
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        setTracking(NONE);
+        Robot.DATA.limelight.set(TARGET_ID, (double) NONE.id());
     }
 
     @Override
@@ -87,7 +88,7 @@ public class Limelight extends Module implements ITargetDataProvider {
             Robot.DATA.limelight.set(TSHORT,mTable.getEntry("tshort").getDouble(Double.NaN));
             Robot.DATA.limelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
             Robot.DATA.limelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
-            Robot. DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
             if(mVisionTarget.equals(NONE)) {
                 Robot.DATA.limelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget.height()));
                 Robot.DATA.limelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
@@ -106,6 +107,8 @@ public class Limelight extends Module implements ITargetDataProvider {
         setCamMode();
         setStreamMode();
         setSnapshotMode();
+        setPipeline();
+//        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, Robot.DATA.flywheel.get(ANGLE_FROM_HORIZON)); TODO Add angle functionality to flywheel module
     }
 
     @Override
@@ -113,35 +116,24 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     }
 
-    private void setPipeline(int pipeline) {
-        mTable.getEntry("pipeline").setNumber(pipeline);
-    }
-
-    private void setTracking(IFieldComponent pFieldElement) {
-        mVisionTarget = pFieldElement;
+    private void setPipeline() {
+        mTable.getEntry("pipeline").setNumber(Robot.DATA.limelight.get(mVisionTarget.pipeline()));
     }
 
     private void setLedMode() {
-        if (Robot.DATA.limelight.get(DESIRED_LED_MODE) != (Robot.DATA.limelight.get(CURRENT_LED_MODE))) {
-            mTable.getEntry("ledMode").setNumber(Robot.DATA.limelight.get(DESIRED_LED_MODE));
-        }
+        mTable.getEntry("ledMode").setNumber(Robot.DATA.limelight.get(LED_MODE));
     }
+
     private void setCamMode() {
-        if (Robot.DATA.limelight.get(DESIRED_CAM_MODE) != Robot.DATA.limelight.get(CURRENT_CAM_MODE)) {
-            mTable.getEntry("camMode").setNumber(Robot.DATA.limelight.get(DESIRED_CAM_MODE));
-        }
+        mTable.getEntry("camMode").setNumber(Robot.DATA.limelight.get(CAM_MODE));
     }
 
     private void setStreamMode() {
-        if (Robot.DATA.limelight.get(DESIRED_STREAM_MODE) != (Robot.DATA.limelight.get(CURRENT_STREAM_MODE))) {
-            mTable.getEntry("stream").setNumber(Robot.DATA.limelight.get(DESIRED_STREAM_MODE));
-        }
+        mTable.getEntry("stream").setNumber(Robot.DATA.limelight.get(STREAM_MODE));
     }
 
     private void setSnapshotMode() {
-        if (Robot.DATA.limelight.get(DESIRED_SNAPSHOT_MODE) != (Robot.DATA.limelight.get(CURRENT_SNAPSHOT_MODE))) {
-            mTable.getEntry("snapshot").setNumber(Robot.DATA.limelight.get(DESIRED_SNAPSHOT_MODE));
-        }
+        mTable.getEntry("snapshot").setNumber(Robot.DATA.limelight.get(SNAPSHOT_MODE));
     }
 
     public String toString() {

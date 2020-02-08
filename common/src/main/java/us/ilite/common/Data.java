@@ -37,7 +37,7 @@ public class Data {
     public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
     public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
     public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
-    public final RobotCodex<ELimelightData> selectedTarget = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
+    public final RobotCodex<ELimelightData> groundTracking = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
     public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
     public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
     public final RobotCodex<EPowerCellData> powercell = new RobotCodex(NULL_CODEX_VALUE, EPowerCellData.class);

@@ -1,5 +1,6 @@
 package us.ilite.common.config;
 
+import us.ilite.common.IFieldComponent;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.NetworkTablesConstantsBase;
 
@@ -14,6 +15,11 @@ import java.util.List;
  *  - Field element locations & vision target heights
  */
 public class Settings {
+
+    public static String kGroundLimelightNetworkTable = "limelight-bottom";
+    public static String kFlywheelLimelightNetworkTable = "limelight-top";
+
+    public static IFieldComponent kActiveTarget;
 
     public static double kControlLoopPeriod = 0.01; // seconds
     public static double kCSVLoggingPeriod = 0.02;  // seconds

@@ -22,10 +22,10 @@ public class LimelightTargetLock extends TargetLock {
 //        mLog.error("STARTED LIMELIGHT TARGET LOCK");
 //    }
 
-    public LimelightTargetLock(Limelight pLimelight, double pAllowableError, IFieldComponent pTrackingType, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
-        super(pAllowableError, pTrackingType, pLimelight, pThrottleProvider, pEndOnAlignment);
+    public LimelightTargetLock() {
+        super();
 
-        this.mLimelight = pLimelight;
+//        this.mLimelight = pLimelight;
         mLog.error("STARTED LIMELIGHT TARGET LOCK");
     }
 

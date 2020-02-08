@@ -1,28 +1,35 @@
 package us.ilite.robot.modules;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
+import us.ilite.common.Field2020;
+import us.ilite.common.IFieldComponent;
+import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
-import java.util.Optional;
+import static us.ilite.common.types.ERawLimelightData.*;
 
-import static us.ilite.common.types.ELimelightData.CALC_ANGLE_TO_TARGET;
+/**
+ * A module for interfacing with the Ground Limelight
+ */
+public class RawLimelight extends Module{
+    public static final IFieldComponent NONE = new IFieldComponent() {
+        public int id() {return -1;}
+        public double height() {return 0;}
+        public int pipeline() {return 0;}
+        public String toString() { return "NONE"; }
+    };
 
-public class RawLimelight extends Module implements ITargetDataProvider {
-
-    public static String tableName = "groundlimelight";
     // =============================================================================
     // LimeLight Camera Constants
     // Note: These constants need to be recalculated for a specific robot geometry
     // =============================================================================
-    public static double kHeightIn = 58.0;
-    public static double kToBumperIn = 10.0;
-    public static double kAngleDeg = 28.55;
+    public static double kHeightIn = 0.0;   //TODO These constants need to be remeasured
+    public static double kToBumperIn = 0.0;
+    public static double kAngleDeg = 0.0;
 
     public static double llFOVVertical = 49.7;
     public static double llFOVHorizontal = 59.6;
@@ -43,24 +50,66 @@ public class RawLimelight extends Module implements ITargetDataProvider {
     public static double kRightBCoeff = -4.53956454545558;
     public static double kRightCCoeff = -0.0437470770400814;
 
-    private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable(tableName);
+    private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable(Settings.kGroundLimelightNetworkTable);
+
+    protected IFieldComponent mVisionTarget;
+    
+    public RawLimelight() {
+    }
+    
+    @Override
+    public void modeInit(EMatchMode pMode, double pNow) {
+        Robot.DATA.rawLimelight.set(TARGET_ID, (double) NONE.id());
+    }
 
     @Override
     public void readInputs(double pNow) {
+        mVisionTarget = Field2020.FieldElement.values()[(int) Robot.DATA.rawLimelight.get(TARGET_ID)];
+
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
-        Robot.DATA.limelight.set(ELimelightData.TV, targetValid ? 1.0d : null);
+        Robot.DATA.rawLimelight.set(TV, targetValid ? 1.0d : null);
 
         if(targetValid) {
-
-//            if(mVisionTarget != null) {
-//
-//                Robot.DATA.limelight.set(ELimelightData.targetOrdinal, (double)mVisionTarget.ordinal());
-//                Robot.DATA.limelight.set(ELimelightData.calcDistToTarget, calcTargetDistance(mVisionTarget));
-//                Robot.DATA.limelight.set(calcAngleToTarget, calcTargetApproachAngle());
+            Robot.DATA.rawLimelight.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TX_0, mTable.getEntry("tx0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TX_1, mTable.getEntry("tx1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TX_2, mTable.getEntry("tx2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TY_0,mTable.getEntry("ty0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TY_1,mTable.getEntry("ty1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TY_2,mTable.getEntry("ty2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TA,mTable.getEntry("ta").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TA_0,mTable.getEntry("ta0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TA_1,mTable.getEntry("ta1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TA_2,mTable.getEntry("ta2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TS_0,mTable.getEntry("ts0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TS_1,mTable.getEntry("ts1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TS_2,mTable.getEntry("ts2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TSHORT,mTable.getEntry("tshort").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TSHORT_0,mTable.getEntry("tshort0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TSHORT_1,mTable.getEntry("tshort1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TSHORT_2,mTable.getEntry("tshort2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TLONG_0,mTable.getEntry("tlong0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TLONG_1,mTable.getEntry("tlong1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TLONG_2,mTable.getEntry("tlong2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(THORIZ_0,mTable.getEntry("thoriz0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(THORIZ_1,mTable.getEntry("thoriz1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(THORIZ_2,mTable.getEntry("thoriz2").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TVERT_0,mTable.getEntry("tvert0").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TVERT_1,mTable.getEntry("tvert1").getDouble(Double.NaN));
+            Robot.DATA.rawLimelight.set(TVERT_2,mTable.getEntry("tvert2").getDouble(Double.NaN));
+//            if(mVisionTarget.equals(NONE)) {
+//                Robot.DATA.rawLimelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget.height()));
+//                Robot.DATA.rawLimelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
 //                Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
 //                if(p.isPresent()) {
-//                    Robot.DATA.limelight.set(ELimelightData.calcTargetX, p.get().getX());
-//                    Robot.DATA.limelight.set(ELimelightData.calcTargetY, p.get().getY());
+//                    Robot.DATA.rawLimelight.set(CALC_TARGET_X, p.get().getX());
+//                    Robot.DATA.rawLimelight.set(CALC_TARGET_Y, p.get().getY());
 //                }
 //            }
         }
@@ -69,56 +118,35 @@ public class RawLimelight extends Module implements ITargetDataProvider {
 
     @Override
     public void setOutputs(double pNow) {
-
+        setLedMode();
+        setCamMode();
+        setStreamMode();
+        setSnapshotMode();
+        setPipeline();
     }
 
-    @Override
-    public RobotCodex<ELimelightData> getTargetingData() {
-        return null;
+    private void setPipeline() {
+        mTable.getEntry("pipeline").setNumber(Robot.DATA.rawLimelight.get(mVisionTarget.pipeline()));
     }
 
-    @Override
-    public double getCameraHeightIn() {
-        return 0;
+    private void setLedMode() {
+        mTable.getEntry("ledMode").setNumber(Robot.DATA.rawLimelight.get(LED_MODE));
     }
 
-    @Override
-    public double getCameraAngleDeg() {
-        return 0;
+    private void setCamMode() {
+        mTable.getEntry("camMode").setNumber(Robot.DATA.rawLimelight.get(CAM_MODE));
     }
 
-    @Override
-    public double getCameraToBumperIn() {
-        return 0;
+    private void setStreamMode() {
+        mTable.getEntry("stream").setNumber(Robot.DATA.rawLimelight.get(STREAM_MODE));
     }
 
-    @Override
-    public double getLeftCoeffA() {
-        return 0;
+    private void setSnapshotMode() {
+        mTable.getEntry("snapshot").setNumber(Robot.DATA.rawLimelight.get(SNAPSHOT_MODE));
     }
 
-    @Override
-    public double getLeftCoeffB() {
-        return 0;
+    public String toString() {
+        return Robot.DATA.limelight.toCSV();
     }
 
-    @Override
-    public double getLeftCoeffC() {
-        return 0;
-    }
-
-    @Override
-    public double getRightCoeffA() {
-        return 0;
-    }
-
-    @Override
-    public double getRightCoeffB() {
-        return 0;
-    }
-
-    @Override
-    public double getRightCoeffC() {
-        return 0;
-    }
 }

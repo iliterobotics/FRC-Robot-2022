@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
     private DJSpinnerModule mDJSpinnerModule;
     private SimulationModule mSimulation;
     private FlywheelModule mFlywheel;
-    private HangerModule mHanger = new HangerModule();
+    private HangerModule mHanger;
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -75,7 +75,8 @@ public class Robot extends TimedRobot {
 //        mIntake = new PowerCellModule();
         mLimelight = new Limelight();
         mRawLimelight = new RawLimelight();
-//        mDJSpinnerModule = new DJSpinnerModule();
+        mDJSpinnerModule = new DJSpinnerModule();
+        mHanger = new HangerModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
