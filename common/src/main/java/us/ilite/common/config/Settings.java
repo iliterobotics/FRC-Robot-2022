@@ -36,9 +36,7 @@ public class Settings {
             public static int kDJBoothTalonId = 72;
             public static int kHangerNeoID1 = 15;
             public static int kHangerNeoID2 = 71;
-            public static int kArmNEOAdress = 64;
             public static int kCANIntakeID = -1;//9; // Change later // Using the bunny bots flywheel id for now
-            public static int kTalonHorizontalID = 3;//3; // Change later
             public static int kTalonVerticalID = 6; // Change later
 //            public static int kTalonThreeID = 65; // Change later
             public static final int kTurretGyroID = 61; // There isn't a gyro on the BunnyBot
@@ -55,6 +53,8 @@ public class Settings {
             // =============================================
             public static int kPDP = 20;
             public static int kPigeon = 21;
+            public static int kNEOIntakeArm = 7;
+            public static int kTalonPowerCellSerializerBAG = 11;
             // ===== 2020 Drive =====
             public static int kDriveLeftMaster = 1;
             public static int kDriveLeftFollower = 2;
@@ -73,9 +73,9 @@ public class Settings {
         }
 
         public static class DIO {
-            public static int kBeamChannel1 = 0; // Change later
-            public static int kBeamChannel2 = 1; // Change later
-            public static int kBeamChannel3 = 2; // Change later
+            public static int kEntryBeamChannel = 9;
+            public static int kSecondaryBeamChannel = 8; // Change later
+            public static int kExitBeamChannel = 7; // Change later
             public static final int kAnglerID = 8; // BunnyBot Catapult
         }
 

@@ -5,9 +5,9 @@ import com.flybotix.hfr.codex.CodexOf;
 public enum EPowerCellData implements CodexOf<Double> {
     UNUSED,
 
-    BREAK_SENSOR_1_STATE,
-    BREAK_SENSOR_2_STATE,
-    BREAK_SENSOR_3_STATE,
+    ENTRY_BEAM_BREAKER,
+    SECONDARY_BREAM_BREAKER,
+    EXIT_BEAM_BREAKER,
 
     // etc - 1 per beam break sensor
 

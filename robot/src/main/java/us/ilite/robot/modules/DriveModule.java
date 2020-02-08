@@ -131,10 +131,10 @@ public class DriveModule extends Module {
 		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
 
 
-		setPIDGains(mLeftCtrl, vPID);
-		setPIDGains(mRightCtrl, vPID);
-		setPIDGains(mLeftCtrl, dPID);
-		setPIDGains(mRightCtrl, dPID);
+		HardwareUtils.setGains(mLeftCtrl, vPID);
+		HardwareUtils.setGains(mRightCtrl, vPID);
+		HardwareUtils.setGains(mLeftCtrl, dPID);
+		HardwareUtils.setGains(mRightCtrl, dPID);
 		mLeftMaster.burnFlash();
 		mLeftFollower.burnFlash();
 		mRightMaster.burnFlash();
@@ -165,21 +165,11 @@ public class DriveModule extends Module {
 
 		mLeftMaster.getEncoder().setPosition(0.0);
 		mRightMaster.getEncoder().setPosition(0.0);
-		setPIDGains(mLeftCtrl, vPID);
-		setPIDGains(mRightCtrl, vPID);
-		setPIDGains(mLeftCtrl, dPID);
-		setPIDGains(mRightCtrl, dPID);
+		HardwareUtils.setGains(mLeftCtrl, vPID);
+		HardwareUtils.setGains(mRightCtrl, vPID);
+		HardwareUtils.setGains(mLeftCtrl, dPID);
+		HardwareUtils.setGains(mRightCtrl, dPID);
 
-	}
-
-	private void setPIDGains(CANPIDController pCtrl, ProfileGains pGains) {
-		pCtrl.setFF(pGains.F, pGains.PROFILE_SLOT);
-		pCtrl.setP(pGains.P, pGains.PROFILE_SLOT);
-		pCtrl.setI(pGains.I, pGains.PROFILE_SLOT);
-		pCtrl.setD(pGains.D, pGains.PROFILE_SLOT);
-		pCtrl.setSmartMotionMaxVelocity(pGains.MAX_VELOCITY, pGains.PROFILE_SLOT);
-		pCtrl.setSmartMotionMaxAccel(pGains.MAX_ACCEL, pGains.PROFILE_SLOT);
-		pCtrl.setSmartMotionAccelStrategy(CANPIDController.AccelStrategy.kSCurve, pGains.PROFILE_SLOT);
 	}
 
 	@Override
