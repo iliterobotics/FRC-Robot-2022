@@ -32,6 +32,7 @@ public class TestController extends AbstractController {
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
 
     private double mLimelightZoomThreshold = 7.0;
+    private double mStartTime;
 
     private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.NOT_HANGING;
     private PowerCellModule.EIntakeState mIntakeState;
@@ -78,31 +79,36 @@ public class TestController extends AbstractController {
 
         }
         else if (db.operatorinput.isSet(InputMap.DRIVER.RELEASE_HANG)){
-            db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
-            db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
+            db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0);
+            db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0);
 
         }
         switch (mHangerState){
             case HANGING:
-                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
-                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
+                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1);
+                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1);
             case NOT_HANGING:
-                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0.0);
-                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0.0);
+                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0);
+                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0);
         }
     }
 
     private void updateFlywheel() {
-        if (db.driverinput.get(InputMap.OPERATOR.SHOOT_FLYWHEEL) != 0.0) {
-            mLog.error("-----------------------------------The Flywheel Should Be Spinning with the velocity: " + db.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
+        if (db.driverinput.get(InputMap.OPERATOR.SHOOT_FLYWHEEL) != 0) {
             db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY , db.flywheel.get(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED));
-            db.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id());
+            db.limelight.set(ELimelightData.TARGET_ID, 1);
         }
         else {
-            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
-            db.limelight.set(ELimelightData.TARGET_ID, 0.0);
+            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
+            db.limelight.set(ELimelightData.TARGET_ID, 0);
         }
         db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, Robot.DATA.flywheel.get(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE));
+        if (db.flywheel.get(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY) == 1) {
+           db.flywheel.set( EShooterSystemData.TARGET_FEEDER_VELOCITY, 1000 );
+        }
+        else {
+            db.flywheel.set( EShooterSystemData.TARGET_FEEDER_VELOCITY, 0 );
+        }
     }
 
     public void updateLimelightTargetLock() {

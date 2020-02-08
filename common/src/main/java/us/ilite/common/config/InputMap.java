@@ -10,7 +10,6 @@ public class InputMap {
         TURN_AXIS = ELogitech310.RIGHT_X_AXIS,
         THROTTLE_AXIS = ELogitech310.LEFT_Y_AXIS,
         SUB_WARP_AXIS = ELogitech310.LEFT_TRIGGER_AXIS,
-        FLYWHEEL_AXIS = ELogitech310.LEFT_TRIGGER_AXIS,
         NUDGE_SEEK_LEFT = ELogitech310.L_BTN,
         NUDGE_SEEK_RIGHT = ELogitech310.R_BTN,
         BEGIN_HANG = ELogitech310.Y_BTN,
@@ -33,15 +32,13 @@ public class InputMap {
         OPERATOR_POSITION_CONTROL = ELogitech310.R_BTN,
         OPERATOR_ROTATION_CONTROL = ELogitech310.R_BTN,
         SHOOT_FLYWHEEL = ELogitech310.A_BTN,
-        INVERSE_FLYWHEEL= ELogitech310.LEFT_TRIGGER_AXIS,
         LOCK_TARGET = ELogitech310.A_BTN,
         LOCK_CELL = ELogitech310.B_BTN,
         LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
         INTAKE = ELogitech310.X_BTN,
         REVERSE_INTAKE = ELogitech310.A_BTN,
         LOWER_ARM = ELogitech310.Y_BTN,
-        HIGHER_ARM = ELogitech310.B_BTN,
-        SERVO_AXIS = ELogitech310.RIGHT_Y_AXIS;
+        HIGHER_ARM = ELogitech310.B_BTN;
     }
 
 }
