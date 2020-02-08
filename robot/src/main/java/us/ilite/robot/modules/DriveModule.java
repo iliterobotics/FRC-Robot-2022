@@ -54,6 +54,7 @@ public class DriveModule extends Module {
 	// =============================================================================
 	private static final int VELOCITY_PID_SLOT = 1;
 	private static final int POSITION_PID_SLOT = 2;
+<<<<<<< HEAD
 	public static ProfileGains dPID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d).slot(POSITION_PID_SLOT);
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
@@ -62,6 +63,11 @@ public class DriveModule extends Module {
 			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
 			.maxAccel(kDriveTrainMaxVelocityRPM*kDriveTrainMaxVelocityRPM)
 			.slot(VELOCITY_PID_SLOT);
+=======
+	public static ProfileGains dPID = new ProfileGains().p(1).slot(POSITION_PID_SLOT);//.maxVelocity(5676d).maxAccel(5676d).slot(POSITION_PID_SLOT);
+//	public static ProfileGains vPID = new ProfileGains().p(1.5234375e-4).d(0.001174257 * 4).maxVelocity(5676d).maxAccel(56760d).slot(VELOCITY_PID_SLOT);
+	public static ProfileGains vPID = new ProfileGains().p(0.000152).maxVelocity(5700d).maxAccel(5700d).slot(VELOCITY_PID_SLOT);
+>>>>>>> Added hold position working
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
 
@@ -116,14 +122,19 @@ public class DriveModule extends Module {
 	}
 
 	public DriveModule() {
-		mLeftMaster = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveLeftMaster, kDriveConfig);
-		mLeftFollower = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveLeftFollower, kDriveConfig);
+		mLeftMaster = SparkMaxFactory.createSparkMax(1/*Settings.Hardware.CAN.kDriveLeftMaster*/, kDriveConfig);
+		mLeftFollower = SparkMaxFactory.createSparkMax(3/*Settings.Hardware.CAN.kDriveLeftFollower*/, kDriveConfig);
 		mLeftFollower.follow(mLeftMaster);
 		mLeftEncoder = mLeftMaster.getEncoder();
 		mLeftCtrl = mLeftMaster.getPIDController();
+<<<<<<< HEAD
 		mLeftCtrl.setOutputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
 		mRightMaster = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveRightMaster, kDriveConfig);
 		mRightFollower = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveRightFollower, kDriveConfig);
+=======
+		mRightMaster = SparkMaxFactory.createSparkMax(2/*Settings.Hardware.CAN.kDriveRightMaster*/, kDriveConfig);
+		mRightFollower = SparkMaxFactory.createSparkMax(4/*Settings.Hardware.CAN.kDriveRightFollower*/, kDriveConfig);
+>>>>>>> Added hold position working
 		mRightFollower.follow(mRightMaster);
 		mRightEncoder = mLeftMaster.getEncoder();
 		mRightCtrl = mRightMaster.getPIDController();
@@ -233,15 +244,13 @@ public class DriveModule extends Module {
 //					mRightCtrl.setReference(mRightHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
 //				}
 //				break;
+
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerSecond);
-//				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-//				DriveMessage d = new DriveMessage().turn(turn).throttle(throttle).normalize();
+//				turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-//				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 				mLeftCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				mRightCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				break;
