@@ -93,6 +93,8 @@ public class DriveModule extends Module {
 	private boolean mStartHoldingPosition;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
+	private double mLeftHoldSetpoint;
+	private double mRightHoldSetpoint;
 
 	private final CANSparkMax mLeftMaster;
 	private final CANSparkMax mLeftFollower;
@@ -155,6 +157,8 @@ public class DriveModule extends Module {
 		mHoldRightPositionPid.setOutputRange(-1, 1);
 		mHoldRightPositionPid.setSetpoint(0.0);
 		mStartHoldingPosition = false;
+		mLeftHoldSetpoint = 0.0;
+		mRightHoldSetpoint = 0.0;
 
 		mLeftMaster.getEncoder().setPosition(0.0);
 		mRightMaster.getEncoder().setPosition(0.0);
@@ -203,17 +207,21 @@ public class DriveModule extends Module {
 		switch (mode) {
 			case HOLD:
 				if (!mStartHoldingPosition) {
+					mLeftHoldSetpoint = db.drivetrain.get(LEFT_POS_INCHES);
+					mRightHoldSetpoint = db.drivetrain.get(RIGHT_POS_INCHES);
 					mHoldLeftPositionPid.setSetpoint(db.drivetrain.get(LEFT_POS_INCHES));
 					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
-				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mHoldLeftPositionPid.getSetpoint()) > .5) {
-					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
-					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mLeftHoldSetpoint) > .5) {
+//					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
+//					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+					mLeftCtrl.setReference(mLeftHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
 				}
-				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mHoldRightPositionPid.getSetpoint()) > .5) {
-					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
-					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mRightHoldSetpoint) > .5) {
+//					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
+//					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
+					mRightCtrl.setReference(mRightHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
 				}
 				break;
 
