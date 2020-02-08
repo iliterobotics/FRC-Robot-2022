@@ -1,10 +1,6 @@
 package us.ilite.common.config;
 
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.lib.util.NetworkTablesConstantsBase;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * ONLY ROBOT-wide settings should go into this class (e.g. things like
@@ -16,7 +12,8 @@ import java.util.List;
 public class Settings {
 
     public static double kControlLoopPeriod = 0.01; // seconds
-    public static double kCSVLoggingPeriod = 0.02;  // seconds
+
+    public static int kSecondsToUpdateCSVLogger = 1; //seconds
 
     public static double kNetworkTableUpdateRate = 0.01;
 
@@ -58,10 +55,17 @@ public class Settings {
             // =============================================
             public static int kPDP = 20;
             public static int kPigeon = 21;
-            public static  int kDriveLeftMaster = 1;
+            // ===== 2020 Drive =====
+            public static int kDriveLeftMaster = 1;
             public static int kDriveLeftFollower = 2;
-            public static  int kDriveRightMaster = 3;
+            public static int kDriveRightMaster = 3;
             public static int kDriveRightFollower = 4;
+
+            // ===== 2019 Drive =====
+//            public static  int kDriveLeftMaster = 1;
+//            public static int kDriveLeftFollower = 3;
+//            public static  int kDriveRightMaster = 2;
+//            public static int kDriveRightFollower = 4;
 
         }
 
@@ -82,14 +86,6 @@ public class Settings {
         }
 
     }
-    public static class Arm {
-        // =============================================================================
-        // IMU Constants
-        // =============================================================================
-
-//        public static int kArmNeoAddress = 16;
-
-    }
 
     public static class Input {
 
@@ -97,6 +93,7 @@ public class Settings {
         // These are applied AFTER the normal throttle reduction
         public static double kSnailModePercentThrottleReduction = 0.5;
         public static double kSnailModePercentRotateReduction = 0.4;
+        public static double kMaxAllowedVelocityMultiplier = 0.1;
 
         // Applied after any scaling
         public static double kDriverInputTurnMaxMagnitude = 0.5;
