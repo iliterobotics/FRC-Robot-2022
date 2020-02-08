@@ -4,6 +4,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.lang.EnumUtils;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
@@ -25,16 +26,14 @@ import java.util.List;
 import static us.ilite.common.config.InputMap.DRIVER.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
-public class TestController extends AbstractController {
+public class TestController extends BaseManualController {
 
     private ILog mLog = Logger.createLog(TestController.class);
     private Double mLastTrackingType = 0d;
-    protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
 
     private double mLimelightZoomThreshold = 7.0;
     private double mStartTime;
 
-    private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.NOT_HANGING;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
 
@@ -72,25 +71,14 @@ public class TestController extends AbstractController {
 //        updateArm(pNow);
     }
 
-    private void updateHanger (double pNow ) {
-        if (db.operatorinput.isSet(InputMap.DRIVER.BEGIN_HANG)){
-            db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1.0);
-            db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1.0);
+    private void updateHanger(double pNow){
+        if(db.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)){
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION , 17.0);
+        }
+        else {
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 0.0);
+        }
 
-        }
-        else if (db.operatorinput.isSet(InputMap.DRIVER.RELEASE_HANG)){
-            db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0);
-            db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0);
-
-        }
-        switch (mHangerState){
-            case HANGING:
-                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 1);
-                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 1);
-            case NOT_HANGING:
-                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , 0);
-                db.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , 0);
-        }
     }
 
     private void updateFlywheel() {
@@ -149,35 +137,6 @@ public class TestController extends AbstractController {
         mLastTrackingType =  db.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
 
-    void updateDrivetrain(double pNow) {
-        double throttle = db.driverinput.get(THROTTLE_AXIS);
-        double rotate = db.driverinput.get(TURN_AXIS);
-        rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
-        rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
-        throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
-
-        db.drivetrain.set(SHOULD_HOLD_POSITION, (throttle == 0.0 && rotate == 0.0) ? 1.0 : 0.0);
-
-        if (throttle == 0.0 && rotate == 0.0) {
-            db.drivetrain.set(DESIRED_THROTTLE, 0.0);
-            db.drivetrain.set(DESIRED_TURN, 0.0);
-        } else {
-            db.drivetrain.set(SHOULD_HOLD_POSITION, 0.0);
-            if (throttle == 0.0 && rotate != 0.0) {
-                throttle += 0.03;
-            }
-            var d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
-            throttle = d.getThrottle();
-            rotate = d.getTurn();
-            if (db.driverinput.isSet(SUB_WARP_AXIS) && db.driverinput.get(SUB_WARP_AXIS) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
-                throttle *= Settings.Input.kSnailModePercentThrottleReduction;
-                rotate *= Settings.Input.kSnailModePercentRotateReduction;
-            }
-            db.drivetrain.set(DESIRED_THROTTLE, -throttle);
-            db.drivetrain.set(DESIRED_TURN, rotate);
-        }
-
-    }
 
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
@@ -210,8 +169,8 @@ public class TestController extends AbstractController {
 
     void updateDJBooth() {
         if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
-            DJSpinnerModule.EColorMatch m =db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
-            if(m.color.equals(db.DJ_COLOR)) {
+            DJSpinnerModule.EColorMatch m = db.color.get(EColorData.SENSED_COLOR, DJSpinnerModule.EColorMatch.class);
+            if(m != null && m.color.equals(db.DJ_COLOR)) {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
             } else {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);

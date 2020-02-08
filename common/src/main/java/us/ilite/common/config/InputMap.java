@@ -20,16 +20,18 @@ public class InputMap {
         DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.B_BTN,
         DRIVER_LIMELIGHT_LOCK_BALL = ELogitech310.A_BTN,
         DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
-        DRIVER_LIMELIGHT_LOCK_BALL_DUAL = ELogitech310.START,
         DRIVER_LIMELIGHT_LOCK_BALL_TRI = ELogitech310.X_BTN,
+        DRIVER_LIMELIGHT_LOCK_BALL_DUAL = ELogitech310.START
 
-        TRACK_HATCH_BTN = ELogitech310.B_BTN;
-
+        ;
     }
 
     public static class OPERATOR {
-        public static final ELogitech310
+        public static  final ELogitech310
+        BEGIN_HANG = ELogitech310.Y_BTN,
+        RELEASE_HANG = ELogitech310.A_BTN,
         OPERATOR_POSITION_CONTROL = ELogitech310.R_BTN,
+        FLYWHEEL_AXIS = ELogitech310.LEFT_TRIGGER_AXIS,
         OPERATOR_ROTATION_CONTROL = ELogitech310.R_BTN,
         SHOOT_FLYWHEEL = ELogitech310.A_BTN,
         LOCK_TARGET = ELogitech310.A_BTN,

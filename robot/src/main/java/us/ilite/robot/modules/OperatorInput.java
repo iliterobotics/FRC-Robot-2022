@@ -21,11 +21,17 @@ public class OperatorInput extends Module {
     public OperatorInput() {
         mDriverJoystick = new Joystick(0);
         mOperatorJoystick = new Joystick(1);
-
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
+
+        if(mDriverJoystick.getType() == null) {
+            System.err.println("======= DRIVER JOYSTICK IS NOT PLUGGED IN =======");
+        }
+        if(mOperatorJoystick.getType() == null) {
+            System.err.println("======= OPERATOR JOYSTICK IS NOT PLUGGED IN =======");
+        }
         mMode = pMode;
     }
 

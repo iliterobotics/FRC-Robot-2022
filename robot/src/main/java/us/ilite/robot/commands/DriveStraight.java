@@ -1,7 +1,5 @@
 package us.ilite.robot.commands;
 
-import com.flybotix.hfr.util.log.ILog;
-import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import us.ilite.common.Angle;
@@ -12,7 +10,6 @@ import us.ilite.common.lib.control.ProfileGains;
 
 import static us.ilite.common.types.sensor.EGyro.HEADING_DEGREES;
 
-import us.ilite.common.types.drive.EDriveData;
 import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.ECommonControlMode;
@@ -42,7 +39,7 @@ public class DriveStraight implements ICommand {
     private PIDController mHeadingController = new PIDController(
             DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
 
-    private ProfiledPIDController mDistanceController = DriveModule.kDistancePID.generateController();
+    private ProfiledPIDController mDistanceController = DriveModule.dPID.generateController();
 
     public DriveStraight(EDriveControlMode pDriveControlMode, Distance pDistanceToDrive) {
         mDistanceToDrive = pDistanceToDrive;
@@ -90,8 +87,8 @@ public class DriveStraight implements ICommand {
         } else {
             DriveMessage d = new DriveMessage().throttle(throttle).turn(turn).normalize();
             Robot.DATA.drivetrain.set(DESIRED_NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
-            Robot.DATA.drivetrain.set(DESIRED_THROTTLE, d.getThrottle());
-            Robot.DATA.drivetrain.set(DESIRED_TURN, d.getTurn());
+            Robot.DATA.drivetrain.set(DESIRED_THROTTLE_PCT, d.getThrottle());
+            Robot.DATA.drivetrain.set(DESIRED_TURN_PCT, d.getTurn());
             mLastTime = pNow;
             return false;
         }

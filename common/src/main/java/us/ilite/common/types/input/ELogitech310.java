@@ -4,6 +4,7 @@ import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexOf;
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.Joystick;
+import us.ilite.common.Data;
 
 import java.awt.*;
 
@@ -41,7 +42,7 @@ public enum ELogitech310 implements CodexOf<Double> {
     public static void map(RobotCodex<ELogitech310> pCodex, Joystick pJoystick, double pRumbleValue, boolean pHandleDeadband) {
         pCodex.reset();
         for(int i = 0 ; i < 10; i++) {
-          pCodex.set(i, pJoystick.getRawButton(i+1) ? 1d : 0d);
+          pCodex.set(i, pJoystick.getRawButton(i+1) ? 1d : Data.NULL_CODEX_VALUE);
         }
 
         if(pHandleDeadband) {
