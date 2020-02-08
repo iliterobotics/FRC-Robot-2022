@@ -12,6 +12,7 @@ import us.ilite.robot.modules.targetData.ITargetDataProvider;
 /**
  * Untested. Should turn more aggressively when further away from the target.
  */
+@Deprecated
 public class DriveToVisionTarget implements ICommand {
 
     private static final double kMaxTargetAngle = 27.0;
@@ -77,7 +78,7 @@ public class DriveToVisionTarget implements ICommand {
         double turn = mHeadingController.calculate(angleToTarget, pNow);
         double throttle = mDistanceController.calculate(distanceFromTarget, pNow);
 
-        mDrive.setDriveMessage(new DriveMessage().throttle(throttle).turn(turn).normalize());
+//        mDrive.setDriveMessage(new DriveMessage().throttle(throttle).turn(turn).normalize());
 
         return false;
     }

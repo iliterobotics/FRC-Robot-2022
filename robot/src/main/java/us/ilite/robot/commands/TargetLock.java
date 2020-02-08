@@ -1,9 +1,14 @@
 package us.ilite.robot.commands;
 
 import com.flybotix.hfr.codex.RobotCodex;
+import us.ilite.common.config.InputMap;
+import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
+import us.ilite.robot.modules.DriveModule;
+import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.EDriveState;
 import us.ilite.robot.modules.IThrottleProvider;
 
 import static us.ilite.common.types.ELimelightData.*;
@@ -46,10 +51,8 @@ public class TargetLock implements ICommand {
         mHasAcquiredTarget = false;
         mAlignedCount = 0;
 
-//        mDrive.setTargetAngleLock();
-//        mDrive.setTargetTrackingThrottle(0);
-
-//        Robot.DATA.drivetrain.set(EDriveData.);   //TODO wait for drivetrain state code
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.TARGET_ANGLE_LOCK);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.0);
 
         this.mPreviousTime = pNow;
     }
@@ -58,7 +61,7 @@ public class TargetLock implements ICommand {
     public boolean update(double pNow) {
         RobotCodex<ELimelightData> currentData = Robot.DATA.limelight;
 
-//        mDrive.setTargetTrackingThrottle(mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, Robot.DATA.operatorinput.get(InputMap.DRIVER.THROTTLE_AXIS) * Settings.Input.kSnailModePercentThrottleReduction);
 
         if(currentData.isSet(TV) && currentData.isSet(TX)) {
             mHasAcquiredTarget = true;
@@ -83,9 +86,7 @@ public class TargetLock implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-//        Robot.DATA.drivetrain.set(EDriveData.); //TODO wait for drivetrain state code
-//        mDrive.setNormal();
-//        mDrive.setDriveMessage(DriveMessage.kNeutral);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.NORMAL);
     }
 
     public TargetLock setTargetLockThrottleProvider(IThrottleProvider pThrottleProvider) {
