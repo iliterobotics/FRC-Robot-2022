@@ -207,11 +207,11 @@ public class NeoDriveHardware implements IDriveHardware {
     }
 
     public double getLeftInches() {
-        return DriveModule.Conversions.ticksToInches(mLeftMaster.getEncoder().getPosition());
+        return DriveModule.ticksToInches(mLeftMaster.getEncoder().getPosition());
     }
 
     public double getRightInches() {
-        return DriveModule.Conversions.ticksToInches(mRightMaster.getEncoder().getPosition());
+        return DriveModule.ticksToInches(mRightMaster.getEncoder().getPosition());
 
     }
 
@@ -240,11 +240,11 @@ public class NeoDriveHardware implements IDriveHardware {
     }
 
     public double getLeftVelInches() {
-        return DriveModule.Conversions.ticksPer100msToRadiansPerSecond(getLeftVelTicks());
+        return DriveModule.ticksPer100msToRadiansPerSecond(getLeftVelTicks());
     }
 
     public double getRightVelInches() {
-        return DriveModule.Conversions.ticksPer100msToRadiansPerSecond(getRightVelTicks());
+        return DriveModule.ticksPer100msToRadiansPerSecond(getRightVelTicks());
     }
 
     @Override

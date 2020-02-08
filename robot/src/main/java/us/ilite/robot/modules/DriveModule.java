@@ -9,11 +9,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.lib.util.Conversions;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
 
 import static us.ilite.common.types.drive.EDriveData.*;
 
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -28,10 +29,10 @@ import us.ilite.robot.hardware.*;
  */
 public class DriveModule extends Module {
 	private final ILog mLogger = Logger.createLog(DriveModule.class);
-	public static double kDriveTrainMaxVelocity = 5676;
+	public static double kDriveTrainMaxVelocityRPM = 5676;
 
-	// TODO Find out what units this is in
-	public static double kMaxHeadingChange = 5;
+	// This is approx 290 Degrees per second
+	public static double kMaxDegreesPerSecond = Units.radians_to_degrees(5);
 
 	public static double kGearboxRatio = (12.0 / 80.0) * (42.0 / 80.0);
 	public static double kClosedLoopVoltageRampRate = 0.1 ;
@@ -42,11 +43,11 @@ public class DriveModule extends Module {
 	public static double kWheelDiameterFeet = kWheelDiameterInches / 12.0;
 	public static double kWheelCircumference = kWheelDiameterInches * Math.PI;
 	public static double kDefaultRampRate = 120.0; // in V/sec
-	public static double kTicksPerRotation = 1.0;
+	public static double kMotorTicksPerWheelRotation = 42d / kGearboxRatio;
 	public static double kEffectiveWheelbase = 23.25;
-	public static double kTurnCircumference = kEffectiveWheelbase * Math.PI;
-	public static double kInchesPerDegree = kTurnCircumference / 360.0;
-	public static double kWheelTurnsPerDegree = kInchesPerDegree / kWheelDiameterInches;
+	public static double kCurvatureCircumference = kEffectiveWheelbase * Math.PI;
+	public static double kInchesPerCurvatureDegree = kCurvatureCircumference / 360.0;
+	public static double kWheelTurnsPerCurvatureDegree = kInchesPerCurvatureDegree / kWheelDiameterInches;
 
 	// =============================================================================
 	// Closed-Loop Velocity Constants
@@ -54,8 +55,7 @@ public class DriveModule extends Module {
 	private static final int VELOCITY_PID_SLOT = 1;
 	private static final int POSITION_PID_SLOT = 2;
 	public static ProfileGains dPID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d).slot(POSITION_PID_SLOT);
-//	public static ProfileGains vPID = new ProfileGains().p(1.5234375e-4).d(0.001174257 * 4).maxVelocity(5676d).maxAccel(56760d).slot(VELOCITY_PID_SLOT);
-	public static ProfileGains vPID = new ProfileGains().p(0.000152).maxVelocity(5700d).maxAccel(5700d).slot(VELOCITY_PID_SLOT);
+	public static ProfileGains vPID = new ProfileGains().f(0.00015).p(0.0001).maxVelocity(5700d).maxAccel(1000d).slot(VELOCITY_PID_SLOT);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
 
@@ -65,6 +65,7 @@ public class DriveModule extends Module {
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kYawGains = new ProfileGains().f(.15);
 	public static double kDriveLinearPercentOutputLimit = 0.5;
+	public IMU mGyro;
 
 	// =============================================================================
 	// Hold Gains
@@ -115,13 +116,17 @@ public class DriveModule extends Module {
 		mLeftFollower.follow(mLeftMaster);
 		mLeftEncoder = mLeftMaster.getEncoder();
 		mLeftCtrl = mLeftMaster.getPIDController();
+		mLeftCtrl.setOutputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
 		mRightMaster = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveRightMaster, kDriveConfig);
 		mRightFollower = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveRightFollower, kDriveConfig);
 		mRightFollower.follow(mRightMaster);
 		mRightEncoder = mLeftMaster.getEncoder();
 		mRightCtrl = mRightMaster.getPIDController();
+		mRightCtrl.setOutputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
+		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
+
 
 		setPIDGains(mLeftCtrl, vPID);
 		setPIDGains(mRightCtrl, vPID);
@@ -142,8 +147,8 @@ public class DriveModule extends Module {
 //		mTargetAngleLockPid.reset();
 
 		mYawPid = new PIDController(kYawGains,
-									-kMaxHeadingChange,
-									kMaxHeadingChange,
+									-kMaxDegreesPerSecond,
+				kMaxDegreesPerSecond,
 									Settings.kControlLoopPeriod);
 		mYawPid.setOutputRange(-1, 1);
 
@@ -178,27 +183,31 @@ public class DriveModule extends Module {
 
 	@Override
 	public void readInputs(double pNow) {
-		db.drivetrain.set(LEFT_POS_INCHES, Conversions.ticksToInches(mLeftEncoder.getPosition()));
-		db.drivetrain.set(LEFT_VEL_IPS, Conversions.ticksToInches(mLeftEncoder.getVelocity()));
+		mGyro.update(pNow);
+		db.drivetrain.set(LEFT_POS_INCHES, ticksToInches(mLeftEncoder.getPosition()));
+		db.drivetrain.set(LEFT_VEL_IPS, ticksToInches(mLeftEncoder.getVelocity()));
 		db.drivetrain.set(LEFT_VEL_TICKS, mLeftEncoder.getVelocity());
-		db.drivetrain.set(RIGHT_POS_INCHES, Conversions.ticksToInches(mRightEncoder.getPosition()));
-		db.drivetrain.set(RIGHT_VEL_IPS, Conversions.ticksToInches(mRightEncoder.getVelocity()));
+		db.drivetrain.set(RIGHT_POS_INCHES, ticksToInches(mRightEncoder.getPosition()));
+		db.drivetrain.set(RIGHT_VEL_IPS, ticksToInches(mRightEncoder.getVelocity()));
 		db.drivetrain.set(RIGHT_VEL_TICKS, mRightEncoder.getVelocity());
 		db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getOutputCurrent());
 		db.drivetrain.set(RIGHT_CURRENT, mRightMaster.getOutputCurrent());
 		db.drivetrain.set(IS_CURRENT_LIMITING, EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots));
 
-//		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, mDriveHardware.getImu().getHeading().getDegrees());
+
+		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, -mGyro.getHeading().getDegrees());
 
 //		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
-//		Robot.DATA.imu.set(EGyro.YAW_DEGREES, mCurrentHeading - mPreviousHeading);
-
+		Robot.DATA.imu.set(EGyro.YAW_DEGREES, -mGyro.getYaw());
+		db.imu.set(EGyro.YAW_OMEGA_DEGREES, ( (-mGyro.getYaw())	 - mPreviousHeading ) / ( pNow - mPreviousTime ) );
 
 	}
 
 	@Override
 	public void setOutputs(double pNow) {
 		EDriveState mode = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
+		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
+		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
 			case HOLD:
 				if (!mStartHoldingPosition) {
@@ -232,19 +241,19 @@ public class DriveModule extends Module {
 
 			case VELOCITY:
 				mStartHoldingPosition = false;
-				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxHeadingChange);
+				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerSecond);
 //				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-				double turn = db.drivetrain.get(DESIRED_TURN_PCT);
-				double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 //				DriveMessage d = new DriveMessage().turn(turn).throttle(throttle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
 //				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 //				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocity, kSmartVelocity, VELOCITY_PID_SLOT, 0);
-				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocity, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				break;
 			case PERCENT_OUTPUT:
+				mLeftMaster.set(throttle+turn);
+				mRightMaster.set(throttle-turn);
 				break;
 		}
 		mPreviousTime = pNow;
@@ -283,7 +292,6 @@ public class DriveModule extends Module {
 //		mUpdateTimer.stop();
 	}
 
-	public static class Conversions {
 
 		public static double rotationsToInches(double rotations) {
 			return rotations * (kWheelDiameterInches * Math.PI);
@@ -302,11 +310,11 @@ public class DriveModule extends Module {
 		}
 
 		public static double radiansPerSecondToTicksPer100ms(double rad_s) {
-			return rad_s / (Math.PI * 2.0) * kTicksPerRotation / 10.0;
+			return rad_s / (Math.PI * 2.0) * kMotorTicksPerWheelRotation / 10.0;
 		}
 
 		public static double ticksToRotations(double ticks) {
-			return ticks / kTicksPerRotation;
+			return ticks / kMotorTicksPerWheelRotation;
 		}
 
 		public static double ticksToInches(double ticks) {
@@ -314,11 +322,11 @@ public class DriveModule extends Module {
 		}
 
 		public static int inchesToTicks(double inches) {
-			return (int)(inchesToRotations(inches) * kTicksPerRotation);
+			return (int)(inchesToRotations(inches) * kMotorTicksPerWheelRotation);
 		}
 
 		public static double ticksPer100msToRotationsPerSecond(double ticks) {
-			return ticks / kTicksPerRotation * 10.0;
+			return ticks / kMotorTicksPerWheelRotation * 10.0;
 		}
 
 		public static double ticksPer100msToInchesPerSecond(double ticks) {
@@ -329,5 +337,4 @@ public class DriveModule extends Module {
 			return ticksPer100msToRotationsPerSecond(ticks) * (Math.PI * 2.0);
 		}
 
-	}
 }
