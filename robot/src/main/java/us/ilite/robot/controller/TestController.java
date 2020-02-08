@@ -183,7 +183,6 @@ public class TestController extends BaseManualController {
         }
         mLastTrackingType =  Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
-
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
             mIntakeState = PowerCellModule.EIntakeState.INTAKE;
