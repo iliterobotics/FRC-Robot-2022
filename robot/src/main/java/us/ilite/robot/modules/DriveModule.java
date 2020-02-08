@@ -215,7 +215,7 @@ public class DriveModule extends Module {
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
-			case HOLD:
+//			case HOLD:
 //				if (!mStartHoldingPosition) {
 //					mLeftHoldSetpoint = db.drivetrain.get(LEFT_POS_INCHES);
 //					mRightHoldSetpoint = db.drivetrain.get(RIGHT_POS_INCHES);
@@ -233,7 +233,6 @@ public class DriveModule extends Module {
 //				} else {
 //					mLeftCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 //				}
-
 //				if (db.drivetrain.get(RIGHT_VEL_TICKS) < 50) {
 //					if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mRightHoldSetpoint) > 2) {
 //						//					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
