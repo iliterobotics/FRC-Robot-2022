@@ -134,6 +134,7 @@ public class PowerCellModule extends Module {
         mSerializer = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kCANIntakeID , CANSparkMaxLowLevel.MotorType.kBrushless );
         mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonHorizontalID);
         mConveyorMotorVertical = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonVerticalID );
+        mConveyorMotorVertical.setInverted(true);
 
         mArmMotor = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kArmNEOAdress , CANSparkMaxLowLevel.MotorType.kBrushless);
 
@@ -214,5 +215,8 @@ public class PowerCellModule extends Module {
             mConveyorMotorHorizontal.set( ControlMode.PercentOutput, 0.0 );
         }
         mGoalBeamCountBroken = mBeamCountBroken + 1;
+    }
+    public void setIntakeState(EIntakeState pIntakeState){
+        mIntakeState = pIntakeState;
     }
 }

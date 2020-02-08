@@ -187,10 +187,11 @@ public class TestController extends BaseManualController {
 
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-            mIntakeState = PowerCellModule.EIntakeState.INTAKE;
-            mArmState = PowerCellModule.EArmState.ENGAGED;
+            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY , PowerCellModule.EIntakeState.INTAKE);
+            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY , PowerCellModule.EIntakeState.INTAKE);
+            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY , PowerCellModule.EIntakeState.INTAKE);
 
-            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
+//            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle()); TODO Commented cuz we don't have an arm
 
             if (db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.INDEXING.ordinal()) {
                 db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
