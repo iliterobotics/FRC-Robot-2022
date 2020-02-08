@@ -11,10 +11,6 @@ public class Log {
         return mGlobalId;
     }
 
-    public void setmGlobalId(int mGlobalId) {
-        this.mGlobalId = mGlobalId;
-    }
-
     public Log(String pCodexIdentifier, String pLogData, int pGlobalId) {
         mCodexIdentifier = pCodexIdentifier;
         mLogData = pLogData;

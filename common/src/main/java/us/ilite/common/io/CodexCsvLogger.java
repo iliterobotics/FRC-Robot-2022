@@ -56,15 +56,6 @@ public class CodexCsvLogger {
         return mCodex.meta();
     }
 
-//    public void writeAllLines() {
-//        try {
-//            writer.append(mCodex.toCSV());
-//            writer.newLine();
-//        } catch (IOException pE) {
-//            pE.printStackTrace();
-//        }
-//    }
-//
     public File file() {
 
         // Don't default to home dir to avoid filling up memory

@@ -27,7 +27,7 @@ import java.util.Map;
 public class Data {
 
     private final ILog mLogger = Logger.createLog(Data.class);
-    
+
     //Add new codexes here as we need more
 
     public static final double NULL_CODEX_VALUE = Double.NaN;
@@ -99,37 +99,32 @@ public class Data {
     }
 
     public void logFromCodexToCSVHeader() {
-        // Check that the USB drivetrain is still plugged in
-//        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
-            mCodexCsvLoggers.forEach(c -> c.writeHeader());
-//        }
+        mCodexCsvLoggers.forEach(c -> c.writeHeader());
     }
     public void logFromCodexToCSVLog( Log pLog ) {
-        // Check that the USB drivetrain is still plugged in
-//        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
-          for ( CodexCsvLogger c : mCodexCsvLoggers ) {
-              if ( c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName().equals(pLog.getmCodexIdentifier()) ) {
+        for ( CodexCsvLogger c : mCodexCsvLoggers ) {
+            if ( c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName().equals(pLog.getmCodexIdentifier()) ) {
 //                  mLogger.error("Saving to: " + c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName() + "   File" );
-                  if ( c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName().equals( "ELogitech310" ) ) {
-                      if ( pLog.getmGlobalId() == driverinput.meta().gid() ) {
-                          for (CodexCsvLogger d : mCodexCsvLoggers) {
-                              if ( d.getMetaDataOfAssociatedCodex().gid() == driverinput.meta().gid() ) {
-                                  d.log( pLog.getmLogData() );
-                              }
-                          }
-                      }
-                      else {
-                          for (CodexCsvLogger o : mCodexCsvLoggers) {
-                              if ( o.getMetaDataOfAssociatedCodex().gid() == operatorinput.meta().gid() ) {
-                                  o.log( pLog.getmLogData() );
-                              }
-                          }
-                      }
-                      return;
-                  }
-                  c.log( pLog.getmLogData() );
-              }
-          }
+                if ( c.getMetaDataOfAssociatedCodex().getEnum().getSimpleName().equals( "ELogitech310" ) ) {
+                    if ( pLog.getmGlobalId() == driverinput.meta().gid() ) {
+                        for (CodexCsvLogger d : mCodexCsvLoggers) {
+                            if ( d.getMetaDataOfAssociatedCodex().gid() == driverinput.meta().gid() ) {
+                                d.log( pLog.getmLogData() );
+                            }
+                        }
+                    }
+                    else {
+                        for (CodexCsvLogger o : mCodexCsvLoggers) {
+                            if ( o.getMetaDataOfAssociatedCodex().gid() == operatorinput.meta().gid() ) {
+                                o.log( pLog.getmLogData() );
+                            }
+                        }
+                    }
+                    return;
+                }
+                c.log( pLog.getmLogData() );
+            }
+        }
 //        }
     }
 

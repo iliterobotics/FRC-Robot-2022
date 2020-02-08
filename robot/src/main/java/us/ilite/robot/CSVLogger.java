@@ -26,20 +26,8 @@ public class CSVLogger {
 
     private void run() {
         try {
-            //System.out.println("Running time is: " + System.currentTimeMillis());
             ArrayList<Log> kTempCSVLogs = new ArrayList<>();
-            //mLogger.error("Beginning to drain!");
             CSVLoggerQueue.kCSVLoggerQueue.drainTo(kTempCSVLogs);
-           mLogger.error("Finished draining, got: " + kTempCSVLogs.size());
-
-//            if ( !kTempCSVLogs.isEmpty() ) {
-//                try {
-//                    Path path = Paths.get(URI.create("file:///Users/jmz00/Git/Robotics/FileTest.java"));
-//                    Files.write(path, kTempCSVLogs);
-//                } catch ( Exception e ) {
-//                    e.printStackTrace();
-//                }
-//            }
 
             for ( Log log : kTempCSVLogs ) {
                 mData.logFromCodexToCSVLog( log );
