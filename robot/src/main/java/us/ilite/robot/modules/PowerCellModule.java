@@ -8,6 +8,8 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
@@ -116,8 +118,8 @@ public class PowerCellModule extends Module {
     }
 
     public enum EIndexingState {
-        INDEXING (1.0),
-        NOT_INDEXING(0.0);
+        BROKEN (1.0),
+        NOT_BROKEN(0.0);
 
         double power;
 
@@ -129,7 +131,7 @@ public class PowerCellModule extends Module {
     public PowerCellModule() {
         mIntakeState = EIntakeState.STOP;
         mArmState = EArmState.DISENGAGED;
-        mIndexingState = EIndexingState.NOT_INDEXING;
+        mIndexingState = EIndexingState.NOT_BROKEN;
 
         mSerializer = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kCANIntakeID , CANSparkMaxLowLevel.MotorType.kBrushless );
         mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonHorizontalID);
@@ -171,9 +173,9 @@ public class PowerCellModule extends Module {
         db.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , mArmEncoder.getPosition());
         db.powercell.set(EPowerCellData.CURRENT_H_VELOCITY, mConveyorMotorHorizontal.getStatorCurrent());
         db.powercell.set(EPowerCellData.CURRENT_V_VELOCITY, mConveyorMotorVertical.getStatorCurrent());
-        db.powercell.set(EPowerCellData.BREAK_SENSOR_1_STATE, readBeamBreakerState(mBeamBreaker1.isBroken()));
-        db.powercell.set(EPowerCellData.BREAK_SENSOR_2_STATE, readBeamBreakerState(mBeamBreaker2.isBroken()));
-        db.powercell.set(EPowerCellData.BREAK_SENSOR_3_STATE, readBeamBreakerState(mBeamBreaker3.isBroken()));
+        db.powercell.set(EPowerCellData.BREAK_SENSOR_1_STATE, (mBeamBreaker1.isBroken()));
+        db.powercell.set(EPowerCellData.BREAK_SENSOR_2_STATE, (mBeamBreaker2.isBroken()));
+        db.powercell.set(EPowerCellData.BREAK_SENSOR_3_STATE, (mBeamBreaker3.isBroken()));
 
         //TODO Determine Indexer State
     }
@@ -184,7 +186,6 @@ public class PowerCellModule extends Module {
         mConveyorMotorHorizontal.set(ControlMode.PercentOutput, db.powercell.get(EPowerCellData.DESIRED_H_VELOCITY));
         mConveyorMotorVertical.set(ControlMode.PercentOutput, db.powercell.get(EPowerCellData.DESIRED_V_VELOCITY));
         mArmEncoder.setPosition(db.powercell.get(EPowerCellData.DESIRED_ARM_ANGLE));
-//        isCurrentLimiting();
         startIndexing();
     }
 
@@ -195,25 +196,26 @@ public class PowerCellModule extends Module {
 //        mIndexingState = EIndexingState.NOT_INDEXING;
     }
 
-    private double readBeamBreakerState(boolean isBroken){
-        if ( isBroken ) {
-            return 1.0;
-        }
-        return 0.0;
-    }
-
     public boolean isCurrentLimiting(){
         return db.pdp.get(EPowerDistPanel.CURRENT5) > kWarnCurrentLimitThreshold;
     }
 
     public void startIndexing() {
         //TODO determine V_Motor and H_Motor specifics with Beam breaker
-        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().map(DigitalBeamSensor::isBroken).filter(e -> e).count();
+        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().filter(DigitalBeamSensor::isBroken).count();
+        SmartDashboard.putNumber("BeamCountBroken" , mBeamCountBroken);
+        SmartDashboard.putNumber("BeamCountBrokenGoal" , mGoalBeamCountBroken);
+
+
+//        for (DigitalBeamSensor mDigitalBeamSensor : mDigitalBeamSensors) {
+//            if (mDigitalBeamSensor.isBroken()) mBeamCountBroken++;
+//        }
         if ( mBeamCountBroken < mGoalBeamCountBroken) {
             mConveyorMotorHorizontal.set( ControlMode.PercentOutput, db.powercell.get(EPowerCellData.DESIRED_H_VELOCITY) );
         } else {
             mConveyorMotorHorizontal.set( ControlMode.PercentOutput, 0.0 );
         }
+
         mGoalBeamCountBroken = mBeamCountBroken + 1;
     }
     public void setIntakeState(EIntakeState pIntakeState){

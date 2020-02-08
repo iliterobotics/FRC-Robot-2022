@@ -69,9 +69,9 @@ public class Settings {
         }
 
         public static class DIO {
-            public static int kBeamChannel1 = 1; // Change later
-            public static int kBeamChannel2 = 2; // Change later
-            public static int kBeamChannel3 = 3; // Change later
+            public static int kBeamChannel1 = 0; // Change later
+            public static int kBeamChannel2 = 1; // Change later
+            public static int kBeamChannel3 = 2; // Change later
             public static final int kAnglerID = 8; // BunnyBot Catapult
         }
 
