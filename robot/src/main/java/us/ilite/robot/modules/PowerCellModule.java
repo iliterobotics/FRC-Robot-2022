@@ -43,6 +43,9 @@ public class PowerCellModule extends Module {
     private DigitalBeamSensor mBeamBreaker2;
     private DigitalBeamSensor mBeamBreaker3;
 
+    private boolean allBeamsBroken;
+    private int beamsNotBrokenCycles;
+
 
 
     //Constants
@@ -172,6 +175,7 @@ public class PowerCellModule extends Module {
     public void readInputs(double pNow) {
 //        mIntakeState = EIntakeState.values()[db.powercell.get(EPowerCellData.DESIRED_INTAKE_STATE).intValue()];
 
+        db.powercell.set(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN, List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count());
         db.powercell.set(EPowerCellData.CURRENT_INTAKE_VELOCITY, mSerializer.getOutputCurrent());
         db.powercell.set(EPowerCellData.CURRENT_INTAKE_VELOCITY_FT_S, mIntakeEncoder.getVelocity());
         db.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , mArmEncoder.getPosition());
@@ -181,13 +185,20 @@ public class PowerCellModule extends Module {
         db.powercell.set(EPowerCellData.BREAK_SENSOR_2_STATE, (mBeamBreaker2.isBroken()));
         db.powercell.set(EPowerCellData.BREAK_SENSOR_3_STATE, (mBeamBreaker3.isBroken()));
 
-        db.powercell.set(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN, List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count());
         if(db.powercell.get(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN) >= 3.0){
             db.powercell.set(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN , (db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN )) + 1)  ;
         }
         else{
             db.powercell.set(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN , 3)  ;
         }
+
+        double currentSensorsBroken = db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN);
+        if (currentSensorsBroken < 3) {
+            beamsNotBrokenCycles++;
+        } else {
+            beamsNotBrokenCycles = 0;
+        }
+        db.powercell.set(EPowerCellData.ALL_BEAMS_BROKEN, beamsNotBrokenCycles < 15);
 
         //TODO Determine Indexer State
     }
