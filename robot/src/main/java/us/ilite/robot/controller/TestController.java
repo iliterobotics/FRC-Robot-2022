@@ -187,9 +187,9 @@ public class TestController extends BaseManualController {
 
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY , PowerCellModule.EIntakeState.INTAKE);
-            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY , PowerCellModule.EIntakeState.INTAKE);
-            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY , PowerCellModule.EIntakeState.INTAKE);
+            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY , PowerCellModule.EIntakeState.INTAKE.getPower());
+            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY , PowerCellModule.EIntakeState.INTAKE.getPower());
+            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY , PowerCellModule.EIntakeState.INTAKE.getPower());
 
 //            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle()); TODO Commented cuz we don't have an arm
 
@@ -200,9 +200,9 @@ public class TestController extends BaseManualController {
             db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
 
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
-            mIntakeState = PowerCellModule.EIntakeState.REVERSE;
-            mArmState = PowerCellModule.EArmState.ENGAGED;
-
+            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY , PowerCellModule.EIntakeState.REVERSE.getPower());
+            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY , PowerCellModule.EIntakeState.REVERSE.getPower());
+            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY , PowerCellModule.EIntakeState.REVERSE.getPower());
             db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
 
             if (db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.INDEXING.ordinal()) {
