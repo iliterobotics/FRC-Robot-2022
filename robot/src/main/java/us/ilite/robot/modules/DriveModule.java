@@ -53,7 +53,7 @@ public class DriveModule extends Module {
 	// =============================================================================
 	private static final int VELOCITY_PID_SLOT = 1;
 	private static final int POSITION_PID_SLOT = 2;
-	public static ProfileGains dPID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d).slot(POSITION_PID_SLOT);
+	public static ProfileGains dPID = new ProfileGains().p(1).slot(POSITION_PID_SLOT);//.maxVelocity(5676d).maxAccel(5676d).slot(POSITION_PID_SLOT);
 //	public static ProfileGains vPID = new ProfileGains().p(1.5234375e-4).d(0.001174257 * 4).maxVelocity(5676d).maxAccel(56760d).slot(VELOCITY_PID_SLOT);
 	public static ProfileGains vPID = new ProfileGains().p(0.000152).maxVelocity(5700d).maxAccel(5700d).slot(VELOCITY_PID_SLOT);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
@@ -111,13 +111,13 @@ public class DriveModule extends Module {
 	}
 
 	public DriveModule() {
-		mLeftMaster = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveLeftMaster, kDriveConfig);
-		mLeftFollower = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveLeftFollower, kDriveConfig);
+		mLeftMaster = SparkMaxFactory.createSparkMax(1/*Settings.Hardware.CAN.kDriveLeftMaster*/, kDriveConfig);
+		mLeftFollower = SparkMaxFactory.createSparkMax(3/*Settings.Hardware.CAN.kDriveLeftFollower*/, kDriveConfig);
 		mLeftFollower.follow(mLeftMaster);
 		mLeftEncoder = mLeftMaster.getEncoder();
 		mLeftCtrl = mLeftMaster.getPIDController();
-		mRightMaster = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveRightMaster, kDriveConfig);
-		mRightFollower = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveRightFollower, kDriveConfig);
+		mRightMaster = SparkMaxFactory.createSparkMax(2/*Settings.Hardware.CAN.kDriveRightMaster*/, kDriveConfig);
+		mRightFollower = SparkMaxFactory.createSparkMax(4/*Settings.Hardware.CAN.kDriveRightFollower*/, kDriveConfig);
 		mRightFollower.follow(mRightMaster);
 		mRightEncoder = mLeftMaster.getEncoder();
 		mRightCtrl = mRightMaster.getPIDController();
@@ -213,15 +213,15 @@ public class DriveModule extends Module {
 					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));
 					mStartHoldingPosition = true;
 				}
-				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mLeftHoldSetpoint) > .5) {
+				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mLeftHoldSetpoint) > 1) {
 //					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
 //					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-					mLeftCtrl.setReference(mLeftHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
+					mLeftCtrl.setReference(Conversions.inchesToRotations(mLeftHoldSetpoint), kPosition, POSITION_PID_SLOT, 0);
 				}
-				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mRightHoldSetpoint) > .5) {
+				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mRightHoldSetpoint) > 1) {
 //					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
 //					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-					mRightCtrl.setReference(mRightHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
+					mRightCtrl.setReference(Conversions.inchesToRotations(mRightHoldSetpoint), kPosition, POSITION_PID_SLOT, 0);
 				}
 				break;
 
@@ -231,13 +231,13 @@ public class DriveModule extends Module {
 //				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
 				double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 				double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
-//				DriveMessage d = new DriveMessage().turn(turn).throttle(throttle).normalize();
+				DriveMessage d = new DriveMessage().turn(turn).throttle(throttle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
 //				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 //				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocity, kSmartVelocity, VELOCITY_PID_SLOT, 0);
-				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocity, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				break;
 			case PERCENT_OUTPUT:
 				break;
