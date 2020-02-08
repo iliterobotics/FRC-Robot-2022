@@ -235,6 +235,7 @@ public class DriveModule extends Module {
 //				}
 //				break;
 
+
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerSecond);
