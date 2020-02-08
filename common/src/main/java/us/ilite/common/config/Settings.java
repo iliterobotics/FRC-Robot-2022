@@ -40,10 +40,10 @@ public class Settings {
             public static int kHangerNeoID1 = 15;
             public static int kHangerNeoID2 = 71;
             public static int kArmNEOAdress = 64;
-            public static int kCANIntakeID = 66; // Change later // Using the bunny bots flywheel id for now
-            public static int kTalonOneID = 63; // Change later
-            public static int kTalonTwoID = 67; // Change later
-            public static int kTalonThreeID = 65; // Change later
+            public static int kCANIntakeID = -1;//9; // Change later // Using the bunny bots flywheel id for now
+            public static int kTalonHorizontalID = 3;//3; // Change later
+            public static int kTalonVerticalID = 6; // Change later
+//            public static int kTalonThreeID = 65; // Change later
             public static final int kTurretGyroID = 61; // There isn't a gyro on the BunnyBot
             public static final int kShooterID = 66; // BunnyBot Shooter
             public static final int kAcceleratorID = 61; // BunnyBot Conveyor
@@ -69,9 +69,9 @@ public class Settings {
         }
 
         public static class DIO {
-            public static int kBeamChannel1; // Change later
-            public static int kBeamChannel2; // Change later
-            public static int kBeamChannel3; // Change later
+            public static int kBeamChannel1 = 1; // Change later
+            public static int kBeamChannel2 = 2; // Change later
+            public static int kBeamChannel3 = 3; // Change later
             public static final int kAnglerID = 8; // BunnyBot Catapult
         }
 

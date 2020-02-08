@@ -192,7 +192,7 @@ public class TestController extends BaseManualController {
 
             db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
 
-            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.INDEXING.ordinal()) {
+            if (db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.INDEXING.ordinal()) {
                 db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
                 db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, mIntakeState.getPower());
             }
@@ -204,9 +204,9 @@ public class TestController extends BaseManualController {
 
             db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
 
-            if(db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.INDEXING.ordinal()) {
-                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, -mIntakeState.getPower());
-                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, -mIntakeState.getPower());
+            if (db.powercell.get(EPowerCellData.CURRENT_INDEXING_STATE) == (double) PowerCellModule.EIndexingState.INDEXING.ordinal()) {
+                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
+                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, mIntakeState.getPower());
             }
 
             db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
@@ -214,9 +214,12 @@ public class TestController extends BaseManualController {
         } else {
             mIntakeState = PowerCellModule.EIntakeState.STOP;
             mArmState = PowerCellModule.EArmState.DISENGAGED;
+            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
+            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
+            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, mIntakeState.getPower());
             db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
         }
-
+    }
         //Testing if statement
 
 //        if(db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
@@ -238,7 +241,7 @@ public class TestController extends BaseManualController {
         }
 
     }
-
+}
 
 
 //    void updateDJBooth() {
@@ -310,4 +313,4 @@ public class TestController extends BaseManualController {
 //        }
 //        TODO default state
 //    }
-}
+
