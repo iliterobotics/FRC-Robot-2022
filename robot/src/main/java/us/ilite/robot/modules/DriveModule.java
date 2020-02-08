@@ -239,8 +239,8 @@ public class DriveModule extends Module {
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
-				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-//				double turn = db.drivetrain.get(DESIRED_TURN_PCT);
+//				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
+				double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 				double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
