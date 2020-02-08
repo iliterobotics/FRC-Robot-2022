@@ -36,8 +36,6 @@ public class TestController extends AbstractController {
     private HangerModule.EHangerState mHangerState = HangerModule.EHangerState.NOT_HANGING;
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
-    private FlywheelModule mFlywheel = new FlywheelModule();
-    private double mPreviousTime;
 
     private static TestController INSTANCE;
 
@@ -69,7 +67,7 @@ public class TestController extends AbstractController {
         Robot.CLOCK.report("updateFlywheel", t->updateFlywheel());
         Robot.CLOCK.report("updateIntake", t->updateIntake(pNow));
         Robot.CLOCK.report("updateHanger", t->updateHanger(pNow));
-        Robot.CLOCK.report("updateDJBooth", t->updateDJBooth());
+//        Robot.CLOCK.report("updateDJBooth", t->updateDJBooth());
 //        updateArm(pNow);
     }
 
@@ -95,15 +93,18 @@ public class TestController extends AbstractController {
     }
 
     private void updateFlywheel() {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
-            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED);
+        if (db.driverinput.get(InputMap.OPERATOR.SHOOT_FLYWHEEL) != 0.0) {
+            mLog.error("-----------------------------------The Flywheel Should Be Spinning with the velocity: " + db.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
+            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY , db.flywheel.get(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED));
+            db.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id());
         }
         else {
             db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0.0);
+            db.limelight.set(ELimelightData.TARGET_ID, 0.0);
         }
         db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, Robot.DATA.flywheel.get(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE));
     }
-    
+
     public void updateLimelightTargetLock() {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
             if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
@@ -174,7 +175,6 @@ public class TestController extends AbstractController {
 
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-            mLog.error("--------------INTAKE IS BEING PRESSED----------");
             mIntakeState = PowerCellModule.EIntakeState.INTAKE;
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
             mIntakeState = PowerCellModule.EIntakeState.REVERSE;
