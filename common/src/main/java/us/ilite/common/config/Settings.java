@@ -14,6 +14,7 @@ public class Settings {
     public static double kControlLoopPeriod = 0.01; // seconds
 
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
+    public static int kAcceptableLogFailures = 8;
 
     public static double kNetworkTableUpdateRate = 0.01;
 

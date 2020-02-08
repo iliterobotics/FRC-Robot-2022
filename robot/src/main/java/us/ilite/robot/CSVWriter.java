@@ -6,6 +6,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import us.ilite.common.Data;
+import us.ilite.common.config.Settings;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Optional;
 
 import static us.ilite.robot.CSVLogger.kCSVLoggerQueue;
 
@@ -23,28 +25,44 @@ public class CSVWriter {
     private static final String LOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
 
     private final ILog mLog = Logger.createLog(CSVWriter.class);
+    private static int mLogFailures;
 
     private RobotCodex<?> mCodex;
-    private BufferedWriter writer;
+    private final Optional<BufferedWriter> writer;
 
     public CSVWriter(RobotCodex<?> pCodex) {
         mCodex = pCodex;
 
+        mLogFailures = 0;
         File file = file();
         Data.handleCreation( file );
+        BufferedWriter bw = null;
         try {
-            writer = new BufferedWriter( new FileWriter( file ) );
+            bw = new BufferedWriter( new FileWriter( file ) );
         } catch (IOException pE) {
-            pE.printStackTrace();
+            System.out.println( pE.getLocalizedMessage() );
         }
+        writer = Optional.ofNullable( bw );
     }
 
     public void log( String s ) {
-        try {
-            writer.append( s );
-            writer.newLine();
-        } catch (IOException pE) {
-            pE.printStackTrace();
+        if ( writer.isPresent() ) {
+            try {
+                writer.get().append( s );
+                writer.get().newLine();
+            } catch (IOException pE) {
+                pE.printStackTrace();
+            }
+        }
+        else {
+            if ( mLogFailures < Settings.kAcceptableLogFailures ) {
+                mLog.error( "Could not find Path: \"" + USB_DIR + "\" on roborio! Try plugging in the USB." );
+                mLogFailures++;
+            }
+            else if ( mLogFailures == Settings.kAcceptableLogFailures ) {
+                mLog.error("---------------------CSV LOGGING DISABLED----------------------");
+                mLogFailures++;
+            }
         }
     }
 
@@ -107,11 +125,13 @@ public class CSVWriter {
     }
 
     public void closeWriter() {
-        try {
-            writer.flush();
-            writer.close();
-        } catch (IOException pE) {
-            pE.printStackTrace();
+        if ( writer.isPresent() ) {
+            try {
+                writer.get().flush();
+                writer.get().close();
+            } catch (IOException pE) {
+                pE.printStackTrace();
+            }
         }
     }
 
