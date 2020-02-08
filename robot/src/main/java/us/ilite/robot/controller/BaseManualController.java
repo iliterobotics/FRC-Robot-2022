@@ -18,7 +18,7 @@ public abstract class BaseManualController extends AbstractController {
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
 
     void updateDrivetrain(double pNow) {
-        double throttle = -db.driverinput.get(THROTTLE_AXIS);
+        double throttle = db.driverinput.get(THROTTLE_AXIS);
         double rotate = db.driverinput.get(TURN_AXIS);
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband

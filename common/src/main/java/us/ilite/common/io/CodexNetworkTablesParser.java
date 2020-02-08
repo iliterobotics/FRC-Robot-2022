@@ -1,15 +1,14 @@
 package us.ilite.common.io;
 
-import java.io.File;
-import java.nio.file.Files;
-
 import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexOf;
 import com.flybotix.hfr.util.lang.EnumUtils;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+
+import java.io.File;
+import java.nio.file.Files;
 
 public class CodexNetworkTablesParser<E extends Enum<E> & CodexOf<Double>> {
 
@@ -100,7 +99,7 @@ public class CodexNetworkTablesParser<E extends Enum<E> & CodexOf<Double>> {
     public File file() {
 
         String dir = "";
-        if(Files.notExists(new File(CodexCsvLogger.USB_DIR).toPath())) {
+        if(Files.notExists(new File("/u").toPath())) {
             dir = USER_DIR;
         } else {
             dir = ROBOT_DIR;
