@@ -21,18 +21,18 @@ public class VisionGyro extends IMU {
     }
 
     @Override
-    public double getYaw() {
-        return getX().rotateBy(mGyroOffsetX).getDegrees();
+    public Rotation2d getYaw() {
+        return getX().rotateBy(mGyroOffsetX);
     }
 
     @Override
-    public double getPitch() {
-        return getY().rotateBy(mGyroOffsetY).getDegrees();
+    public Rotation2d getPitch() {
+        return getY().rotateBy(mGyroOffsetY);
     }
 
     @Override
-    public double getRoll() {
-        return 0;
+    public Rotation2d getRoll() {
+        return ZERO;
     }
 
     @Override
