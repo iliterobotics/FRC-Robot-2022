@@ -62,7 +62,7 @@ public class TestController extends BaseManualController {
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        Robot.CLOCK.report("updateLimelightTargetLock", t->updateLimelightTargetLock(pNow));
+        Robot.CLOCK.report("updateLimelightTargetLock", t->updateLimelightTargetLock());
         Robot.CLOCK.report("updateDrivetrain", t->updateDrivetrain(pNow));
         Robot.CLOCK.report("updateFlywheel", t->updateFlywheel());
         Robot.CLOCK.report("updateIntake", t->updateIntake(pNow));
@@ -98,33 +98,32 @@ public class TestController extends BaseManualController {
         }
     }
 
-    public void updateLimelightTargetLock(double pNow) {
-        System.out.println(db.limelight);
+    public void updateLimelightTargetLock() {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-//            if (Robot.DATA.groundTracking.isSet(ELimelightData.TY)) {
-//                SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
-//            }
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id() );
+            if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
+                SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
+            }
+            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
-            if (Robot.DATA.groundTracking.isSet(ELimelightData.TY)) {
-                if (Math.abs(Robot.DATA.groundTracking.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
-                    Robot.DATA.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET_ZOOM.id());
+            if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
+                if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
+                    Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET_ZOOM.id());
                     System.out.println("ZOOMING");
                 } else {
-                    Robot.DATA.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id() );
+                    db.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
                 }
             } else {
-                   Robot.DATA.groundTracking.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id());
+                   db.selectedTarget.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
             }
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.BALL.id());
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.BALL_DUAL.id());
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.BALL_TRI.id());
+        } else if (db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
+            db.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL.id());
+        } else if (db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
+            db.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_DUAL.id());
+        } else if (db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
+            db.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_TRI.id());
         }
         else {
-                Robot.DATA.limelight.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
+                db.limelight.set(ELimelightData.TARGET_ID, (double)Limelight.NONE.id());
 //            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
         }
         if ((Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) != (mLastTrackingType) )
@@ -136,6 +135,7 @@ public class TestController extends BaseManualController {
         }
         mLastTrackingType =  db.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
+
 
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {

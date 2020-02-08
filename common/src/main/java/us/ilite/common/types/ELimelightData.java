@@ -15,37 +15,42 @@ public enum ELimelightData {
     TVERT,      // Vertical side-length of the rough bounding box (0 - 320 pixels)
 
 
+    CURRENT_PIPELINE,   // Current pipeline
+    DESIRED_PIPELINE,   // Desired pipeline
+
     //  Limelight LED state
     // 0 - Use Pipeline LED state
     // 1 - Force LED off
     // 2 - Force LED blink
     // 3 - Force LED on
-    LED_MODE,
+    CURRENT_LED_MODE,    // Current limelight’s LED state
+    DESIRED_LED_MODE,    // Desired limelight's LED state
 
     //  Limelight camera mode
     // 0 - Vision Processor
     // 1 - Driver Camera (Increases exposure, disables vision processing)
-    CAM_MODE,    // Current camera mode
+    CURRENT_CAM_MODE,    // Current camera mode
+    DESIRED_CAM_MODE,    // Desired camera mode
 
     //  Limelight stream mode
     // 0 - Standard - Side-by-side streams if a webcam is attached to Limelight
     // 1 - PiP Main - The secondary camera stream is placed in the lower-right corner of the primary camera stream
     // 2 - PiP Secondary - The primary camera stream is placed in the lower-right corner of the secondary camera stream
-    STREAM_MODE,    // Current stream mode
+    CURRENT_STREAM_MODE,    // Current stream mode
+    DESIRED_STREAM_MODE,    // Desired stream mode
 
     //  Limelight snapshot state
     // 0 - Stop taking snapshots
     // 1 - Take two snapshots per second
-    SNAPSHOT_MODE,      // Current snapshot mode
+    CURRENT_SNAPSHOT_MODE,      // Current snapshot mode
+    DESIRED_SNAPSHOT_MODE,      // Desired snapshot mode
 
     CALC_DIST_TO_TARGET,    // The calculated distance to the current target
     CALC_ANGLE_TO_TARGET,   // The calculated angle to the current target
     CALC_TARGET_X,          // The calculated x-position of the current target
     CALC_TARGET_Y,          // The calculated y-position of the current target
 
-    TARGET_ID,
-
-    ANGLE_FROM_HORIZON;
+    TARGET_ID;
 
 
     public enum LedMode {
