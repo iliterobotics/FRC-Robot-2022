@@ -34,14 +34,6 @@ public abstract class AbstractController {
             // Every 10s or so
             mCycleCount++;
         }
-
-        // Enforce a maximum allowed speed, system-wide. DO NOT comment this code out without checking with a mentor first.
-        if(db.drivetrain.isSet(DESIRED_TURN_PCT)) {
-            db.drivetrain.set(DESIRED_TURN_PCT, Utils.clamp(db.drivetrain.get(DESIRED_TURN_PCT), Settings.Input.kMaxAllowedVelocityMultiplier));
-        }
-        if(db.drivetrain.isSet(DESIRED_THROTTLE_PCT)) {
-            db.drivetrain.set(DESIRED_THROTTLE_PCT, Utils.clamp(db.drivetrain.get(DESIRED_THROTTLE_PCT), Settings.Input.kMaxAllowedVelocityMultiplier));
-        }
     }
 
     /**
