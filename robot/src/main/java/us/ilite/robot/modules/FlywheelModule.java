@@ -3,6 +3,8 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.*;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -10,6 +12,7 @@ import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.lib.util.NetworkTablesConstantsBase;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EMatchMode;
@@ -27,8 +30,11 @@ public class FlywheelModule extends Module {
     private double mPreviousTime;
 
     public FlywheelModule() {
+        mFlywheelGains.p(0.5);
+        mFlywheelGains.i(0.2);
+        mFlywheelGains.d(0.3);
+        mFlywheelGains.generateController();
         mFlywheelMasterOne = new TalonFX(50);
-        mFlywheelGains.p(0.0005);
         mFlywheelPID = new PIDController(mFlywheelGains, 0, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY), Settings.kControlLoopPeriod);
         mFlywheelFeeder = SparkMaxFactory.createDefaultSparkMax(9 , CANSparkMaxLowLevel.MotorType.kBrushless);
     }
@@ -78,28 +84,24 @@ public class FlywheelModule extends Module {
             Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, calcSpeedFromDistance(Distance.fromInches(Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET))));
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, calcAngleFromDistance(Distance.fromInches(Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET))));
         } else {
-            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, 3000);
+            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, 2750);
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, 60);
         }
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mFlywheelPID.setPIDGains(mFlywheelGains);
-        mFlywheelPID.setSetpoint(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
-
-        mFlywheelGains.MAX_VELOCITY = 0.5;
-        mFlywheelGains.MAX_ACCEL = 0.05;
-
         mFlywheelMasterOne.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
         mFlywheelFeeder.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
 
+        SmartDashboard.putNumber("Flywheel Target Velocity", Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
         SmartDashboard.putNumber("Flywheel Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
         SmartDashboard.putNumber("Feeder Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FEEDER_VELOCITY));
         SmartDashboard.putNumber("Flywheel Gains P", mFlywheelGains.P);
         SmartDashboard.putNumber("Flywheel Gains I", mFlywheelGains.I);
         SmartDashboard.putNumber("Flywheel Gains D", mFlywheelGains.D);
 
+        Shuffleboard.addEventMarker("Flywheel Target Velocity", EventImportance.kHigh);
         Shuffleboard.addEventMarker("Flywheel Velocity", EventImportance.kHigh);
         Shuffleboard.addEventMarker("Feeder Velocity", EventImportance.kHigh);
         Shuffleboard.addEventMarker("Flywheel Gains P", EventImportance.kHigh);
@@ -108,7 +110,6 @@ public class FlywheelModule extends Module {
 
         mPreviousTime = pNow;
     }
-
 
     @Override
     public void shutdown(double pNow) {
