@@ -44,7 +44,6 @@ public class GroundTracking extends Module {
                     }
                 }
 
-                System.out.println("Selected Target" + mSelectedTarget);
                 Robot.DATA.groundTracking.set(ELimelightData.TX, Robot.DATA.rawLimelight.get(getEnumFromString("TX_" + mSelectedTarget)) * (Limelight.llFOVHorizontal / 2));
                 Robot.DATA.groundTracking.set(ELimelightData.TY, Robot.DATA.rawLimelight.get(getEnumFromString("TY_" + mSelectedTarget)) * (Limelight.llFOVVertical / 2));
                 Robot.DATA.groundTracking.set(ELimelightData.TA, Robot.DATA.rawLimelight.get(getEnumFromString("TA_" + mSelectedTarget)));

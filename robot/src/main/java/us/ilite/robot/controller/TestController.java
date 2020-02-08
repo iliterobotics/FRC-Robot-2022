@@ -147,7 +147,6 @@ public class TestController extends BaseManualController {
     }
 
     public void updateLimelightTargetLock(double pNow) {
-        System.out.println(db.limelight);
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
 //            if (Robot.DATA.groundTracking.isSet(ELimelightData.TY)) {
 //                SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
@@ -157,7 +156,6 @@ public class TestController extends BaseManualController {
             if (Robot.DATA.groundTracking.isSet(ELimelightData.TY)) {
                 if (Math.abs(Robot.DATA.groundTracking.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
                     Robot.DATA.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET_ZOOM.id());
-                    System.out.println("ZOOMING");
                 } else {
                     Robot.DATA.limelight.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id() );
                 }

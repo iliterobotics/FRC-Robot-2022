@@ -46,7 +46,6 @@ public class TargetLock implements ICommand {
 
     @Override
     public void init(double pNow) {
-        System.out.println("++++++++++++++++++++++++++TARGET LOCKING++++++++++++++++++++++++++++++++++++\n\n\n\n");
 
         mHasAcquiredTarget = false;
         mAlignedCount = 0;
@@ -68,7 +67,6 @@ public class TargetLock implements ICommand {
 
             mAlignedCount++;
             if(mEndOnAlignment && Math.abs(currentData.get(TX)) < mAllowableError && mAlignedCount > kAlignCount) {
-                System.out.println("FINISHED");
                 // Zero drivetrain outputs in shutdown()
                 return true;
             }
