@@ -56,6 +56,12 @@ public class PowerCellModule extends Module {
     public static double kWarnCurrentLimitThreshold = 30; //Tune this later
     public static double kArmPowerEngaged = 1.0;
     public static double kArmPowerDisengaged = 0.0;
+
+    private static final int UP_PID_SLOT_ID = 1;
+    public static double P = 5.0e-4;
+    public static double I = 0.0;
+    public static double D = 0.0;
+    public static double F = 0.000391419;
     //Intake state
     private EIntakeState mIntakeState;
     private EIndexingState mIndexingState;
