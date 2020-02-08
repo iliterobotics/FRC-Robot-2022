@@ -199,8 +199,8 @@ public class DriveModule extends Module {
 		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, -mGyro.getHeading().getDegrees());
 
 //		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
-		Robot.DATA.imu.set(EGyro.YAW_DEGREES, -mGyro.getYaw());
-		db.imu.set(EGyro.YAW_OMEGA_DEGREES, ( (-mGyro.getYaw())	 - mPreviousHeading ) / ( pNow - mPreviousTime ) );
+		Robot.DATA.imu.set(EGyro.YAW_DEGREES, -mGyro.getYaw().getDegrees());
+		db.imu.set(EGyro.YAW_OMEGA_DEGREES, ( (-mGyro.getYaw().getDegrees())	 - mPreviousHeading ) / ( pNow - mPreviousTime ) );
 
 	}
 
