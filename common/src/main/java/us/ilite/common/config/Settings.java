@@ -1,10 +1,6 @@
 package us.ilite.common.config;
 
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.lib.util.NetworkTablesConstantsBase;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * ONLY ROBOT-wide settings should go into this class (e.g. things like
@@ -16,7 +12,8 @@ import java.util.List;
 public class Settings {
 
     public static double kControlLoopPeriod = 0.01; // seconds
-    public static double kCSVLoggingPeriod = 0.02;  // seconds
+
+    public static int kSecondsToUpdateCSVLogger = 1; //seconds
 
     public static double kNetworkTableUpdateRate = 0.01;
 
