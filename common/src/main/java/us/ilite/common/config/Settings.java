@@ -37,7 +37,7 @@ public class Settings {
 
         public static class CAN {
             public static int kDJBoothTalonId = 72;
-            public static int kHangerNeoID1 = 70;
+            public static int kHangerNeoID1 = 15;
             public static int kHangerNeoID2 = 71;
             public static int kArmNEOAdress = 64;
             public static int kCANIntakeID = 66; // Change later // Using the bunny bots flywheel id for now

@@ -31,6 +31,10 @@ public abstract class AbstractController {
         }
     }
 
+    /**
+     * Enables / Disables this controller.
+     * @param pEnabled TRUE if enabled
+     */
     public final void setEnabled(boolean pEnabled) {
         mCycleCount = 0;
         mEnabled = pEnabled;
