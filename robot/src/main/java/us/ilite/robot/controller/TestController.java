@@ -1,30 +1,20 @@
 package us.ilite.robot.controller;
 
-import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.lang.EnumUtils;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import us.ilite.common.Data;
-import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
-import us.ilite.common.types.input.EInputScale;
-import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
 import us.ilite.common.types.*;
-import us.ilite.common.types.input.EInputScale;
-import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.*;
+import us.ilite.robot.modules.DJSpinnerModule;
+import us.ilite.robot.modules.Limelight;
+import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
-
-import static us.ilite.common.config.InputMap.DRIVER.*;
-import static us.ilite.common.types.drive.EDriveData.*;
 
 public class TestController extends BaseManualController {
 
@@ -82,19 +72,20 @@ public class TestController extends BaseManualController {
     }
 
     private void updateFlywheel() {
-        if (db.driverinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
+            db.limelight.set( ELimelightData.TARGET_ID, 1 );
             db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY , db.flywheel.get(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED));
-            mLog.error("--------------------------------------------------------PRESSED");
         }
         else {
+            db.limelight.set( ELimelightData.TARGET_ID, 0 );
             db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
         }
         db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, Robot.DATA.flywheel.get(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE));
         if (db.flywheel.get(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY) == 1) {
-           db.flywheel.set( EShooterSystemData.TARGET_FEEDER_VELOCITY, 1000 );
+           db.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 1000);
         }
         else {
-            db.flywheel.set( EShooterSystemData.TARGET_FEEDER_VELOCITY, 0 );
+            db.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
         }
     }
 
