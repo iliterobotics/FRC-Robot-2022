@@ -1,13 +1,11 @@
-package us.ilite.common.io;
+package us.ilite.robot;
 
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
-import us.ilite.common.CSVLoggerQueue;
 import us.ilite.common.Data;
-import us.ilite.common.Log;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,18 +14,20 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class CodexCsvLogger {
+import static us.ilite.robot.CSVLogger.kCSVLoggerQueue;
+
+public class CSVWriter {
 
     public static final String USB_DIR = "/u";
     public static final String USER_DIR = System.getProperty("user.home");
     private static final String LOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
 
-    private final ILog mLog = Logger.createLog(CodexCsvLogger.class);
+    private final ILog mLog = Logger.createLog(CSVWriter.class);
 
     private RobotCodex<?> mCodex;
     private BufferedWriter writer;
 
-    public CodexCsvLogger(RobotCodex<?> pCodex) {
+    public CSVWriter(RobotCodex<?> pCodex) {
         mCodex = pCodex;
 
         File file = file();
@@ -49,7 +49,7 @@ public class CodexCsvLogger {
     }
 
     public void writeHeader() {
-        CSVLoggerQueue.kCSVLoggerQueue.add( new Log( mCodex.meta().getEnum().getSimpleName(), mCodex.getCSVHeader(), mCodex.meta().gid() ) );
+        kCSVLoggerQueue.add( new Log( mCodex.getCSVHeader(), mCodex.meta().gid() ) );
     }
 
     public CodexMetadata<?> getMetaDataOfAssociatedCodex() {
@@ -76,7 +76,7 @@ public class CodexCsvLogger {
 
         File file = null;
         if ( mCodex.meta().getEnum().getSimpleName().equals("ELogitech310")) {
-            if ( mCodex.meta().gid() == 123 ) {
+            if ( mCodex.meta().gid() == Robot.DATA.driverinput.meta().gid() ) {
                 file = new File(String.format( dir + LOG_PATH_FORMAT,
                         eventName,
                         "DriverInput",

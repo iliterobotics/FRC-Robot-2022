@@ -1,9 +1,8 @@
-package us.ilite.common;
+package us.ilite.robot;
 
 import java.util.Objects;
 
 public class Log {
-    private String mCodexIdentifier;
     private String mLogData;
     private int mGlobalId;
 
@@ -11,8 +10,7 @@ public class Log {
         return mGlobalId;
     }
 
-    public Log(String pCodexIdentifier, String pLogData, int pGlobalId) {
-        mCodexIdentifier = pCodexIdentifier;
+    public Log( String pLogData, int pGlobalId) {
         mLogData = pLogData;
         mGlobalId = pGlobalId;
     }
@@ -20,8 +18,8 @@ public class Log {
     @Override
     public String toString() {
         return "Log{" +
-                "mCodexIdentifier=" + mCodexIdentifier +
-                ", mData='" + mLogData + '\'' +
+                "mLogData='" + mLogData + '\'' +
+                ", mGlobalId=" + mGlobalId +
                 '}';
     }
 
@@ -30,17 +28,8 @@ public class Log {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Log log = (Log) o;
-        return Objects.equals(mCodexIdentifier, log.mCodexIdentifier) &&
+        return mGlobalId == log.mGlobalId &&
                 Objects.equals(mLogData, log.mLogData);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(mCodexIdentifier, mLogData);
-    }
-
-    public String getmCodexIdentifier() {
-        return mCodexIdentifier;
     }
 
     public String getmLogData() {

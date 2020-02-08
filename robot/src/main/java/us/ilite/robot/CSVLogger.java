@@ -1,72 +1,86 @@
 package us.ilite.robot;
 
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import us.ilite.common.CSVLoggerQueue;
-import us.ilite.common.Data;
-import us.ilite.common.Log;
 import us.ilite.common.config.Settings;
 
 import java.util.ArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class CSVLogger {
+    public static LinkedBlockingDeque<Log> kCSVLoggerQueue = new LinkedBlockingDeque<>();
+    private List<CSVWriter> mCSVWriters;
     private ILog mLogger = Logger.createLog(this.getClass());
-    private Data mData;
     private static final ScheduledExecutorService mExService =
             Executors.newSingleThreadScheduledExecutor((run)->new Thread(run, "My timer thread"));
     private ScheduledFuture<?> scheduledFuture;
+    private boolean mIsAcceptingToQueue;
 
-    public CSVLogger(Data pData ) {
-        mData = pData;
+    public CSVLogger( ) {
+        mCSVWriters = new ArrayList<>();
+        for ( RobotCodex c : Robot.DATA.mLoggedCodexes ) {
+            mCSVWriters.add( new CSVWriter( c ) );
+        }
+        mIsAcceptingToQueue = false;
+        logFromCodexToCSVHeader();
+        scheduledFuture = mExService.scheduleAtFixedRate(this::run, Settings.kSecondsToUpdateCSVLogger, Settings.kSecondsToUpdateCSVLogger, TimeUnit.SECONDS);
     }
 
     private void run() {
-        try {
-            ArrayList<Log> kTempCSVLogs = new ArrayList<>();
-            CSVLoggerQueue.kCSVLoggerQueue.drainTo(kTempCSVLogs);
+        if ( !kCSVLoggerQueue.isEmpty() ) {
+            try {
+                ArrayList<Log> kTempCSVLogs = new ArrayList<>();
+                kCSVLoggerQueue.drainTo(kTempCSVLogs);
 
-            for ( Log log : kTempCSVLogs ) {
-                mData.logFromCodexToCSVLog( log );
+                for ( Log log : kTempCSVLogs ) {
+                    logFromCodexToCSVLog( log );
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+    }
+
+    public void logFromCodexToCSVHeader() {
+        mCSVWriters.forEach(c -> c.writeHeader());
+    }
+    
+    public void logFromCodexToCSVLog( Log pLog ) {
+        for ( CSVWriter c : mCSVWriters ) {
+            if ( c.getMetaDataOfAssociatedCodex().gid().equals(pLog.getmGlobalId()) ) {
+                c.log( pLog.getmLogData() );
+            }
         }
     }
 
 
     /**
-     * Initiates the Executor Service
+     * Opens the queue
      */
     public void start() {
-        mLogger.error("Starting CSV Logging!!!!");
-        mData.logFromCodexToCSVHeader();
-        scheduledFuture = mExService.scheduleAtFixedRate(this::run, Settings.kSecondsToUpdateCSVLogger, Settings.kSecondsToUpdateCSVLogger, TimeUnit.SECONDS);
+        mIsAcceptingToQueue = true;
     }
 
     /**
-     * Ends the scheduled executor service when called
-     * Keep in mind that robot initialization and process sequencing in the Robot.class is weird and CSV logger must be compatible.
+     * Closes the queue
      */
     public void stop() {
+        mIsAcceptingToQueue = false;
+    }
 
-        scheduledFuture.cancel(true);
-        Robot.DATA.closeWriters();
-//        try {
-//            if(scheduledFuture != null) {
-//                scheduledFuture.cancel(true);
-//                if(true) {
-//                    throw new RuntimeException("Really?");
-//                }
-//                scheduledFuture = null;
-//            }
-//        }
-//        catch ( Exception e ) {
-//            e.printStackTrace();
-//        }
+    public void addToQueue( Log pLog ) {
+        if ( mIsAcceptingToQueue ) {
+            kCSVLoggerQueue.add( pLog );
+        }
+    }
+
+    /**
+     * Closes all the writers in mNetworkTableWriters
+     */
+    public void closeWriters() {
+        mCSVWriters.forEach(c -> c.closeWriter());
     }
 
 }
