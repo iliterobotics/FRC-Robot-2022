@@ -85,11 +85,11 @@ public class SimDriveHardware implements IDriveHardware {
     }
     
     public double getLeftInches() {
-        return DriveModule.Conversions.ticksToInches((int)mLeftEncoder.getPosition());
+        return DriveModule.ticksToInches((int)mLeftEncoder.getPosition());
     }
 
     public double getRightInches() {
-        return DriveModule.Conversions.ticksToInches((int)mRightEncoder.getPosition());
+        return DriveModule.ticksToInches((int)mRightEncoder.getPosition());
     }
 
     public double getLeftVelTicks() {
@@ -111,11 +111,11 @@ public class SimDriveHardware implements IDriveHardware {
     }
 
     public double getLeftVelInches() {
-        return DriveModule.Conversions.ticksPer100msToInchesPerSecond((int)mLeftEncoder.getVelocity());
+        return DriveModule.ticksPer100msToInchesPerSecond((int)mLeftEncoder.getVelocity());
     }
 
     public double getRightVelInches() {
-        return DriveModule.Conversions.ticksPer100msToInchesPerSecond((int)mRightEncoder.getVelocity());
+        return DriveModule.ticksPer100msToInchesPerSecond((int)mRightEncoder.getVelocity());
     }
 
     //TODO
