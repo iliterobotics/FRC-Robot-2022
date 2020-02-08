@@ -88,7 +88,7 @@ public class Limelight extends Module implements ITargetDataProvider {
             Robot.DATA.limelight.set(TSHORT,mTable.getEntry("tshort").getDouble(Double.NaN));
             Robot.DATA.limelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
             Robot.DATA.limelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
-            Robot. DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
+            Robot.DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
             if(mVisionTarget.equals(NONE)) {
                 Robot.DATA.limelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget.height()));
                 Robot.DATA.limelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
@@ -108,6 +108,7 @@ public class Limelight extends Module implements ITargetDataProvider {
         setStreamMode();
         setSnapshotMode();
         setPipeline();
+//        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, Robot.DATA.flywheel.get(ANGLE_FROM_HORIZON)); TODO Add angle functionality to flywheel module
     }
 
     @Override

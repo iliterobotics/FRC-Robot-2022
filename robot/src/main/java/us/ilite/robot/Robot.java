@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger = new CSVLogger(DATA);
-    private HangerModule mHanger = new HangerModule();
+    private HangerModule mHanger;
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
@@ -76,6 +76,7 @@ public class Robot extends TimedRobot {
         mLimelight = new Limelight();
         mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
+        mHanger = new HangerModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }

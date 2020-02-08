@@ -43,7 +43,9 @@ public enum ELimelightData {
     CALC_TARGET_X,          // The calculated x-position of the current target
     CALC_TARGET_Y,          // The calculated y-position of the current target
 
-    TARGET_ID;
+    TARGET_ID,
+
+    ANGLE_FROM_HORIZON;
 
 
     public enum LedMode {
