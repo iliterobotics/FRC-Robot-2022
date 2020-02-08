@@ -126,6 +126,10 @@ public class PowerCellModule extends Module {
         EIndexingState(boolean broken) {
             this.broken = broken;
         }
+
+        public boolean getState(){
+            return this.broken;
+        }
     }
 
     public PowerCellModule() {
