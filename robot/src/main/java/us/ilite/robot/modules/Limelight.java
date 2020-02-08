@@ -69,15 +69,17 @@ public class Limelight extends Module implements ITargetDataProvider {
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
         Robot.DATA.limelight.set(TARGET_ID, (double) NONE.id());
+//        mVisionTarget = Field2020.FieldElement.values()[(int)Robot.DATA.limelight.get(TARGET_ID)];
+        mVisionTarget = NONE;
     }
 
     @Override
     public void readInputs(double pNow) {
-        mVisionTarget = Robot.DATA.limelight.get(TARGET_ID, Field2020.FieldElement.class);
+
 //        mVisionTarget = Field2020.FieldElement.values()[Robot.DATA.limelight.get(TARGET_ID).intValue()];
 
-        boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
-        Robot.DATA.limelight.set(TV, targetValid ? 1.0d : null);
+        boolean targetValid = mTable.getEntry("tv").getDouble(Double.NaN) > 0.0;
+        Robot.DATA.limelight.set(TV, targetValid ? 1.0d : 0d);
 
         if(targetValid) {
             Robot.DATA.limelight.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
@@ -89,7 +91,7 @@ public class Limelight extends Module implements ITargetDataProvider {
             Robot.DATA.limelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
             Robot.DATA.limelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
             Robot.DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
-            if(mVisionTarget.equals(NONE)) {
+            if(Robot.DATA.limelight.get(TARGET_ID) != 0.0) {
                 Robot.DATA.limelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget.height()));
                 Robot.DATA.limelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
                 Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
