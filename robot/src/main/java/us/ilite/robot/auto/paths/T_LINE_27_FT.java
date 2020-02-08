@@ -1,8 +1,8 @@
-package us.ilite.paths;
+package us.ilite.robot.auto.paths;
 
 import com.team319.trajectory.Path;
 
-public class UNIT_TEST_STRAIGHT_LINE extends Path {
+public class T_LINE_27_FT extends Path {
    // dt,x,y,left.pos,left.vel,left.acc,left.jerk,center.pos,center.vel,center.acc,center.jerk,right.pos,right.vel,right.acc,right.jerk,heading
 	private static final double[][] points = {
 				{0.0200,0.0113,0.0000,0.0113,0.5640,28.2000,0.0000,0.0113,0.5640,28.2000,0.0000,0.0113,0.5640,28.2000,0.0000,0.0000},

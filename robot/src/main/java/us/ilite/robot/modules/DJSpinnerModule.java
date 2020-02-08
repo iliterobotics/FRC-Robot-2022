@@ -74,7 +74,7 @@ public class DJSpinnerModule extends Module {
         }
     }
 
-    private final VictorSPX mVictor = new VictorSPX( Settings.kDJBoothTalonId );
+    private final VictorSPX mVictor = new VictorSPX( Settings.Hardware.CAN.kDJBoothTalonId );
 
     private ColorSensorV3 mColorSensorV3;
     private final ColorMatch mColorMatcher = new ColorMatch();
@@ -115,15 +115,14 @@ public class DJSpinnerModule extends Module {
         db.color.set(EColorData.MEAURED_GREEN, c.green);
         db.color.set(EColorData.MEAURED_RED, c.red);
         ColorMatchResult match = mColorMatcher.matchClosestColor(c);
-        EColorMatch cm = EColorMatch.from(match);
-        db.color.set(EColorData.SENSED_COLOR, (double)cm.ordinal());
+        db.color.set(EColorData.SENSED_COLOR, EColorMatch.from(match));
         db.color.set(EColorData.WHEEL_ROTATION_COUNT, mSolidStateCounter);
     }
 
     @Override
     public void setOutputs(double pNow) {
         mVictor.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
-        if(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE) == EColorWheelState.ROTATION.ordinal()) {
+        if(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.class) == EColorWheelState.ROTATION) {
             if(eLastColorState.nextColor() == eCurrentColorState) {
                 mColorChangeCounter++;
             }

@@ -60,7 +60,7 @@ public class GroundTracking extends Module {
             Robot.DATA.rawLimelight.set(calcDistToTarget, Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
             Robot.DATA.rawLimelight.set(calcAngleToTarget, Robot.DATA.limelight.get(ELimelightData.CALC_ANGLE_TO_TARGET));
 
-            if (Robot.DATA.limelight.get(ELimelightData.TARGET_ID) != null) {
+            if (Robot.DATA.limelight.isSet(ELimelightData.TARGET_ID)) {
              //   Commented out for now until issue with enums isnt fixed
             //    Optional<Translation2d> p = Robot.DATA.limelight.get((Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE));
           //      if (p.isPresent()) {

@@ -1,6 +1,5 @@
 package us.ilite.robot.hardware;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANPIDController;
@@ -8,12 +7,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.util.Conversions;
-import us.ilite.common.types.drive.EDriveData;
-import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveMessage;
 import us.ilite.robot.modules.DriveModule;
 
+@Deprecated
 public class NeoDriveHardware implements IDriveHardware {
 
     private final ILog mLogger = Logger.createLog(NeoDriveHardware.class);
@@ -31,29 +28,25 @@ public class NeoDriveHardware implements IDriveHardware {
         // mGyro = new NavX(SerialPort.Port.kMXP);
         mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
 
-        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mLeftMiddle = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kDriveLeftMiddle, mLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(7, CANSparkMaxLowLevel.MotorType.kBrushless);//Settings.Hardware.CAN.kDriveLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mLeftMiddle = SparkMaxFactory.createFollowerSparkMax(5, mLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);//Settings.Hardware.CAN.kDriveLeftMiddle, mLeftMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        mRightMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kDriveRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mRightMiddle = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kDriveRightMiddle, mRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mRightMaster = SparkMaxFactory.createDefaultSparkMax(6, CANSparkMaxLowLevel.MotorType.kBrushless);//Settings.Hardware.CAN.kDriveRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mRightMiddle = SparkMaxFactory.createFollowerSparkMax(4, mRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);//Settings.Hardware.CAN.kDriveRightMiddle, mRightMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         configureMaster(mLeftMaster, true);
         configureMotor(mLeftMaster);
         configureMotor(mLeftMiddle);
-//        configureMotor(mLeftRear);
 
         configureMaster(mRightMaster, false);
         configureMotor(mRightMaster);
         configureMotor(mRightMiddle);
-//        configureMotor(mRightRear);
 
         mLeftMaster.setInverted(true);
         mLeftMiddle.setInverted(true);
-//        mLeftRear.setInverted(true);
 
         mRightMaster.setInverted(false);
         mRightMiddle.setInverted(false);
-//        mRightRear.setInverted(true);
 
         // Invert sensor readings by multiplying by 1 or -1
         mLeftMaster.getEncoder().setPositionConversionFactor(1.0 * kGearRatio);
@@ -62,10 +55,8 @@ public class NeoDriveHardware implements IDriveHardware {
         mRightMaster.getEncoder().setPositionConversionFactor(1.0 * kGearRatio);
         mRightMaster.getEncoder().setVelocityConversionFactor(1.0 * kGearRatio);
 
-
         reloadVelocityGains(mLeftMaster);
         reloadVelocityGains(mRightMaster);
-
     }
 
     @Override
@@ -108,8 +99,9 @@ public class NeoDriveHardware implements IDriveHardware {
     }
 
     public void setTarget(double pLeftPercentMaxVelocity, double pRightPercentMaxVelocity) {
-        mLeftMaster.getPIDController().setReference(pLeftPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
-        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
+//        mLeftMaster.getPIDController().setReference(pLeftPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
+//        mRightMaster.getPIDController().setReference(pRightPercentMaxVelocity * Settings.Drive.kDriveTrainMaxVelocity, ControlType.kVelocity, 1, 0);
+        System.out.println("---------------------------- LEFT CURRENT: " +  mLeftMaster.getOutputCurrent() + "      ||||||||||     RIGHT CURRENT " + mRightMaster.getOutputCurrent() + "\n");
     }
 
     /**
@@ -201,15 +193,17 @@ public class NeoDriveHardware implements IDriveHardware {
         mLogger.info("Reloading gains for Talon ID ", pSparkMax.getDeviceId());
 
         CANPIDController sparkMaxPid = pSparkMax.getPIDController();
-        HardwareUtils.setGains(sparkMaxPid, DriveModule.kVelocityPID);
+        HardwareUtils.setGains(sparkMaxPid, DriveModule.vPID);
     }
 
     private void configSparkForSmartMotion(CANSparkMax talon) {
         reloadVelocityGains(talon);
     }
 
-    private void configureAllForSmartMotion() {
-
+    private void configureAllForSmartMotion(CANSparkMax ... canSparkMaxes) {
+        for (CANSparkMax c : canSparkMaxes) {
+            configSparkForSmartMotion(c);
+        }
     }
 
     public double getLeftInches() {
@@ -218,7 +212,7 @@ public class NeoDriveHardware implements IDriveHardware {
 
     public double getRightInches() {
         return DriveModule.Conversions.ticksToInches(mRightMaster.getEncoder().getPosition());
-        
+
     }
 
     public double getLeftVelTicks() {

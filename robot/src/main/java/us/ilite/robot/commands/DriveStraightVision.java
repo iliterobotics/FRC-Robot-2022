@@ -1,24 +1,27 @@
 package us.ilite.robot.commands;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import us.ilite.common.Angle;
 import us.ilite.common.Data;
+import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.ELimelightData;
+import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.IMU;
 import us.ilite.robot.modules.DriveModule;
 
-public class DriveStraightVision extends CommandQueue {
+import static us.ilite.common.types.sensor.EGyro.HEADING_DEGREES;
 
-    private IMU mInitialImu;
+public class DriveStraightVision extends DriveStraight {
 
-    public DriveStraightVision(DriveModule pDrive, IMU pImu, Data pData, DriveStraight.EDriveControlMode pDriveControlMode, double pDistanceToDrive) {
-        mInitialImu = pDrive.getDriveHardware().getImu();
-        setCommands(
-                new FunctionalCommand(() -> pDrive.getDriveHardware().setImu(pImu)),
-                new DriveStraight(pDrive, pData, pDriveControlMode, pDistanceToDrive)
-                        .setTargetHeading(Rotation2d.fromDegrees(0.0))
-                        .setHeadingGains(Settings.kTargetAngleLockGains),
-                new FunctionalCommand(() -> pDrive.getDriveHardware().setImu(mInitialImu))
-        );
+
+    public DriveStraightVision(DriveStraight.EDriveControlMode pDriveControlMode, Distance pDistanceToDrive) {
+        super(pDriveControlMode, pDistanceToDrive);
+    }
+
+    @Override
+    protected Angle getHeading() {
+        return Angle.fromDegrees(Robot.DATA.limelight.get(ELimelightData.CALC_ANGLE_TO_TARGET));
     }
 
 }

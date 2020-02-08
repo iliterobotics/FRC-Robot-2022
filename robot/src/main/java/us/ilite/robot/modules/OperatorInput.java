@@ -7,6 +7,8 @@ import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
 
+import java.util.List;
+
 public class OperatorInput extends Module {
     protected static final double
             DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
@@ -14,16 +16,23 @@ public class OperatorInput extends Module {
 
     private Joystick mDriverJoystick;
     private Joystick mOperatorJoystick;
+    private EMatchMode mMode = EMatchMode.DISABLED;
 
     public OperatorInput() {
         mDriverJoystick = new Joystick(0);
         mOperatorJoystick = new Joystick(1);
-
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
 
+        if(mDriverJoystick.getType() == null) {
+            System.err.println("======= DRIVER JOYSTICK IS NOT PLUGGED IN =======");
+        }
+        if(mOperatorJoystick.getType() == null) {
+            System.err.println("======= OPERATOR JOYSTICK IS NOT PLUGGED IN =======");
+        }
+        mMode = pMode;
     }
 
     @Override
