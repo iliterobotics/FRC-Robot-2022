@@ -32,7 +32,7 @@ public class DriveModule extends Module {
 	public static double kDriveTrainMaxVelocityRPM = 5676;
 
 	// This is approx 290 Degrees per second
-	public static double kMaxDegreesPerSecond = Units.radians_to_degrees(5);
+	public static double kMaxDegreesPerCycle = Units.radians_to_degrees(5);
 
 	public static double kGearboxRatio = (12.0 / 80.0) * (42.0 / 80.0);
 	public static double kClosedLoopVoltageRampRate = 0.1 ;
@@ -153,8 +153,8 @@ public class DriveModule extends Module {
 //		mTargetAngleLockPid.reset();
 
 		mYawPid = new PIDController(kYawGains,
-									-kMaxDegreesPerSecond,
-				kMaxDegreesPerSecond,
+									-kMaxDegreesPerCycle,
+									kMaxDegreesPerCycle,
 									Settings.kControlLoopPeriod);
 		mYawPid.setOutputRange(-1, 1);
 
@@ -247,7 +247,7 @@ public class DriveModule extends Module {
 
 			case VELOCITY:
 				mStartHoldingPosition = false;
-				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerSecond);
+				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
 //				turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
