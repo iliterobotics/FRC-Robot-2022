@@ -72,6 +72,7 @@ public class TestController extends BaseManualController {
     }
 
     private void updateFlywheel() {
+        mLog.error("------------------------------------------------------CURRENT FLYWHEEL VELOCITY: " + db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
         if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
             if (db.limelight.isSet(ELimelightData.TV)) {
                 SmartDashboard.putNumber("Distance To Target", db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
@@ -80,7 +81,11 @@ public class TestController extends BaseManualController {
                 } else {
                     db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 2000);
                 }
+            } else {
+                db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 1000);
             }
+        } else {
+            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
         }
     }
 
