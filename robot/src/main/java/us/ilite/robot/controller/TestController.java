@@ -1,34 +1,23 @@
 package us.ilite.robot.controller;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.lang.EnumUtils;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import us.ilite.common.Data;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
-import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
-import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
-import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.*;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EPowerCellData;
-import us.ilite.common.types.EShooterSystemData;
+import static us.ilite.common.types.EPowerCellData.*;
 
 import java.util.List;
-
-import static us.ilite.common.config.InputMap.DRIVER.*;
-import static us.ilite.common.types.drive.EDriveData.*;
 
 public class TestController extends BaseManualController {
 
@@ -60,7 +49,13 @@ public class TestController extends BaseManualController {
             List<Enum<?>> enums =  EnumUtils.getEnums(db.mMappedCodex.get(key).meta().getEnum(), true);
             enums.stream().forEach(
                     e -> {
-                        tab.addNumber(e.name(), ()->db.mMappedCodex.get(key).get(e));
+                        tab.addNumber(e.name(), ()->{
+                            if(db.mMappedCodex.get(key).isSet(e)) {
+                                return db.mMappedCodex.get(key).get(e);
+                            } else {
+                                return 0d;
+                            }
+                        });
                     }
             );
         }
@@ -73,7 +68,7 @@ public class TestController extends BaseManualController {
         Robot.CLOCK.report("updateLimelightTargetLock", t->updateLimelightTargetLock());
         Robot.CLOCK.report("updateDrivetrain", t->updateDrivetrain(pNow));
         Robot.CLOCK.report("updateFlywheel", t->updateFlywheel(pNow));
-        Robot.CLOCK.report("updateIntake", t->updateIntake(pNow));
+        Robot.CLOCK.report("updateIntake", t-> updatePowerCells(pNow));
         Robot.CLOCK.report("updateHanger", t->updateHanger(pNow));
         Robot.CLOCK.report("updateDJBooth", t->updateDJBooth());
 //        updateArm(pNow);
@@ -190,26 +185,28 @@ public class TestController extends BaseManualController {
     }
 
 
-    private void updateIntake(double pNow) {
+    protected void updatePowerCells(double pNow) {
+        // Practice bot testing, min power
+        // Power of 1.0 was waaaaay too fast
+        if(db.operatorinput.isSet(ELogitech310.L_BTN)) {
+            db.powercell.set(UNUSED, 0.2);
+        }
 
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
+            setIntakeArmEnabled(pNow, true);
+            crossedEntry = activateSerializer(pNow);
+//            if (crossedEntry && !db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER)) {
+//                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, power);
+//                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, power);
+//            } else if ( db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER) ) {
+//                crossedEntry = false;
+//            }
 
-            if (db.powercell.isSet(EPowerCellData.ENTRY_BEAM_BREAKER)) {
-                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, 0.1);
-                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, 0.1);
-                crossedEntry = true;
-            } else {
-                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, 0.0);
-                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, 0.0);
-            }
-
-            if (crossedEntry && !db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER)) {
-                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, 0.1);
-                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, 0.1);
-            } else if ( db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER) ) {
-                crossedEntry = false;
-            }
-
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
+            reverseSerializer(pNow);
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.STOW_INTAKE)){
+            setIntakeArmEnabled(pNow, false);
+            crossedEntry = activateSerializer(pNow);
         }
 
 
@@ -264,14 +261,6 @@ public class TestController extends BaseManualController {
 //        }
 
     }
-        //Testing if statement
-
-//        if(db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-//            mLog.error("-------------------------------------------------------ispressed---------------");
-//            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, 0.25);
-//        } else {
-//            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, 0.0);
-//        }
 
     void updateDJBooth() {
         if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {

@@ -34,7 +34,7 @@ public class InputMap {
         INTAKE = ELogitech310.A_BTN,
         REVERSE_INTAKE = ELogitech310.X_BTN,
         LOWER_ARM = ELogitech310.Y_BTN,
-        HIGHER_ARM = ELogitech310.B_BTN;
+        STOW_INTAKE = ELogitech310.B_BTN;
     }
 
 }

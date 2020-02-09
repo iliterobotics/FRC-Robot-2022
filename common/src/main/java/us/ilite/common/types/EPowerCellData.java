@@ -4,20 +4,14 @@ import com.flybotix.hfr.codex.CodexOf;
 
 public enum EPowerCellData implements CodexOf<Double> {
     UNUSED,
-
-    ENTRY_BEAM_BREAKER,
-    SECONDARY_BREAM_BREAKER,
-    EXIT_BEAM_BREAKER,
+    ENTRY_BEAM,
+    SECONDARY_BREAM,
+    EXIT_BEAM,
 
     // etc - 1 per beam break sensor
 
     DESIRED_H_VELOCITY,
-    CURRENT_H_VELOCITY,
     DESIRED_V_VELOCITY,
-    CURRENT_V_VELOCITY,
-
-    DESIRED_INTAKE_VELOCITY, //Talon
-    CURRENT_INTAKE_VELOCITY,
 
     CURRENT_ARM_ANGLE,
     DESIRED_ARM_ANGLE,
@@ -30,5 +24,10 @@ public enum EPowerCellData implements CodexOf<Double> {
     CURRENT_AMOUNT_OF_SENSORS_BROKEN,
     DESIRED_AMOUNT_OF_SENSORS_BROKEN,
 
-    ALL_BEAMS_BROKEN;
+    ALL_BEAMS_BROKEN,
+
+    INTAKE_PIVOT_CURRENT,
+    INTAKE_ROLLER_CURRENT,
+    SERIALIZER_CURRENT,
+    VERTICAL_CURRENT
 }
