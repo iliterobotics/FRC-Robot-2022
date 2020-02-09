@@ -10,12 +10,16 @@ import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.types.input.ELogitech310;
+import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.*;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.EPowerCellData;
+
 import static us.ilite.common.types.EPowerCellData.*;
+import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
+import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
+import static us.ilite.robot.modules.DriveModule.kDriveNEOVelocityFactor;
 
 import java.util.List;
 
@@ -61,6 +65,8 @@ public class TestController extends BaseManualController {
         }
     }
 
+    private double mMaxSpeed = 0.0;
+    private double mMaxYaw = 0.0;
     protected void updateImpl(double pNow) {
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
@@ -72,6 +78,14 @@ public class TestController extends BaseManualController {
         Robot.CLOCK.report("updateHanger", t->updateHanger(pNow));
         Robot.CLOCK.report("updateDJBooth", t->updateDJBooth());
 //        updateArm(pNow);
+
+        double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
+        mMaxSpeed = Math.max(mMaxSpeed, spd);
+        SmartDashboard.putNumber("Max Robot Speed (ft/s)", mMaxSpeed);
+        SmartDashboard.putNumber("Max Drive RPM", mMaxSpeed / kDriveNEOVelocityFactor);
+
+        mMaxYaw = Math.max(mMaxYaw, db.imu.get(EGyro.YAW_OMEGA_DEGREES));
+        SmartDashboard.putNumber("Max Robot Omega (deg/s)", mMaxYaw);
     }
 
     private void updateHanger(double pNow){

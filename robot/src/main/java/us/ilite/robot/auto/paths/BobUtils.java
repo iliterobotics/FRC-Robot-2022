@@ -187,7 +187,7 @@ public class BobUtils {
      * Determines the path's maximum allotted time
      *  Caches the result for future use so this is only calculated once per path.
      * @param pPath
-     * @return
+     * @return path time in seconds
      */
     public static double getPathTotalTime(Path pPath) {
         String key = pPath.getClass().getSimpleName();
