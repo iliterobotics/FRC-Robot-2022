@@ -16,7 +16,7 @@ import us.ilite.common.types.EColorData;
 
 public class DJSpinnerModule extends Module {
 
-    public static final double sTARGET_ROTATION_COUNT = 32d;
+    public static final double TARGET_ROTATION_COUNT = 32.0;
     private ILog mLog = Logger.createLog( this.getClass());
 
     public enum EColorMatch {
