@@ -72,20 +72,30 @@ public class TestController extends BaseManualController {
     }
 
     private void updateFlywheel() {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
-            db.limelight.set( ELimelightData.TARGET_ID, 1 );
-            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY , db.flywheel.get(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED));
-        }
-        else {
-            db.limelight.set( ELimelightData.TARGET_ID, 0 );
+//        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
+//            db.limelight.set( ELimelightData.TARGET_ID, 1 );
+//            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY , db.flywheel.get(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED));
+//        }
+//        else {
+//            db.limelight.set( ELimelightData.TARGET_ID, 0 );
+//            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
+//        }
+//        db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, Robot.DATA.flywheel.get(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE));
+//        if (db.flywheel.get(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY) == 1) {
+//           db.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 1000);
+//        }
+//        else {
+//            db.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
+//        }
+        if (Math.abs(db.operatorinput.get(InputMap.OPERATOR.SHOOT_FLYWHEEL)) > 0.2) {
+            db.limelight.set(ELimelightData.TARGET_ID, 1);
+            if (db.limelight.isSet(ELimelightData.TY)) {
+                db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 2000);
+            } else {
+                db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 1000);
+            }
+        } else {
             db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
-        }
-        db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, Robot.DATA.flywheel.get(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE));
-        if (db.flywheel.get(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY) == 1) {
-           db.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 1000);
-        }
-        else {
-            db.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
         }
     }
 
