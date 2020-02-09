@@ -1,6 +1,7 @@
 package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
@@ -74,8 +75,7 @@ public class DJSpinnerModule extends Module {
         }
     }
 
-    private final VictorSPX mVictor = new VictorSPX( Settings.Hardware.CAN.kDJBoothTalonId );
-
+    private TalonFX mDJTalonFX;
     private ColorSensorV3 mColorSensorV3;
     private final ColorMatch mColorMatcher = new ColorMatch();
     private EColorMatch eDesiredColorState;
@@ -99,6 +99,7 @@ public class DJSpinnerModule extends Module {
         eDesiredColorState = EColorMatch.NONE;
         mIsDone = false;
         mMightBeDone = false;
+        mDJTalonFX = new TalonFX(50);
 
         for(EColorMatch cm : EColorMatch.values()) {
             if(cm != EColorMatch.NONE) {
