@@ -101,6 +101,8 @@ public class DriveModule extends Module {
 //	private PIDController mHoldLeftPositionPid;
 //	private PIDController mHoldRightPositionPid;
 	private boolean mStartHoldingPosition;
+	private double mLeftHoldSetpoint;
+	private double mRightHoldSetpoint;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
 	private double mLeftHoldSetpoint;
@@ -209,34 +211,32 @@ public class DriveModule extends Module {
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
-//			case HOLD:
-//				if (!mStartHoldingPosition) {
-//					mLeftHoldSetpoint = db.drivetrain.get(LEFT_POS_INCHES);
-//					mRightHoldSetpoint = db.drivetrain.get(RIGHT_POS_INCHES);
-//					mHoldLeftPositionPid.setSetpoint(db.drivetrain.get(LEFT_POS_INCHES));
-//					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));
-//					mStartHoldingPosition = true;
-//				}
-//
-//				if (db.drivetrain.get(LEFT_VEL_TICKS) < 50) {
-//					if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mLeftHoldSetpoint) > 2) {
-//						//					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
-//						//					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//						mLeftCtrl.setReference(Conversions.inchesToRotations(mLeftHoldSetpoint), kPosition, POSITION_PID_SLOT, 0);
-//					}
-//				} else {
-//					mLeftCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//				if (db.drivetrain.get(RIGHT_VEL_TICKS) < 50) {
-//					if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mRightHoldSetpoint) > 2) {
-//						//					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
-//						//					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//						mRightCtrl.setReference(Conversions.inchesToRotations(mRightHoldSetpoint), kPosition, POSITION_PID_SLOT, 0);
-//					}
-//				} else {
-//					mRightCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//				break;
+			case HOLD:
+				if (!mStartHoldingPosition) {
+					mLeftHoldSetpoint = db.drivetrain.get(LEFT_POS_INCHES);
+					mRightHoldSetpoint = db.drivetrain.get(RIGHT_POS_INCHES);
+					mRightMaster.getEncoder().setPosition(0.0);
+					mLeftMaster.getEncoder().setPosition(0.0);
+					mStartHoldingPosition = true;
+				}
+
+				if (db.drivetrain.get(LEFT_VEL_TICKS) < 100) {
+					if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mLeftHoldSetpoint) > 2) {
+						mLeftCtrl.setReference(inchesToRotations(mLeftHoldSetpoint), kPosition, POSITION_PID_SLOT, 0);
+					}
+				} else {
+					mLeftCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				}
+
+				if (db.drivetrain.get(RIGHT_VEL_TICKS) < 100) {
+					if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mRightHoldSetpoint) > 2) {
+						mRightCtrl.setReference(inchesToRotations(mRightHoldSetpoint), kPosition, POSITION_PID_SLOT, 0);
+					}
+				} else {
+					mRightCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				}
+				break;
+
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);

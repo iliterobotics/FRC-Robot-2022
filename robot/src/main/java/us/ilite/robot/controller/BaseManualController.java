@@ -26,7 +26,7 @@ public abstract class BaseManualController extends AbstractController {
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
 
         if(throttle == 0.0 && rotate == 0.0) {
-            db.drivetrain.set(DESIRED_STATE, EDriveState.VELOCITY);//HOLD);
+            db.drivetrain.set(DESIRED_STATE, EDriveState.HOLD);
             db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
             db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
         } else {
