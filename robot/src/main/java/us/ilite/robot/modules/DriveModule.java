@@ -116,8 +116,8 @@ public class DriveModule extends Module {
 	}
 
 	public DriveModule() {
-		mLeftMaster = SparkMaxFactory.createSparkMax(1/*Settings.Hardware.CAN.kDriveLeftMaster*/, kDriveConfig);
-		mLeftFollower = SparkMaxFactory.createSparkMax(3/*Settings.Hardware.CAN.kDriveLeftFollower*/, kDriveConfig);
+		mLeftMaster = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveLeftMaster, kDriveConfig);
+		mLeftFollower = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveLeftFollower, kDriveConfig);
 		mLeftFollower.follow(mLeftMaster);
 		mLeftEncoder = mLeftMaster.getEncoder();
 		mLeftCtrl = mLeftMaster.getPIDController();
@@ -246,12 +246,9 @@ public class DriveModule extends Module {
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerSecond);
-//				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-//				DriveMessage d = new DriveMessage().turn(turn).throttle(throttle).normalize();
+				turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-//				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 				mLeftCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				mRightCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				break;
