@@ -6,6 +6,8 @@ import us.ilite.common.*;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Utils;
 import us.ilite.common.types.EMatchMode;
+
+import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.drive.EDriveData;
@@ -34,6 +36,45 @@ public abstract class AbstractController {
             // Every 10s or so
             mCycleCount++;
         }
+    }
+
+    /**
+     * TODO - adjust arm angles
+     * @param pNow - Current Timestamp
+     * @param pEnabled if TRUE, the arm is put down and rollers activated; if FALSE, it is stowed
+     */
+    protected void setIntakeArmEnabled(double pNow, boolean pEnabled) {
+        if(pEnabled) {
+            double speed = Math.max(db.drivetrain.get(LEFT_VEL_IPS), db.drivetrain.get(RIGHT_VEL_IPS)) / 12.0;
+            db.powercell.set(DESIRED_ARM_ANGLE, 0d);
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, speed);
+        } else {
+            db.powercell.set(DESIRED_ARM_ANGLE, 90d);
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
+        }
+    }
+
+    /**
+     * Activates the serializer based upon the beam breaks. Assumes all other conditions are met.
+     * @param pNow
+     * @return
+     */
+    protected boolean activateSerializer(double pNow) {
+        double power =0.3;
+        if (db.powercell.isSet(ENTRY_BEAM)) {
+            db.powercell.set(DESIRED_H_VELOCITY, power);
+            db.powercell.set(DESIRED_V_VELOCITY, power);
+            return true;
+        } else {
+            db.powercell.set(DESIRED_H_VELOCITY, 0.0);
+            db.powercell.set(DESIRED_V_VELOCITY, 0.0);
+            return false;
+        }
+    }
+
+    protected void reverseSerializer(double pNow) {
+        db.powercell.set(DESIRED_H_VELOCITY, -1.0);
+        db.powercell.set(DESIRED_V_VELOCITY, -1.0);
     }
 
     /**
