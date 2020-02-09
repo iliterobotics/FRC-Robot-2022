@@ -21,7 +21,9 @@ import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
 import us.ilite.robot.hardware.TalonSRXFactory;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PowerCellModule extends Module {
 
@@ -47,7 +49,9 @@ public class PowerCellModule extends Module {
     private DigitalBeamSensor mExitBeam;
 
     private boolean allBeamsBroken;
-    private int beamsNotBrokenCycles;
+    private int mEntryBeamNotBrokenCycles = 0;
+    private int mSecondaryBeamNotBrokenCycles = 0;
+    private int mExitBeamNotBrokenCycles = 0;
 
 
 
@@ -168,6 +172,7 @@ public class PowerCellModule extends Module {
     @Override
     public void readInputs(double pNow) {
 //        mIntakeState = EIntakeState.values()[db.powercell.get(EPowerCellData.DESIRED_INTAKE_STATE).intValue()];
+        Object[] brokenArray = Arrays.stream(mDigitalBeamSensors).map(e -> !e.isBroken()).toArray();
 
         db.powercell.set(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN, List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count());
         db.powercell.set(EPowerCellData.CURRENT_INTAKE_VELOCITY, mIntakeRoller.getOutputCurrent());
@@ -175,9 +180,6 @@ public class PowerCellModule extends Module {
         db.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , mIntakePivotEncoder.getPosition());
         db.powercell.set(EPowerCellData.CURRENT_H_VELOCITY, mConveyorMotorHorizontal.getStatorCurrent());
         db.powercell.set(EPowerCellData.CURRENT_V_VELOCITY, mConveyorMotorVertical.getStatorCurrent());
-        db.powercell.set(EPowerCellData.ENTRY_BEAM_BREAKER, (mEntryBeam.isBroken()));
-        db.powercell.set(EPowerCellData.SECONDARY_BREAM_BREAKER, (mSecondaryBeam.isBroken()));
-        db.powercell.set(EPowerCellData.EXIT_BEAM_BREAKER, (mExitBeam.isBroken()));
 
         if(db.powercell.get(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN) >= 3.0){
             db.powercell.set(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN , (db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN )) + 1)  ;
@@ -186,13 +188,35 @@ public class PowerCellModule extends Module {
             db.powercell.set(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN , 3)  ;
         }
 
-        double currentSensorsBroken = db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN);
-        if (currentSensorsBroken < 3) {
-            beamsNotBrokenCycles++;
+//        double currentSensorsBroken = db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN);
+//        if (currentSensorsBroken < 3) {
+//            mEntryBeamNotBrokenCycles++;
+//        } else {
+//            mEntryBeamNotBrokenCycles = 0;
+//    }
+//        db.powercell.set(EPowerCellData.ALL_BEAMS_BROKEN, mEntryBeamNotBrokenCycles < 15);
+
+        if((boolean)brokenArray[0]) {
+            mEntryBeamNotBrokenCycles++;
         } else {
-            beamsNotBrokenCycles = 0;
+            mEntryBeamNotBrokenCycles = 0;
         }
-        db.powercell.set(EPowerCellData.ALL_BEAMS_BROKEN, beamsNotBrokenCycles < 15);
+
+        if((boolean)brokenArray[1]) {
+            mSecondaryBeamNotBrokenCycles++;
+        } else {
+            mSecondaryBeamNotBrokenCycles = 0;
+        }
+
+        if((boolean)brokenArray[2]) {
+            mExitBeamNotBrokenCycles++;
+        } else {
+            mExitBeamNotBrokenCycles = 0;
+        }
+
+        db.powercell.set(EPowerCellData.ENTRY_BEAM_BREAKER, mEntryBeamNotBrokenCycles > 15);//mEntryBeamNotBrokenCycles > 15);
+        db.powercell.set(EPowerCellData.SECONDARY_BREAM_BREAKER, mSecondaryBeamNotBrokenCycles > 15);
+        db.powercell.set(EPowerCellData.EXIT_BEAM_BREAKER, mExitBeamNotBrokenCycles > 15);
 
         //TODO Determine Indexer State
     }
@@ -235,6 +259,8 @@ public class PowerCellModule extends Module {
 
         mGoalBeamCountBroken = mBeamCountBroken + 1;
     }
+
+
     public void setIntakeState(EIntakeState pIntakeState){
         mIntakeState = pIntakeState;
     }
