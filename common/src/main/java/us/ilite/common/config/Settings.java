@@ -37,11 +37,8 @@ public class Settings {
             public static int kDJBoothTalonId = 72;
             public static int kHangerNeoID1 = 15;
             public static int kHangerNeoID2 = 71;
-            public static int kArmNEOAdress = 64;
-            public static int kCANIntakeID = 66; // Change later // Using the bunny bots flywheel id for now
-            public static int kTalonOneID = 63; // Change later
-            public static int kTalonTwoID = 67; // Change later
-            public static int kTalonThreeID = 65; // Change later
+            public static int kTalonVerticalID = 6; // Change later
+//            public static int kTalonThreeID = 65; // Change later
             public static final int kTurretGyroID = 61; // There isn't a gyro on the BunnyBot
             public static final int kShooterID = 66; // BunnyBot Shooter
             public static final int kAcceleratorID = 61; // BunnyBot Conveyor
@@ -62,6 +59,10 @@ public class Settings {
             public static int kDriveRightMaster = 3;
             public static int kDriveRightFollower = 4;
 
+            public static int kMAXIntakeArm = 7;
+            public static int kMAXIntakeRollerId = 8;
+            public static int kTalonPowerCellSerializer = 11;
+
             // ===== 2019 Drive =====
 //            public static  int kDriveLeftMaster = 1;
 //            public static int kDriveLeftFollower = 3;
@@ -74,9 +75,9 @@ public class Settings {
         }
 
         public static class DIO {
-            public static int kBeamChannel1; // Change later
-            public static int kBeamChannel2; // Change later
-            public static int kBeamChannel3; // Change later
+            public static int kEntryBeamChannel = 9;
+            public static int kSecondaryBeamChannel = 8; // Change later
+            public static int kExitBeamChannel = 7; // Change later
             public static final int kAnglerID = 8; // BunnyBot Catapult
         }
 
@@ -87,14 +88,6 @@ public class Settings {
         }
 
     }
-    public static class Arm {
-        // =============================================================================
-        // IMU Constants
-        // =============================================================================
-
-//        public static int kArmNeoAddress = 16;
-
-    }
 
     public static class Input {
 
@@ -102,6 +95,7 @@ public class Settings {
         // These are applied AFTER the normal throttle reduction
         public static double kSnailModePercentThrottleReduction = 0.5;
         public static double kSnailModePercentRotateReduction = 0.4;
+        public static double kMaxAllowedVelocityMultiplier = 0.1;
 
         // Applied after any scaling
         public static double kDriverInputTurnMaxMagnitude = 0.5;

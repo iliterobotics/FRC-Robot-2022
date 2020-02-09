@@ -55,7 +55,13 @@ public class DriveModule extends Module {
 	private static final int VELOCITY_PID_SLOT = 1;
 	private static final int POSITION_PID_SLOT = 2;
 	public static ProfileGains dPID = new ProfileGains().p(1.0).maxVelocity(5676d).maxAccel(56760d).slot(POSITION_PID_SLOT);
-	public static ProfileGains vPID = new ProfileGains().f(0.00015).p(0.0001).maxVelocity(5700d).maxAccel(1000d).slot(VELOCITY_PID_SLOT);
+	public static ProfileGains vPID = new ProfileGains()
+			.f(0.00015)
+			.p(0.0001)
+			// Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
+			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
+			.maxAccel(kDriveTrainMaxVelocityRPM*kDriveTrainMaxVelocityRPM)
+			.slot(VELOCITY_PID_SLOT);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
 
@@ -64,7 +70,6 @@ public class DriveModule extends Module {
 	// =============================================================================
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kYawGains = new ProfileGains().f(.15);
-	public static double kDriveLinearPercentOutputLimit = 0.5;
 	public IMU mGyro;
 
 	// =============================================================================
@@ -121,15 +126,15 @@ public class DriveModule extends Module {
 		mRightEncoder = mLeftMaster.getEncoder();
 		mRightCtrl = mRightMaster.getPIDController();
 		mRightCtrl.setOutputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
-		mRightMaster.setInverted(true);
-		mRightFollower.setInverted(true);
+		mLeftMaster.setInverted(true);
+		mLeftFollower.setInverted(true);
 		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
 
 
-		setPIDGains(mLeftCtrl, vPID);
-		setPIDGains(mRightCtrl, vPID);
-		setPIDGains(mLeftCtrl, dPID);
-		setPIDGains(mRightCtrl, dPID);
+		HardwareUtils.setGains(mLeftCtrl, vPID);
+		HardwareUtils.setGains(mRightCtrl, vPID);
+		HardwareUtils.setGains(mLeftCtrl, dPID);
+		HardwareUtils.setGains(mRightCtrl, dPID);
 		mLeftMaster.burnFlash();
 		mLeftFollower.burnFlash();
 		mRightMaster.burnFlash();
@@ -160,21 +165,11 @@ public class DriveModule extends Module {
 
 		mLeftMaster.getEncoder().setPosition(0.0);
 		mRightMaster.getEncoder().setPosition(0.0);
-		setPIDGains(mLeftCtrl, vPID);
-		setPIDGains(mRightCtrl, vPID);
-		setPIDGains(mLeftCtrl, dPID);
-		setPIDGains(mRightCtrl, dPID);
+		HardwareUtils.setGains(mLeftCtrl, vPID);
+		HardwareUtils.setGains(mRightCtrl, vPID);
+		HardwareUtils.setGains(mLeftCtrl, dPID);
+		HardwareUtils.setGains(mRightCtrl, dPID);
 
-	}
-
-	private void setPIDGains(CANPIDController pCtrl, ProfileGains pGains) {
-		pCtrl.setFF(pGains.F, pGains.PROFILE_SLOT);
-		pCtrl.setP(pGains.P, pGains.PROFILE_SLOT);
-		pCtrl.setI(pGains.I, pGains.PROFILE_SLOT);
-		pCtrl.setD(pGains.D, pGains.PROFILE_SLOT);
-		pCtrl.setSmartMotionMaxVelocity(pGains.MAX_VELOCITY, pGains.PROFILE_SLOT);
-		pCtrl.setSmartMotionMaxAccel(pGains.MAX_ACCEL, pGains.PROFILE_SLOT);
-		pCtrl.setSmartMotionAccelStrategy(CANPIDController.AccelStrategy.kSCurve, pGains.PROFILE_SLOT);
 	}
 
 	@Override
@@ -194,8 +189,8 @@ public class DriveModule extends Module {
 		Robot.DATA.imu.set(EGyro.HEADING_DEGREES, -mGyro.getHeading().getDegrees());
 
 //		mCurrentHeading = Robot.DATA.imu.get(EGyro.HEADING_DEGREES);
-		Robot.DATA.imu.set(EGyro.YAW_DEGREES, -mGyro.getYaw());
-		db.imu.set(EGyro.YAW_OMEGA_DEGREES, ( (-mGyro.getYaw())	 - mPreviousHeading ) / ( pNow - mPreviousTime ) );
+		Robot.DATA.imu.set(EGyro.YAW_DEGREES, -mGyro.getYaw().getDegrees());
+		db.imu.set(EGyro.YAW_OMEGA_DEGREES, ( (-mGyro.getYaw().getDegrees())	 - mPreviousHeading ) / ( pNow - mPreviousTime ) );
 
 	}
 
@@ -230,12 +225,12 @@ public class DriveModule extends Module {
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
 //				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
 //				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
-				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				mLeftCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				mRightCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				break;
 			case PERCENT_OUTPUT:
-				mLeftMaster.set(throttle+turn);
-				mRightMaster.set(throttle-turn);
+				mLeftMaster.set(throttle-turn);
+				mRightMaster.set(throttle+turn);
 				break;
 		}
 		mPreviousTime = pNow;

@@ -6,6 +6,7 @@ import java.util.Collections;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import us.ilite.common.Angle;
 import us.ilite.common.config.Settings;
 
 public class Pigeon extends IMU{
@@ -48,33 +49,23 @@ public class Pigeon extends IMU{
 		for(int i = 0 ; i < ypr.length; i++) {
 		  ypr[i] = Rotation2d.fromDegrees(ypr[i]).getDegrees();
 		}
-
-		double currentAccelX = getRawAccelX();
-		double currentAccelY = getRawAccelY();
-
-		mJerkX = (currentAccelX - mAccelerationX.getAverage()) / (pTimestampNow - mLastUpdate);
-		mJerkY = (currentAccelY - mAccelerationY.getAverage()) / (pTimestampNow - mLastUpdate);
-
 		mPigeon.getBiasedAccelerometer(xyz);
-		mAccelerationX.addNumber(currentAccelX);
-		mAccelerationY.addNumber(currentAccelY);
-		mLastUpdate = pTimestampNow;
 	}
 	
 	public Rotation2d getHeading() {
-	  return Rotation2d.fromDegrees(mPigeon.getFusedHeading());
+		return Rotation2d.fromDegrees(mPigeon.getFusedHeading());
 	}
 
-	public double getYaw() {
-    return ypr[0];
+	public Rotation2d getYaw() {
+    return Rotation2d.fromDegrees(ypr[0]);
 	}
 	
-	public double getPitch() {
-    return ypr[1];
+	public Rotation2d getPitch() {
+    	return Rotation2d.fromDegrees(ypr[1]);
 	}
 	
-	public double getRoll() {
-    return ypr[2];
+	public Rotation2d getRoll() {
+    	return Rotation2d.fromDegrees(ypr[2]);
 	}	
 	
 	public double getAccelX() {
