@@ -1,5 +1,6 @@
 package us.ilite.robot.modules;
 
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
@@ -11,8 +12,11 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Conversions;
 import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 
+import static us.ilite.common.types.ELimelightData.TV;
+import static us.ilite.common.types.ELimelightData.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.sensor.EGyro;
@@ -252,33 +256,32 @@ public class DriveModule extends Module {
 
 	public void loop(double pNow) {
 //		mUpdateTimer.start();
-//		mDriveState = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
-//		switch(mDriveState) {
+		mDriveState = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
+		switch(mDriveState) {
 //			case PATH_FOLLOWING:
 //				mDriveHardware.configureMode(ECommonControlMode.VELOCITY);
-//			case TARGET_ANGLE_LOCK:
+			case TARGET_ANGLE_LOCK:
 //				mDriveHardware.configureMode(ECommonControlMode.PERCENT_OUTPUT);
 //				mDriveHardware.set(DriveMessage.kNeutral);
-//				RobotCodex<ELimelightData> targetData = Robot.DATA.limelight;
-//				double pidOutput;
-//				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
-//
-//					//if there is a target in the limelight's fov, lock onto target using feedback loop
-//					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
-//					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-//
-//					double mTargetTrackingThrottle = db.drivetrain.get(TARGET_TRACKING_THROTTLE);
-//					mDriveMessage = new DriveMessage().throttle(mTargetTrackingThrottle).turn(pidOutput).calculateCurvature();
-//					// If we've already seen the target and lose tracking, exit.
-//				}
-//				break;
-//			case NORMAL:
-//				break;
-//			default:
-//				mLogger.warn("Got drivetrain state: " + mDriveState+" which is unhandled");
-//				break;
-//		}
-//		mPreviousTime = pNow;
+				RobotCodex<ELimelightData> targetData = Robot.DATA.limelight;
+				double pidOutput;
+				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
+
+					//if there is a target in the limelight's fov, lock onto target using feedback loop
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
+					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
+
+					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
+					// If we've already seen the target and lose tracking, exit.
+				}
+				break;
+			case NORMAL:
+				break;
+			default:
+				mLogger.warn("Got drivetrain state: " + mDriveState+" which is unhandled");
+				break;
+		}
+		mPreviousTime = pNow;
 //		mUpdateTimer.stop();
 	}
 
