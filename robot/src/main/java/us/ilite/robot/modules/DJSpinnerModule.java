@@ -39,9 +39,13 @@ public class DJSpinnerModule extends Module {
         }
 
         public EColorMatch nextColor() {
-            if(this == GREEN) {
+            if(this.ordinal() == GREEN.ordinal()) {
+                System.out.println(this);
                 return RED;
-            } else {
+            } else if (this.ordinal() == NONE.ordinal() ){
+                return NONE;
+            }
+            else {
                 return EColorMatch.values()[ordinal()+1];
             }
         }
@@ -96,6 +100,12 @@ public class DJSpinnerModule extends Module {
     private EColorWheelState eColorWheelState;
     private boolean mIsDone;
     private boolean mMightBeDone;
+    private int mRedTracker;
+    private int mBlueTracker;
+    private int mGreenTracker;
+    private int mYellowTracker;
+    private int total;
+
 
     public DJSpinnerModule() {
 
@@ -127,9 +137,38 @@ public class DJSpinnerModule extends Module {
         db.color.set(EColorData.MEAURED_RED, c.red);
         ColorMatchResult match = mColorMatcher.matchClosestColor(c);
         db.color.set(EColorData.SENSED_COLOR, EColorMatch.from(match));
-        db.color.set(EColorData.WHEEL_ROTATION_COUNT, mSolidStateCounter);
+        db.color.set(EColorData.WHEEL_ROTATION_COUNT, total);
         db.color.set(EColorData.CURRENT_MOTOR_POWER , mDJTalonFX.getStatorCurrent());
         SmartDashboard.putString("Detected Color: ", getEnumOfOrdinal( db.color.get( EColorData.SENSED_COLOR ) ).name() );
+
+        if(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.class) == EColorWheelState.ROTATION) {
+            SmartDashboard.putNumber("Number of color changes" , db.color.get(EColorData.WHEEL_ROTATION_COUNT));
+            if(eLastColorState.nextColor() == eCurrentColorState) {
+                incrementStateIterator( eCurrentColorState );
+                mColorChangeCounter++;
+            }
+            eLastColorState = eCurrentColorState;
+        }
+    }
+
+    public void incrementStateIterator( EColorMatch colorMatch ) {
+        if ( colorMatch.ordinal() == EColorMatch.RED.ordinal() ) {
+            mRedTracker++;
+        }
+        if ( colorMatch.ordinal() == EColorMatch.GREEN.ordinal() ) {
+            mGreenTracker++;
+        }if ( colorMatch.ordinal() == EColorMatch.BLUE.ordinal() ) {
+            mBlueTracker++;
+        }if ( colorMatch.ordinal() == EColorMatch.YELLOW.ordinal() ) {
+            mYellowTracker++;
+        }
+        total = mBlueTracker + mYellowTracker + mGreenTracker + mRedTracker;
+        SmartDashboard.putNumber("TOTAL COLORS" , total);
+        if (total >= 32 ){
+            mDJTalonFX.set(ControlMode.PercentOutput , 0.0);
+        }
+
+
     }
 
     public EColorMatch getEnumOfOrdinal( double d ) {
@@ -153,11 +192,8 @@ public class DJSpinnerModule extends Module {
     @Override
     public void setOutputs(double pNow) {
         mDJTalonFX.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
-        if(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.class) == EColorWheelState.ROTATION) {
-            if(eLastColorState.nextColor() == eCurrentColorState) {
-                mColorChangeCounter++;
-            }
-            eLastColorState = eCurrentColorState;
-        }
+
     }
+
+
 }

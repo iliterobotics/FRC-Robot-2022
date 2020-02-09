@@ -261,9 +261,9 @@ public class TestController extends BaseManualController {
     }
 
     void updateDJBooth(double pNow) {
-        if (db.operatorinput.isSet(ELogitech310.X_BTN)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
             db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.getPower());
-            int i = (int) (double) db.color.get(EColorData.SENSED_COLOR);
+            int i = (int) db.color.get(EColorData.SENSED_COLOR);
             DJSpinnerModule.EColorMatch m = DJSpinnerModule.EColorMatch.values()[i];
             Color DJ_COLOR = null;
             switch (db.recieveColorFmsRelay()) {
@@ -292,7 +292,7 @@ public class TestController extends BaseManualController {
             }
         }
         else if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL)) {
-
+            db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.getPower());
             if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.TARGET_ROTATION_COUNT) {
                 db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.OFF.ordinal());
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.getPower());
