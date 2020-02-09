@@ -26,7 +26,10 @@ public class DJSpinnerModule extends Module {
         GREEN(  0.197, 0.561, 0.240 ),
         NONE(0, 0, 0 );
         public Color color;
-        public double r, g, b;
+        public double r;
+        public double g;
+        public double b;
+
         EColorMatch(double r, double g, double b) {
             color = new Color(r,g,b);
         }

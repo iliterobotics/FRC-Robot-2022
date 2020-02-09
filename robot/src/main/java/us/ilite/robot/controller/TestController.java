@@ -39,20 +39,20 @@ public class TestController extends BaseManualController {
     private static TestController INSTANCE;
 
     public static TestController getInstance() {
-        if(INSTANCE == null) {
+        if (INSTANCE == null) {
             INSTANCE = new TestController();
         }
         return INSTANCE;
     }
 
     private TestController() {
-        for(String key : db.mMappedCodex.keySet()) {
+        for (String key : db.mMappedCodex.keySet()) {
             ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
-            List<Enum<?>> enums =  EnumUtils.getEnums(db.mMappedCodex.get(key).meta().getEnum(), true);
+            List<Enum<?>> enums = EnumUtils.getEnums(db.mMappedCodex.get(key).meta().getEnum(), true);
             enums.stream().forEach(
                     e -> {
-                        tab.addNumber(e.name(), ()->{
-                            if(db.mMappedCodex.get(key).isSet(e)) {
+                        tab.addNumber(e.name(), () -> {
+                            if (db.mMappedCodex.get(key).isSet(e)) {
                                 return db.mMappedCodex.get(key).get(e);
                             } else {
                                 return 0d;
@@ -67,20 +67,19 @@ public class TestController extends BaseManualController {
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        Robot.CLOCK.report("updateLimelightTargetLock", t->updateLimelightTargetLock());
-        Robot.CLOCK.report("updateDrivetrain", t->updateDrivetrain(pNow));
-        Robot.CLOCK.report("updateFlywheel", t->updateFlywheel(pNow));
-        Robot.CLOCK.report("updateIntake", t-> updatePowerCells(pNow));
-        Robot.CLOCK.report("updateHanger", t->updateHanger(pNow));
-        Robot.CLOCK.report("updateDJBooth", t->updateDJBooth());
+        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
+        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
+        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
+        Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
+        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
+        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth());
 //        updateArm(pNow);
     }
 
-    private void updateHanger(double pNow){
-        if(db.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION , 17.0);
-        }
-        else {
+    private void updateHanger(double pNow) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)) {
+            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 17.0);
+        } else {
             Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 0.0);
         }
 
@@ -153,14 +152,14 @@ public class TestController extends BaseManualController {
             if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
                 SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
             }
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
+            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
             if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
                 if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
                     Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET_ZOOM.id());
                     System.out.println("ZOOMING");
                 } else {
-                    Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
+                    Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
                 }
             } else {
                 Robot.DATA.selectedTarget.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
@@ -171,26 +170,25 @@ public class TestController extends BaseManualController {
             Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_DUAL.id());
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
             Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_TRI.id());
-        }
-        else {
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double)Limelight.NONE.id());
+        } else {
+            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Limelight.NONE.id());
 //            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
         }
-        if ((Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) != (mLastTrackingType) )
+        if ((Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) != (mLastTrackingType))
                 && !(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) == Limelight.NONE.id())) {
             mLog.error("Requesting command start");
             mLog.error("Stopping teleop command queue");
 //            mTeleopCommandManager.stopRunningCommands(pNow);
 //            mTeleopCommandManager.startCommands(new LimelightTargetLock(mDrive, mLimelight, 2, mTrackingType, this, false).setStopWhenTargetLost(false));
         }
-        mLastTrackingType =  Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
+        mLastTrackingType = Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
 
 
     protected void updatePowerCells(double pNow) {
         // Practice bot testing, min power
         // Power of 1.0 was waaaaay too fast
-        if(db.operatorinput.isSet(ELogitech310.L_BTN)) {
+        if (db.operatorinput.isSet(ELogitech310.L_BTN)) {
             db.powercell.set(UNUSED, 0.2);
         }
 
@@ -206,12 +204,10 @@ public class TestController extends BaseManualController {
 
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
             reverseSerializer(pNow);
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.STOW_INTAKE)){
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.STOW_INTAKE)) {
             setIntakeArmEnabled(pNow, false);
             crossedEntry = activateSerializer(pNow);
         }
-
-
 
 
 //        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
@@ -265,9 +261,9 @@ public class TestController extends BaseManualController {
     }
 
     void updateDJBooth() {
-        if ( db.operatorinput.isSet(ELogitech310.X_BTN)) {
-            db.color.set(EColorData.DESIRED_MOTOR_POWER , DJSpinnerModule.EColorWheelState.POSITION.getPower());
-            int i = (int)(double)db.color.get(EColorData.SENSED_COLOR);
+        if (db.operatorinput.isSet(ELogitech310.X_BTN)) {
+            db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.getPower());
+            int i = (int) (double) db.color.get(EColorData.SENSED_COLOR);
             DJSpinnerModule.EColorMatch m = DJSpinnerModule.EColorMatch.values()[i];
             Color DJ_COLOR = null;
             switch (db.recieveColorFmsRelay()) {
@@ -287,7 +283,7 @@ public class TestController extends BaseManualController {
                     DJ_COLOR = null;
                     break;
             }
-            if(m.color.equals(DJ_COLOR)) {
+            if (m.color.equals(DJ_COLOR)) {
                 //TODO stop using the module for the desired power
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
             } else {
@@ -295,19 +291,20 @@ public class TestController extends BaseManualController {
                 db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.POSITION.ordinal());
             }
         }
-        else if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL)) {
-
-            if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.sTARGET_ROTATION_COUNT) {
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.OFF.ordinal());
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
-            } else {
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.ROTATION.ordinal());
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.power);
-            }
-        }
+//        else if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL)) {
+//
+//            if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.sTARGET_ROTATION_COUNT) {
+//                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.OFF.ordinal());
+//                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
+//            } else {
+//                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.ROTATION.ordinal());
+//                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.power);
+//            }
+//        }
 
     }
 }
+
 
 
 //    void updateDJBooth() {
