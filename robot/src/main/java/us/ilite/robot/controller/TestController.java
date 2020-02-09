@@ -265,8 +265,9 @@ public class TestController extends BaseManualController {
     }
 
     void updateDJBooth() {
-        if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
-                int i = (int)(double)db.color.get(EColorData.SENSED_COLOR);
+        if ( db.operatorinput.isSet(ELogitech310.X_BTN)) {
+            db.color.set(EColorData.DESIRED_MOTOR_POWER , DJSpinnerModule.EColorWheelState.POSITION.getPower());
+            int i = (int)(double)db.color.get(EColorData.SENSED_COLOR);
             DJSpinnerModule.EColorMatch m = DJSpinnerModule.EColorMatch.values()[i];
             Color DJ_COLOR = null;
             switch (db.recieveColorFmsRelay()) {

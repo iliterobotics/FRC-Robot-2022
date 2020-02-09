@@ -108,13 +108,14 @@ public class Data {
     }
 
     public char recieveColorFmsRelay() {
-        String gameData;
-        gameData = DriverStation.getInstance().getGameSpecificMessage();
-        if(gameData.length() > 0) {
-            return gameData.charAt(0);
-        } else {
-            return '\u1000';
-        }
+//        String gameData;
+//        gameData = DriverStation.getInstance().getGameSpecificMessage();
+//        if(gameData.length() > 0) {
+//            return gameData.charAt(0);
+//        } else {
+//            return '\u1000';
+
+        return 'R';
     }
 
 }

@@ -3,10 +3,13 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EColorData;
@@ -14,6 +17,7 @@ import us.ilite.common.types.EColorData;
 public class DJSpinnerModule extends Module {
 
     public static final double sTARGET_ROTATION_COUNT = 32d;
+    private ILog mLog = Logger.createLog( this.getClass());
 
     public enum EColorMatch {
         RED( 0.561, 0.232, 0.114 ),
@@ -70,6 +74,9 @@ public class DJSpinnerModule extends Module {
             power = _power;
         }
 
+        public double getPower(){
+            return this.power;
+        }
         public static EColorWheelState valueOf(double pOrdinal) {
             return values()[(int)pOrdinal];
         }
@@ -118,11 +125,31 @@ public class DJSpinnerModule extends Module {
         ColorMatchResult match = mColorMatcher.matchClosestColor(c);
         db.color.set(EColorData.SENSED_COLOR, EColorMatch.from(match));
         db.color.set(EColorData.WHEEL_ROTATION_COUNT, mSolidStateCounter);
+        db.color.set(EColorData.CURRENT_MOTOR_POWER , mDJTalonFX.getStatorCurrent());
+        SmartDashboard.putString("Detected Color: ", getEnumOfOrdinal( db.color.get( EColorData.SENSED_COLOR ) ).name() );
+    }
+
+    public EColorMatch getEnumOfOrdinal( double d ) {
+        if ( d == EColorMatch.RED.ordinal() ) {
+            return EColorMatch.RED;
+        }
+        else if ( d == EColorMatch.BLUE.ordinal() ) {
+            return EColorMatch.BLUE;
+        }
+        else if ( d == EColorMatch.GREEN.ordinal() ) {
+            return EColorMatch.GREEN;
+        }
+        else if ( d == EColorMatch.YELLOW.ordinal() ) {
+            return EColorMatch.YELLOW;
+        }
+        else {
+            return EColorMatch.NONE;
+        }
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mDJTalonFX.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
+        mDJTalonFX.set(ControlMode.PercentOutput, 0.8);
         if(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.class) == EColorWheelState.ROTATION) {
             if(eLastColorState.nextColor() == eCurrentColorState) {
                 mColorChangeCounter++;
