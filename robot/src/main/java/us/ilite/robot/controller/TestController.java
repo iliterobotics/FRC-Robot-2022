@@ -238,7 +238,7 @@ public class TestController extends BaseManualController {
                     break;
             }
             if(m.color.equals(DJ_COLOR)) {
-
+                //TODO stop using the module for the desired power
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
             } else {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.power);
