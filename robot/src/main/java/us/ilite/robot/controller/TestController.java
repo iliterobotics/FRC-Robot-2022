@@ -72,7 +72,7 @@ public class TestController extends BaseManualController {
         Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
         Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
-        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth());
+        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
 //        updateArm(pNow);
     }
 
@@ -260,7 +260,7 @@ public class TestController extends BaseManualController {
 
     }
 
-    void updateDJBooth() {
+    void updateDJBooth(double pNow) {
         if (db.operatorinput.isSet(ELogitech310.X_BTN)) {
             db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.getPower());
             int i = (int) (double) db.color.get(EColorData.SENSED_COLOR);
