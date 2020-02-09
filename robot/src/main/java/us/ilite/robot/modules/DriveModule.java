@@ -98,8 +98,8 @@ public class DriveModule extends Module {
 
 	private PIDController mTargetAngleLockPid;
 	private PIDController mYawPid;
-	private PIDController mHoldLeftPositionPid;
-	private PIDController mHoldRightPositionPid;
+//	private PIDController mHoldLeftPositionPid;
+//	private PIDController mHoldRightPositionPid;
 	private boolean mStartHoldingPosition;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
@@ -150,23 +150,24 @@ public class DriveModule extends Module {
 
 	@Override
 	public void modeInit(EMatchMode pMode, double pNow) {
-//		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
-//		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
-//		mTargetAngleLockPid.setSetpoint(0);
-//		mTargetAngleLockPid.reset();
+		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
+		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
+		mTargetAngleLockPid.setSetpoint(0);
+		mTargetAngleLockPid.reset();
 
 		mYawPid = new PIDController(kYawGains,
 									-kMaxDegreesPerCycle,
 									kMaxDegreesPerCycle,
 									Settings.kControlLoopPeriod);
 		mYawPid.setOutputRange(-1, 1);
+		mYawPid.reset();
 
-		mHoldLeftPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-		mHoldLeftPositionPid.setOutputRange(-1, 1);
-		mHoldLeftPositionPid.setSetpoint(0.0);
-		mHoldRightPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-		mHoldRightPositionPid.setOutputRange(-1, 1);
-		mHoldRightPositionPid.setSetpoint(0.0);
+//		mHoldLeftPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
+//		mHoldLeftPositionPid.setOutputRange(-1, 1);
+//		mHoldLeftPositionPid.setSetpoint(0.0);
+//		mHoldRightPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
+//		mHoldRightPositionPid.setOutputRange(-1, 1);
+//		mHoldRightPositionPid.setSetpoint(0.0);
 		mStartHoldingPosition = false;
 		mLeftHoldSetpoint = 0.0;
 		mRightHoldSetpoint = 0.0;

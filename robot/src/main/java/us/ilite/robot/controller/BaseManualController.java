@@ -1,5 +1,6 @@
 package us.ilite.robot.controller;
 
+import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.robot.modules.DriveMessage;
@@ -41,7 +42,11 @@ public abstract class BaseManualController extends AbstractController {
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
             }
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
-            db.drivetrain.set(DESIRED_TURN_PCT, rotate);
+
+            //TODO - Button here is bound to change once everything is integrated
+            if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_BALL)) {
+                db.drivetrain.set(DESIRED_TURN_PCT, rotate);
+            }
         }
 
     }
