@@ -23,14 +23,16 @@ public class FlywheelModule extends Module {
     private double mPreviousTime;
 
     private final int kFlywheelFalconPIDSlot = 0;
+    private final int kMaxFalconVelocity = 6380;
 
     public FlywheelModule() {
         mFlywheelFalcon = new TalonFX(50);
         mFlywheelFeeder = SparkMaxFactory.createDefaultSparkMax(9 , CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        mFlywheelFalcon.config_kP(kFlywheelFalconPIDSlot, 0.005);
+        mFlywheelFalcon.config_kP(kFlywheelFalconPIDSlot, 0.25);
         mFlywheelFalcon.config_kI(kFlywheelFalconPIDSlot, 0);
         mFlywheelFalcon.config_kD(kFlywheelFalconPIDSlot, 0);
+        mFlywheelFalcon.config_kF(kFlywheelFalconPIDSlot, 0);
     }
 
     private boolean isMaxVelocity() {
@@ -65,16 +67,14 @@ public class FlywheelModule extends Module {
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
 
         SmartDashboard.putNumber("Flywheel Current Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
-        SmartDashboard.putNumber("Flywheel Target Velocity", Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
 
         Shuffleboard.addEventMarker("Flywheel Current Velocity", EventImportance.kHigh);
-        Shuffleboard.addEventMarker("Flywheel Target Velocity", EventImportance.kHigh);
     }
 
     @Override
     public void readInputs(double pNow) {
         Distance distanceFromTarget = Distance.fromInches(Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, mFlywheelFalcon.getSelectedSensorVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, DriveModule.Conversions.ticksPer100msToRotationsPerSecond(mFlywheelFalcon.getSelectedSensorVelocity()));
 
         if (isMaxVelocity()) {
             Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY, 1);
@@ -83,11 +83,10 @@ public class FlywheelModule extends Module {
         }
 
         if (targetValid(ELimelightData.TY) && Robot.DATA.limelight.get( ELimelightData.CURRENT_PIPELINE ) == 1 ) {
-//            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, calcSpeedFromDistance(Distance.fromInches(Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET))));
             Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, calcSpeedFromDistance(distanceFromTarget));
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, calcAngleFromDistance(distanceFromTarget));
         } else {
-            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, 1250);
+            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, 2000);
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, 60);
         }
     }
