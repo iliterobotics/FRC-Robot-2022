@@ -133,7 +133,6 @@ public class DriveModule extends Module {
 		mLeftFollower.setInverted(true);
 		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
 
-
 		setPIDGains(mLeftCtrl, vPID);
 		setPIDGains(mRightCtrl, vPID);
 		setPIDGains(mLeftCtrl, dPID);
