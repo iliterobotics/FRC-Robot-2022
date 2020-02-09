@@ -17,6 +17,7 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.BaseAutonController;
 import us.ilite.robot.controller.TeleopController;
@@ -37,13 +38,13 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-    private CSVLogger mCSVLogger = new CSVLogger();
+    public static final CSVLogger mCSVLogger = new CSVLogger();
     private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
     private Limelight mLimelight;
-//    private PowerCellModule mIntake;
+    //    private PowerCellModule mIntake;
     private RawLimelight mRawLimelight;
     private DJSpinnerModule mDJSpinnerModule;
     private SimulationModule mSimulation;
@@ -80,6 +81,8 @@ public class Robot extends TimedRobot {
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
+
+        mCSVLogger.start();
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -128,7 +131,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        mCSVLogger.start();
+        //mCSVLogger.start();
         MODE=AUTONOMOUS;
         mActiveController = mBaseAutonController;
         mActiveController.setEnabled(true);
@@ -141,7 +144,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        mCSVLogger.start();
+        //mCSVLogger.start();
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -158,7 +161,7 @@ public class Robot extends TimedRobot {
         mLogger.info("Disabled Initialization");
 
         mRunningModules.shutdown(CLOCK.getCurrentTime());
-        mCSVLogger.stop();
+        //mCSVLogger.stop();
 
         if(mActiveController != null) {
             mActiveController.setEnabled(false);
@@ -173,7 +176,7 @@ public class Robot extends TimedRobot {
     @Override
     public void testInit() {
         if(mTestController == null) {
-             mTestController = TestController.getInstance();
+            mTestController = TestController.getInstance();
         }
         MODE = TEST;
         mActiveController = mTestController;
@@ -202,14 +205,19 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
+        SmartDashboard.putNumber("Driver Input A", DATA.driverinput.get(ELogitech310.A_BTN));
+//        mLogger.error("----ABtn State:  " + DATA.driverinput.isSet( ELogitech310.A_BTN ) );
         for (RobotCodex c : DATA.mLoggedCodexes ) {
-            mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
+            if ( c.meta().gid() == DATA.driverinput.meta().gid() ) {
+//                mLogger.error("----ABtn State:  " + DATA.driverinput.isSet( ELogitech310.A_BTN ) );
+            }
+            Robot.mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
         }
         for ( RobotCodex c : DATA.mAllCodexes ) {
             c.reset();
         }
-
 //        EPowerDistPanel.map(mData.pdp, pdp);
+
         mRunningModules.readInputs(CLOCK.getCurrentTime());
         mActiveController.update(CLOCK.getCurrentTime());
         mRunningModules.setOutputs(CLOCK.getCurrentTime());
@@ -222,9 +230,7 @@ public class Robot extends TimedRobot {
             mMatchMeta = new MatchMetadata();
             int gid = mMatchMeta.hash;
             for (RobotCodex c : DATA.mAllCodexes) {
-                if ( !c.meta().getEnum().getSimpleName().equals("ELogitech310")) {
-                    c.meta().setGlobalId(gid);
-                }
+                c.meta().setGlobalId(gid);
             }
         }
     }

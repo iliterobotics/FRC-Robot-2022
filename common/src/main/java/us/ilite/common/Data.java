@@ -10,9 +10,6 @@ import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +25,7 @@ public class Data {
     //Add new codexes here as we need more
 
     public static final double NULL_CODEX_VALUE = Double.NaN;
-    public final RobotCodex<EGyro> imu = new RobotCodex(Double.NaN, EGyro.class);
+    public final RobotCodex<EGyro> imu = new RobotCodex(NULL_CODEX_VALUE, EGyro.class);
     public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
@@ -49,6 +46,9 @@ public class Data {
             driverinput,
             operatorinput,
             pdp,
+            rawLimelight,
+            selectedTarget,
+            flywheel,
             powercell,
             hanger,
             limelight,
@@ -86,25 +86,6 @@ public class Data {
 
     public Data() {
         this(true);
-    }
-
-    /**
-     * Makes the log file if it doesn't already exist
-     */
-    public static void handleCreation(File pFile) {
-        //Makes every folder before the file if the CSV's parent folder doesn't exist
-        if(Files.notExists(pFile.toPath())) {
-            pFile.getAbsoluteFile().getParentFile().mkdirs();
-        }
-
-        //Creates the .CSV if it doesn't exist
-        if(!pFile.exists()) {
-            try {
-                pFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 }

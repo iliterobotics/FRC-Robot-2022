@@ -1,33 +1,25 @@
 package us.ilite.robot.controller;
 
-import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.lang.EnumUtils;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import us.ilite.common.Data;
-import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
-import us.ilite.common.types.input.EInputScale;
-import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
-import us.ilite.common.types.input.EInputScale;
-import us.ilite.common.types.input.ELogitech310;
-import us.ilite.robot.Robot;
-import us.ilite.robot.modules.*;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EColorData;
 import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EPowerCellData;
-import us.ilite.common.types.EShooterSystemData;
+import us.ilite.robot.Robot;
+import us.ilite.robot.modules.DJSpinnerModule;
+import us.ilite.robot.modules.Limelight;
+import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
 
-import static us.ilite.common.config.InputMap.DRIVER.*;
-import static us.ilite.common.types.drive.EDriveData.*;
+import static us.ilite.robot.Robot.DATA;
 
 public class TestController extends BaseManualController {
 
@@ -76,10 +68,10 @@ public class TestController extends BaseManualController {
 
     private void updateHanger(double pNow){
         if(db.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)){
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION , 17.0);
+            DATA.hanger.set(EHangerModuleData.DESIRED_POSITION , 17.0);
         }
         else {
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 0.0);
+            DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 0.0);
         }
 
     }
@@ -147,43 +139,44 @@ public class TestController extends BaseManualController {
     }
 
     public void updateLimelightTargetLock() {
-        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-            if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
-                SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
+        if (DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
+            if (DATA.selectedTarget.isSet(ELimelightData.TY)) {
+                SmartDashboard.putNumber("Distance to Target", DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
             }
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
-            if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
-                if (Math.abs(Robot.DATA.selectedTarget.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
-                    Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET_ZOOM.id());
+            DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
+        } else if (DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
+            if (DATA.selectedTarget.isSet(ELimelightData.TY)) {
+                if (Math.abs(DATA.selectedTarget.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
+                    DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET_ZOOM.id());
                     System.out.println("ZOOMING");
                 } else {
-                    Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
+                    DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id() );
                 }
             } else {
-                   Robot.DATA.selectedTarget.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
+                   DATA.selectedTarget.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
             }
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL.id());
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_DUAL.id());
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
-            Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_TRI.id());
+        } else if (DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
+            DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL.id());
+        } else if (DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
+            DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_DUAL.id());
+        } else if (DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
+            DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.BALL_TRI.id());
         }
         else {
-                Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double)Limelight.NONE.id());
+                DATA.limelight.set(ELimelightData.TARGET_ID, (double)Limelight.NONE.id());
 //            if(mTeleopCommandManager.isRunningCommands()) mTeleopCommandManager.stopRunningCommands(pNow);
         }
-        if ((Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) != (mLastTrackingType) )
-                && !(Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) == Limelight.NONE.id())) {
+        if ((DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) != (mLastTrackingType) )
+                && !(DATA.limelight.get(ELimelightData.TARGET_ID.ordinal()) == Limelight.NONE.id())) {
                 mLog.error("Requesting command start");
                 mLog.error("Stopping teleop command queue");
 //            mTeleopCommandManager.stopRunningCommands(pNow);
 //            mTeleopCommandManager.startCommands(new LimelightTargetLock(mDrive, mLimelight, 2, mTrackingType, this, false).setStopWhenTargetLost(false));
         }
-        mLastTrackingType =  Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
+        mLastTrackingType =  DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
 
+    //
 
     private void updateIntake(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {

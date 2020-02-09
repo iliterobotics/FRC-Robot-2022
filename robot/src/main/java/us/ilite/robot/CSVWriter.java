@@ -5,65 +5,88 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
-import us.ilite.common.Data;
-import us.ilite.common.config.Settings;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Optional;
 
 import static us.ilite.robot.CSVLogger.kCSVLoggerQueue;
 
 public class CSVWriter {
 
-    public static final String USB_DIR = "/u";
+    public static final String USB_DIR = "/w";
     public static final String USER_DIR = System.getProperty("user.home");
     private static final String LOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
+    private static final String eventName = new SimpleDateFormat("MM-dd-YYYY_HH-mm-ss").format(Calendar.getInstance().getTime());
 
     private final ILog mLog = Logger.createLog(CSVWriter.class);
     private static int mLogFailures;
 
     private RobotCodex<?> mCodex;
-    private final Optional<BufferedWriter> writer;
+    private BufferedWriter writer;
 
     public CSVWriter(RobotCodex<?> pCodex) {
+
         mCodex = pCodex;
 
         mLogFailures = 0;
         File file = file();
-        Data.handleCreation( file );
+        handleCreation( file );
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter( new FileWriter( file ) );
         } catch (IOException pE) {
             System.out.println( pE.getLocalizedMessage() );
         }
-        writer = Optional.ofNullable( bw );
+        writer = bw;
+    }
+
+    public void handleCreation(File pFile) {
+        //Makes every folder before the file if the CSV's parent folder doesn't exist
+        if(Files.notExists(pFile.toPath())) {
+            mLog.error( pFile.getAbsoluteFile().getParentFile().mkdirs() );
+        }
+
+        //Creates the .CSV if it doesn't exist
+        if(!pFile.exists()) {
+            try {
+                pFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void log( String s ) {
-        if ( writer.isPresent() ) {
+//        if ( writer.isPresent() ) {
             try {
-                writer.get().append( s );
-                writer.get().newLine();
+                writer.append( s );
+                writer.newLine();
             } catch (IOException pE) {
                 pE.printStackTrace();
             }
-        }
-        else {
-            if ( mLogFailures < Settings.kAcceptableLogFailures ) {
-                mLog.error( "Could not find Path: \"" + USB_DIR + "\" on roborio! Try plugging in the USB." );
-                mLogFailures++;
-            }
-            else if ( mLogFailures == Settings.kAcceptableLogFailures ) {
-                mLog.error("---------------------CSV LOGGING DISABLED----------------------");
-                mLogFailures++;
-            }
-        }
+//        }
+//        else {
+//            if ( mLogFailures < Settings.kAcceptableLogFailures ) {
+//                mLog.error("Failure with logging codex: " + mCodex.meta().getEnum().getSimpleName() );
+//                mLog.error( "Could not find Path: \"" + USB_DIR + "\" on roborio! Try plugging in the USB." );
+//                mLogFailures++;
+//                try {
+//                    writer = Optional.ofNullable( new BufferedWriter( new FileWriter( file() )) );
+//                }
+//                catch ( Exception e ) {
+//                    System.out.println( e.getLocalizedMessage() );
+//                }
+//            }
+//            else if ( mLogFailures == Settings.kAcceptableLogFailures ) {
+//                mLog.error("---------------------CSV LOGGING DISABLED----------------------");
+//                mLogFailures++;
+//            }
+//        }
     }
 
     public void writeHeader() {
@@ -85,12 +108,6 @@ public class CSVWriter {
 //        }
 
         String dir = USB_DIR;
-
-        String eventName = DriverStation.getInstance().getEventName();
-        if ( eventName.length() <= 0 ) {
-            // event name format: MM-DD-YYYY_HH-MM-SS
-            eventName =  new SimpleDateFormat("MM-dd-YYYY_HH-mm-ss").format(Calendar.getInstance().getTime());
-        }
 
         File file = null;
         if ( mCodex.meta().getEnum().getSimpleName().equals("ELogitech310")) {
@@ -125,14 +142,14 @@ public class CSVWriter {
     }
 
     public void closeWriter() {
-        if ( writer.isPresent() ) {
+//        if ( writer.isPresent() ) {
             try {
-                writer.get().flush();
-                writer.get().close();
+                writer.flush();
+                writer.close();
             } catch (IOException pE) {
                 pE.printStackTrace();
             }
-        }
+//        }
     }
 
 }
