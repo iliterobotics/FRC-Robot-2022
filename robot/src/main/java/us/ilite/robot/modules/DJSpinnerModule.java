@@ -149,7 +149,7 @@ public class DJSpinnerModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        mDJTalonFX.set(ControlMode.PercentOutput, 0.8);
+        mDJTalonFX.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
         if(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.class) == EColorWheelState.ROTATION) {
             if(eLastColorState.nextColor() == eCurrentColorState) {
                 mColorChangeCounter++;
