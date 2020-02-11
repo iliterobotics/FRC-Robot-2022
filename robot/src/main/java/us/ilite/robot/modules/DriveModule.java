@@ -78,7 +78,7 @@ public class DriveModule extends Module {
 			// Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
 			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4)
 			.slot(VELOCITY_PID_SLOT)
-			.conversion(kDriveNEOPositionFactor);
+			.conversion(kDriveNEOVelocityFactor);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
 
@@ -143,16 +143,18 @@ public class DriveModule extends Module {
 		mRightFollower.setInverted(true);
 //		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
 		mGyro = new ADIS16470();
-		mLeftEncoder.setPositionConversionFactor(1d);
-		mLeftEncoder.setVelocityConversionFactor(1d);
-		mRightEncoder.setPositionConversionFactor(1d);
-		mRightEncoder.setPositionConversionFactor(1d);
 
 
 		HardwareUtils.setGains(mLeftCtrl, vPID);
 		HardwareUtils.setGains(mRightCtrl, vPID);
 		HardwareUtils.setGains(mLeftCtrl, dPID);
 		HardwareUtils.setGains(mRightCtrl, dPID);
+
+		//TODO - we want to do use our conversion factor calculated above, but that requires re-turning of F & P
+		mLeftEncoder.setPositionConversionFactor(1d);
+		mLeftEncoder.setVelocityConversionFactor(1d);
+		mRightEncoder.setPositionConversionFactor(1d);
+		mRightEncoder.setPositionConversionFactor(1d);
 		mLeftMaster.burnFlash();
 		mLeftFollower.burnFlash();
 		mRightMaster.burnFlash();

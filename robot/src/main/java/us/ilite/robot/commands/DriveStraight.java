@@ -105,9 +105,9 @@ public class DriveStraight implements ICommand {
     }
 
     private Distance getAverageDriveDistance() {
-        return Distance.fromInches(
-                        Robot.DATA.drivetrain.get(L_ACTUAL_POS_FT) +
-                        Robot.DATA.drivetrain.get(R_ACTUAL_POS_FT) / 2.0);
+        return Distance.fromFeet(
+                (Robot.DATA.drivetrain.get(L_ACTUAL_POS_FT) +
+                        Robot.DATA.drivetrain.get(R_ACTUAL_POS_FT)) / 2.0);
     }
 
     private Distance getAverageDistanceTraveled() {
