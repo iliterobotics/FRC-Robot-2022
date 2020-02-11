@@ -109,6 +109,8 @@ public class Data {
     }
 
     public char recieveColorFmsRelay() {
+        //For testing make sure to comment out the method and
+        //return a single char for the symbol of the color.
         String gameData;
         gameData = DriverStation.getInstance().getGameSpecificMessage();
         if (gameData.length() > 0) {

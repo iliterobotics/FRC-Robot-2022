@@ -1,6 +1,7 @@
 package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.flybotix.hfr.util.log.ILog;
@@ -111,6 +112,7 @@ public class DJSpinnerModule extends Module {
 
         I2C.Port i2cPort = I2C.Port.kOnboard;
         mColorSensorV3 = new ColorSensorV3(i2cPort);
+        mDJTalonFX.setNeutralMode(NeutralMode.Brake);
 
         mSolidStateCounter = 0;
         eColorWheelState = EColorWheelState.OFF;
