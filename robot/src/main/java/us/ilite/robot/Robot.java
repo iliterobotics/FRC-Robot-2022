@@ -188,7 +188,7 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mDrive);
-        mRunningModules.addModule(mHanger);
+//        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
         if(IS_SIMULATED) {
@@ -205,11 +205,8 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        SmartDashboard.putNumber("Driver Input A", DATA.driverinput.get(ELogitech310.A_BTN));
-//        mLogger.error("----ABtn State:  " + DATA.driverinput.isSet( ELogitech310.A_BTN ) );
         for (RobotCodex c : DATA.mLoggedCodexes ) {
             if ( c.meta().gid() == DATA.driverinput.meta().gid() ) {
-//                mLogger.error("----ABtn State:  " + DATA.driverinput.isSet( ELogitech310.A_BTN ) );
             }
             Robot.mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
         }

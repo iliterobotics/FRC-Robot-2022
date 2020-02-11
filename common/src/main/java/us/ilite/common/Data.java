@@ -64,8 +64,8 @@ public class Data {
             operatorinput,
             pdp,
             powercell,
-            hanger,
-            limelight,
+//            hanger,
+//            limelight,
     };
 
     //Stores writers per codex needed for CSV logging
