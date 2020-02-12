@@ -13,7 +13,7 @@ public enum ELimelightData {
     TLONG,      // Side-length of longest side of the fitted bounding box (pixels)
     THORIZ,     // Horizontal side-length of the rough bounding box (0 - 320 pixels)
     TVERT,      // Vertical side-length of the rough bounding box (0 - 320 pixels)
-
+    PIPELINE,   // Current vision targeting pipeline
 
     //  Limelight LED state
     // 0 - Use Pipeline LED state

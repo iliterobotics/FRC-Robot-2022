@@ -16,7 +16,6 @@ public class InputMap {
         DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
         DRIVER_LIMELIGHT_LOCK_BALL_TRI = ELogitech310.X_BTN,
         DRIVER_LIMELIGHT_LOCK_BALL_DUAL = ELogitech310.START
-
         ;
     }
 

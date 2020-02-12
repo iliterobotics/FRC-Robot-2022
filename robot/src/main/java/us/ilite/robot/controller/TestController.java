@@ -151,7 +151,8 @@ public class TestController extends BaseManualController {
 
     public void updateLimelightTargetLock(double pNow) {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-            Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
+//            Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
+            Robot.DATA.limelight.set(PIPELINE, 2);
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
             if (Robot.DATA.limelight.isSet(TY)) {
                 if (Math.abs(Robot.DATA.groundTracking.get(TX)) < mLimelightZoomThreshold) {
@@ -160,7 +161,7 @@ public class TestController extends BaseManualController {
                     Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
                 }
             } else {
-                Robot.DATA.groundTracking.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
+                Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
             }
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
             Robot.DATA.groundTracking.set(TARGET_ID, Field2020.FieldElement.BALL.id());
