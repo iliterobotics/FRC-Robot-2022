@@ -58,14 +58,14 @@ public class Data {
     public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
 
     public final RobotCodex[] mLoggedCodexes = new RobotCodex[] {
-            imu,
-            drivetrain,
+//            imu,
+//            drivetrain,
             driverinput,
             operatorinput,
-            pdp,
-            powercell,
-            hanger,
-            limelight,
+//            pdp,
+//            powercell,
+//            hanger,
+//            limelight,
     };
 
     //Stores writers per codex needed for CSV logging

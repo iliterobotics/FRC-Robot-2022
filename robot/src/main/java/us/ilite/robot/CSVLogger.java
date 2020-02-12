@@ -42,6 +42,9 @@ public class CSVLogger {
                 e.printStackTrace();
             }
         }
+        else if ( kCSVLoggerQueue.isEmpty() && mIsAcceptingToQueue == false ) {
+
+        }
     }
 
     public void logFromCodexToCSVHeader() {
@@ -75,13 +78,6 @@ public class CSVLogger {
         if ( mIsAcceptingToQueue ) {
             kCSVLoggerQueue.add( pLog );
         }
-    }
-
-    /**
-     * Closes all the writers in mNetworkTableWriters
-     */
-    public void closeWriters() {
-        mCSVWriters.forEach(c -> c.closeWriter());
     }
 
 }

@@ -17,7 +17,6 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.controller.BaseAutonController;
 import us.ilite.robot.controller.TeleopController;
@@ -38,7 +37,7 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-    public static final CSVLogger mCSVLogger = new CSVLogger();
+    public static CSVLogger mCSVLogger;
     private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
@@ -81,8 +80,6 @@ public class Robot extends TimedRobot {
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
-
-        mCSVLogger.start();
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -144,6 +141,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        mCSVLogger = new CSVLogger();
+
+        mCSVLogger.start();
         //mCSVLogger.start();
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
@@ -205,12 +205,7 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        SmartDashboard.putNumber("Driver Input A", DATA.driverinput.get(ELogitech310.A_BTN));
-//        mLogger.error("----ABtn State:  " + DATA.driverinput.isSet( ELogitech310.A_BTN ) );
         for (RobotCodex c : DATA.mLoggedCodexes ) {
-            if ( c.meta().gid() == DATA.driverinput.meta().gid() ) {
-//                mLogger.error("----ABtn State:  " + DATA.driverinput.isSet( ELogitech310.A_BTN ) );
-            }
             Robot.mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
         }
         for ( RobotCodex c : DATA.mAllCodexes ) {
