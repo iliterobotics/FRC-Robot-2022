@@ -21,7 +21,7 @@ public class CSVLogger {
     public CSVLogger( ) {
         mCSVWriters = new ArrayList<>();
         for ( RobotCodex c : Robot.DATA.mLoggedCodexes ) {
-            mCSVWriters.add( new CSVWriter( c ) );
+//            mCSVWriters.add( new CSVWriter( c ) );
         }
         mIsAcceptingToQueue = false;
         logFromCodexToCSVHeader();

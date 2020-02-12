@@ -4,6 +4,7 @@ import com.flybotix.hfr.util.lang.EnumUtils;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import us.ilite.common.config.InputMap;
+import us.ilite.common.lib.control.PIDGains;
 import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -148,11 +149,11 @@ public class TestController extends BaseManualController {
 //        mPreviousTime = pNow;
 //        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
-
     public void updateLimelightTargetLock(double pNow) {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-//            Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
-            Robot.DATA.limelight.set(PIPELINE, 2);
+//            mLog.error("--------------I EXIST-------------");
+//            Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id()());
+            Robot.DATA.limelight.set(TARGET_ID, (Field2020.FieldElement.TARGET.id()));
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
             if (Robot.DATA.limelight.isSet(TY)) {
                 if (Math.abs(Robot.DATA.groundTracking.get(TX)) < mLimelightZoomThreshold) {
@@ -174,7 +175,7 @@ public class TestController extends BaseManualController {
             Robot.DATA.groundTracking.set(TARGET_ID, RawLimelight.NONE.id());
         }
         if ((Robot.DATA.limelight.get(TARGET_ID.ordinal()) != (mLastTrackingType))
-                && !(Robot.DATA.limelight.get(TARGET_ID.ordinal()) == Limelight.NONE.id())) {
+                && !(Robot.DATA.limelight.get(TARGET_ID.ordinal()) == Limelight.NONE.id()) ){
             //TargetLock(); something to do with targetlock here, need clarification on command structure
         }
         mLastTrackingType = Robot.DATA.limelight.get(TARGET_ID.ordinal());

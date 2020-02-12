@@ -77,7 +77,6 @@ public class Limelight extends Module implements ITargetDataProvider {
     public void readInputs(double pNow) {
 
         mVisionTarget = Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)];
-
         boolean targetValid = mTable.getEntry("tv").getDouble(Double.NaN) > 0.0;
         Robot.DATA.limelight.set(TV, targetValid ? 1.0d : 0d);
 
@@ -91,7 +90,7 @@ public class Limelight extends Module implements ITargetDataProvider {
             Robot.DATA.limelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
             Robot.DATA.limelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
             Robot.DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
-            if(Robot.DATA.limelight.get(TARGET_ID) != 0.0) {
+            if(Robot.DATA.limelight.isSet(TARGET_ID)) {
                 Robot.DATA.limelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget.height()));
                 Robot.DATA.limelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
                 Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
@@ -109,7 +108,8 @@ public class Limelight extends Module implements ITargetDataProvider {
         setCamMode();
         setStreamMode();
         setSnapshotMode();
-        setPipeline(mVisionTarget.pipeline());
+//        setPipeline( (int) Robot.DATA.limelight.get(PIPELINE));
+        setPipeline(Field2020.FieldElement.values()[(int)db.limelight.get(TARGET_ID)].pipeline());
 //        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, Robot.DATA.flywheel.get(ANGLE_FROM_HORIZON)); TODO Add angle functionality to flywheel module
     }
 
@@ -120,7 +120,7 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     private void setPipeline(int pipeline) {
         Robot.DATA.limelight.set(PIPELINE, pipeline);
-        mTable.getEntry("pipeline").setNumber(Robot.DATA.limelight.get(PIPELINE));
+        mTable.getEntry("pipeline").setNumber(Robot.DATA.limelight.get(PIPELINE) );
     }
 
     private void setLedMode() {
