@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EColorData;
+import us.ilite.robot.hardware.TalonSRXFactory;
 
 public class DJSpinnerModule extends Module {
 
@@ -41,7 +42,6 @@ public class DJSpinnerModule extends Module {
 
         public EColorMatch nextColor() {
             if(this.ordinal() == GREEN.ordinal()) {
-                System.out.println(this);
                 return RED;
             } else if (this.ordinal() == NONE.ordinal() ){
                 return NONE;
@@ -90,7 +90,7 @@ public class DJSpinnerModule extends Module {
         }
     }
 
-    private TalonFX mDJTalonFX;
+    private VictorSPX mVictor;
     private ColorSensorV3 mColorSensorV3;
     private final ColorMatch mColorMatcher = new ColorMatch();
     private EColorMatch eDesiredColorState;
@@ -112,7 +112,6 @@ public class DJSpinnerModule extends Module {
 
         I2C.Port i2cPort = I2C.Port.kOnboard;
         mColorSensorV3 = new ColorSensorV3(i2cPort);
-        mDJTalonFX.setNeutralMode(NeutralMode.Brake);
 
         mSolidStateCounter = 0;
         eColorWheelState = EColorWheelState.OFF;
@@ -121,7 +120,9 @@ public class DJSpinnerModule extends Module {
         eDesiredColorState = EColorMatch.NONE;
         mIsDone = false;
         mMightBeDone = false;
-        mDJTalonFX = new TalonFX(50);
+        mVictor = TalonSRXFactory.createDefaultVictor(Settings.Hardware.CAN.kDJSpinnerVictorID);
+        mVictor.setNeutralMode(NeutralMode.Brake);
+
 
         for(EColorMatch cm : EColorMatch.values()) {
             if(cm != EColorMatch.NONE) {
@@ -140,7 +141,7 @@ public class DJSpinnerModule extends Module {
         ColorMatchResult match = mColorMatcher.matchClosestColor(c);
         db.color.set(EColorData.SENSED_COLOR, EColorMatch.from(match));
         db.color.set(EColorData.WHEEL_ROTATION_COUNT, total);
-        db.color.set(EColorData.CURRENT_MOTOR_POWER , mDJTalonFX.getStatorCurrent());
+        db.color.set(EColorData.CURRENT_MOTOR_POWER , mVictor.getMotorOutputPercent());
         SmartDashboard.putString("Detected Color: ", getEnumOfOrdinal( db.color.get( EColorData.SENSED_COLOR ) ).name() );
 
         if(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.class) == EColorWheelState.ROTATION) {
@@ -167,33 +168,34 @@ public class DJSpinnerModule extends Module {
         total = mBlueTracker + mYellowTracker + mGreenTracker + mRedTracker;
         SmartDashboard.putNumber("TOTAL COLORS" , total);
         if (total >= 32 ){
-            mDJTalonFX.set(ControlMode.PercentOutput , 0.0);
+            mVictor.set(ControlMode.PercentOutput , 0.0);
         }
 
 
     }
 
     public EColorMatch getEnumOfOrdinal( double d ) {
-        if ( d == EColorMatch.RED.ordinal() ) {
-            return EColorMatch.RED;
-        }
-        else if ( d == EColorMatch.BLUE.ordinal() ) {
-            return EColorMatch.BLUE;
-        }
-        else if ( d == EColorMatch.GREEN.ordinal() ) {
-            return EColorMatch.GREEN;
-        }
-        else if ( d == EColorMatch.YELLOW.ordinal() ) {
-            return EColorMatch.YELLOW;
-        }
-        else {
-            return EColorMatch.NONE;
-        }
+//        if ( d == EColorMatch.RED.ordinal() ) {
+//            return EColorMatch.RED;
+//        }
+//        else if ( d == EColorMatch.BLUE.ordinal() ) {
+//            return EColorMatch.BLUE;
+//        }
+//        else if ( d == EColorMatch.GREEN.ordinal() ) {
+//            return EColorMatch.GREEN;
+//        }
+//        else if ( d == EColorMatch.YELLOW.ordinal() ) {
+//            return EColorMatch.YELLOW;
+//        }
+//        else {
+//            return EColorMatch.NONE;
+//        }
+        return EColorMatch.values()[(int) d];
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mDJTalonFX.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
+        mVictor.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
 
     }
 

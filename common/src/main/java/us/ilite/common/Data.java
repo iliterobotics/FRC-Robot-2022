@@ -108,7 +108,7 @@ public class Data {
         }
     }
 
-    public char recieveColorFmsRelay() {
+    public static char recieveColorFmsRelay() {
         //For testing make sure to comment out the method and
         //return a single char for the symbol of the color.
         String gameData;
