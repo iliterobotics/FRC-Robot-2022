@@ -61,7 +61,6 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable(Settings.kFlywheelLimelightNetworkTable);
 
-    protected IFieldComponent mVisionTarget;
 
     public Limelight() {
     }
@@ -69,14 +68,10 @@ public class Limelight extends Module implements ITargetDataProvider {
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
         Robot.DATA.limelight.set(TARGET_ID, (double) NONE.id());
-//        mVisionTarget = Field2020.FieldElement.values()[(int)Robot.DATA.limelight.get(TARGET_ID)];
-        mVisionTarget = NONE;
     }
 
     @Override
     public void readInputs(double pNow) {
-
-        mVisionTarget = Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)];
         boolean targetValid = mTable.getEntry("tv").getDouble(Double.NaN) > 0.0;
         Robot.DATA.limelight.set(TV, targetValid ? 1.0d : 0d);
 
@@ -91,9 +86,9 @@ public class Limelight extends Module implements ITargetDataProvider {
             Robot.DATA.limelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
             Robot.DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
             if(Robot.DATA.limelight.isSet(TARGET_ID)) {
-                Robot.DATA.limelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget.height()));
+                Robot.DATA.limelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)].height()));
                 Robot.DATA.limelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
-                Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
+                Optional<Translation2d> p = calcTargetLocation(Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)]);
                 if(p.isPresent()) {
                     Robot.DATA.limelight.set(CALC_TARGET_X, p.get().getX());
                     Robot.DATA.limelight.set(CALC_TARGET_Y, p.get().getY());
@@ -108,8 +103,7 @@ public class Limelight extends Module implements ITargetDataProvider {
         setCamMode();
         setStreamMode();
         setSnapshotMode();
-//        setPipeline( (int) Robot.DATA.limelight.get(PIPELINE));
-        setPipeline(Field2020.FieldElement.values()[(int)db.limelight.get(TARGET_ID)].pipeline());
+        setPipeline();
 //        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, Robot.DATA.flywheel.get(ANGLE_FROM_HORIZON)); TODO Add angle functionality to flywheel module
     }
 
@@ -118,9 +112,13 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     }
 
-    private void setPipeline(int pipeline) {
-        Robot.DATA.limelight.set(PIPELINE, pipeline);
-        mTable.getEntry("pipeline").setNumber(Robot.DATA.limelight.get(PIPELINE) );
+    private void setPipeline() {
+        int mPipeline = (Robot.DATA.limelight.get(TARGET_ID) == -1) ?
+                        NONE.pipeline() :
+                        Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)].pipeline();
+
+        Robot.DATA.limelight.set(PIPELINE, mPipeline);
+        mTable.getEntry("pipeline").setNumber(Robot.DATA.limelight.get(PIPELINE));
     }
 
     private void setLedMode() {

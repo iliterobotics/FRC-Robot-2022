@@ -4,19 +4,14 @@ import com.flybotix.hfr.util.lang.EnumUtils;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.lib.control.PIDGains;
 import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
-import us.ilite.robot.commands.TargetLock;
 import us.ilite.robot.modules.*;
-import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.EPowerCellData;
 
 import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.EPowerCellData.*;
@@ -26,7 +21,9 @@ import java.util.List;
 public class TestController extends BaseManualController {
 
     private ILog mLog = Logger.createLog(TestController.class);
-    private Double mLastTrackingType = 0d;
+
+    private Double mLastTargetTrackingType = 0d;
+    private Double mLastGroundTrackingType = 0d;
 
     private double mLimelightZoomThreshold = 7.0;
 
@@ -69,7 +66,7 @@ public class TestController extends BaseManualController {
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        Robot.CLOCK.report("updateLimelightTargetLock", t->updateLimelightTargetLock(pNow));
+        Robot.CLOCK.report("updateLimelightTargetLock", t-> updateTargetTracking(pNow));
         Robot.CLOCK.report("updateDrivetrain", t->updateDrivetrain(pNow));
         Robot.CLOCK.report("updateFlywheel", t->updateFlywheel(pNow));
         Robot.CLOCK.report("updateIntake", t-> updatePowerCells(pNow));
@@ -149,36 +146,43 @@ public class TestController extends BaseManualController {
 //        mPreviousTime = pNow;
 //        mLog.error("-------------------------------------------------------Flywheel Velocity: ", db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
     }
-    public void updateLimelightTargetLock(double pNow) {
+
+    public void updateTargetTracking(double pNow) {
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-//            mLog.error("--------------I EXIST-------------");
-//            Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id()());
             Robot.DATA.limelight.set(TARGET_ID, (Field2020.FieldElement.TARGET.id()));
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
             if (Robot.DATA.limelight.isSet(TY)) {
-                if (Math.abs(Robot.DATA.groundTracking.get(TX)) < mLimelightZoomThreshold) {
+                if (Math.abs(Robot.DATA.limelight.get(TX)) < mLimelightZoomThreshold) {
                     Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET_ZOOM.id());
-                } else {
-                    Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
                 }
             } else {
                 Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
             }
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
+        } else {
+            Robot.DATA.limelight.set(TARGET_ID, Limelight.NONE.id());
+        }
+        if ((Robot.DATA.limelight.get(TARGET_ID.ordinal()) != (mLastTargetTrackingType))
+                && !(Robot.DATA.limelight.get(TARGET_ID.ordinal()) == Limelight.NONE.id())) {
+            //TargetLock(); something to do with targetlock here, need clarification on command structure
+        }
+        mLastTargetTrackingType = Robot.DATA.limelight.get(TARGET_ID.ordinal());
+    }
+
+    public void updateGroundTracking(double pNow) {
+        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
             Robot.DATA.groundTracking.set(TARGET_ID, Field2020.FieldElement.BALL.id());
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
             Robot.DATA.groundTracking.set(TARGET_ID, Field2020.FieldElement.BALL_DUAL.id());
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
             Robot.DATA.groundTracking.set(TARGET_ID, Field2020.FieldElement.BALL_TRI.id());
         } else {
-            Robot.DATA.limelight.set(TARGET_ID, Limelight.NONE.id());
             Robot.DATA.groundTracking.set(TARGET_ID, RawLimelight.NONE.id());
         }
-        if ((Robot.DATA.limelight.get(TARGET_ID.ordinal()) != (mLastTrackingType))
-                && !(Robot.DATA.limelight.get(TARGET_ID.ordinal()) == Limelight.NONE.id()) ){
+        if ((Robot.DATA.groundTracking.get(TARGET_ID.ordinal()) != (mLastGroundTrackingType))
+                && !(Robot.DATA.groundTracking.get(TARGET_ID.ordinal()) == RawLimelight.NONE.id())) {
             //TargetLock(); something to do with targetlock here, need clarification on command structure
         }
-        mLastTrackingType = Robot.DATA.limelight.get(TARGET_ID.ordinal());
+        mLastGroundTrackingType = Robot.DATA.limelight.get(TARGET_ID.ordinal());
     }
 
     protected void updatePowerCells(double pNow) {
