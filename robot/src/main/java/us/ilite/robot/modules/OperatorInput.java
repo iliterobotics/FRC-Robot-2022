@@ -2,7 +2,9 @@ package us.ilite.robot.modules;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
@@ -18,7 +20,12 @@ public class OperatorInput extends Module {
     private Joystick mOperatorJoystick;
     private EMatchMode mMode = EMatchMode.DISABLED;
 
+    private ShuffleboardTab AutonPathDropdown;
+    private NetworkTableEntry mMatchTimeEntry;
+
     public OperatorInput() {
+        mMatchTimeEntry = AutonPathDropdown.add("Match Time", 0).withSize(2, 1).
+                withPosition(0, 0).getEntry();
         mDriverJoystick = new Joystick(0);
         mOperatorJoystick = new Joystick(1);
     }
