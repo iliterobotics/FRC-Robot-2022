@@ -1,16 +1,11 @@
 package us.ilite.robot.controller;
 
 import com.flybotix.hfr.codex.RobotCodex;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import us.ilite.common.*;
-import us.ilite.common.config.Settings;
-import us.ilite.common.lib.util.Utils;
-import us.ilite.common.types.EMatchMode;
 
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
 
 import java.util.List;
@@ -19,6 +14,8 @@ public abstract class AbstractController {
     protected final Data db = Robot.DATA;
     private boolean mEnabled = false;
     protected int mCycleCount = 0;
+    protected double mLastTime = 0d;
+    protected double dt = 1d;
 
     public AbstractController(){
 
@@ -29,6 +26,7 @@ public abstract class AbstractController {
      * @param pNow the amount of time since the robot started
      */
     public void update(double pNow){
+        dt = pNow - mLastTime;
         if(mEnabled) {
             // split this out so we can put additional common elements here
             updateImpl(pNow);
@@ -36,6 +34,7 @@ public abstract class AbstractController {
             // Every 10s or so
             mCycleCount++;
         }
+        mLastTime = pNow;
     }
 
     /**
@@ -45,7 +44,7 @@ public abstract class AbstractController {
      */
     protected void setIntakeArmEnabled(double pNow, boolean pEnabled) {
         if(pEnabled) {
-            double speed = Math.max(db.drivetrain.get(LEFT_VEL_IPS), db.drivetrain.get(RIGHT_VEL_IPS)) / 12.0;
+            double speed = Math.max(db.drivetrain.get(L_ACTUAL_VEL_FT_s), db.drivetrain.get(R_ACTUAL_VEL_FT_s));
             db.powercell.set(DESIRED_ARM_ANGLE, 0d);
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, speed);
         } else {
