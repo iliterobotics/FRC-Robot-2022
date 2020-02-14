@@ -17,10 +17,7 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.robot.controller.AbstractController;
-import us.ilite.robot.controller.BaseAutonController;
-import us.ilite.robot.controller.TeleopController;
-import us.ilite.robot.controller.TestController;
+import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
 
@@ -52,7 +49,7 @@ public class Robot extends TimedRobot {
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private OperatorInput mOI;
-    private LEDControl mLedControl;
+//    private LEDControl mLedControl;
 
     private MatchMetadata mMatchMeta = null;
 
@@ -71,13 +68,13 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-        mLedControl = new LEDControl();
-        mShooter = new FlywheelModule();
-        mIntake = new PowerCellModule();
+//        mLedControl = new LEDControl();
+//        mShooter = new FlywheelModule();
+//        mIntake = new PowerCellModule();
         mLimelight = new Limelight();
-        mRawLimelight = new RawLimelight();
-        mDJSpinnerModule = new DJSpinnerModule();
-        mHanger = new HangerModule();
+//        mRawLimelight = new RawLimelight();
+//        mDJSpinnerModule = new DJSpinnerModule();
+//        mHanger = new HangerModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -131,8 +128,12 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         mCSVLogger.start();
         MODE=AUTONOMOUS;
-        mActiveController = mBaseAutonController;
+        mActiveController = new AutonCalibration();
         mActiveController.setEnabled(true);
+
+        mRunningModules.clearModules();
+        mRunningModules.addModule(mDrive);
+        mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 
     @Override
@@ -184,13 +185,12 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
-//        mRunningModules.addModule(mDrive);
-//        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
         if(IS_SIMULATED) {
-//            mRunningModules.addModule(mSimulation);
+            mRunningModules.addModule(mSimulation);
         }
         mRunningModules.modeInit(TEST, CLOCK.getCurrentTime());
         mRunningModules.checkModule(CLOCK.getCurrentTime());
