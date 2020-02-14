@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
@@ -72,7 +73,6 @@ public class TestController extends BaseManualController {
     }
 
     private void updateFlywheel() {
-        mLog.error("------------------------------------------------------CURRENT FLYWHEEL VELOCITY: " + db.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
         if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
             if (db.limelight.isSet(ELimelightData.TV)) {
                 SmartDashboard.putNumber("Distance To Target", db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
@@ -87,6 +87,18 @@ public class TestController extends BaseManualController {
         } else {
             db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
         }
+
+        if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
+            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 1.0);
+
+        } else if (db.operatorinput.isSet(ELogitech310.Y_BTN)){
+            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
+        }
+        else {
+            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0.5);
+        }
+
+
     }
 
     public void updateLimelightTargetLock() {

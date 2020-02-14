@@ -1,9 +1,13 @@
 package us.ilite.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,8 +23,12 @@ public class FlywheelModule extends Module {
 
     private CANSparkMax mFlywheelFeeder;
     private TalonFX mFlywheelFalcon;
-
+    private Servo mHoodAngler;
+    private ILog mLog = Logger.createLog(this.getClass());
+    private final double kMaxServoVelocity = 76.923;
     private double mPreviousTime;
+    private Potentiometer mHoodPot;
+
 
     private final int kFlywheelFalconPIDSlot = 0;
     private final int kMaxFalconVelocity = 6380;
@@ -28,7 +36,8 @@ public class FlywheelModule extends Module {
     public FlywheelModule() {
         mFlywheelFalcon = new TalonFX(50);
         mFlywheelFeeder = SparkMaxFactory.createDefaultSparkMax(9 , CANSparkMaxLowLevel.MotorType.kBrushless);
-
+        mHoodAngler = new Servo(9);
+        mHoodPot = new AnalogPotentiometer(0);
         mFlywheelFalcon.config_kP(kFlywheelFalconPIDSlot, 0.25);
         mFlywheelFalcon.config_kI(kFlywheelFalconPIDSlot, 0);
         mFlywheelFalcon.config_kD(kFlywheelFalconPIDSlot, 0);
@@ -63,7 +72,7 @@ public class FlywheelModule extends Module {
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, 0);
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 60);
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
 
         SmartDashboard.putNumber("Flywheel Current Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
@@ -89,21 +98,24 @@ public class FlywheelModule extends Module {
             Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, 2000);
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, 60);
         }
+
+        Robot.DATA.flywheel.set(EShooterSystemData.POTENTIOMETER_CURRENT_ANGLE, mHoodPot.get());
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mFlywheelFalcon.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
-        mFlywheelFeeder.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
-
+//        mFlywheelFalcon.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
+//        mFlywheelFeeder.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
+        mHoodAngler.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_SERVO_ANGLE));
+        mLog.error("----------------------------------------------------- SERVO SPEED--------------------------------------" + mHoodAngler.getSpeed());
         mPreviousTime = pNow;
     }
 
     @Override
     public void shutdown(double pNow) {
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 60);
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
+//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
+//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
+//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 60);
+//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
     }
 }
