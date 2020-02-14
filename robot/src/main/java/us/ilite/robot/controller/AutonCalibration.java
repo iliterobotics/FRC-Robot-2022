@@ -42,10 +42,8 @@ public class AutonCalibration extends BaseAutonController {
     public AutonCalibration() {
         mAutonConfiguration = Shuffleboard.getTab("Auton Config");
         mPathNumber = mAutonConfiguration.add("Path Number", 0)
-                .withWidget(BuiltInWidgets.kNumberBar)
-                .withProperties(Map.of("min", 1, "max", 10))
+                .withWidget(BuiltInWidgets.kTextView)
                 .getEntry();
-        mAutonConfiguration.add("Selected Path", PATHS.values()[((Double) mPathNumber.getValue().getDouble()).intValue()]);
 
         mActivePath = PATHS.Loop.path;
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
@@ -64,6 +62,7 @@ public class AutonCalibration extends BaseAutonController {
         if(mPathStartTime == 0) {
             mPathStartTime = pNow;
         }
+        mPathNumber.setString(PATHS.values()[((int) mPathNumber.getDouble(0))].name());
 
         // Add a time check to prevent errors when things go wrong
 //        if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
