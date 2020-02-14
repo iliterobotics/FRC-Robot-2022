@@ -20,10 +20,10 @@ import static us.ilite.robot.CSVLogger.kCSVLoggerQueue;
 
 public class CSVWriter {
 
-    public static final String USB_DIR = "/u";
-    public static final String USER_DIR = System.getProperty("user.home");
+    //public static final String USER_DIR = System.getProperty("user.home");
     private static final String LOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
-    private static final String eventName = new SimpleDateFormat("MM-dd-YYYY_HH-mm-ss").format(Calendar.getInstance().getTime());
+    private static String eventName = DriverStation.getInstance().getEventName();
+    private Optional<BufferedWriter> bw;
 
     private final ILog mLog = Logger.createLog(CSVWriter.class);
     private static int mLogFailures;
@@ -37,7 +37,23 @@ public class CSVWriter {
 
         mLogFailures = 0;
         file = file();
-        handleCreation( file );
+        if ( file != null ) {
+            handleCreation( file );
+        }
+
+        bw = Optional.empty();
+        try  {
+            if ( file != null ) {
+                bw = Optional.of( new BufferedWriter( new FileWriter( file ) ) );
+            }
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+
+        if ( eventName.length() <= 0 ) {
+            // event name format: MM-DD-YYYY_HH-MM-SS
+            eventName =  new SimpleDateFormat("MM-dd-YYYY_HH-mm-ss").format(Calendar.getInstance().getTime());
+        }
     }
 
     public void handleCreation(File pFile) {
@@ -57,21 +73,25 @@ public class CSVWriter {
     }
 
     public void log( String s ) {
+
         try {
-            Optional<BufferedWriter> bw = Optional.ofNullable( new BufferedWriter( new FileWriter( file ) ) );
             if ( bw.isPresent() ) {
                 bw.get().append(s);
                 bw.get().newLine();
-                bw.get().flush();
-                bw.get().close();
             }
             else {
                 if ( mLogFailures < Settings.kAcceptableLogFailures ) {
                     mLog.error("Failure with logging codex: " + mCodex.meta().getEnum().getSimpleName() );
-                    mLog.error( "Could not find Path: \"" + USB_DIR + "\" on roborio! Try plugging in the USB." );
+                    mLog.error( "Could not find Path:  (Path to USB)  on roborio! Try plugging in the USB." );
                     mLogFailures++;
                     try {
-                       file = file();
+                        file = file();
+                        if ( file != null ) {
+                            bw = Optional.of( new BufferedWriter( new FileWriter( file ) ) );
+                        }
+                        else {
+                            bw = Optional.empty();
+                        }
                     }
                     catch( Exception e ) {
                         e.printStackTrace();
@@ -105,37 +125,50 @@ public class CSVWriter {
 //            dir = USB_DIR;
 //        }
 
-        String dir = USB_DIR;
-
-        File file = null;
-        if ( mCodex.meta().getEnum().getSimpleName().equals("ELogitech310")) {
-            if ( mCodex.meta().gid() == Robot.DATA.driverinput.meta().gid() ) {
-                file = new File(String.format( dir + LOG_PATH_FORMAT,
-                        eventName,
-                        "DriverInput",
-                        DriverStation.getInstance().getMatchType().name(),
-                        Integer.toString(DriverStation.getInstance().getMatchNumber())
-                ));
-            } else {
-                file = new File(String.format( dir + LOG_PATH_FORMAT,
-                        eventName,
-                        "OperatorInput",
-                        DriverStation.getInstance().getMatchType().name(),
-                        Integer.toString(DriverStation.getInstance().getMatchNumber())
-                ));
+        String dir = "";
+        char[] letters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+        for ( char c : letters ) {
+            if (Files.exists((new File(String.format("/%c/logs/here.txt", c )).toPath()))) {
+                dir = "/" + c;
+                break;
             }
         }
-        else {
-            file = new File(String.format( dir + LOG_PATH_FORMAT,
-                    eventName,
-                    mCodex.meta().getEnum().getSimpleName(),
-                    DriverStation.getInstance().getMatchType().name(),
-                    Integer.toString(DriverStation.getInstance().getMatchNumber())
-            ));
+
+//        String dir = USB_DIR;
+
+        if (!dir.isEmpty()) {
+            File file = null;
+            if (mCodex.meta().getEnum().getSimpleName().equals("ELogitech310")) {
+                if (mCodex.meta().gid() == Robot.DATA.driverinput.meta().gid()) {
+                    file = new File(String.format(dir + LOG_PATH_FORMAT,
+                            eventName,
+                            "DriverInput",
+                            DriverStation.getInstance().getMatchType().name(),
+                            DriverStation.getInstance().getMatchNumber()
+                    ));
+                } else {
+                    file = new File(String.format(dir + LOG_PATH_FORMAT,
+                            eventName,
+                            "OperatorInput",
+                            DriverStation.getInstance().getMatchType().name(),
+                            DriverStation.getInstance().getMatchNumber()
+                    ));
+                }
+            } else {
+                file = new File(String.format(dir + LOG_PATH_FORMAT,
+                        eventName,
+                        mCodex.meta().getEnum().getSimpleName(),
+                        DriverStation.getInstance().getMatchType().name(),
+                        DriverStation.getInstance().getMatchNumber()
+                ));
+            }
+
+            mLog.error("Creating log file at ", file.toPath());
+
+            return file;
         }
 
-        mLog.error("Creating log file at ", file.toPath());
-
-        return file;
+        mLog.error("Did not make log file for: " + mCodex.meta().getEnum().getSimpleName());
+        return null;
     }
 }

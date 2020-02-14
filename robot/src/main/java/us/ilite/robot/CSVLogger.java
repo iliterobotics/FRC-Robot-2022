@@ -42,9 +42,6 @@ public class CSVLogger {
                 e.printStackTrace();
             }
         }
-        else if ( kCSVLoggerQueue.isEmpty() && mIsAcceptingToQueue == false ) {
-
-        }
     }
 
     public void logFromCodexToCSVHeader() {

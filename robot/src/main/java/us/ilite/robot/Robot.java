@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-    public static CSVLogger mCSVLogger;
+    public static final CSVLogger mCSVLogger = new CSVLogger();
     private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
@@ -141,10 +141,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        mCSVLogger = new CSVLogger();
+//        mCSVLogger = new CSVLogger();
 
         mCSVLogger.start();
-        //mCSVLogger.start();
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -175,6 +174,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
+        mCSVLogger.start();
+
         if(mTestController == null) {
             mTestController = TestController.getInstance();
         }
@@ -248,7 +249,6 @@ public class Robot extends TimedRobot {
         if (this.isTest()) {
             mRobotEnabledDisabled = "Test";
         }
-
         if (this.isEnabled()) {
             mRobotEnabledDisabled = "Enabled";
         }
