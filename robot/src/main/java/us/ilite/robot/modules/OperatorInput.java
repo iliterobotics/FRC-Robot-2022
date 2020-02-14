@@ -24,22 +24,9 @@ public class OperatorInput extends Module {
     private Joystick mOperatorJoystick;
     private EMatchMode mMode = EMatchMode.DISABLED;
 
-    private ShuffleboardTab mAutonConfiguration;
-    private NetworkTableEntry AutonPathDropdown;
-    private NetworkTableEntry mMatchTimeEntry;
-
-
     public OperatorInput() {
         mDriverJoystick = new Joystick(0);
         mOperatorJoystick = new Joystick(1);
-
-        mAutonConfiguration = Shuffleboard.getTab("Auton Config");
-        mMatchTimeEntry = mAutonConfiguration.add("Match Time", 0).withSize(2, 1).
-                withPosition(0, 0).getEntry();
-        AutonPathDropdown = mAutonConfiguration.add("Option", 0)
-            .withWidget(BuiltInWidgets.kNumberBar)
-            .withProperties(Map.of("min", 1, "max", 10))
-            .getEntry();
     }
 
     @Override
