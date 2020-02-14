@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
@@ -29,15 +30,16 @@ public class OperatorInput extends Module {
 
 
     public OperatorInput() {
+        mDriverJoystick = new Joystick(0);
+        mOperatorJoystick = new Joystick(1);
+
+        mAutonConfiguration = Shuffleboard.getTab("Auton Config");
         mMatchTimeEntry = mAutonConfiguration.add("Match Time", 0).withSize(2, 1).
                 withPosition(0, 0).getEntry();
-        mDriverJoystick = new Joystick(0);
-        AutonPathDropdown = Shuffleboard.getTab("Auton Options").add("Option", 0)
-                .withWidget(BuiltInWidgets.kNumberSlider)
-                .withProperties(Map.of("min", 0, "max", 5))
-                .getEntry();
-
-        mOperatorJoystick = new Joystick(1);
+        AutonPathDropdown = mAutonConfiguration.add("Option", 0)
+            .withWidget(BuiltInWidgets.kNumberBar)
+            .withProperties(Map.of("min", 1, "max", 10))
+            .getEntry();
     }
 
     @Override
