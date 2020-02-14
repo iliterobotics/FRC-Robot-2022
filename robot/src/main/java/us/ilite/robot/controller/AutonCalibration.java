@@ -32,21 +32,20 @@ public class AutonCalibration extends BaseAutonController {
             this.path = path;
         }
     }
+
     private ShuffleboardTab mAutonConfiguration;
-    private NetworkTableEntry AutonPathDropdown;
-    private NetworkTableEntry mMatchTimeEntry;
+    private NetworkTableEntry mPathNumber;
 
     private final Distance mPathTotalDistance;
     private final double mMaxAllowedPathTime;
 
     public AutonCalibration() {
         mAutonConfiguration = Shuffleboard.getTab("Auton Config");
-        mMatchTimeEntry = mAutonConfiguration.add("Match Time", 0).withSize(2, 1).
-                withPosition(0, 0).getEntry();
-        AutonPathDropdown = mAutonConfiguration.add("Option", 0)
+        mPathNumber = mAutonConfiguration.add("Path Number", 0)
                 .withWidget(BuiltInWidgets.kNumberBar)
                 .withProperties(Map.of("min", 1, "max", 10))
                 .getEntry();
+        mAutonConfiguration.add("Selected Path", PATHS.values()[((Double) mPathNumber.getValue().getDouble()).intValue()]);
 
         mActivePath = PATHS.Loop.path;
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
@@ -67,23 +66,23 @@ public class AutonCalibration extends BaseAutonController {
         }
 
         // Add a time check to prevent errors when things go wrong
-        if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
-            int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
-            if(index >= 0) {
-                db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_BASIC);
-                db.drivetrain.set(EDriveData.L_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.LEFT_VELOCITY));
-                db.drivetrain.set(EDriveData.R_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.RIGHT_VELOCITY));
-            } else {
-                e();
-                System.out.println("==== SUCCESSFULLY END AUTONOMOUS PATH ====");
-                e();
-                mActivePath = null;
-            }
-        } else if(mActivePath != null && pNow - mPathStartTime > mMaxAllowedPathTime) {
-            e();
-            System.out.println("==== END AUTONOMOUS PATH DUE TO TIME OVERRUN ====");
-            e();
-        }
+//        if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
+//            int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
+//            if(index >= 0) {
+//                db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_BASIC);
+//                db.drivetrain.set(EDriveData.L_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.LEFT_VELOCITY));
+//                db.drivetrain.set(EDriveData.R_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.RIGHT_VELOCITY));
+//            } else {
+//                e();
+//                System.out.println("==== SUCCESSFULLY END AUTONOMOUS PATH ====");
+//                e();
+//                mActivePath = null;
+//            }
+//        } else if(mActivePath != null && pNow - mPathStartTime > mMaxAllowedPathTime) {
+//            e();
+//            System.out.println("==== END AUTONOMOUS PATH DUE TO TIME OVERRUN ====");
+//            e();
+//        }
     }
 
     private static final void e() {
