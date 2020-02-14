@@ -183,8 +183,7 @@ public class DriveModule extends Module {
 		mHoldRightPositionPid.setSetpoint(0.0);
 		mStartHoldingPosition = false;
 
-		mLeftEncoder.setPosition(0.0);
-		mRightEncoder.setPosition(0.0);
+		reset();
 		HardwareUtils.setGains(mLeftCtrl, vPID);
 		HardwareUtils.setGains(mRightCtrl, vPID);
 		HardwareUtils.setGains(mLeftCtrl, dPID);
@@ -218,6 +217,9 @@ public class DriveModule extends Module {
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
+			case RESET:
+				reset();
+				break;
 //			case HOLD:
 //				if (!mStartHoldingPosition) {
 //					mHoldLeftPositionPid.setSetpoint(db.drivetrain.get(LEFT_POS_INCHES));
@@ -247,6 +249,7 @@ public class DriveModule extends Module {
 				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				break;
 			case PATH_FOLLOWING_BASIC:
+			case PATH_FOLLOWING_HELIX:
 				mLeftCtrl.setReference(db.drivetrain.get(L_PATH_FT_s) / kDriveNEOVelocityFactor, kVelocity, VELOCITY_PID_SLOT, 0);
 				mRightCtrl.setReference(db.drivetrain.get(R_PATH_FT_s) / kDriveNEOVelocityFactor, kVelocity, VELOCITY_PID_SLOT, 0);
 				break;
@@ -255,6 +258,11 @@ public class DriveModule extends Module {
 				mRightMaster.set(throttle-turn);
 				break;
 		}
+	}
+
+	private void reset() {
+		mLeftEncoder.setPosition(0.0);
+		mRightEncoder.setPosition(0.0);
 	}
 
 	public void loop(double pNow) {
