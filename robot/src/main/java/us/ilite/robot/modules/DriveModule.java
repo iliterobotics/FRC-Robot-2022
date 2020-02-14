@@ -105,8 +105,6 @@ public class DriveModule extends Module {
 	private double mRightHoldSetpoint;
 	private double mPreviousHeading = 0.0;
 	private double mPreviousTime = 0;
-	private double mLeftHoldSetpoint;
-	private double mRightHoldSetpoint;
 
 	private final CANSparkMax mLeftMaster;
 	private final CANSparkMax mLeftFollower;
