@@ -3,8 +3,6 @@ package us.ilite.robot.modules;
 import java.util.Optional;
 
 import com.flybotix.hfr.codex.RobotCodex;
-import com.flybotix.hfr.util.log.ILog;
-import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -13,8 +11,6 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.IFieldComponent;
-import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 import static us.ilite.common.types.ELimelightData.*;
@@ -22,8 +18,6 @@ import static us.ilite.common.types.ELimelightData.*;
 /**
  * A module for interfacing with the Goal Limelight
  */
-
-
 public class Limelight extends Module implements ITargetDataProvider {
     public static final IFieldComponent NONE = new IFieldComponent() {
         public int id() {return -1;}

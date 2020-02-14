@@ -30,6 +30,7 @@ public class TestController extends BaseManualController {
     private Double mLastGroundTrackingType = 0d;
 
     private double mLimelightZoomThreshold = 7.0;
+    private double mLimelightGoalThreshold = 5.0;
 
     private PowerCellModule.EIntakeState mIntakeState;
     private PowerCellModule.EArmState mArmState;
@@ -162,6 +163,8 @@ public class TestController extends BaseManualController {
     }
 
     public void updateTargetTracking(double pNow) {
+        boolean isOffset = !(Robot.DATA.limelight.get(TS) > 0 - mLimelightGoalThreshold || Robot.DATA.limelight.get(TS) < -90 + mLimelightGoalThreshold);
+
         if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
             Robot.DATA.limelight.set(TARGET_ID, (Field2020.FieldElement.TARGET.id()));
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
