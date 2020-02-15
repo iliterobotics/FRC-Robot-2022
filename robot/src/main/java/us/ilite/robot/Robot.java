@@ -42,17 +42,15 @@ public class Robot extends TimedRobot {
     private DriveModule mDrive;
     private Limelight mLimelight;
     private PowerCellModule mIntake;
-//    private RawLimelight mRawLimelight;
+    private RawLimelight mRawLimelight;
 //    private DJSpinnerModule mDJSpinnerModule;
-//    private LEDControl mLEDControl;
+    private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private OperatorInput mOI;
-//    private LEDControl mLedControl;
-
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
@@ -70,13 +68,12 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-//        mLedControl = new LEDControl();
-//        mShooter = new FlywheelModule();
+        mLEDControl = new LEDControl();
+        mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
-//        mLimelight = new Limelight();
-//        mRawLimelight = new RawLimelight();
+        mLimelight = new Limelight();
+        mRawLimelight = new RawLimelight();
 //        mDJSpinnerModule = new DJSpinnerModule();
-//        mLEDControl = new LEDControl();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -191,7 +188,7 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mHanger);
         mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
-//        mRunningModules.addModule(mLEDControl);
+        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }
