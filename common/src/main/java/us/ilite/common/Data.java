@@ -40,6 +40,8 @@ public class Data {
     public final RobotCodex<EPowerCellData> powercell = new RobotCodex(NULL_CODEX_VALUE, EPowerCellData.class);
     public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(NULL_CODEX_VALUE, EShooterSystemData.class);
     public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
+    public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
+
 
     public Color DJ_COLOR = Color.kAzure;
 

@@ -3,12 +3,16 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.CANifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
+import us.ilite.common.config.Settings;
 import us.ilite.common.types.EColorData;
+import us.ilite.common.types.ELEDControlData;
+import us.ilite.robot.Robot;
+
 import static us.ilite.robot.modules.DJSpinnerModule.*;
 
 public class LEDControl extends Module {
 
-    private CANifier mCanifier;
+    private CANifier mLEDCan;
     private Timer mBlinkTimer;
     private boolean mLedOn;
     private Message mCurrentMessage;
@@ -126,6 +130,14 @@ public class LEDControl extends Module {
             }
         }
     }
+    public enum LEDState {
+        ON(true),
+        OFF(false);
+        boolean isOn;
+        LEDState(boolean isOn){
+            this.isOn = isOn;
+        }
+    }
 
 
     public LEDControl(/*DJBoothPositionControl pDjBoothPositionControl, DJBoothRotationControl pDjBoothRotationControl */) {
@@ -137,13 +149,12 @@ public class LEDControl extends Module {
 
         this.mBlinkTimer = new Timer();
         this.mBlinkTimer.reset();
+        mLEDCan = new CANifier(Settings.Hardware.CAN.kLEDControlCanifier);
     }
 
 
     public void modeInit(double pNow) {
-        this.turnOffLED();
-        this.mCurrentMessage = Message.NONE;
-        this.mLedOn = true;
+        Robot.DATA.ledcontrol.set(ELEDControlData.LED_STATE , 1.0);
         this.mBlinkTimer.stop();
         this.mBlinkTimer.reset();
     }
@@ -154,8 +165,7 @@ public class LEDControl extends Module {
      */
     public void update(double pNow) {
         Message lastMsg = this.mCurrentMessage;
-        this.mCurrentMessage = Message.NONE;
-        
+        Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.NONE);
 //        if(mCargoSpit.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
 //        if(mElevator.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
 //        if(mDrive.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
@@ -175,22 +185,22 @@ public class LEDControl extends Module {
 
 
         if (color == EColorMatch.BLUE && !isDone) {
-            mCurrentMessage = Message.ON_BLUE;
+            Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.ON_BLUE);
         } else if (color == EColorMatch.RED && !isDone) {
-            mCurrentMessage = Message.ON_RED;
+            Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.ON_RED);
         } else if (color == EColorMatch.GREEN && !isDone) {
-            mCurrentMessage = Message.ON_GREEN;
+            Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.ON_GREEN);
         } else if (color == EColorMatch.YELLOW && !isDone) {
-            mCurrentMessage = Message.ON_YELLOW;
+            Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.ON_YELLOW);
         }
         else if (color == EColorMatch.BLUE && isDone) {
-            mCurrentMessage = Message.FINISHED_ON_BLUE;
+            Robot.DATA.ledcontrol.set(ELEDControlData.DESIRED_MESSAGE , Message.ON_BLUE);
         } else if (color == EColorMatch.RED && isDone) {
-            mCurrentMessage = Message.FINISHED_ON_RED;
+            Robot.DATA.ledcontrol.set(ELEDControlData.DESIRED_MESSAGE , Message.ON_RED);
         } else if (color == EColorMatch.GREEN && isDone) {
-            mCurrentMessage = Message.FINISHED_ON_GREEN;
+            Robot.DATA.ledcontrol.set(ELEDControlData.DESIRED_MESSAGE , Message.ON_GREEN);
         } else if (color == EColorMatch.YELLOW && isDone) {
-            mCurrentMessage = Message.FINISHED_ON_YELLOW;
+            Robot.DATA.ledcontrol.set(ELEDControlData.DESIRED_MESSAGE , Message.ON_YELLOW);
         }
 
 //        if ( Math.abs( red - LEDColor.RED.getColor().getR() ) <= 10  &&
@@ -258,9 +268,9 @@ public class LEDControl extends Module {
     // LED Channels: A = Green B = Red C = Blue
     private void setLED(RGB rgb)
     {
-        mCanifier.setLEDOutput(rgb.getRPercent(), CANifier.LEDChannel.LEDChannelB); // Red
-        mCanifier.setLEDOutput(rgb.getGPercent(), CANifier.LEDChannel.LEDChannelA); // Green
-        mCanifier.setLEDOutput(rgb.getBPercent(), CANifier.LEDChannel.LEDChannelC); // Blue
+        mLEDCan.setLEDOutput(rgb.getRPercent(), CANifier.LEDChannel.LEDChannelB); // Red
+        mLEDCan.setLEDOutput(rgb.getGPercent(), CANifier.LEDChannel.LEDChannelA); // Green
+        mLEDCan.setLEDOutput(rgb.getBPercent(), CANifier.LEDChannel.LEDChannelC); // Blue
     }
 
 
@@ -271,11 +281,13 @@ public class LEDControl extends Module {
 
 
     @Override
-    public void readInputs(double pNow) {}
+    public void readInputs(double pNow) {
+        //TODO decide what to put in here
+    }
 
     @Override
     public void setOutputs(double pNow) {
-
+        //TODO decide what to put in here
     }
 
     public void shutdown(double pNow) {

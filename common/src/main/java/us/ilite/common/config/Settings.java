@@ -61,6 +61,7 @@ public class Settings {
             public static int kMAXIntakeArm = 7;
             public static int kMAXIntakeRollerId = 8;
             public static int kTalonPowerCellSerializer = 11;
+            public static int kLEDControlCanifier = 10;
 
             // ===== 2019 Drive =====
 //            public static  int kDriveLeftMaster = 1;
