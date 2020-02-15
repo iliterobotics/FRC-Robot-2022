@@ -20,6 +20,7 @@ import static us.ilite.robot.CSVLogger.kCSVLoggerQueue;
 
 public class CSVWriter {
 
+    public static final String USB_DIR = "/u";
     //public static final String USER_DIR = System.getProperty("user.home");
     private static final String LOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
     private static String eventName = DriverStation.getInstance().getEventName();
@@ -125,50 +126,51 @@ public class CSVWriter {
 //            dir = USB_DIR;
 //        }
 
-        String dir = "";
-        char[] letters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
-        for ( char c : letters ) {
-            if (Files.exists((new File(String.format("/%c/logs/here.txt", c )).toPath()))) {
-                dir = "/" + c;
-                break;
-            }
-        }
+        //THIS CODE IS USED FOR A MULTI-PARTITION DRIVE AND FINDING IT'S LOCATION IN THE ROBORIO FILE DIRECTORIES
+//        String dir = "";
+//        char[] letters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+//        for ( char c : letters ) {
+//            if (Files.exists((new File(String.format("/%c/logs/here.txt", c )).toPath()))) {
+//                dir = "/" + c;
+//                break;
+//            }
+//        }
 
-//        String dir = USB_DIR;
+        String dir = USB_DIR;
 
-        if (!dir.isEmpty()) {
-            File file = null;
-            if (mCodex.meta().getEnum().getSimpleName().equals("ELogitech310")) {
-                if (mCodex.meta().gid() == Robot.DATA.driverinput.meta().gid()) {
-                    file = new File(String.format(dir + LOG_PATH_FORMAT,
-                            eventName,
-                            "DriverInput",
-                            DriverStation.getInstance().getMatchType().name(),
-                            DriverStation.getInstance().getMatchNumber()
-                    ));
-                } else {
-                    file = new File(String.format(dir + LOG_PATH_FORMAT,
-                            eventName,
-                            "OperatorInput",
-                            DriverStation.getInstance().getMatchType().name(),
-                            DriverStation.getInstance().getMatchNumber()
-                    ));
-                }
+//        if (!dir.isEmpty()) {
+        File file = null;
+        if (mCodex.meta().getEnum().getSimpleName().equals("ELogitech310")) {
+            if (mCodex.meta().gid() == Robot.DATA.driverinput.meta().gid()) {
+                file = new File(String.format(dir + LOG_PATH_FORMAT,
+                        eventName,
+                        "DriverInput",
+                        DriverStation.getInstance().getMatchType().name(),
+                        DriverStation.getInstance().getMatchNumber()
+                ));
             } else {
                 file = new File(String.format(dir + LOG_PATH_FORMAT,
                         eventName,
-                        mCodex.meta().getEnum().getSimpleName(),
+                        "OperatorInput",
                         DriverStation.getInstance().getMatchType().name(),
                         DriverStation.getInstance().getMatchNumber()
                 ));
             }
-
-            mLog.error("Creating log file at ", file.toPath());
-
-            return file;
+        } else {
+            file = new File(String.format(dir + LOG_PATH_FORMAT,
+                    eventName,
+                    mCodex.meta().getEnum().getSimpleName(),
+                    DriverStation.getInstance().getMatchType().name(),
+                    DriverStation.getInstance().getMatchNumber()
+            ));
         }
 
-        mLog.error("Did not make log file for: " + mCodex.meta().getEnum().getSimpleName());
-        return null;
+        mLog.error("Creating log file at ", file.toPath());
+
+        return file;
+//        }
+
+//        mLog.error("Did not make log file for: " + mCodex.meta().getEnum().getSimpleName());
+//        return null;
     }
 }
