@@ -4,10 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
@@ -61,19 +58,41 @@ public class PowerCellModule extends Module {
     public static double kForStopTalon = 0d;
     public static double kIntakePower = 1.0;
     public static double kForStop = 1.0;
-    public static double kPowerCellP;
-    public static double kPowerCellI;
-    public static double kPowerCellD;
-    public static double kPowerCellF;
-    public static double kWarnCurrentLimitThreshold = 30; //Tune this later
-    public static double kArmPowerEngaged = 1.0;
-    public static double kArmPowerDisengaged = 0.0;
+    public static int kWarnCurrentLimitThreshold = 20;
 
-    private static final int INTAKE_PIVOT_SLOT = 1;
-    private static final ProfileGains mIntakePivotGains = new ProfileGains()
-            .slot(INTAKE_PIVOT_SLOT)
-            .p(0.0005)
-            .f(0.0000391419);
+    private static final int INTAKE_PIVOT_DOWN_SLOT = 1;
+    private static final int INTAKE_PIVOT_UP_SLOT = 2;
+
+    // 100:1 AM Sport with 16:36 sprocket reduction
+    // We may change this ratio to speed up the arm, so leave the math separated out like this
+    private static final double kPivotGearRatio = 1.0/100.0 * 16.0 / 36.0;
+    // 36T Driving sprocket on the pivot, 16T driven sprocket on the cross-axle
+    private static final double kAbsoluteEncoderRatio = kPivotGearRatio * 36.0 / 16.0;
+    // Rotations in degrees
+    private static final double kPivotConversion = kPivotGearRatio * 360.0;
+    // RPM to degrees / second
+    private static final double kPivotVelocityConversion = kPivotConversion / 60.0;
+    private static final double kMaxIntakePivotVelocityDeg_s = 10.0;
+    private static final ProfileGains mIntakePivotDownGains = new ProfileGains()
+            .slot(INTAKE_PIVOT_DOWN_SLOT)
+            .p(0.00025)
+            .maxAccel(9000d)
+            .maxVelocity(6000d)
+            ;
+
+    private static final ProfileGains mIntakePivotUpGains = mIntakePivotDownGains;
+//    private static final ProfileGains mIntakePivotUpGains = new ProfileGains()
+//            .slot(INTAKE_PIVOT_UP_SLOT)
+//            .p(0.0005)
+//            .f(0.1)
+////            .maxAccel(kMaxIntakePivotVelocityDeg_s * kPivotVelocityConversion/4.0)
+////            .maxVelocity(kMaxIntakePivotVelocityDeg_s / kPivotVelocityConversion / 2.0)
+//            .maxAccel(6000d)
+//            .maxVelocity(6000d)
+////            .velocityConversion(kPivotVelocityConversion)
+////            .positionConversion(kPivotConversion)
+////            .f(0.0000391419)
+//            ;
 
     //Intake state
     private EIntakeState mIntakeState;
@@ -110,18 +129,17 @@ public class PowerCellModule extends Module {
     }
 
     public enum EArmState {
-        //TODO find angles
-        ENGAGED (1.0),
-        DISENGAGED (0.0);
+        NONE(0.0, 0),
+        OUT(90.0, INTAKE_PIVOT_DOWN_SLOT),
+        // TODO - fix to UP slot
+        STOW(0.0, INTAKE_PIVOT_DOWN_SLOT),
+        HOLD(0.0, INTAKE_PIVOT_DOWN_SLOT);
 
-        double angle;
+        public double angle;
+        public int slot;
 
-        EArmState (double angle) {
+        EArmState (double angle, int slot) {
             this.angle = angle;
-        }
-
-        public double getAngle() {
-            return angle;
         }
     }
 
@@ -142,33 +160,44 @@ public class PowerCellModule extends Module {
 
     public PowerCellModule() {
         mIntakeState = EIntakeState.STOP;
-        mArmState = EArmState.DISENGAGED;
+        mArmState = EArmState.STOW;
         mIndexingState = EIndexingState.NOT_BROKEN;
 
         mIntakeRoller = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeRollerId, CANSparkMaxLowLevel.MotorType.kBrushless );
         mIntakeRoller.setInverted(true);
+        mIntakeRoller.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        mIntakeRoller.setSmartCurrentLimit(25);
+
         mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonPowerCellSerializer);
         mConveyorMotorVertical = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonVerticalID );
         mConveyorMotorVertical.setInverted(true);
 
         mIntakePivot = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeArm, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mIntakePivot.setInverted(true);
+        mIntakePivot.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        mIntakePivot.setSecondaryCurrentLimit(15);
 
         mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel);
         mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel);
         mExitBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kExitBeamChannel);
         mDigitalBeamSensors = new DigitalBeamSensor[]{mEntryBeam, mSecondaryBeam, mExitBeam};
 
-        mIntakePivotEncoder = mIntakePivot.getEncoder();
+        mIntakePivotEncoder = new CANEncoder(mIntakePivot);
         mIntakeRollerEncoder = mIntakeRoller.getEncoder();
 
         mIntakePivotCtrl = mIntakePivot.getPIDController();
-//        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotGains);
+        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotDownGains);
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-//        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotGains);
+        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotUpGains);
+//        HardwareUtils.setGains(mIntakePivotEncoder, mIntakePivotUpGains);
+        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotDownGains);
+//        HardwareUtils.setGains(mIntakePivotEncoder, mIntakePivotDownGains);
+        mIntakePivotEncoder.setPosition(0.0);
+        mIntakePivotCtrl.setOutputRange(0.0, 95.0);
+        SmartDashboard.putNumber("Rotation Conversion (deg)", mIntakePivotDownGains.POSITION_CONVERSION_FACTOR);
+        SmartDashboard.putNumber("Max Rotation Speed (deg/s)", kMaxIntakePivotVelocityDeg_s * kPivotVelocityConversion);
     }
 
     @Override
@@ -179,7 +208,7 @@ public class PowerCellModule extends Module {
         db.powercell.set(CURRENT_AMOUNT_OF_SENSORS_BROKEN, List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count());
         db.powercell.set(INTAKE_ROLLER_CURRENT, mIntakeRoller.getOutputCurrent());
         db.powercell.set(CURRENT_INTAKE_VELOCITY_FT_S, mIntakeRollerEncoder.getVelocity());
-        db.powercell.set(CURRENT_ARM_ANGLE , mIntakePivotEncoder.getPosition());
+        db.powercell.set(CURRENT_ARM_ANGLE , mIntakePivotEncoder.getPosition() * kPivotConversion);
         db.powercell.set(SERIALIZER_CURRENT, mConveyorMotorHorizontal.getStatorCurrent());
         db.powercell.set(VERTICAL_CURRENT, mConveyorMotorVertical.getStatorCurrent());
         db.powercell.set(INTAKE_PIVOT_CURRENT, mIntakePivot.getOutputCurrent());
@@ -226,11 +255,23 @@ public class PowerCellModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        mIntakeRoller.set(db.powercell.get(DESIRED_INTAKE_VELOCITY_FT_S));
-//        mConveyorMotorHorizontal.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_H_VELOCITY));
-//        mConveyorMotorVertical.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_V_VELOCITY));
-//        mIntakePivotEncoder.setPosition(db.powercell.get(EPowerCellData.DESIRED_ARM_ANGLE));
-        mIntakePivot.set(db.powercell.get(UNUSED));
+        mConveyorMotorHorizontal.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_H_VELOCITY));
+        mConveyorMotorVertical.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_V_VELOCITY));
+        if(db.powercell.isSet(INTAKE_STATE)) {
+            mIntakeRoller.set(db.powercell.get(DESIRED_INTAKE_VELOCITY_FT_S));
+            EArmState state = db.powercell.get(INTAKE_STATE, EArmState.class);
+            switch(state) {
+                case OUT:
+                case STOW:
+                    mIntakePivotCtrl.setReference(state.angle/kPivotConversion, ControlType.kSmartMotion, INTAKE_PIVOT_DOWN_SLOT, 0.01);
+                    break;
+                default:
+                    mIntakePivot.set(0.0);
+            }
+            SmartDashboard.putNumber("TARGET ANGLE (deg)", state.angle);
+        } else {
+            mIntakePivot.set(0.0);
+        }
     }
 
     @Override
@@ -238,10 +279,6 @@ public class PowerCellModule extends Module {
 //        mIntakeState = EIntakeState.STOP;
 //        mArmState = EArmState.DISENGAGED;
 //        mIndexingState = EIndexingState.NOT_INDEXING;
-    }
-
-    public boolean isCurrentLimiting(){
-        return db.pdp.get(EPowerDistPanel.CURRENT5) > kWarnCurrentLimitThreshold;
     }
 
     public void startIndexing() {
@@ -262,10 +299,5 @@ public class PowerCellModule extends Module {
         }
 
         mGoalBeamCountBroken = mBeamCountBroken + 1;
-    }
-
-
-    public void setIntakeState(EIntakeState pIntakeState){
-        mIntakeState = pIntakeState;
     }
 }

@@ -69,7 +69,7 @@ public class DriveModule extends Module {
 			.p(1.0).maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
 			.maxAccel(56760d)
 			.slot(POSITION_PID_SLOT)
-			.conversion(kDriveNEOPositionFactor);
+			.velocityConversion(kDriveNEOPositionFactor);
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
 			.p(0.0001)
@@ -78,7 +78,7 @@ public class DriveModule extends Module {
 			// Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
 			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4)
 			.slot(VELOCITY_PID_SLOT)
-			.conversion(kDriveNEOVelocityFactor);
+			.velocityConversion(kDriveNEOVelocityFactor);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
 

@@ -58,10 +58,10 @@ public class Settings {
             public static int kDriveLeftMaster = 3;
             public static int kDriveLeftFollower = 4;
 
-            public static int kTalonVerticalID = 6; // Change later
             public static int kMAXIntakeRollerId = 7;
             public static int kMAXIntakeArm = 8;
             public static int kTalonPowerCellSerializer = 11;
+            public static int kTalonVerticalID = 12;
             public static int kLEDControlCanifierID = 0;
 
             // ===== 2019 Drive =====
