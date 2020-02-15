@@ -43,7 +43,7 @@ public class AutonCalibration extends BaseAutonController {
     private final double mMaxAllowedPathTime;
 
     public AutonCalibration() {
-        mActivePath = PATHS.Loop.path;
+        mActivePath = PATHS.values()[mPathNumber.getNumber(0).intValue()].path;
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
         mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1;
 
@@ -60,8 +60,7 @@ public class AutonCalibration extends BaseAutonController {
         if(mPathStartTime == 0) {
             mPathStartTime = pNow;
         }
-        int pathNumber = mPathNumber.getNumber(999).intValue();
-        mPathNumber.setString(PATHS.values()[pathNumber].name());
+        System.out.println(mActivePath);
         // Add a time check to prevent errors when things go wrong
 //        if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
 //            int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
