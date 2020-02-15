@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpiutil.net.PortForwarder;
 import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
@@ -21,6 +22,7 @@ import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
 
+import javax.sound.sampled.Port;
 import java.util.TimerTask;
 
 import static us.ilite.common.types.EMatchMode.*;
@@ -61,6 +63,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+
+        PortForwarder.add(5801,"10.18.85.2",5801);
         // Init the actual robot
         initTimer.reset();
         initTimer.start();
