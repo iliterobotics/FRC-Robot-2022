@@ -63,12 +63,12 @@ public class LEDControl extends Module {
         //Prioritization of LED control
         mCurrentMessage = Message.fromColorMatch(color, isDone);
 
-        if (isVisionTracking()) {
-            mCurrentMessage = Message.VISION_TRACKING;
-        }
-
         if (isCurrentLimiting()) {
             mCurrentMessage = Message.CURRENT_LIMITING;
+        }
+
+        if (isVisionTracking()) {
+            mCurrentMessage = Message.VISION_TRACKING;
         }
 
         // Did the message change?
@@ -80,7 +80,7 @@ public class LEDControl extends Module {
             this.mBlinkTimer.start();
         }
 
-        controlLED(Message.fromColorMatch(color, isDone));
+        controlLED(mCurrentMessage);
         mLastMessage = mCurrentMessage;
     }
 
@@ -129,11 +129,13 @@ public class LEDControl extends Module {
 
     private boolean isCurrentLimiting() {
         // TODO implement current limiting from intake
-        return false;
+//        return false;
+        return true;
     }
 
     private boolean isVisionTracking() {
-        return db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL);
+//        return db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL);
+        return false;
     }
 
     public void shutdown(double pNow) {
