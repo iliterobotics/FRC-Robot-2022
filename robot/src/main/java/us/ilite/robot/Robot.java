@@ -63,8 +63,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-
-        PortForwarder.add(5801,"10.18.85.2",5801);
+        PortForwarder.add(5800,"10.18.85.11",5800);
+        PortForwarder.add(5801,"10.18.85.11",5801);
         // Init the actual robot
         initTimer.reset();
         initTimer.start();
