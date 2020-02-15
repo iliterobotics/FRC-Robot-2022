@@ -36,7 +36,6 @@ public class Settings {
             public static int kDJBoothTalonId = 72;
             public static int kHangerNeoID1 = 15;
             public static int kHangerNeoID2 = 71;
-            public static int kTalonVerticalID = 6; // Change later
 //            public static int kTalonThreeID = 65; // Change later
             public static final int kTurretGyroID = 61; // There isn't a gyro on the BunnyBot
             public static final int kShooterID = 66; // BunnyBot Shooter
@@ -59,9 +58,10 @@ public class Settings {
             public static int kDriveLeftMaster = 3;
             public static int kDriveLeftFollower = 4;
 
-            public static int kMAXIntakeArm = 7;
-            public static int kMAXIntakeRollerId = 8;
+            public static int kMAXIntakeRollerId = 7;
+            public static int kMAXIntakeArm = 8;
             public static int kTalonPowerCellSerializer = 11;
+            public static int kTalonVerticalID = 12;
             public static int kLEDControlCanifierID = 0;
 
             // ===== 2019 Drive =====

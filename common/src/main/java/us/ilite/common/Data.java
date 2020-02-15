@@ -29,7 +29,7 @@ public class Data {
 
     //Add new codexes here as we need more
 
-    public static final double NULL_CODEX_VALUE = Double.NaN;
+    public static final double NULL_CODEX_VALUE = 0.0;
     public final RobotCodex<EGyro> imu = new RobotCodex(Double.NaN, EGyro.class);
     public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
@@ -60,7 +60,7 @@ public class Data {
     public final RobotCodex[] mLoggedCodexes = new RobotCodex[]{
             imu,
             drivetrain,
-            driverinput,
+//            driverinput,
             operatorinput,
             pdp,
             powercell,
@@ -78,7 +78,7 @@ public class Data {
      */
     public Data(boolean pLogging) {
         int i = 0;
-        for (RobotCodex rc : mAllCodexes) {
+        for (RobotCodex rc : mLoggedCodexes) {
             mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
             rc.meta().setGlobalId(i);
             i++;

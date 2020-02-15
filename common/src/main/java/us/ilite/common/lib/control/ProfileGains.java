@@ -18,7 +18,8 @@ public class ProfileGains {
     public double MAX_ACCEL = 0d;
     public double MAX_VELOCITY = 0d;
     public double TOLERANCE = 0d;
-    public double CONVERSION_FACTOR = 1d;
+    public double VELOCITY_CONVERSION_FACTOR = 1d;
+    public double POSITION_CONVERSION_FACTOR = 1d;
 
     /** Defaulted to 1 */
     public int PROFILE_SLOT = 1;
@@ -113,8 +114,13 @@ public class ProfileGains {
         return this;
     }
 
-    public ProfileGains conversion(double pConversionFactor) {
-        CONVERSION_FACTOR = pConversionFactor;
+    public ProfileGains velocityConversion(double pConversionFactor) {
+        VELOCITY_CONVERSION_FACTOR = pConversionFactor;
+        return this;
+    }
+
+    public ProfileGains positionConversion(double pConversionFactor) {
+        POSITION_CONVERSION_FACTOR = pConversionFactor;
         return this;
     }
 }
