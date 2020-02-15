@@ -102,11 +102,6 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
 
-        try {
-        } catch (Exception e) {
-            mLogger.exception(e);
-        }
-
         LiveWindow.disableAllTelemetry();
 
         TimerTask shuffleupdate = new TimerTask(){
