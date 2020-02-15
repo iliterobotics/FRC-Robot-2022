@@ -15,7 +15,7 @@ public class ADIS16470 extends IMU {
         rawAccelY = 0d;
 
 
-    public ADIS16470(double[] pFilterGains) {
+    public ADIS16470() {
         super(new double[]{1.0});
     }
 
