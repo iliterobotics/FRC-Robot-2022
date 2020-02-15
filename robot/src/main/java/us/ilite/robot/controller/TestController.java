@@ -315,7 +315,6 @@ public class TestController extends BaseManualController {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.getPower());
             }
         }
-
     }
 }
 
