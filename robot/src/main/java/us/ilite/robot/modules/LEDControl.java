@@ -23,7 +23,7 @@ public class LEDControl extends Module {
         private int mB;
 
         public RGB(int pR, int pG, int pB) {
-            // Value range for each color is 0-255, we'll enforce this with a modulo divide
+            // Value range for each color is 0-255, we'll enforce this with a module divide
             this.mR = pR % 256;
             this.mG = pG % 256;
             this.mB = pB % 256;
@@ -96,7 +96,10 @@ public class LEDControl extends Module {
         FINISHED_ON_RED( LEDColor.RED, true ),
         FINISHED_ON_GREEN( LEDColor.GREEN, true ),
         FINISHED_ON_YELLOW( LEDColor.YELLOW, true ),
-        NONE(LEDColor.NONE, false);
+        NONE(LEDColor.NONE, false),
+
+        CURRENT_LIMITING( LEDColor.RED, false),
+        VISION_TRACKING( LEDColor.GREEN, false);
 
         final LEDColor color;
         final int pulse; // milliseconds
