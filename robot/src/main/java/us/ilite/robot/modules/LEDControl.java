@@ -129,13 +129,11 @@ public class LEDControl extends Module {
 
     private boolean isCurrentLimiting() {
         // TODO implement current limiting from intake
-//        return false;
-        return true;
+        return false;
     }
 
     private boolean isVisionTracking() {
-//        return db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL);
-        return false;
+        return db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL);
     }
 
     public void shutdown(double pNow) {
