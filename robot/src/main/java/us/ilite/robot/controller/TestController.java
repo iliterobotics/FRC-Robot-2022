@@ -10,6 +10,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
@@ -224,19 +225,24 @@ public class TestController extends BaseManualController {
             db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
             reverseSerializer(pNow);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW)) {
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
             setIntakeArmEnabled(pNow, false);
             crossedEntry = activateSerializer(pNow);
         } else {
             // TODO - only enable once we have set the hold gains
 //            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
             db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.NONE);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
         }
 
         db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
         if(db.operatorinput.isSet(FIRE_POWER_CELLS)) {
-            db.powercell.set(DESIRED_V_VELOCITY, 1.0);
-            db.powercell.set(DESIRED_H_VELOCITY, 0.3);
+            if (!(db.powercell.get(EXIT_BEAM) == (1.0))){
+                db.powercell.set(DESIRED_V_VELOCITY, -0.3);
+                db.powercell.set(DESIRED_H_VELOCITY, -0.3);
+            }else {
+                db.powercell.set(DESIRED_V_VELOCITY, 1.0);
+                db.powercell.set(DESIRED_H_VELOCITY, 0.3);
+            }
         }
 
 
