@@ -9,6 +9,7 @@ import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.EDriveState;
+import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
 
@@ -18,6 +19,10 @@ public abstract class AbstractController {
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
     protected double dt = 1d;
+
+
+    public static double kIntakeRollerPower_on = 1.0;
+    public static double kIntakeRollerPower_off = 0.0;
 
     public AbstractController(){
 
@@ -47,11 +52,14 @@ public abstract class AbstractController {
     protected void setIntakeArmEnabled(double pNow, boolean pEnabled) {
         if(pEnabled) {
             double speed = Math.max(db.drivetrain.get(L_ACTUAL_VEL_FT_s), db.drivetrain.get(R_ACTUAL_VEL_FT_s));
-            db.powercell.set(DESIRED_ARM_ANGLE, 0d);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, speed);
+            if(speed <= 1.0) {
+                speed = 10.0;
+            }
+            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.OUT);
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_on);
         } else {
-            db.powercell.set(DESIRED_ARM_ANGLE, 90d);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
+            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_off);
         }
     }
 
@@ -64,7 +72,7 @@ public abstract class AbstractController {
         double power =0.3;
         if (db.powercell.isSet(ENTRY_BEAM)) {
             db.powercell.set(DESIRED_H_VELOCITY, power);
-            db.powercell.set(DESIRED_V_VELOCITY, power);
+            db.powercell.set(DESIRED_V_VELOCITY, power + 0.2);
             return true;
         } else {
             db.powercell.set(DESIRED_H_VELOCITY, 0.0);

@@ -1,5 +1,6 @@
 package us.ilite.robot.hardware;
 
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import us.ilite.common.lib.control.ProfileGains;
 
@@ -13,6 +14,11 @@ public class HardwareUtils {
         pNEO.setSmartMotionAllowedClosedLoopError(pGains.TOLERANCE, pGains.PROFILE_SLOT);
         pNEO.setSmartMotionMaxAccel(pGains.MAX_ACCEL, pGains.PROFILE_SLOT);
         pNEO.setSmartMotionMaxVelocity(pGains.MAX_VELOCITY, pGains.PROFILE_SLOT);
+    }
+
+    public static void setGains(CANEncoder pEncoder, ProfileGains pGains) {
+        pEncoder.setPositionConversionFactor(pGains.POSITION_CONVERSION_FACTOR);
+        pEncoder.setVelocityConversionFactor(pGains.VELOCITY_CONVERSION_FACTOR);
     }
 
     private HardwareUtils() {}

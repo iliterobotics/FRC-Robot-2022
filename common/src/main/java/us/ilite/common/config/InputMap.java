@@ -22,19 +22,20 @@ public class InputMap {
 
     public static class OPERATOR {
         public static  final ELogitech310
-        BEGIN_HANG = ELogitech310.Y_BTN,
-        RELEASE_HANG = ELogitech310.A_BTN,
-        OPERATOR_POSITION_CONTROL = ELogitech310.R_BTN,
-        FLYWHEEL_AXIS = ELogitech310.LEFT_TRIGGER_AXIS,
-        OPERATOR_ROTATION_CONTROL = ELogitech310.R_BTN,
-        SHOOT = ELogitech310.RIGHT_TRIGGER_AXIS,
-        LOCK_TARGET = ELogitech310.A_BTN,
-        LOCK_CELL = ELogitech310.B_BTN,
-        LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
-        INTAKE = ELogitech310.A_BTN,
-        REVERSE_INTAKE = ELogitech310.X_BTN,
-        LOWER_ARM = ELogitech310.Y_BTN,
-        STOW_INTAKE = ELogitech310.B_BTN;
+                // DO NOT CHANGE THESE
+                INTAKE_ACTIVATE = ELogitech310.A_BTN,
+                INTAKE_REVERSE = ELogitech310.X_BTN,
+                INTAKE_STOW = ELogitech310.B_BTN,
+                FIRE_POWER_CELLS = ELogitech310.Y_BTN,
+
+        // PUT TEST ITEMS BELOW
+        BEGIN_HANG = ELogitech310.START,
+        RELEASE_HANG = ELogitech310.START,
+        COLOR_POSITION = ELogitech310.START,
+        FLYWHEEL_AXIS = ELogitech310.START,
+        COLOR_ROTATION = ELogitech310.START,
+        LOWER_ARM = ELogitech310.START
+                ;
     }
 
 }
