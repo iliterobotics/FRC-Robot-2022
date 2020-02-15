@@ -1,6 +1,5 @@
 package us.ilite.robot.controller;
 
-import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.robot.modules.DriveMessage;

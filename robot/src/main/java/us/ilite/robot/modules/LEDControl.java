@@ -2,6 +2,8 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.CANifier;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EColorData;
 import us.ilite.common.types.ELEDControlData;
@@ -131,11 +133,7 @@ public class LEDControl extends Module {
     }
 
     private boolean isVisionTracking() {
-        if (db.drivetrain.get(EDriveData.DESIRED_STATE, EDriveState.class) != null) {
-            return db.drivetrain.get(EDriveData.DESIRED_STATE, EDriveState.class) == EDriveState.TARGET_ANGLE_LOCK;
-        } else {
-            return false;
-        }
+        return db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL);
     }
 
     public void shutdown(double pNow) {
