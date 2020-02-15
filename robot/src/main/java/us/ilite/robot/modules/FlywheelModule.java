@@ -14,7 +14,6 @@ import us.ilite.common.Distance;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EShooterSystemData;
-import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
@@ -101,7 +100,7 @@ public class FlywheelModule extends Module {
     @Override
     public void readInputs(double pNow) {
         Distance distanceFromTarget = Distance.fromInches(Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, DriveModule.Conversions.ticksPer100msToRotationsPerSecond(mFlywheelFalcon.getSelectedSensorVelocity()));
+//        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, DriveModule.Conversions.ticksPer100msToRotationsPerSecond(mFlywheelFalcon.getSelectedSensorVelocity()));
 
 //        if (isMaxVelocity()) {
 //            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY, 1);

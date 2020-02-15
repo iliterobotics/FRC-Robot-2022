@@ -1,20 +1,18 @@
 package us.ilite.robot.controller;
 
-import edu.wpi.first.wpilibj.util.Color;
-import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.lang.EnumUtils;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import us.ilite.common.config.InputMap;
-import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.types.*;
+import us.ilite.common.types.EColorData;
+import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
@@ -22,12 +20,12 @@ import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
 import us.ilite.robot.modules.PowerCellModule;
 
-import static us.ilite.common.types.EPowerCellData.*;
+import java.util.List;
+
+import static us.ilite.common.types.EPowerCellData.UNUSED;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 import static us.ilite.robot.modules.DriveModule.kDriveNEOVelocityFactor;
-
-import java.util.List;
 
 public class TestController extends BaseManualController {
 
@@ -80,7 +78,7 @@ public class TestController extends BaseManualController {
         // ========================================
         Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
         Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
-        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
+        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel());
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
         Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
         Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));

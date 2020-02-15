@@ -6,6 +6,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -39,13 +40,13 @@ public class Robot extends TimedRobot {
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
-//    private Limelight mLimelight;
+    private Limelight mLimelight;
     private PowerCellModule mIntake;
 //    private RawLimelight mRawLimelight;
 //    private DJSpinnerModule mDJSpinnerModule;
 //    private LEDControl mLEDControl;
     private SimulationModule mSimulation;
-//    private FlywheelModule mShooter;
+    private FlywheelModule mShooter;
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -185,7 +186,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mLimelight);
-        mRunningModules.addModule(mFlywheel);
+        mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
         mRunningModules.addModule(mIntake);
