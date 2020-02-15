@@ -131,7 +131,11 @@ public class LEDControl extends Module {
     }
 
     private boolean isVisionTracking() {
-        return db.drivetrain.get(EDriveData.DESIRED_STATE, EDriveState.class) == EDriveState.TARGET_ANGLE_LOCK;
+        if (db.drivetrain.get(EDriveData.DESIRED_STATE, EDriveState.class) != null) {
+            return db.drivetrain.get(EDriveData.DESIRED_STATE, EDriveState.class) == EDriveState.TARGET_ANGLE_LOCK;
+        } else {
+            return false;
+        }
     }
 
     public void shutdown(double pNow) {
