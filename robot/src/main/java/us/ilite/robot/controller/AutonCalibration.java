@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import jdk.swing.interop.SwingInterOpUtils;
 import us.ilite.common.Distance;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.auto.paths.*;
@@ -33,18 +34,15 @@ public class AutonCalibration extends BaseAutonController {
         }
     }
 
-    private ShuffleboardTab mAutonConfiguration;
-    private NetworkTableEntry mPathNumber;
+    private ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
+    private NetworkTableEntry mPathNumber = mAutonConfiguration.add("Path Number", 0)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
 
     private final Distance mPathTotalDistance;
     private final double mMaxAllowedPathTime;
 
     public AutonCalibration() {
-        mAutonConfiguration = Shuffleboard.getTab("Auton Config");
-        mPathNumber = mAutonConfiguration.add("Path Number", 0)
-                .withWidget(BuiltInWidgets.kTextView)
-                .getEntry();
-
         mActivePath = PATHS.Loop.path;
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
         mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1;
@@ -62,7 +60,8 @@ public class AutonCalibration extends BaseAutonController {
         if(mPathStartTime == 0) {
             mPathStartTime = pNow;
         }
-        mPathNumber.setString(PATHS.values()[((int) mPathNumber.getDouble(0))].name());
+        int pathNumber = mPathNumber.getNumber(999).intValue();
+        mPathNumber.setString(PATHS.values()[pathNumber].name());
         // Add a time check to prevent errors when things go wrong
 //        if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
 //            int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
