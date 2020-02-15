@@ -141,8 +141,8 @@ public class DriveModule extends Module {
 		mRightCtrl.setOutputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
-//		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
-		mGyro = new ADIS16470();
+		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
+//		mGyro = new ADIS16470();
 
 
 		HardwareUtils.setGains(mLeftCtrl, vPID);

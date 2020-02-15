@@ -44,9 +44,9 @@ public abstract class AbstractController {
      */
     protected void setIntakeArmEnabled(double pNow, boolean pEnabled) {
         if(pEnabled) {
-            double speed = Math.max(db.drivetrain.get(L_ACTUAL_VEL_FT_s), db.drivetrain.get(R_ACTUAL_VEL_FT_s));
+//            double speed = Math.max(db.drivetrain.get(L_ACTUAL_VEL_FT_s), db.drivetrain.get(R_ACTUAL_VEL_FT_s));
             db.powercell.set(DESIRED_ARM_ANGLE, 0d);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, speed);
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0.2);
         } else {
             db.powercell.set(DESIRED_ARM_ANGLE, 90d);
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);

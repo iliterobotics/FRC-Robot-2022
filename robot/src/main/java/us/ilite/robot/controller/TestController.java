@@ -11,6 +11,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
@@ -73,12 +74,12 @@ public class TestController extends BaseManualController {
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
-        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
-        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
+//        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
+//        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
+//        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
-        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
-        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
+//        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
+//        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
 //        updateArm(pNow);
 
         double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
@@ -202,13 +203,17 @@ public class TestController extends BaseManualController {
     protected void updatePowerCells(double pNow) {
         // Practice bot testing, min power
         // Power of 1.0 was waaaaay too fast
+        SmartDashboard.putNumber("L_BTN", db.operatorinput.get(ELogitech310.L_BTN));
         if (db.operatorinput.isSet(ELogitech310.L_BTN)) {
             db.powercell.set(UNUSED, 0.2);
+        } else {
+            db.powercell.set(UNUSED, 0.0);
         }
 
+        SmartDashboard.putNumber("A_BTN", db.operatorinput.get(InputMap.OPERATOR.INTAKE));
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
             setIntakeArmEnabled(pNow, true);
-            crossedEntry = activateSerializer(pNow);
+//            crossedEntry = activateSerializer(pNow);
 //            if (crossedEntry && !db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER)) {
 //                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, power);
 //                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, power);
@@ -217,10 +222,12 @@ public class TestController extends BaseManualController {
 //            }
 
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
-            reverseSerializer(pNow);
+//            reverseSerializer(pNow);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.STOW_INTAKE)) {
             setIntakeArmEnabled(pNow, false);
-            crossedEntry = activateSerializer(pNow);
+//            crossedEntry = activateSerializer(pNow);
+        } else {
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
         }
 
 

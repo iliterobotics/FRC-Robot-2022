@@ -146,11 +146,13 @@ public class PowerCellModule extends Module {
         mIndexingState = EIndexingState.NOT_BROKEN;
 
         mIntakeRoller = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeRollerId, CANSparkMaxLowLevel.MotorType.kBrushless );
+        mIntakeRoller.setInverted(true);
         mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonPowerCellSerializer);
         mConveyorMotorVertical = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonVerticalID );
         mConveyorMotorVertical.setInverted(true);
 
         mIntakePivot = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeArm, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mIntakePivot.setInverted(true);
 
         mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel);
         mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel);
@@ -161,12 +163,12 @@ public class PowerCellModule extends Module {
         mIntakeRollerEncoder = mIntakeRoller.getEncoder();
 
         mIntakePivotCtrl = mIntakePivot.getPIDController();
-        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotGains);
+//        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotGains);
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotGains);
+//        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotGains);
     }
 
     @Override
@@ -225,8 +227,8 @@ public class PowerCellModule extends Module {
     @Override
     public void setOutputs(double pNow) {
         mIntakeRoller.set(db.powercell.get(DESIRED_INTAKE_VELOCITY_FT_S));
-        mConveyorMotorHorizontal.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_H_VELOCITY));
-        mConveyorMotorVertical.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_V_VELOCITY));
+//        mConveyorMotorHorizontal.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_H_VELOCITY));
+//        mConveyorMotorVertical.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_V_VELOCITY));
 //        mIntakePivotEncoder.setPosition(db.powercell.get(EPowerCellData.DESIRED_ARM_ANGLE));
         mIntakePivot.set(db.powercell.get(UNUSED));
     }
