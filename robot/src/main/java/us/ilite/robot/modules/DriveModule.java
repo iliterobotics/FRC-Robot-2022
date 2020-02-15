@@ -32,7 +32,8 @@ public class DriveModule extends Module {
 	// DO NOT CHANGE THE GEAR RATIO
 	public static double kGearboxRatio = (10.0 / 40.0) * (14.0 / 40.0);
 	// As of 2/9this is for omni wheels on a solid floor
-	public static double kWheelDiameterInches = 6.125;
+	//public static double kWheelDiameterInches = 6.125;
+	public static double kWheelDiameterInches = 5.9375;
 	public static double kWheelCircumferenceFeet = kWheelDiameterInches*Math.PI/12.0;
 	// For position, getPosition() returns raw rotations - so convert that to feet
 	public static double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
