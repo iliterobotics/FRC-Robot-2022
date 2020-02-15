@@ -75,6 +75,7 @@ public class DriveModule extends Module {
 			.maxAccel(56760d)
 			.slot(POSITION_PID_SLOT)
 			.conversion(kDriveNEOPositionFactor);
+
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
 			.p(0.0001)
@@ -231,31 +232,29 @@ public class DriveModule extends Module {
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
-//			case HOLD:
-//				if (!mStartHoldingPosition) {
-//					mLeftHoldSetpoint = mLeftEncoder.getPosition();
-//					mRightHoldSetpoint = mRightEncoder.getPosition();
-//					mRightMaster.getEncoder().setPosition(0.0);
-//					mLeftMaster.getEncoder().setPosition(0.0);
-//					mStartHoldingPosition = true;
-//				}
-//
-//				if (mLeftEncoder.getVelocity() < 100) {
-//					if (Math.abs(mLeftEncoder.getPosition() - mLeftHoldSetpoint) > 2) {
-//						mLeftCtrl.setReference(mLeftHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
-//					}
-//				} else {
-//					mLeftCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//
-//				if (mRightEncoder.getVelocity() < 100) {
-//					if (Math.abs(mRightEncoder.getPosition() - mRightHoldSetpoint) > 2) {
-//						mRightCtrl.setReference(mRightHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
-//					}
-//				} else {
-//					mRightCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//				break;
+			case HOLD:
+				if (!mStartHoldingPosition) {
+					mLeftHoldSetpoint = mLeftEncoder.getPosition();
+					mRightHoldSetpoint = mRightEncoder.getPosition();
+					mStartHoldingPosition = true;
+				}
+
+				if (mLeftEncoder.getVelocity() < 100) {
+					if (Math.abs(mLeftEncoder.getPosition() - mLeftHoldSetpoint) > 2) {
+						mLeftCtrl.setReference(mLeftHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
+					}
+				} else {
+					mLeftCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				}
+
+				if (mRightEncoder.getVelocity() < 100) {
+					if (Math.abs(mRightEncoder.getPosition() - mRightHoldSetpoint) > 2) {
+						mRightCtrl.setReference(mRightHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
+					}
+				} else {
+					mRightCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				}
+				break;
 			case TARGET_ANGLE_LOCK:
 			case VELOCITY:
 				mStartHoldingPosition = false;
