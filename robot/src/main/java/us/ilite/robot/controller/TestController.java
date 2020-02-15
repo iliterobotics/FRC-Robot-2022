@@ -198,7 +198,6 @@ public class TestController extends BaseManualController {
         mLastTrackingType = Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
 
-
     protected void updatePowerCells(double pNow) {
         // Practice bot testing, min power
         // Power of 1.0 was waaaaay too fast
@@ -222,8 +221,7 @@ public class TestController extends BaseManualController {
             setIntakeArmEnabled(pNow, false);
             crossedEntry = activateSerializer(pNow);
         }
-
-
+        
 //        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
 ////            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
 ////            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());

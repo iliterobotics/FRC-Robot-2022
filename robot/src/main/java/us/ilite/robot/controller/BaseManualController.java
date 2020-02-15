@@ -1,5 +1,6 @@
 package us.ilite.robot.controller;
 
+import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.robot.modules.DriveMessage;
@@ -25,11 +26,11 @@ public abstract class BaseManualController extends AbstractController {
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
 
         if(throttle == 0.0 && rotate == 0.0) {
-            db.drivetrain.set(STATE, EDriveState.VELOCITY);//HOLD);
+            db.drivetrain.set(DESIRED_STATE, EDriveState.HOLD);
             db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
             db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
         } else {
-            db.drivetrain.set(STATE, EDriveState.VELOCITY);
+            db.drivetrain.set(DESIRED_STATE, EDriveState.VELOCITY);
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.01;
             }
@@ -41,7 +42,12 @@ public abstract class BaseManualController extends AbstractController {
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
             }
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
-            db.drivetrain.set(DESIRED_TURN_PCT, rotate);
+
+            //TODO - Button here is bound to change once everything is integrated
+            if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_BALL)) {
+                db.drivetrain.set(DESIRED_STATE, TARGET_TRACKING);
+                db.drivetrain.set(DESIRED_TURN_PCT, rotate);
+            }
         }
 
     }
