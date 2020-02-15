@@ -133,7 +133,7 @@ public class LEDControl extends Module {
     }
 
     private boolean isVisionTracking() {
-        return db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL);
+        return db.drivetrain.get(EDriveData.DESIRED_STATE, EDriveState.class) == EDriveState.TARGET_ANGLE_LOCK;
     }
 
     public void shutdown(double pNow) {
