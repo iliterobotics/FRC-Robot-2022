@@ -49,7 +49,7 @@ public class TargetLock implements ICommand {
         mHasAcquiredTarget = false;
         mAlignedCount = 0;
 
-        Robot.DATA.drivetrain.set(EDriveData.STATE, EDriveState.TARGET_ANGLE_LOCK);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.TARGET_ANGLE_LOCK);
         Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.0);
 
         this.mPreviousTime = pNow;
@@ -96,7 +96,7 @@ public class TargetLock implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-        Robot.DATA.drivetrain.set(EDriveData.STATE, EDriveState.NORMAL);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.NORMAL);
     }
 
     public TargetLock setTargetLockThrottleProvider(IThrottleProvider pThrottleProvider) {

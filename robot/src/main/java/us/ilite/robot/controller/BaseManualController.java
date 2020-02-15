@@ -41,11 +41,13 @@ public abstract class BaseManualController extends AbstractController {
                 throttle *= Settings.Input.kSnailModePercentThrottleReduction;
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
             }
+
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
 
             //TODO - Button here is bound to change once everything is integrated
             if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_BALL)) {
                 db.drivetrain.set(DESIRED_STATE, TARGET_TRACKING);
+            } else {
                 db.drivetrain.set(DESIRED_TURN_PCT, rotate);
             }
         }
