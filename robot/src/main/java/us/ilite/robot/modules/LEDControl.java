@@ -14,20 +14,8 @@ public class LEDControl extends Module {
 
     private CANifier mLEDCan;
     private Timer mBlinkTimer;
-    private boolean mLedOn;
     private Message mCurrentMessage;
-//    private DJBoothPositionControl mDjBoothPositionControl;
-//    private DJBoothRotationControl mDjBoothRotationControl;
-    
-//    private final Drive mDrive;
-//    private final Elevator mElevator;
-//    private final PneumaticIntake mPneumaticIntake;
-//    private final CargoSpit mCargoSpit;
-//    private final HatchFlower mHatchFlower;
-//    private final FourBar mFourBar;
-//    private final Limelight mLimelight;
-//    private final Data mData;
-
+    private LEDState mLEDState;
 
     public static class RGB {
         private int mR;
@@ -99,13 +87,6 @@ public class LEDControl extends Module {
 
     // pulse speed in milliseconds, 0 = on solid
     public enum Message {
-//        HAS_HATCH( LEDColor.YELLOW, 0 ),
-//        HAS_CARGO( LEDColor.ORANGE, 0 ),
-//        CURRENT_LIMITING( LEDColor.RED, 300 ),
-//        VISION_TRACKING( LEDColor.GREEN, 0 ),
-//        KICKING_HATCH( LEDColor.BLUE, 0 ),
-//        SPITTING_CARGO( LEDColor.WHITE, 0 ),
-//        NONE( LEDColor.NONE, 0 );
 
         ON_BLUE( LEDColor.BLUE, false ),
         ON_RED( LEDColor.RED, false ),
@@ -137,6 +118,10 @@ public class LEDControl extends Module {
         LEDState(boolean isOn){
             this.isOn = isOn;
         }
+        public boolean isOn(){
+            return isOn;
+        }
+
     }
 
 
@@ -145,7 +130,7 @@ public class LEDControl extends Module {
 //        this.mDjBoothRotationControl = pDjBoothRotationControl;
 
         this.mCurrentMessage = Message.NONE;
-        this.mLedOn = true;
+        mLEDState = LEDState.ON;
 
         this.mBlinkTimer = new Timer();
         this.mBlinkTimer.reset();
@@ -166,21 +151,8 @@ public class LEDControl extends Module {
     public void update(double pNow) {
         Message lastMsg = this.mCurrentMessage;
         Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.NONE);
-//        if(mCargoSpit.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
-//        if(mElevator.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
-//        if(mDrive.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
-//        if(mFourBar.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
-//
-//        if(mCargoSpit.hasCargo()) mCurrentMessage = Message.HAS_CARGO;
-//        if(mHatchFlower.hasHatch()) mCurrentMessage = Message.HAS_HATCH;
-//
-//        if(mCargoSpit.isOuttaking()) mCurrentMessage = Message.SPITTING_CARGO;
-//        if(mHatchFlower.shouldBackUp()) mCurrentMessage = Message.KICKING_HATCH;
-//
-//        if(mLimelight.getTracking() != ETrackingType.NONE) mCurrentMessage = Message.VISION_TRACKING;
-//
 
-        EColorMatch color = EColorMatch.values()[(int)(double)db.color.get(EColorData.SENSED_COLOR)];
+        EColorMatch color = EColorMatch.values()[(int) db.color.get(EColorData.SENSED_COLOR)];
         boolean isDone = (EColorWheelState.valueOf(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE)) == EColorWheelState.OFF);
 
 
@@ -227,7 +199,7 @@ public class LEDControl extends Module {
         // Did the message change?
         if ( lastMsg != this.mCurrentMessage ) {
             // The message changed, reset the timer and on state
-            this.mLedOn = true;
+            mLEDState = LEDState.ON;
             this.mBlinkTimer.stop();
             this.mBlinkTimer.reset();
             this.mBlinkTimer.start();
@@ -243,16 +215,16 @@ public class LEDControl extends Module {
 
         if(m.pulse == 0)
         {
-            mLedOn = true;
+           mLEDState = LEDState.ON;
         }
         else if( this.mBlinkTimer.hasPeriodPassed(blinkPeriod) ) {
-            mLedOn = !mLedOn;
+            mLEDState.isOn = !mLEDState.isOn;
             this.mBlinkTimer.stop();
             this.mBlinkTimer.reset();
             this.mBlinkTimer.start();
         }
 
-        if(mLedOn) {
+        if(mLEDState.isOn()) {
             setLED(m.color);
         } else {
             turnOffLED();
@@ -283,11 +255,13 @@ public class LEDControl extends Module {
     @Override
     public void readInputs(double pNow) {
         //TODO decide what to put in here
+        Robot.DATA.ledcontrol.set(ELEDControlData.LED_STATE , mLEDState.isOn() );
     }
 
     @Override
     public void setOutputs(double pNow) {
         //TODO decide what to put in here
+        update(pNow);
     }
 
     public void shutdown(double pNow) {
