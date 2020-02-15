@@ -67,7 +67,7 @@ public class LEDControlUtils {
         FINISHED_ON_RED( LEDColor.RED, true ),
         FINISHED_ON_GREEN( LEDColor.GREEN, true ),
         FINISHED_ON_YELLOW( LEDColor.YELLOW, true ),
-        NONE(LEDColor.PURPLE, false),
+        NONE(LEDColor.DEFAULT, false),
 
         CURRENT_LIMITING( LEDColor.RED, false),
         VISION_TRACKING( LEDColor.GREEN, false);

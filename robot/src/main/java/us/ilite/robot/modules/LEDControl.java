@@ -21,16 +21,24 @@ public class LEDControl extends Module {
     private LEDState mLEDState;
 
     public enum LEDState {
-        ON(true),
-        OFF(false);
-        boolean isOn;
-        LEDState(boolean isOn){
-            this.isOn = isOn;
-        }
-        public boolean isOn(){
-            return isOn;
+        ON,
+        OFF;
+
+        public LEDState fromState(boolean isOn) {
+            if (isOn) {
+                return ON;
+            } else {
+                return OFF;
+            }
         }
 
+        public boolean isOn(){
+            return this == ON;
+        }
+
+        public LEDState flip() {
+            return fromState(!isOn());
+        }
     }
 
     @Override
@@ -90,7 +98,7 @@ public class LEDControl extends Module {
         if(m.pulse == 0) {
             mLEDState = LEDState.ON;
         } else if( this.mBlinkTimer.hasPeriodPassed(blinkPeriod) ) {
-            mLEDState.isOn = !mLEDState.isOn;
+            mLEDState = mLEDState.flip();
             this.mBlinkTimer.stop();
             this.mBlinkTimer.reset();
             this.mBlinkTimer.start();
