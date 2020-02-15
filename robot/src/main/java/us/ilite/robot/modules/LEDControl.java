@@ -49,13 +49,16 @@ public class LEDControl extends Module {
     public void setOutputs(double pNow) {
         EColorMatch color = EColorMatch.values()[(int) db.color.get(EColorData.SENSED_COLOR)];
         boolean isDone = (EColorWheelState.valueOf(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE)) == EColorWheelState.OFF);
-        if (isCurrentLimiting()) {
-            mCurrentMessage = Message.CURRENT_LIMITING;
-        } else {
-            mCurrentMessage = Message.fromColorMatch(color, isDone);
-        }
+
+        //Prioritization of LED control
+        mCurrentMessage = Message.fromColorMatch(color, isDone);
+
         if (isVisionTracking()) {
             mCurrentMessage = Message.VISION_TRACKING;
+        }
+
+        if (isCurrentLimiting()) {
+            mCurrentMessage = Message.CURRENT_LIMITING;
         }
 
         // Did the message change?
@@ -108,20 +111,20 @@ public class LEDControl extends Module {
         setLED(color.getColor());
     }
 
-        private void setLED(RGB rgb) {
-            mLEDCan.setLEDOutput(rgb.getRPercent(), CANifier.LEDChannel.LEDChannelB); // Red
-            mLEDCan.setLEDOutput(rgb.getGPercent(), CANifier.LEDChannel.LEDChannelA); // Green
-            mLEDCan.setLEDOutput(rgb.getBPercent(), CANifier.LEDChannel.LEDChannelC); // Blue
-        }
+    private void setLED(RGB rgb) {
+        mLEDCan.setLEDOutput(rgb.getRPercent(), CANifier.LEDChannel.LEDChannelB); // Red
+        mLEDCan.setLEDOutput(rgb.getGPercent(), CANifier.LEDChannel.LEDChannelA); // Green
+        mLEDCan.setLEDOutput(rgb.getBPercent(), CANifier.LEDChannel.LEDChannelC); // Blue
+    }
 
-        private boolean isCurrentLimiting() {
-            // TODO implement current limiting from intake
-            return false;
-        }
+    private boolean isCurrentLimiting() {
+        // TODO implement current limiting from intake
+        return false;
+    }
 
-        private boolean isVisionTracking() {
-            return db.drivetrain.get(EDriveData.STATE, EDriveState.class) == EDriveState.TARGET_ANGLE_LOCK;
-        }
+    private boolean isVisionTracking() {
+        return db.drivetrain.get(EDriveData.STATE, EDriveState.class) == EDriveState.TARGET_ANGLE_LOCK;
+    }
 
     public void shutdown(double pNow) {
         // TODO Auto-generated method stub
