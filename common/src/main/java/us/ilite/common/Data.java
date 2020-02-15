@@ -3,6 +3,7 @@ package us.ilite.common;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class Data {
 
     private final ILog mLogger = Logger.createLog(Data.class);
+    public Color DJ_COLOR;
 
     //Add new codexes here as we need more
 
@@ -38,9 +40,7 @@ public class Data {
     public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(NULL_CODEX_VALUE, EShooterSystemData.class);
     public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
 
-    public Color DJ_COLOR = Color.kAzure;
-
-    public final RobotCodex[] mAllCodexes = new RobotCodex[] {
+    public final RobotCodex[] mAllCodexes = new RobotCodex[]{
             imu,
             drivetrain,
             driverinput,
@@ -57,7 +57,7 @@ public class Data {
 
     public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
 
-    public final RobotCodex[] mLoggedCodexes = new RobotCodex[] {
+    public final RobotCodex[] mLoggedCodexes = new RobotCodex[]{
             imu,
             drivetrain,
             driverinput,
@@ -71,11 +71,12 @@ public class Data {
 
     /**
      * Create a Data object based on whether or not it is being used for logging
+     *
      * @param pLogging
      */
     public Data(boolean pLogging) {
         int i = 0;
-        for(RobotCodex rc : mAllCodexes) {
+        for (RobotCodex rc : mAllCodexes) {
             mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
             rc.meta().setGlobalId(i);
             i++;
@@ -86,4 +87,16 @@ public class Data {
         this(true);
     }
 
+    public static char recieveColorFmsRelay() {
+        //For testing make sure to comment out the method and
+        //return a single char for the symbol of the color.
+        String gameData;
+        gameData = DriverStation.getInstance().getGameSpecificMessage();
+        if (gameData.length() > 0) {
+            return gameData.charAt(0);
+        } else {
+            return '\u1000';
+        }
+
+    }
 }
