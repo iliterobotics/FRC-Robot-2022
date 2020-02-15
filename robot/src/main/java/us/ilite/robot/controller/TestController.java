@@ -1,10 +1,6 @@
 package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.lang.EnumUtils;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import us.ilite.common.config.InputMap;
-import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -13,14 +9,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EColorData;
-import us.ilite.common.types.input.ELogitech310;
-import us.ilite.common.types.sensor.EGyro;
-import us.ilite.robot.Robot;
-import us.ilite.robot.modules.*;
-import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.EPowerCellData;
+import us.ilite.common.types.input.ELogitech310;
+import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
@@ -28,14 +20,11 @@ import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
 
-import static us.ilite.robot.Robot.DATA;
-
-import static us.ilite.common.types.EPowerCellData.*;
+import static us.ilite.common.types.EPowerCellData.UNUSED;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
+import static us.ilite.robot.Robot.DATA;
 import static us.ilite.robot.modules.DriveModule.kDriveNEOVelocityFactor;
-
-import java.util.List;
 
 public class TestController extends BaseManualController {
 

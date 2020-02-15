@@ -207,7 +207,9 @@ public class Robot extends TimedRobot {
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
         for (RobotCodex c : DATA.mLoggedCodexes ) {
-            Robot.mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
+            if ( c.hasChanged() ) {
+                Robot.mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
+            }
         }
         for ( RobotCodex c : DATA.mAllCodexes ) {
             c.reset();
