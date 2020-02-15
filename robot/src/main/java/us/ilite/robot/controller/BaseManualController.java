@@ -45,6 +45,7 @@ public abstract class BaseManualController extends AbstractController {
 
             //TODO - Button here is bound to change once everything is integrated
             if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_BALL)) {
+                db.drivetrain.set(DESIRED_STATE, TARGET_TRACKING);
                 db.drivetrain.set(DESIRED_TURN_PCT, rotate);
             }
         }

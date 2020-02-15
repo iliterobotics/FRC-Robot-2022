@@ -256,7 +256,7 @@ public class DriveModule extends Module {
 					mRightCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				}
 				break;
-
+			case TARGET_ANGLE_LOCK:
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
@@ -289,7 +289,6 @@ public class DriveModule extends Module {
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 
 					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
-					// If we've already seen the target and lose tracking, exit.
 				}
 				break;
 			case NORMAL:
