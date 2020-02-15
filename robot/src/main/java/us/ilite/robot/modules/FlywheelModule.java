@@ -1,8 +1,7 @@
 package us.ilite.robot.modules;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.flybotix.hfr.util.log.ILog;
-import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -20,16 +19,19 @@ import us.ilite.robot.hardware.SparkMaxFactory;
 
 
 public class FlywheelModule extends Module {
+    //Hood Servo Gear Ratio
+    // 32 / 20 * 14 / 360
 
     private CANSparkMax mFlywheelFeeder;
     private TalonFX mFlywheelFalcon;
     private Servo mHoodAngler;
-    private ILog mLog = Logger.createLog(this.getClass());
-    private final double kMaxServoVelocity = 76.923;
-    private double mPreviousTime;
     private Potentiometer mHoodPot;
 
+    private double potentiometerTurns;
 
+    private final double kHoodGearRatio = 14d / 225d;
+    private final double kHoodConstant = kHoodGearRatio * 10;
+    private final int kBaseHoodAngle = 60;
     private final int kFlywheelFalconPIDSlot = 0;
     private final int kMaxFalconVelocity = 6380;
 
@@ -37,7 +39,9 @@ public class FlywheelModule extends Module {
         mFlywheelFalcon = new TalonFX(50);
         mFlywheelFeeder = SparkMaxFactory.createDefaultSparkMax(9 , CANSparkMaxLowLevel.MotorType.kBrushless);
         mHoodAngler = new Servo(9);
+
         mHoodPot = new AnalogPotentiometer(0);
+
         mFlywheelFalcon.config_kP(kFlywheelFalconPIDSlot, 0.25);
         mFlywheelFalcon.config_kI(kFlywheelFalconPIDSlot, 0);
         mFlywheelFalcon.config_kD(kFlywheelFalconPIDSlot, 0);
@@ -48,11 +52,12 @@ public class FlywheelModule extends Module {
         return mFlywheelFalcon.getSelectedSensorVelocity() >= 2000;
     }
 
-    private boolean targetValid(ELimelightData pLimelightData) {
-        return Robot.DATA.limelight.isSet(pLimelightData);
+    private boolean targetValid() {
+        return Robot.DATA.limelight.isSet(ELimelightData.TY);
     }
 
     private double calcSpeedFromDistance(Distance pDistance) {
+        //TODO figure out necessity
         return 7.2E-3 * Math.pow(pDistance.inches(), 3)
                 - 0.209 * Math.pow(pDistance.inches(), 2)
                 + 6.31 * pDistance.inches()
@@ -60,11 +65,22 @@ public class FlywheelModule extends Module {
     }
 
     private double calcAngleFromDistance(Distance pDistance) {
+        //TODO tuning
         return 5.2E-05 * Math.pow(pDistance.inches(), 4)
                 - 4.9E-03 * Math.pow(pDistance.inches(), 3)
                 + 0.157 * Math.pow(pDistance.inches(), 2)
                 + 2.94 * pDistance.inches()
                 + 68.2;
+    }
+
+    private double potentiometerBasedAngle() {
+//        double distanceFromTarget;
+//        if (targetValid()) {
+//            distanceFromTarget = Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET);
+//
+//        }
+        return 60 - kHoodGearRatio * Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_POTENTIOMETER_READING);
+//        return kHoodConstant - kHoodGearRatio * Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_POTENTIOMETER_READING);
     }
 
     @Override
@@ -76,6 +92,7 @@ public class FlywheelModule extends Module {
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
 
         SmartDashboard.putNumber("Flywheel Current Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
+        SmartDashboard.putNumber("Hood Angle", potentiometerBasedAngle());
 
         Shuffleboard.addEventMarker("Flywheel Current Velocity", EventImportance.kHigh);
     }
@@ -85,13 +102,13 @@ public class FlywheelModule extends Module {
         Distance distanceFromTarget = Distance.fromInches(Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, DriveModule.Conversions.ticksPer100msToRotationsPerSecond(mFlywheelFalcon.getSelectedSensorVelocity()));
 
-        if (isMaxVelocity()) {
-            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY, 1);
-        } else {
-            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY, 0);
-        }
+//        if (isMaxVelocity()) {
+//            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY, 1);
+//        } else {
+//            Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_IS_MAX_VELOCITY, 0);
+//        }
 
-        if (targetValid(ELimelightData.TY) && Robot.DATA.limelight.get( ELimelightData.CURRENT_PIPELINE ) == 1 ) {
+        if (targetValid() && Robot.DATA.limelight.get( ELimelightData.CURRENT_PIPELINE ) == 1 ) {
             Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, calcSpeedFromDistance(distanceFromTarget));
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, calcAngleFromDistance(distanceFromTarget));
         } else {
@@ -99,23 +116,21 @@ public class FlywheelModule extends Module {
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, 60);
         }
 
-        Robot.DATA.flywheel.set(EShooterSystemData.POTENTIOMETER_CURRENT_ANGLE, mHoodPot.get());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_POTENTIOMETER_READING, mHoodPot.get());
     }
 
     @Override
     public void setOutputs(double pNow) {
-//        mFlywheelFalcon.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
-//        mFlywheelFeeder.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
+        mFlywheelFalcon.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
+        mFlywheelFeeder.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
         mHoodAngler.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_SERVO_ANGLE));
-        mLog.error("----------------------------------------------------- SERVO SPEED--------------------------------------" + mHoodAngler.getSpeed());
-        mPreviousTime = pNow;
     }
 
     @Override
     public void shutdown(double pNow) {
-//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
-//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
-//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 60);
-//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
     }
 }
