@@ -6,7 +6,6 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -18,10 +17,7 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.robot.controller.AbstractController;
-import us.ilite.robot.controller.BaseAutonController;
-import us.ilite.robot.controller.TeleopController;
-import us.ilite.robot.controller.TestController;
+import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
 
@@ -38,22 +34,23 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-    private CSVLogger mCSVLogger = new CSVLogger(DATA);
+//    private CSVLogger mCSVLogger = new CSVLogger();
+    private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
-    private Limelight mLimelight;
-//    private PowerCellModule mIntake;
-    private RawLimelight mRawLimelight;
-    private DJSpinnerModule mDJSpinnerModule;
+//    private Limelight mLimelight;
+    private PowerCellModule mIntake;
+//    private RawLimelight mRawLimelight;
+//    private DJSpinnerModule mDJSpinnerModule;
+//    private LEDControl mLEDControl;
     private SimulationModule mSimulation;
-    private FlywheelModule mFlywheel;
-    private HangerModule mHanger = new HangerModule();
+//    private FlywheelModule mShooter;
 
     private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private OperatorInput mOI;
-    private LEDControl mLedControl;
+//    private LEDControl mLedControl;
 
     private MatchMetadata mMatchMeta = null;
 
@@ -72,12 +69,13 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-        mLedControl = new LEDControl();
-        mFlywheel = new FlywheelModule();
-//        mIntake = new PowerCellModule();
-        mLimelight = new Limelight();
-        mRawLimelight = new RawLimelight();
+//        mLedControl = new LEDControl();
+//        mShooter = new FlywheelModule();
+        mIntake = new PowerCellModule();
+//        mLimelight = new Limelight();
+//        mRawLimelight = new RawLimelight();
 //        mDJSpinnerModule = new DJSpinnerModule();
+//        mLEDControl = new LEDControl();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -129,9 +127,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+//        mCSVLogger.start();
         MODE=AUTONOMOUS;
-        mActiveController = mBaseAutonController;
+        mActiveController = new AutonCalibration();
         mActiveController.setEnabled(true);
+
+        mRunningModules.clearModules();
+        mRunningModules.addModule(mDrive);
+        mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 
     @Override
@@ -141,6 +144,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+//        mCSVLogger.start();
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -155,8 +159,10 @@ public class Robot extends TimedRobot {
     public void disabledInit() {
         MODE=DISABLED;
         mLogger.info("Disabled Initialization");
+
         mRunningModules.shutdown(CLOCK.getCurrentTime());
-        mCSVLogger.stop(); // stop csv logging
+//        mCSVLogger.stop();
+
         if(mActiveController != null) {
             mActiveController.setEnabled(false);
         }
@@ -181,10 +187,10 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mFlywheel);
         mRunningModules.addModule(mDrive);
-//        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
+//        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }
@@ -199,9 +205,13 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for(RobotCodex rc : DATA.mAllCodexes){
-            rc.reset();
+        for (RobotCodex c : DATA.mLoggedCodexes ) {
+//            mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
         }
+        for ( RobotCodex c : DATA.mAllCodexes ) {
+            c.reset();
+        }
+
 //        EPowerDistPanel.map(mData.pdp, pdp);
 
         mRunningModules.readInputs(CLOCK.getCurrentTime());
@@ -216,7 +226,9 @@ public class Robot extends TimedRobot {
             mMatchMeta = new MatchMetadata();
             int gid = mMatchMeta.hash;
             for (RobotCodex c : DATA.mAllCodexes) {
-                c.meta().setGlobalId(gid);
+                if ( !c.meta().getEnum().getSimpleName().equals("ELogitech310")) {
+                    c.meta().setGlobalId(gid);
+                }
             }
         }
     }

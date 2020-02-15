@@ -86,7 +86,7 @@ public class DriveStraight implements ICommand {
             return true;
         } else {
             DriveMessage d = new DriveMessage().throttle(throttle).turn(turn).normalize();
-            Robot.DATA.drivetrain.set(DESIRED_NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
+            Robot.DATA.drivetrain.set(NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
             Robot.DATA.drivetrain.set(DESIRED_THROTTLE_PCT, d.getThrottle());
             Robot.DATA.drivetrain.set(DESIRED_TURN_PCT, d.getTurn());
             mLastTime = pNow;
@@ -105,9 +105,9 @@ public class DriveStraight implements ICommand {
     }
 
     private Distance getAverageDriveDistance() {
-        return Distance.fromInches(
-                        Robot.DATA.drivetrain.get(LEFT_POS_INCHES) +
-                        Robot.DATA.drivetrain.get(RIGHT_POS_INCHES) / 2.0);
+        return Distance.fromFeet(
+                (Robot.DATA.drivetrain.get(L_ACTUAL_POS_FT) +
+                        Robot.DATA.drivetrain.get(R_ACTUAL_POS_FT)) / 2.0);
     }
 
     private Distance getAverageDistanceTraveled() {

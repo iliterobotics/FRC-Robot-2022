@@ -14,6 +14,7 @@ import us.ilite.common.Distance;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EShooterSystemData;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
 

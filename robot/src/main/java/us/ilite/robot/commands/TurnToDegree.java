@@ -67,7 +67,7 @@ public class TurnToDegree implements ICommand {
 
     // End if on target for 25 counts
     if ( mAlignedCount >= kMIN_ALIGNED_COUNT || pNow - mStartTime > kTIMEOUT ) {
-      Robot.DATA.drivetrain.set(EDriveData.DESIRED_NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
+      Robot.DATA.drivetrain.set(EDriveData.NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
       Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0d);
       Robot.DATA.drivetrain.set(EDriveData.DESIRED_TURN_PCT, 0d);
       mLogger.info( "Turn finished" );

@@ -15,9 +15,10 @@ public class ProfileGains {
     public double D = 0;
     public double F = 0;
 
-    public double MAX_ACCEL = 0;
-    public double MAX_VELOCITY = 0;
-    public double TOLERANCE = 0;
+    public double MAX_ACCEL = 0d;
+    public double MAX_VELOCITY = 0d;
+    public double TOLERANCE = 0d;
+    public double CONVERSION_FACTOR = 1d;
 
     /** Defaulted to 1 */
     public int PROFILE_SLOT = 1;
@@ -109,6 +110,11 @@ public class ProfileGains {
      */
     public ProfileGains slot(int gain) {
         PROFILE_SLOT = gain;
+        return this;
+    }
+
+    public ProfileGains conversion(double pConversionFactor) {
+        CONVERSION_FACTOR = pConversionFactor;
         return this;
     }
 }
