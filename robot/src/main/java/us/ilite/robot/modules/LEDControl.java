@@ -15,6 +15,7 @@ public class LEDControl extends Module {
     private CANifier mLEDCan;
     private Timer mBlinkTimer;
     private Message mCurrentMessage;
+    private Message mLastMessage;
     private LEDState mLEDState;
 
     public static class RGB {
@@ -83,11 +84,9 @@ public class LEDControl extends Module {
             return this.rgb;
         }
     }
-
-
+    
     // pulse speed in milliseconds, 0 = on solid
     public enum Message {
-
         ON_BLUE( LEDColor.BLUE, false ),
         ON_RED( LEDColor.RED, false ),
         ON_GREEN( LEDColor.GREEN, false ),
@@ -111,6 +110,34 @@ public class LEDControl extends Module {
             }
             else {
                 this.pulse = 0;
+            }
+        }
+
+        static Message fromColorMatch(EColorMatch color, boolean isDone) {
+            if (isDone) {
+                if (color == EColorMatch.BLUE) {
+                    return FINISHED_ON_BLUE;
+                } else if (color == EColorMatch.RED) {
+                    return FINISHED_ON_RED;
+                } else if (color == EColorMatch.GREEN) {
+                    return FINISHED_ON_GREEN;
+                } else if (color == EColorMatch.YELLOW) {
+                    return FINISHED_ON_YELLOW;
+                } else {
+                    return NONE;
+                }
+            } else {
+                if (color == EColorMatch.BLUE) {
+                    return ON_BLUE;
+                } else if (color == EColorMatch.RED) {
+                    return ON_RED;
+                } else if (color == EColorMatch.GREEN) {
+                    return ON_GREEN;
+                } else if (color == EColorMatch.YELLOW) {
+                    return ON_YELLOW;
+                } else {
+                    return NONE;
+                }
             }
         }
     }
@@ -147,77 +174,11 @@ public class LEDControl extends Module {
         this.mBlinkTimer.reset();
     }
 
-
-    /**
-     * Updates LED strip based on mechanism states. We check mechanisms in order of lowest to highest priority.
-     */
-    public void update(double pNow) {
-        Message lastMsg = this.mCurrentMessage;
-        Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.NONE);
-
-        EColorMatch color = EColorMatch.values()[(int) db.color.get(EColorData.SENSED_COLOR)];
-        boolean isDone = (EColorWheelState.valueOf(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE)) == EColorWheelState.OFF);
-
-
-        if (color == EColorMatch.BLUE && !isDone) {
-            Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.ON_BLUE);
-        } else if (color == EColorMatch.RED && !isDone) {
-            Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.ON_RED);
-        } else if (color == EColorMatch.GREEN && !isDone) {
-            Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.ON_GREEN);
-        } else if (color == EColorMatch.YELLOW && !isDone) {
-            Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.ON_YELLOW);
-        }
-        else if (color == EColorMatch.BLUE && isDone) {
-            Robot.DATA.ledcontrol.set(ELEDControlData.DESIRED_MESSAGE , Message.ON_BLUE);
-        } else if (color == EColorMatch.RED && isDone) {
-            Robot.DATA.ledcontrol.set(ELEDControlData.DESIRED_MESSAGE , Message.ON_RED);
-        } else if (color == EColorMatch.GREEN && isDone) {
-            Robot.DATA.ledcontrol.set(ELEDControlData.DESIRED_MESSAGE , Message.ON_GREEN);
-        } else if (color == EColorMatch.YELLOW && isDone) {
-            Robot.DATA.ledcontrol.set(ELEDControlData.DESIRED_MESSAGE , Message.ON_YELLOW);
-        }
-
-//        if ( Math.abs( red - LEDColor.RED.getColor().getR() ) <= 10  &&
-//                Math.abs( green - LEDColor.RED.getColor().getG() ) <= 10  &&
-//                Math.abs(blue - LEDColor.RED.getColor().getB()) <= 10 ) {
-//            mCurrentMessage = Message.ON_RED;
-//        }
-//        else if ( Math.abs( red - LEDColor.BLUE.getColor().getR() ) <= 10  &&
-//                Math.abs( green - LEDColor.BLUE.getColor().getG() ) <= 10  &&
-//                Math.abs(blue - LEDColor.BLUE.getColor().getB()) <= 10) {
-//            mCurrentMessage = Message.ON_BLUE;
-//        }
-//        else if ( Math.abs( red - LEDColor.GREEN.getColor().getR() ) <= 10  &&
-//                Math.abs( green - LEDColor.GREEN.getColor().getG() ) <= 10  &&
-//                Math.abs(blue - LEDColor.GREEN.getColor().getB()) <= 10) {
-//            mCurrentMessage = Message.ON_GREEN;
-//        }
-//        else if ( Math.abs( red - LEDColor.YELLOW.getColor().getR() ) <= 10  &&
-//                Math.abs( green - LEDColor.YELLOW.getColor().getG() ) <= 10  &&
-//                Math.abs(blue - LEDColor.YELLOW.getColor().getB()) <= 10) {
-//            mCurrentMessage = Message.ON_YELLOW;
-//        }
-
-        // Did the message change?
-        if ( lastMsg != this.mCurrentMessage ) {
-            // The message changed, reset the timer and on state
-            mLEDState = LEDState.ON;
-            this.mBlinkTimer.stop();
-            this.mBlinkTimer.reset();
-            this.mBlinkTimer.start();
-        }
-
-        controlLED(mCurrentMessage);
-    }
-
-    public void controlLED(Message m)
-    {
+    public void controlLED(Message m) {
         // Timer wants elapsed time in double seconds, pulse period specified in ms.
         double blinkPeriod = ((double) m.pulse) / 1000.0;
 
-        if(m.pulse == 0)
-        {
+        if(m.pulse == 0) {
            mLEDState = LEDState.ON;
         }
         else if( this.mBlinkTimer.hasPeriodPassed(blinkPeriod) ) {
@@ -241,16 +202,14 @@ public class LEDControl extends Module {
     }
 
     // LED Channels: A = Green B = Red C = Blue
-    private void setLED(RGB rgb)
-    {
+    private void setLED(RGB rgb) {
         mLEDCan.setLEDOutput(rgb.getRPercent(), CANifier.LEDChannel.LEDChannelB); // Red
         mLEDCan.setLEDOutput(rgb.getGPercent(), CANifier.LEDChannel.LEDChannelA); // Green
         mLEDCan.setLEDOutput(rgb.getBPercent(), CANifier.LEDChannel.LEDChannelC); // Blue
     }
 
 
-    public void turnOffLED()
-    {
+    public void turnOffLED() {
         setLED(LEDColor.NONE);
     }
 
@@ -263,8 +222,23 @@ public class LEDControl extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        //TODO decide what to put in here
-        update(pNow);
+        Robot.DATA.ledcontrol.set(ELEDControlData.CURRENT_MESSAGE , Message.NONE);
+
+        EColorMatch color = EColorMatch.values()[(int) db.color.get(EColorData.SENSED_COLOR)];
+        boolean isDone = (EColorWheelState.valueOf(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE)) == EColorWheelState.OFF);
+        mCurrentMessage = Message.fromColorMatch(color, isDone);
+
+        // Did the message change?
+        if ( mLastMessage != this.mCurrentMessage ) {
+            // The message changed, reset the timer and on state
+            mLEDState = LEDState.ON;
+            this.mBlinkTimer.stop();
+            this.mBlinkTimer.reset();
+            this.mBlinkTimer.start();
+        }
+
+        controlLED(Message.fromColorMatch(color, isDone));
+        mLastMessage = mCurrentMessage;
     }
 
     public void shutdown(double pNow) {
