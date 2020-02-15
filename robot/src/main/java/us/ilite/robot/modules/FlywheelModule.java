@@ -11,8 +11,10 @@ import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
@@ -44,7 +46,7 @@ public class FlywheelModule extends Module {
     public FlywheelModule() {
         mShooter = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kShooterID, CANSparkMaxLowLevel.MotorType.kBrushless);
         mAccelerator = new TalonSRX(Settings.Hardware.CAN.kAcceleratorID);
-        mHoodAngler = new Servo(Settings.Hardware.CAN.kAnglerID);
+        mHoodAngler = new Servo(Settings.Hardware.DIO.kAnglerID);
         mTurret = new TalonSRX(Settings.Hardware.CAN.kTurretID);
         mTurretGyro = new PigeonIMU(Settings.Hardware.CAN.kTurretGyroID);
 //        mTurretPid = new PIDController(kTurretAngleLockGains, 0, 1, SeleLockGains, -1, 1, Settings.kControlLoopPeriod);
@@ -110,6 +112,7 @@ public class FlywheelModule extends Module {
 
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_MODE, (double) mTurretMode.ordinal());
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_MODE, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_MODE));
+
 
 
     }

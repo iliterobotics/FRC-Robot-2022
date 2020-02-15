@@ -1,10 +1,6 @@
 package us.ilite.common.config;
 
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.lib.util.NetworkTablesConstantsBase;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * ONLY ROBOT-wide settings should go into this class (e.g. things like
@@ -13,17 +9,19 @@ import java.util.List;
  *  - Driver Input
  *  - Field element locations & vision target heights
  */
-public class Settings extends NetworkTablesConstantsBase {
+public class Settings {
 
     public static double kControlLoopPeriod = 0.01; // seconds
-    public static double kCSVLoggingPeriod = 0.02;  // seconds
+
+    public static int kSecondsToUpdateCSVLogger = 1; //seconds
 
     public static double kNetworkTableUpdateRate = 0.01;
 
     public static double kDJOutput = .25;
-    public static int kDJBoothTalonId = 12;
 
     public static int sCODEX_COMMS_PORT = 5805;
+
+    public static final String AUTO_PATH_PACKAGE = "us.ilite.robot.auto.paths";
 
     // ================================
     // System ID's
@@ -35,30 +33,42 @@ public class Settings extends NetworkTablesConstantsBase {
 
 
         public static class CAN {
-            public static int kHangerNeoID1;
-            public static int kHangerNeoID2;
-            public static int kArmNEOAdress = 4;
-            public static int kCANIntakeID = 16; // Change later // Using the bunny bots flywheel id for now
-            public static int kTalonOneID = 3; // Change later
-            public static int kTalonTwoID = 7; // Change later
-            public static int kTalonThreeID = 5; // Change later
-            public static final int kTurretGyroID = 1; // There isn't a gyro on the BunnyBot
-            public static final int kShooterID = 16; // BunnyBot Shooter
-            public static final int kAcceleratorID = 11; // BunnyBot Conveyor
-            public static final int kAnglerID = 9; // BunnyBot Catapult
-            public static final int kTurretID = 9; // BunnyBot Hopper
+            public static int kDJBoothTalonId = 72;
+            public static int kHangerNeoID1 = 15;
+            public static int kHangerNeoID2 = 71;
+            public static int kTalonVerticalID = 6; // Change later
+//            public static int kTalonThreeID = 65; // Change later
+            public static final int kTurretGyroID = 61; // There isn't a gyro on the BunnyBot
+            public static final int kShooterID = 66; // BunnyBot Shooter
+            public static final int kAcceleratorID = 61; // BunnyBot Conveyor
+            public static final int kTurretID = 69; // BunnyBot Hopper
+            public static final int kDJSpinnerVictorID = 50;
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
-            public static int kPCM = 20;
-            public static int kPDP = 21;
-            public static int kPigeon = 30;
 //            public static double kGyroCollisionThreshold = 0.0;
 
-            public static  int kDriveLeftMaster = 1;
-            public static int kDriveLeftMiddle = 3;
-            public static  int kDriveRightMaster = 2;
-            public static int kDriveRightMiddle = 4;
+            // =============================================
+            // DO NOT CHANGE ANY OF THE FOLLOWING CAN ID's
+            // =============================================
+            public static int kPDP = 20;
+            public static int kPigeon = 21;
+            // ===== 2020 Drive =====
+            public static int kDriveRightMaster = 1;
+            public static int kDriveRightFollower = 2;
+            public static int kDriveLeftMaster = 3;
+            public static int kDriveLeftFollower = 4;
+
+            public static int kMAXIntakeArm = 7;
+            public static int kMAXIntakeRollerId = 8;
+            public static int kTalonPowerCellSerializer = 11;
+            public static int kLEDControlCanifierID = 0;
+
+            // ===== 2019 Drive =====
+//            public static  int kDriveLeftMaster = 1;
+//            public static int kDriveLeftFollower = 3;
+//            public static  int kDriveRightMaster = 2;
+//            public static int kDriveRightFollower = 4;
 
         }
 
@@ -66,9 +76,10 @@ public class Settings extends NetworkTablesConstantsBase {
         }
 
         public static class DIO {
-            public static int kBeamChannel1; // Change later
-            public static int kBeamChannel2; // Change later
-            public static int kBeamChannel3; // Change later
+            public static int kEntryBeamChannel = 9;
+            public static int kSecondaryBeamChannel = 8; // Change later
+            public static int kExitBeamChannel = 7; // Change later
+            public static final int kAnglerID = 8; // BunnyBot Catapult
         }
 
         public static class PCM {
@@ -78,28 +89,6 @@ public class Settings extends NetworkTablesConstantsBase {
         }
 
     }
-    public static class Arm {
-        // =============================================================================
-        // IMU Constants
-        // =============================================================================
-
-//        public static int kArmNeoAddress = 16;
-
-    }
-
-    //==============================================================================
-    // Logging
-    // =============================================================================
-
-    // =============================================================================
-    // Drive Train Constants
-    // =============================================================================
-    public static class Drive {
-        public static double kDriveTrainMaxVelocity = 5676;
-
-        // TODO Find out what units this is in
-        public static double kMaxHeadingChange = 5;
-    }
 
     public static class Input {
 
@@ -107,6 +96,7 @@ public class Settings extends NetworkTablesConstantsBase {
         // These are applied AFTER the normal throttle reduction
         public static double kSnailModePercentThrottleReduction = 0.5;
         public static double kSnailModePercentRotateReduction = 0.4;
+        public static double kMaxAllowedVelocityMultiplier = 0.15;
 
         // Applied after any scaling
         public static double kDriverInputTurnMaxMagnitude = 0.5;

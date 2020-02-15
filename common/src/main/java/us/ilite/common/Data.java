@@ -1,11 +1,10 @@
 package us.ilite.common;
 
-import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
-import us.ilite.common.io.CodexCsvLogger;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
@@ -15,8 +14,8 @@ import us.ilite.common.types.sensor.EPowerDistPanel;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Think of this class link an in-memory database optimized for 1 row.  If you need multiple rows, simply manage multiple
@@ -27,23 +26,24 @@ public class Data {
 
     private final ILog mLogger = Logger.createLog(Data.class);
     public Color DJ_COLOR;
-    
+
     //Add new codexes here as we need more
 
-    public final Codex<Double, EGyro> imu = Codex.of.thisEnum(EGyro.class);
-    public final Codex<Double, ELogitech310> driverinput = Codex.of.thisEnum(ELogitech310.class);
-    public final Codex<Double, ELogitech310> operatorinput = Codex.of.thisEnum(ELogitech310.class);
-    public final Codex<Double, EPowerDistPanel> pdp = Codex.of.thisEnum(EPowerDistPanel.class);
-    public final Codex<Double, ELimelightData> limelight = Codex.of.thisEnum(ELimelightData.class);
-    public final Codex<Double, ERawLimelightData> rawLimelight = Codex.of.thisEnum(ERawLimelightData.class);
-    public final Codex<Double, ELimelightData> selectedTarget = Codex.of.thisEnum(ELimelightData.class);
-    public final Codex<Double , EHangerModuleData> hanger = Codex.of.thisEnum(EHangerModuleData.class);
-    public final Codex<Double, EDriveData> drivetrain = Codex.of.thisEnum(EDriveData.class);
-    public Codex<Double , EPowerCellData> powercell = Codex.of.thisEnum(EPowerCellData.class);
-    public final Codex<Double, EShooterSystemData> flywheel = Codex.of.thisEnum(EShooterSystemData.class);
-    public final Codex<Double, EColorData> color = Codex.of.thisEnum(EColorData.class);
+    public static final double NULL_CODEX_VALUE = Double.NaN;
+    public final RobotCodex<EGyro> imu = new RobotCodex(Double.NaN, EGyro.class);
+    public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
+    public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
+    public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
+    public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
+    public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
+    public final RobotCodex<ELimelightData> selectedTarget = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
+    public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
+    public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
+    public final RobotCodex<EPowerCellData> powercell = new RobotCodex(NULL_CODEX_VALUE, EPowerCellData.class);
+    public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(NULL_CODEX_VALUE, EShooterSystemData.class);
+    public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
 
-    public final Codex[] mAllCodexes = new Codex[] {
+    public final RobotCodex[] mAllCodexes = new RobotCodex[]{
             imu,
             drivetrain,
             driverinput,
@@ -55,7 +55,9 @@ public class Data {
             color,
     };
 
-    public final Codex[] mLoggedCodexes = new Codex[] {
+    public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
+
+    public final RobotCodex[] mLoggedCodexes = new RobotCodex[]{
             imu,
             drivetrain,
             driverinput,
@@ -66,17 +68,20 @@ public class Data {
             limelight,
     };
 
-
     //Stores writers per codex needed for CSV logging
-    private List<CodexCsvLogger> mCodexCsvLoggers;
+
 
     /**
      * Create a Data object based on whether or not it is being used for logging
+     *
      * @param pLogging
      */
     public Data(boolean pLogging) {
-        if(pLogging) {
-            initParsers();
+        int i = 0;
+        for (RobotCodex rc : mAllCodexes) {
+            mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
+            rc.meta().setGlobalId(i);
+            i++;
         }
     }
 
@@ -84,42 +89,17 @@ public class Data {
         this(true);
     }
 
-    private void initParsers() {
-
-        mCodexCsvLoggers = new ArrayList<>();
-    }
-
-    public void logFromCodexToCSVHeader() {
-        // Check that the USB drivetrain is still plugged in
-//        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
-            mCodexCsvLoggers.forEach(c -> c.writeHeader());
-//        }
-    }
-    public void logFromCodexToCSVLog() {
-        // Check that the USB drivetrain is still plugged in
-//        if(Files.exists(new File(CodexCsvLogger.USB_DIR).toPath())) {
-            mCodexCsvLoggers.forEach(c -> c.writeLine());
-//        }
-    }
-
-    /**
-     * Closes all the writers in mNetworkTableWriters
-     */
-    public void closeWriters() {
-        mCodexCsvLoggers.forEach(c -> c.closeWriter());
-    }
-
     /**
      * Makes the log file if it doesn't already exist
      */
     public static void handleCreation(File pFile) {
         //Makes every folder before the file if the CSV's parent folder doesn't exist
-        if(Files.notExists(pFile.toPath())) {
+        if (Files.notExists(pFile.toPath())) {
             pFile.getAbsoluteFile().getParentFile().mkdirs();
         }
 
         //Creates the .CSV if it doesn't exist
-        if(!pFile.exists()) {
+        if (!pFile.exists()) {
             try {
                 pFile.createNewFile();
             } catch (IOException e) {
@@ -128,14 +108,16 @@ public class Data {
         }
     }
 
-    public char recieveColorFmsRelay() {
+    public static char recieveColorFmsRelay() {
+        //For testing make sure to comment out the method and
+        //return a single char for the symbol of the color.
         String gameData;
         gameData = DriverStation.getInstance().getGameSpecificMessage();
-        if(gameData.length() > 0) {
+        if (gameData.length() > 0) {
             return gameData.charAt(0);
         } else {
             return '\u1000';
         }
-    }
 
+    }
 }

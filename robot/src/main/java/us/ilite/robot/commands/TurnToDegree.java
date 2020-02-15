@@ -1,8 +1,10 @@
 package us.ilite.robot.commands;
 
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Robot;
+import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.modules.DriveModule;
-import us.ilite.robot.modules.DriveMessage;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.Data;
 import us.ilite.common.lib.control.PIDController;
@@ -28,12 +30,9 @@ public class TurnToDegree implements ICommand {
 
   private Rotation2d mInitialYaw, mTurnAngle, mTargetYaw;
   private PIDController pid;
-  private DriveModule mDrive;
   public Data mData;
   
-  public TurnToDegree(DriveModule pDrive, Rotation2d pTurnAngle, double pAllowableError, Data pData ) {
-    this.mDrive = pDrive;
-    
+  public TurnToDegree(Rotation2d pTurnAngle, double pAllowableError, Data pData ) {
     this.mTurnAngle = pTurnAngle;
     this.mAllowableError = pAllowableError;
 
@@ -68,13 +67,15 @@ public class TurnToDegree implements ICommand {
 
     // End if on target for 25 counts
     if ( mAlignedCount >= kMIN_ALIGNED_COUNT || pNow - mStartTime > kTIMEOUT ) {
-      mDrive.setDriveMessage( DriveMessage.kNeutral );
+      Robot.DATA.drivetrain.set(EDriveData.NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
+      Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0d);
+      Robot.DATA.drivetrain.set(EDriveData.DESIRED_TURN_PCT, 0d);
       mLogger.info( "Turn finished" );
       return true;
     }
 
     // Apply output, log, and return false for unfinished
-    mDrive.setDriveMessage( new DriveMessage().turn(mOutput));
+    Robot.DATA.drivetrain.set(EDriveData.DESIRED_TURN_PCT, mOutput);
     mLogger.info( "Target: " + mTargetYaw + " Yaw: " + getYaw() + "\n" );
     return false;
   }

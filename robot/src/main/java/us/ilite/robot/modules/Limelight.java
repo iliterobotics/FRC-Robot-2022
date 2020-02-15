@@ -1,24 +1,22 @@
 package us.ilite.robot.modules;
 
-import java.util.Optional;
-
 import com.flybotix.hfr.codex.Codex;
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import us.ilite.common.Field2020;
-import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ELimelightData;
 import us.ilite.common.IFieldComponent;
-import static us.ilite.common.types.ELimelightData.*;
-
-
+import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
+
+import java.util.Optional;
+
+import static us.ilite.common.types.ELimelightData.*;
 
 public class Limelight extends Module implements ITargetDataProvider {
     public static final IFieldComponent NONE = new IFieldComponent() {
@@ -71,7 +69,8 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     @Override
     public void readInputs(double pNow) {
-        mVisionTarget = Field2020.FieldElement.values()[Robot.DATA.limelight.get(TARGET_ID).intValue()];
+        mVisionTarget = Robot.DATA.limelight.get(TARGET_ID, Field2020.FieldElement.class);
+//        mVisionTarget = Field2020.FieldElement.values()[Robot.DATA.limelight.get(TARGET_ID).intValue()];
 
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
         Robot.DATA.limelight.set(TV, targetValid ? 1.0d : null);
@@ -120,24 +119,24 @@ public class Limelight extends Module implements ITargetDataProvider {
     }
 
     private void setLedMode() {
-        if (!Robot.DATA.limelight.get(DESIRED_LED_MODE).equals(Robot.DATA.limelight.get(CURRENT_LED_MODE))) {
+        if (Robot.DATA.limelight.get(DESIRED_LED_MODE) != (Robot.DATA.limelight.get(CURRENT_LED_MODE))) {
             mTable.getEntry("ledMode").setNumber(Robot.DATA.limelight.get(DESIRED_LED_MODE));
         }
     }
     private void setCamMode() {
-        if (!Robot.DATA.limelight.get(DESIRED_CAM_MODE).equals(Robot.DATA.limelight.get(CURRENT_CAM_MODE))) {
+        if (Robot.DATA.limelight.get(DESIRED_CAM_MODE) != Robot.DATA.limelight.get(CURRENT_CAM_MODE)) {
             mTable.getEntry("camMode").setNumber(Robot.DATA.limelight.get(DESIRED_CAM_MODE));
         }
     }
 
     private void setStreamMode() {
-        if (!Robot.DATA.limelight.get(DESIRED_STREAM_MODE).equals(Robot.DATA.limelight.get(CURRENT_STREAM_MODE))) {
+        if (Robot.DATA.limelight.get(DESIRED_STREAM_MODE) != (Robot.DATA.limelight.get(CURRENT_STREAM_MODE))) {
             mTable.getEntry("stream").setNumber(Robot.DATA.limelight.get(DESIRED_STREAM_MODE));
         }
     }
 
     private void setSnapshotMode() {
-        if (!Robot.DATA.limelight.get(DESIRED_SNAPSHOT_MODE).equals(Robot.DATA.limelight.get(CURRENT_SNAPSHOT_MODE))) {
+        if (Robot.DATA.limelight.get(DESIRED_SNAPSHOT_MODE) != (Robot.DATA.limelight.get(CURRENT_SNAPSHOT_MODE))) {
             mTable.getEntry("snapshot").setNumber(Robot.DATA.limelight.get(DESIRED_SNAPSHOT_MODE));
         }
     }
@@ -147,7 +146,7 @@ public class Limelight extends Module implements ITargetDataProvider {
     }
 
     @Override
-    public Codex<Double, ELimelightData> getTargetingData() {
+    public RobotCodex<ELimelightData> getTargetingData() {
         return Robot.DATA.limelight;
     }
 

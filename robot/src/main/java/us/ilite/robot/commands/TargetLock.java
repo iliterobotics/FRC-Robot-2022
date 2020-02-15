@@ -1,12 +1,13 @@
 package us.ilite.robot.commands;
 
-import com.flybotix.hfr.codex.Codex;
-
+import com.flybotix.hfr.codex.RobotCodex;
 import us.ilite.common.IFieldComponent;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveModule;
-import us.ilite.robot.modules.DriveMessage;
+import us.ilite.robot.modules.EDriveState;
 import us.ilite.robot.modules.IThrottleProvider;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
@@ -48,19 +49,19 @@ public class TargetLock implements ICommand {
         mHasAcquiredTarget = false;
         mAlignedCount = 0;
 
-        mDrive.setTargetAngleLock();
-        mDrive.setTargetTrackingThrottle(0);
+        Robot.DATA.drivetrain.set(EDriveData.STATE, EDriveState.TARGET_ANGLE_LOCK);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.0);
 
         this.mPreviousTime = pNow;
     }
 
     @Override
     public boolean update(double pNow) {
-        Codex<Double, ELimelightData> currentData = mCamera.getTargetingData();
+        RobotCodex<ELimelightData> currentData = mCamera.getTargetingData();
 
-        mDrive.setTargetTrackingThrottle(mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
 
-        if(currentData != null && currentData.isSet(ELimelightData.TV) && currentData.get(ELimelightData.TX) != null) {
+        if(currentData != null && currentData.isSet(ELimelightData.TV) && currentData.isSet(ELimelightData.TX)) {
             mHasAcquiredTarget = true;
 
             mAlignedCount++;
@@ -95,8 +96,7 @@ public class TargetLock implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-        mDrive.setNormal();
-        mDrive.setDriveMessage(DriveMessage.kNeutral);
+        Robot.DATA.drivetrain.set(EDriveData.STATE, EDriveState.NORMAL);
     }
 
     public TargetLock setTargetLockThrottleProvider(IThrottleProvider pThrottleProvider) {
