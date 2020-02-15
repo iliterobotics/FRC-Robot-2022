@@ -96,7 +96,7 @@ public class Settings {
         // These are applied AFTER the normal throttle reduction
         public static double kSnailModePercentThrottleReduction = 0.5;
         public static double kSnailModePercentRotateReduction = 0.4;
-        public static double kMaxAllowedVelocityMultiplier = 0.15;
+        public static double kMaxAllowedVelocityMultiplier = 0.5;
 
         // Applied after any scaling
         public static double kDriverInputTurnMaxMagnitude = 0.5;

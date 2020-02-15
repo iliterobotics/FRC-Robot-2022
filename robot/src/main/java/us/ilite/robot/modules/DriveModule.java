@@ -75,6 +75,7 @@ public class DriveModule extends Module {
 			.maxAccel(56760d)
 			.slot(POSITION_PID_SLOT)
 			.conversion(kDriveNEOPositionFactor);
+
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
 			.p(0.0001)
@@ -235,8 +236,6 @@ public class DriveModule extends Module {
 				if (!mStartHoldingPosition) {
 					mLeftHoldSetpoint = mLeftEncoder.getPosition();
 					mRightHoldSetpoint = mRightEncoder.getPosition();
-					mRightMaster.getEncoder().setPosition(0.0);
-					mLeftMaster.getEncoder().setPosition(0.0);
 					mStartHoldingPosition = true;
 				}
 
@@ -265,6 +264,7 @@ public class DriveModule extends Module {
 				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
 				mLeftCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				mRightCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				break;
 			case PATH_FOLLOWING_BASIC:
 				mLeftCtrl.setReference(db.drivetrain.get(L_PATH_FT_s) / kDriveNEOVelocityFactor, kVelocity, VELOCITY_PID_SLOT, 0);
 				mRightCtrl.setReference(db.drivetrain.get(R_PATH_FT_s) / kDriveNEOVelocityFactor, kVelocity, VELOCITY_PID_SLOT, 0);
