@@ -23,16 +23,17 @@ public class AutonSelection {
             .withPosition(0, 1)
             .getEntry().getNumber(0).intValue();
 
-    public BaseAutonController mSelectedAutonController = getAutonControllers().get(mControllerNumber);
-    public double mDelayCycleCount = mDelaySeconds / 0.02;
+    public BaseAutonController mSelectedAutonController;
+    public double mDelayCycleCount;
 
     public AutonSelection() {
         int displayIndex = 0;
-        for (Class c : getControllers()) {
+        for (Class<?> c : getControllers()) {
             mAutonConfiguration.addPersistent(String.format("%s", displayIndex), c.getSimpleName());
             displayIndex ++;
         }
-
+        mSelectedAutonController = getAutonControllers().get(mControllerNumber);
+        mDelayCycleCount = mDelaySeconds / 0.02;
     }
 
     private static Set<Class<? extends BaseAutonController>> getControllers(Reflections reflections) {
