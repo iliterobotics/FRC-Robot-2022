@@ -33,6 +33,7 @@ public class CSVLogger {
             try {
                 ArrayList<Log> kTempCSVLogs = new ArrayList<>();
                 kCSVLoggerQueue.drainTo(kTempCSVLogs);
+                //mLogger.error( "Drained queue got: " + kTempCSVLogs.size() );
 
                 for ( Log log : kTempCSVLogs ) {
                     logFromCodexToCSVLog( log );
@@ -49,12 +50,12 @@ public class CSVLogger {
     
     public void logFromCodexToCSVLog( Log pLog ) {
         for ( CSVWriter c : mCSVWriters ) {
-            if ( c.getMetaDataOfAssociatedCodex().gid().equals(pLog.getmGlobalId()) ) {
+            if ( c.getMetaDataOfAssociatedCodex().gid() == pLog.getmGlobalId() ) {
                 c.log( pLog.getmLogData() );
+                break;
             }
         }
     }
-
 
     /**
      * Opens the queue
@@ -76,11 +77,10 @@ public class CSVLogger {
         }
     }
 
-    /**
-     * Closes all the writers in mNetworkTableWriters
-     */
     public void closeWriters() {
-        mCSVWriters.forEach(c -> c.closeWriter());
+        for ( CSVWriter cw : mCSVWriters ) {
+            cw.close();
+        }
     }
 
 }
