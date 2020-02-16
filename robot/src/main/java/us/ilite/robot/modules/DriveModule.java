@@ -232,7 +232,7 @@ public class DriveModule extends Module {
 				}
 
 				if (mLeftEncoder.getVelocity() < 100) {
-					if (Math.abs(mLeftEncoder.getPosition() - mLeftHoldSetpoint) > 2) {
+					if (Math.abs(mLeftEncoder.getPosition() - mLeftHoldSetpoint) > .15) {
 						mLeftCtrl.setReference(mLeftHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
 					}
 				} else {
@@ -240,7 +240,7 @@ public class DriveModule extends Module {
 				}
 
 				if (mRightEncoder.getVelocity() < 100) {
-					if (Math.abs(mRightEncoder.getPosition() - mRightHoldSetpoint) > 2) {
+					if (Math.abs(mRightEncoder.getPosition() - mRightHoldSetpoint) > .15) {
 						mRightCtrl.setReference(mRightHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
 					}
 				} else {
@@ -248,6 +248,15 @@ public class DriveModule extends Module {
 				}
 				break;
 			case TARGET_ANGLE_LOCK:
+				RobotCodex<ELimelightData> targetData = Robot.DATA.limelight;
+				double pidOutput;
+				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
+					//if there is a target in the limelight's fov, lock onto target using feedback loop
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
+					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
+
+					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
+				}
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
@@ -273,15 +282,6 @@ public class DriveModule extends Module {
 		EDriveState mDriveState = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
 		switch(mDriveState) {
 			case TARGET_ANGLE_LOCK:
-				RobotCodex<ELimelightData> targetData = Robot.DATA.limelight;
-				double pidOutput;
-				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
-					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
-					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-
-					db.drivetrain.set(DESIRED_TURN_PCT, -.5);//pidOutput);
-				}
 				break;
 			case NORMAL:
 				break;
