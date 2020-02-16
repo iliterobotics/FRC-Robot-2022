@@ -49,13 +49,12 @@ public class Settings {
 
             public static final int kShooterID = 66; // BunnyBot Shooter
             public static final int kFeederId = 61; // BunnyBot Conveyor
-            public static final int kTurretID = 69; // BunnyBot Hopper
 
-            public static int kMAXTurretId = 9;
+            public static int kSRXTurretId = 9;
             public static int kMAXFeederId = 10;
             public static int kFalconMasterId = 13;
             public static int kFalconFollowerId = 14;
-            public static int kHoodServoId = 9; //Servo channel from Bunnybot, not finalized
+            public static int kHoodServoId = 9;
 
 //            public static double kGyroCollisionThreshold = 0.0;
 

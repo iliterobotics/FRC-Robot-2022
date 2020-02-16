@@ -7,7 +7,6 @@ import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EColorData;
@@ -121,13 +120,13 @@ public class TestController extends BaseManualController {
         }
 
         if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
-            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 1.0);
+            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 1.0);
 
         } else if (db.operatorinput.isSet(ELogitech310.Y_BTN)){
-            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
+            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 0);
         }
         else {
-            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0.5);
+            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 0.5);
         }
 //        if (db.operatorinput.isSet(InputMap.OPERATOR.LOCK_TARGET)) {
 //            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE);
