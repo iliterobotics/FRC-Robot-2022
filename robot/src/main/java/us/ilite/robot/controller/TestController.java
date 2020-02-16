@@ -127,8 +127,11 @@ public class TestController extends BaseManualController {
         else {
             db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0.5);
         }
-
-
+        if (db.operatorinput.isSet(InputMap.OPERATOR.LOCK_TARGET)) {
+            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE);
+        } else {
+            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
+        }
     }
 
     public void updateLimelightTargetLock() {
