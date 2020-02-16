@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import jdk.swing.interop.SwingInterOpUtils;
 import us.ilite.common.Distance;
 import us.ilite.common.types.drive.EDriveData;
@@ -35,24 +36,33 @@ public class AutonCalibration extends BaseAutonController {
         }
     }
 
+    private Map<String, Path> mPaths = BobUtils.getAvailablePaths();
     private ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
-    private NetworkTableEntry mPathNumber = mAutonConfiguration.add("Path Number", 0)
-            .withWidget(BuiltInWidgets.kTextView)
+    private NetworkTableEntry mPathNumber = mAutonConfiguration.add("Path Number", 1)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 9, "block increment", 1))
             .getEntry();
+    private NetworkTableEntry mPathDelay = mAutonConfiguration.add("Path Delay Seconds", 0).getEntry();
+
 
     private final Distance mPathTotalDistance;
     private final double mMaxAllowedPathTime;
+    private double mDelayCycleCount;
 
     public AutonCalibration() {
-        mActivePath = DisplayPaths.values()[mPathNumber.getNumber(0).intValue()].path;
-        mAutonConfiguration = Shuffleboard.getTab("Auton Config");
-        mPathNumber = mAutonConfiguration.add("Path Number", 0)
-                .withWidget(BuiltInWidgets.kTextView)
-                .getEntry();
+        int pathIndex = 0;
+        mAutonConfiguration.addPersistent("Path Selection", "Select paths by clicking on the 'Path Number' slider dot and using arrow keys").withPosition(0, 1).withSize(4, 1);
+        for (Map.Entry<String, Path> entry : mPaths.entrySet()) {
+            mAutonConfiguration.addPersistent(entry.getKey(), pathIndex).withSize(1, 1).withPosition(pathIndex, 2);
+            pathIndex++;
+        }
 
-        mActivePath = DisplayPaths.NONE.path;
+        mActivePath = DisplayPaths.values()[mPathNumber.getNumber(0).intValue()].path;
+        mDelayCycleCount = mPathDelay.getDouble(0.0) / .02;
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
-        mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1;
+
+        // Time to go through path plus any delay
+        mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1 + (mDelayCycleCount * .02);
 
         e();
         System.out.println("==== RUNNING AUTONOMOUS PATH ====");
@@ -64,28 +74,30 @@ public class AutonCalibration extends BaseAutonController {
 
     @Override
     protected void updateImpl(double pNow) {
-        if(mPathStartTime == 0) {
-            mPathStartTime = pNow;
-        }
-        mPathNumber.setString(DisplayPaths.values()[((int) mPathNumber.getDouble(0))].name());
-
-        // Add a time check to prevent errors when things go wrong
-        if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
-            int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
-            if(index >= 0) {
-                db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_BASIC);
-                db.drivetrain.set(EDriveData.L_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.LEFT_VELOCITY));
-                db.drivetrain.set(EDriveData.R_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.RIGHT_VELOCITY));
-            } else {
-                e();
-                System.out.println("==== SUCCESSFULLY END AUTONOMOUS PATH ====");
-                e();
-                mActivePath = null;
+        if (mDelayCycleCount == 0) {
+            if (mPathStartTime == 0) {
+                mPathStartTime = pNow;
             }
-        } else if(mActivePath != null && pNow - mPathStartTime > mMaxAllowedPathTime) {
-            e();
-            System.out.println("==== END AUTONOMOUS PATH DUE TO TIME OVERRUN ====");
-            e();
+//          Add a time check to prevent errors when things go wrong
+            if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
+                int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
+                if(index >= 0) {
+                    db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_BASIC);
+                    db.drivetrain.set(EDriveData.L_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.LEFT_VELOCITY));
+                    db.drivetrain.set(EDriveData.R_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.RIGHT_VELOCITY));
+                } else {
+                    e();
+                    System.out.println("==== SUCCESSFULLY END AUTONOMOUS PATH ====");
+                    e();
+                    mActivePath = null;
+                }
+            } else if(mActivePath != null && pNow - mPathStartTime > mMaxAllowedPathTime) {
+                e();
+                System.out.println("==== END AUTONOMOUS PATH DUE TO TIME OVERRUN ====");
+                e();
+            }
+        } else {
+            mDelayCycleCount--;
         }
     }
 

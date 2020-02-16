@@ -60,6 +60,7 @@ public abstract class AbstractController {
         } else {
             db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_off);
+
         }
     }
 
