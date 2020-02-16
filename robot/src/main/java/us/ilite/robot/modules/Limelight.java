@@ -30,9 +30,9 @@ public class Limelight extends Module implements ITargetDataProvider {
     // LimeLight Camera Constants
     // Note: These constants need to be recalculated for a specific robot geometry
     // =============================================================================
-    public static double kHeightIn = 0.0;   //TODO These constants need to be remeasured
-    public static double kToBumperIn = 0.0;
-    public static double kAngleDeg = 0.0;
+    public static double kHeightIn = 31.75;   //Measurements from Bunnybot for skew testing
+    public static double kToBumperIn = 22.125;
+    public static double kAngleDeg = 24.85;
 
     public static double llFOVVertical = 49.7;
     public static double llFOVHorizontal = 59.6;
@@ -79,7 +79,7 @@ public class Limelight extends Module implements ITargetDataProvider {
             Robot.DATA.limelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
             Robot.DATA.limelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
             Robot.DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
-            if(Robot.DATA.limelight.isSet(TARGET_ID)) {
+            if(Robot.DATA.limelight.get(TARGET_ID) != -1) {
                 Robot.DATA.limelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)].height()));
                 Robot.DATA.limelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
                 Optional<Translation2d> p = calcTargetLocation(Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)]);
@@ -98,7 +98,8 @@ public class Limelight extends Module implements ITargetDataProvider {
         setStreamMode();
         setSnapshotMode();
         setPipeline();
-//        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, Robot.DATA.flywheel.get(ANGLE_FROM_HORIZON)); TODO Add angle functionality to flywheel module
+        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, kAngleDeg);
+//        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, Robot.DATA.flywheel.get(ANGLE_FROM_HORIZON)); //TODO Add angle functionality to flywheel module
     }
 
     @Override

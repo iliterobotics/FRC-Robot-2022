@@ -69,12 +69,12 @@ public class Robot extends TimedRobot {
         mOI = new OperatorInput();
         mDrive = new DriveModule();
 //        mLedControl = new LEDControl();
-//        mShooter = new FlywheelModule();
-//        mIntake = new PowerCellModule();
+        mShooter = new FlywheelModule();
+        mIntake = new PowerCellModule();
         mLimelight = new Limelight();
-//        mRawLimelight = new RawLimelight();
-//        mDJSpinnerModule = new DJSpinnerModule();
-//        mHanger = new HangerModule();
+        mRawLimelight = new RawLimelight();
+        mDJSpinnerModule = new DJSpinnerModule();
+        mHanger = new HangerModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
