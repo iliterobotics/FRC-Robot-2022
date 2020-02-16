@@ -1,19 +1,25 @@
 package us.ilite.robot.controller;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.team2363.commands.HelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import org.reflections.Reflections;
+import us.ilite.common.config.Settings;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.modules.EDriveState;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+
 public class BaseAutonController extends AbstractController {
 
-    protected ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
-    private double mPathDelay = mAutonConfiguration.add("Path Delay Seconds", 0).getEntry().getDouble(0.0);
     protected double mDelayCycleCount;
 
     protected Path mActivePath = null;
@@ -22,7 +28,6 @@ public class BaseAutonController extends AbstractController {
     private Velocities mVelocities = new Velocities();
 
     public BaseAutonController() {
-        mDelayCycleCount = mPathDelay / .02;
 
     }
 

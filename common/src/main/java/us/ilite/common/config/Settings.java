@@ -23,6 +23,8 @@ public class Settings {
 
     public static final String AUTO_PATH_PACKAGE = "us.ilite.robot.auto.paths";
 
+    public static final String CONTROLLER_PATH_PACKAGE = "us.ilite.robot.controller";
+
     // ================================
     // System ID's
     // ================================

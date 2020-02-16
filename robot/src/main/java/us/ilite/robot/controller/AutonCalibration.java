@@ -11,8 +11,8 @@ import us.ilite.common.Distance;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.auto.paths.*;
 import us.ilite.robot.modules.EDriveState;
-
 import java.util.Map;
+import static us.ilite.robot.auto.paths.AutonSelection.mAutonConfiguration;
 
 public class AutonCalibration extends BaseAutonController {
 
@@ -24,7 +24,6 @@ public class AutonCalibration extends BaseAutonController {
             .getEntry()
             .getNumber(0)
             .intValue();
-
 
     private final Distance mPathTotalDistance;
     private final double mMaxAllowedPathTime;
