@@ -11,6 +11,9 @@ import us.ilite.common.lib.control.ProfileGains;
  */
 public class Settings {
 
+    public static String kGroundLimelightNetworkTable = "limelight-bottom";
+    public static String kFlywheelLimelightNetworkTable = "limelight-top";
+
     public static double kControlLoopPeriod = 0.01; // seconds
 
     public static int kSecondsToUpdateCSVLogger = 1; //seconds

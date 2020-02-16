@@ -9,10 +9,8 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.apache.commons.lang3.Conversion;
 import us.ilite.common.Distance;
 import us.ilite.common.lib.control.PIDController;
-import us.ilite.common.lib.util.Conversions;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EShooterSystemData;
@@ -95,7 +93,7 @@ public class FlywheelModule extends Module {
     private double turretTurn() {
         current = mTurret.getSelectedSensorVelocity();
         if (targetValid()) {
-            target = Robot.DATA.selectedTarget.get(ELimelightData.TX);
+            target = Robot.DATA.groundTracking.get(ELimelightData.TX);
         } else {
             target = 0;
         }

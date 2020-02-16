@@ -35,16 +35,15 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-//    private CSVLogger mCSVLogger = new CSVLogger();
-    private HangerModule mHanger = new HangerModule();
+    private HangerModule mHanger;
+    private CSVLogger mCSVLogger = new CSVLogger();
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
     private Limelight mLimelight;
     private PowerCellModule mIntake;
     private RawLimelight mRawLimelight;
-//    private DJSpinnerModule mDJSpinnerModule;
-    private LEDControl mLEDControl;
+    private DJSpinnerModule mDJSpinnerModule;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
 
@@ -68,12 +67,13 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-        mLEDControl = new LEDControl();
+//        mLedControl = new LEDControl();
         mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
         mLimelight = new Limelight();
         mRawLimelight = new RawLimelight();
-//        mDJSpinnerModule = new DJSpinnerModule();
+        mDJSpinnerModule = new DJSpinnerModule();
+        mHanger = new HangerModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
