@@ -11,6 +11,7 @@ import org.reflections.Reflections;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
+import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.modules.EDriveState;
 
 import java.io.File;
@@ -28,7 +29,7 @@ public class BaseAutonController extends AbstractController {
     private Velocities mVelocities = new Velocities();
 
     public BaseAutonController() {
-
+        mDelayCycleCount = AutonSelection.mDelaySeconds;
     }
 
     @Override

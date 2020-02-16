@@ -31,6 +31,7 @@ public class Data {
 
     public static final double NULL_CODEX_VALUE = 0.0;
     public final RobotCodex<EGyro> imu = new RobotCodex(Double.NaN, EGyro.class);
+    public final RobotCodex<EAutonSelectionData> autonSelection = new RobotCodex(NULL_CODEX_VALUE, EAutonSelectionData.class);
     public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
@@ -53,6 +54,7 @@ public class Data {
             hanger,
             limelight,
             color,
+            autonSelection
     };
 
     public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();

@@ -131,7 +131,7 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
 //        mCSVLogger.start();
         MODE=AUTONOMOUS;
-        mActiveController = mAutonSelection.getSelectedAutonController();
+        mActiveController = AutonSelection.getAutonControllers().get((String) AutonSelection.getAutonControllers().keySet().toArray()[AutonSelection.mControllerNumber]);
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
