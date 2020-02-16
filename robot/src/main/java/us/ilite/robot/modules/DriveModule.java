@@ -115,8 +115,6 @@ public class DriveModule extends Module {
 	private Rotation2d mGyroOffset = new Rotation2d();
 	private PIDController mTargetAngleLockPid;
 	private PIDController mYawPid;
-//	private PIDController mHoldLeftPositionPid;
-//	private PIDController mHoldRightPositionPid;
 	private boolean mStartHoldingPosition;
 
 	private double mLeftHoldSetpoint;
@@ -187,12 +185,6 @@ public class DriveModule extends Module {
 		mYawPid.setOutputRange(-1, 1);
 		mYawPid.reset();
 
-//		mHoldLeftPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-//		mHoldLeftPositionPid.setOutputRange(-1, 1);
-//		mHoldLeftPositionPid.setSetpoint(0.0);
-//		mHoldRightPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-//		mHoldRightPositionPid.setOutputRange(-1, 1);
-//		mHoldRightPositionPid.setSetpoint(0.0);
 		mStartHoldingPosition = false;
 		mLeftHoldSetpoint = 0.0;
 		mRightHoldSetpoint = 0.0;
@@ -255,7 +247,7 @@ public class DriveModule extends Module {
 					mRightCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				}
 				break;
-			case 	TARGET_ANGLE_LOCK:
+			case TARGET_ANGLE_LOCK:
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
@@ -288,7 +280,7 @@ public class DriveModule extends Module {
 					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 
-					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
+					db.drivetrain.set(DESIRED_TURN_PCT, -.5);//pidOutput);
 				}
 				break;
 			case NORMAL:
