@@ -199,6 +199,8 @@ public class TestController extends BaseManualController {
         mLastTrackingType = Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
 
+    boolean tripped = false;
+    private boolean lastExitBeam = false;
 
     protected void updatePowerCells(double pNow) {
         // Default to none
@@ -233,16 +235,24 @@ public class TestController extends BaseManualController {
 //            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
             db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.NONE);
         }
-
-        db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
         if(db.operatorinput.isSet(FIRE_POWER_CELLS)) {
-            if (!(db.powercell.get(EXIT_BEAM) == (1.0))){
-                db.powercell.set(DESIRED_V_VELOCITY, -0.3);
-                db.powercell.set(DESIRED_H_VELOCITY, -0.3);
-            }else {
-                db.powercell.set(DESIRED_V_VELOCITY, 1.0);
-                db.powercell.set(DESIRED_H_VELOCITY, 0.3);
+            boolean exit = db.powercell.isSet(EXIT_BEAM);
+            if(!exit || tripped) {
+                db.powercell.set(DESIRED_V_VELOCITY, 0.5);
+                db.powercell.set(DESIRED_H_VELOCITY, 0.5);
+            } else {
+                if (exit && !tripped ) {
+                    db.powercell.set(DESIRED_V_VELOCITY, -0.3);
+                    db.powercell.set(DESIRED_H_VELOCITY, -0.3);
+                } else if(exit && !lastExitBeam) {
+                    tripped = true;
+                }
             }
+        } else {
+            db.powercell.set(DESIRED_V_VELOCITY, 0.0);
+            db.powercell.set(DESIRED_H_VELOCITY, 0.0);
+            tripped = false;
+            lastExitBeam = false;
         }
 
 

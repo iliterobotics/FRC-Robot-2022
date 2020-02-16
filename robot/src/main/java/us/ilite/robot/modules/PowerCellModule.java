@@ -176,9 +176,10 @@ public class PowerCellModule extends Module {
         mIntakePivot.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mIntakePivot.setSecondaryCurrentLimit(15);
 
-        mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel);
-        mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel);
-        mExitBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kExitBeamChannel);
+        double debounceTime_s = 0.25;
+        mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel, debounceTime_s);
+        mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel, debounceTime_s);
+        mExitBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kExitBeamChannel, debounceTime_s);
         mDigitalBeamSensors = new DigitalBeamSensor[]{mEntryBeam, mSecondaryBeam, mExitBeam};
 
         mIntakePivotEncoder = new CANEncoder(mIntakePivot);
@@ -246,10 +247,13 @@ public class PowerCellModule extends Module {
             mExitBeamNotBrokenCycles = 0;
         }
 
-        db.powercell.set(ENTRY_BEAM, mEntryBeamNotBrokenCycles > 15);//mEntryBeamNotBrokenCycles > 15);
-        db.powercell.set(SECONDARY_BREAM, mSecondaryBeamNotBrokenCycles > 15);
-        db.powercell.set(EXIT_BEAM, mExitBeamNotBrokenCycles > 15);
+//        db.powercell.set(ENTRY_BEAM, mEntryBeamNotBrokenCycles > 15);//mEntryBeamNotBrokenCycles > 15);
+//        db.powercell.set(SECONDARY_BREAM, mSecondaryBeamNotBrokenCycles > 15);
+//        db.powercell.set(EXIT_BEAM, mExitBeamNotBrokenCycles > 15);
 
+        db.powercell.set(ENTRY_BEAM, mEntryBeam.isBroken());
+        db.powercell.set(SECONDARY_BREAM, mSecondaryBeam.isBroken());
+        db.powercell.set(EXIT_BEAM, mExitBeam.isBroken());
         //TODO Determine Indexer State
     }
 
