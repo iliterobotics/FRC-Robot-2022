@@ -1,6 +1,7 @@
 package us.ilite.common;
 
 import com.flybotix.hfr.codex.RobotCodex;
+import com.flybotix.hfr.util.lang.EnumUtils;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,6 +13,7 @@ import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -97,6 +99,17 @@ public class Data {
         } else {
             return '\u1000';
         }
-
     }
+
+    //USE TO TEST LOGGING
+//    public void randomizeCodex( RobotCodex c ) {
+//        for ( RobotCodex rb : mLoggedCodexes ) {
+//            List<Enum<?>> enums = EnumUtils.getEnums(c.meta().getEnum(), true);
+//            if ( rb.equals( c ) ) {
+//                for ( Enum e : enums ) {
+//                    rb.set( e, Math.random()*10 );
+//                }
+//            }
+//        }
+//    }
 }

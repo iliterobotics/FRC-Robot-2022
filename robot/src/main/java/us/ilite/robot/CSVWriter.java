@@ -20,7 +20,7 @@ import static us.ilite.robot.CSVLogger.kCSVLoggerQueue;
 
 public class CSVWriter {
 
-    public static final String USB_DIR = "/u";
+    //public static final String USB_DIR = "/u";
     //public static final String USER_DIR = System.getProperty("user.home");
     private static final String LOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
     private static String eventName = DriverStation.getInstance().getEventName();
@@ -127,16 +127,16 @@ public class CSVWriter {
 //        }
 
         //THIS CODE IS USED FOR A MULTI-PARTITION DRIVE AND FINDING IT'S LOCATION IN THE ROBORIO FILE DIRECTORIES
-//        String dir = "";
-//        char[] letters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
-//        for ( char c : letters ) {
-//            if (Files.exists((new File(String.format("/%c/logs/here.txt", c )).toPath()))) {
-//                dir = "/" + c;
-//                break;
-//            }
-//        }
+        String dir = "";
+        char[] letters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+        for ( char c : letters ) {
+            if (Files.exists((new File(String.format("/%c/logs/here.txt", c )).toPath()))) {
+                dir = "/" + c;
+                break;
+            }
+        }
 
-        String dir = USB_DIR;
+        //String dir = USB_DIR;
 
 //        if (!dir.isEmpty()) {
         File file = null;
