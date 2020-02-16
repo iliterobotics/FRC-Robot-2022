@@ -103,6 +103,8 @@ public class Limelight extends Module implements ITargetDataProvider {
         setCamMode();
         setStreamMode();
         setSnapshotMode();
+        setPipeline(1);
+        setTracking(Field2020.FieldElement.TARGET);
     }
 
     @Override

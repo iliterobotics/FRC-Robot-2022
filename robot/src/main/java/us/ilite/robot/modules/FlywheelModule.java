@@ -2,6 +2,7 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -10,12 +11,14 @@ import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.Conversion;
 import us.ilite.common.Distance;
+import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.util.Conversions;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
+import us.ilite.robot.hardware.TalonSRXFactory;
 
 public class FlywheelModule extends Module {
     // Hood Servo Gear Ratio
@@ -24,8 +27,14 @@ public class FlywheelModule extends Module {
     private CANSparkMax mFlywheelFeeder;
     private TalonFX mFlywheelFalcon;
     private Servo mHoodAngler;
+    private TalonSRX mTurret;
 
     private Potentiometer mHoodPot;
+
+    private PIDController mTurretPID;
+
+    private double target;
+    private double current;
 
     private final double kHoodGearRatio = 14d / 225d;
     private double mIntegral = 0;
@@ -33,7 +42,8 @@ public class FlywheelModule extends Module {
 
     public FlywheelModule() {
         mFlywheelFalcon = new TalonFX(50);
-        mFlywheelFeeder = SparkMaxFactory.createDefaultSparkMax(9 , CANSparkMaxLowLevel.MotorType.kBrushless);
+        mFlywheelFeeder = SparkMaxFactory.createDefaultSparkMax(0 , CANSparkMaxLowLevel.MotorType.kBrushless);
+        mTurret = TalonSRXFactory.createDefaultTalon(9);
         mHoodAngler = new Servo(9);
 
         mHoodPot = new AnalogPotentiometer(0);
@@ -82,12 +92,22 @@ public class FlywheelModule extends Module {
         double output = Robot.DATA.flywheel.get(EShooterSystemData.TARGET_SERVO_ANGLE) / 5;
     }
 
+    private double turretTurn() {
+        current = mTurret.getSelectedSensorVelocity();
+        if (targetValid()) {
+            target = Robot.DATA.selectedTarget.get(ELimelightData.TX);
+        } else {
+            target = 0;
+        }
+        return -target;
+    }
+
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY, 0);
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
+//        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
 
         SmartDashboard.putNumber("Flywheel Current Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
@@ -110,17 +130,16 @@ public class FlywheelModule extends Module {
             Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, 2000);
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, 0);
         }
-
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY, mTurret.getSelectedSensorVelocity());
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_POTENTIOMETER_TURNS, mHoodPot.get());
     }
 
     @Override
     public void setOutputs(double pNow) {
-        System.out.println("-----------------------------------------------------------------------CURRENT POTENTIOMETER READING: " + 5 * Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_POTENTIOMETER_TURNS));
-        hoodAnglePID(0.005, 0, 0);
-        mFlywheelFalcon.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
-        mFlywheelFeeder.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
-        mHoodAngler.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_SERVO_ANGLE));
+//        mFlywheelFalcon.set(ControlMode.Velocity, Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY));
+//        mFlywheelFeeder.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_FEEDER_VELOCITY));
+//        mHoodAngler.set(Robot.DATA.flywheel.get(EShooterSystemData.TARGET_SERVO_ANGLE));
+        mTurret.set(ControlMode.PercentOutput, 0.25);
     }
 
     @Override
