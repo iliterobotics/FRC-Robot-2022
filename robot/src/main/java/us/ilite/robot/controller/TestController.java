@@ -20,6 +20,7 @@ import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
 import us.ilite.robot.modules.PowerCellModule;
 
+import java.sql.Driver;
 import java.util.List;
 
 import static us.ilite.common.types.EPowerCellData.UNUSED;
@@ -278,7 +279,6 @@ public class TestController extends BaseManualController {
 
     void updateDJBooth(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
-            db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.getPower());
             int i = (int) db.color.get(EColorData.SENSED_COLOR);
             DJSpinnerModule.EColorMatch m = DJSpinnerModule.EColorMatch.values()[i];
             Color DJ_COLOR = null;
@@ -306,20 +306,19 @@ public class TestController extends BaseManualController {
                 db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.POSITION.ordinal());
             } else if (m.color.equals(DJ_COLOR)) {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.power);
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) DJSpinnerModule.EColorWheelState.POSITION.ordinal());
             } else {
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.getPower());
                 db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.POSITION.ordinal());
             }
         }
         else if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL)) {
-            db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.getPower());
             if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.TARGET_ROTATION_COUNT) {
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.OFF.ordinal());
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.getPower());
             } else {
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.ROTATION.ordinal());
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.getPower());
             }
+            db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.ROTATION.ordinal());
         }
     }
 }

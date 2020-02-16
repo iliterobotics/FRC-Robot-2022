@@ -73,9 +73,9 @@ public class DJSpinnerModule extends Module {
     }
 
     public enum EColorWheelState {
+        OFF (0.0),
         ROTATION (0.2),
-        POSITION (0.2),
-        OFF (0.0);
+        POSITION (0.2);
 
         public double power;
         private EColorWheelState(double _power) {
@@ -97,15 +97,9 @@ public class DJSpinnerModule extends Module {
     private EColorMatch eCurrentColorState;
     private EColorMatch eLastColorState;
     private double mSolidStateCounter;
-    private double mColorChangeCounter = 0;
+    private double mColorChangeCounter;
     private EColorWheelState eColorWheelState;
-    private boolean mIsDone;
-    private boolean mMightBeDone;
-    private int mRedTracker;
-    private int mBlueTracker;
-    private int mGreenTracker;
-    private int mYellowTracker;
-    private int total;
+    private boolean mUpdatingFlag;
 
 
     public DJSpinnerModule() {
@@ -118,10 +112,10 @@ public class DJSpinnerModule extends Module {
         eCurrentColorState = EColorMatch.NONE;
         eLastColorState = EColorMatch.NONE;
         eDesiredColorState = EColorMatch.NONE;
-        mIsDone = false;
-        mMightBeDone = false;
+        mColorChangeCounter = 0;
         mVictor = TalonSRXFactory.createDefaultVictor(Settings.Hardware.CAN.kDJSpinnerVictorID);
         mVictor.setNeutralMode(NeutralMode.Brake);
+        mUpdatingFlag = false;
 
 
         for(EColorMatch cm : EColorMatch.values()) {
@@ -140,63 +134,32 @@ public class DJSpinnerModule extends Module {
         db.color.set(EColorData.MEAURED_RED, c.red);
         ColorMatchResult match = mColorMatcher.matchClosestColor(c);
         db.color.set(EColorData.SENSED_COLOR, EColorMatch.from(match));
-        db.color.set(EColorData.WHEEL_ROTATION_COUNT, total);
+        if ( !mUpdatingFlag ) {
+            eCurrentColorState = EColorMatch.from(match);
+        }
+        else {
+            mUpdatingFlag = false;
+        }
+        db.color.set(EColorData.WHEEL_ROTATION_COUNT, mColorChangeCounter);
         db.color.set(EColorData.CURRENT_MOTOR_POWER , mVictor.getMotorOutputPercent());
-        SmartDashboard.putString("Detected Color: ", getEnumOfOrdinal( db.color.get( EColorData.SENSED_COLOR ) ).name() );
-
-        if(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.class) == EColorWheelState.ROTATION) {
-            SmartDashboard.putNumber("Number of color changes" , db.color.get(EColorData.WHEEL_ROTATION_COUNT));
-            if(eLastColorState.nextColor() == eCurrentColorState) {
-                incrementStateIterator( eCurrentColorState );
-                mColorChangeCounter++;
-            }
-            eLastColorState = eCurrentColorState;
-        }
-    }
-
-    public void incrementStateIterator( EColorMatch colorMatch ) {
-        if ( colorMatch.ordinal() == EColorMatch.RED.ordinal() ) {
-            mRedTracker++;
-        }
-        if ( colorMatch.ordinal() == EColorMatch.GREEN.ordinal() ) {
-            mGreenTracker++;
-        }if ( colorMatch.ordinal() == EColorMatch.BLUE.ordinal() ) {
-            mBlueTracker++;
-        }if ( colorMatch.ordinal() == EColorMatch.YELLOW.ordinal() ) {
-            mYellowTracker++;
-        }
-        total = mBlueTracker + mYellowTracker + mGreenTracker + mRedTracker;
-        SmartDashboard.putNumber("TOTAL COLORS" , total);
-        if (total >= 32 ){
-            mVictor.set(ControlMode.PercentOutput , 0.0);
-        }
-
-
-    }
-
-    public EColorMatch getEnumOfOrdinal( double d ) {
-//        if ( d == EColorMatch.RED.ordinal() ) {
-//            return EColorMatch.RED;
-//        }
-//        else if ( d == EColorMatch.BLUE.ordinal() ) {
-//            return EColorMatch.BLUE;
-//        }
-//        else if ( d == EColorMatch.GREEN.ordinal() ) {
-//            return EColorMatch.GREEN;
-//        }
-//        else if ( d == EColorMatch.YELLOW.ordinal() ) {
-//            return EColorMatch.YELLOW;
-//        }
-//        else {
-//            return EColorMatch.NONE;
-//        }
-        return EColorMatch.values()[(int) d];
     }
 
     @Override
     public void setOutputs(double pNow) {
         mVictor.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
 
+        if( db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE) == EColorWheelState.ROTATION.ordinal() ) {
+            if (eLastColorState.nextColor() == eCurrentColorState) {
+                mColorChangeCounter++;
+            }
+            else if ( eCurrentColorState != eLastColorState ) {
+                mUpdatingFlag = true;
+                eCurrentColorState = eLastColorState;
+            }
+            else {
+                eLastColorState = eCurrentColorState;
+            }
+        }
     }
 
 

@@ -20,6 +20,7 @@ import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
+import us.ilite.robot.modules.Module;
 
 import java.util.TimerTask;
 
@@ -35,14 +36,14 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
 //    private CSVLogger mCSVLogger = new CSVLogger();
-    private HangerModule mHanger = new HangerModule();
-    private Timer initTimer = new Timer();
+//    private HangerModule mHanger = new HangerModule();
+//    private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
 //    private Limelight mLimelight;
     private PowerCellModule mIntake;
 //    private RawLimelight mRawLimelight;
-//    private DJSpinnerModule mDJSpinnerModule;
+    private DJSpinnerModule mDJSpinnerModule;
 //    private LEDControl mLEDControl;
     private SimulationModule mSimulation;
 //    private FlywheelModule mShooter;
@@ -63,8 +64,8 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         // Init the actual robot
-        initTimer.reset();
-        initTimer.start();
+//        initTimer.reset();
+//        initTimer.start();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
@@ -74,7 +75,7 @@ public class Robot extends TimedRobot {
         mIntake = new PowerCellModule();
 //        mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
-//        mDJSpinnerModule = new DJSpinnerModule();
+        mDJSpinnerModule = new DJSpinnerModule();
 //        mLEDControl = new LEDControl();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
@@ -112,8 +113,8 @@ public class Robot extends TimedRobot {
         };
         new java.util.Timer().scheduleAtFixedRate(shuffleupdate, 15000, 1000);
 
-        initTimer.stop();
-        mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
+//        initTimer.stop();
+//        mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
     }
 
     /**
@@ -189,7 +190,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
         mRunningModules.addModule(mIntake);
-//        mRunningModules.addModule(mDJSpinnerModule);
+        mRunningModules.addModule(mDJSpinnerModule);
 //        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
