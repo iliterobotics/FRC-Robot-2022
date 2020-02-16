@@ -62,8 +62,10 @@ public class Data {
     public final RobotCodex[] mLoggedCodexes = new RobotCodex[]{
             imu,
             drivetrain,
-//            driverinput,
+            driverinput,
             operatorinput,
+            pdp,
+            powercell,
             hanger,
             limelight,
     };
@@ -102,14 +104,14 @@ public class Data {
     }
 
     //USE TO TEST LOGGING
-//    public void randomizeCodex( RobotCodex c ) {
-//        for ( RobotCodex rb : mLoggedCodexes ) {
-//            List<Enum<?>> enums = EnumUtils.getEnums(c.meta().getEnum(), true);
-//            if ( rb.equals( c ) ) {
-//                for ( Enum e : enums ) {
-//                    rb.set( e, Math.random()*10 );
-//                }
-//            }
-//        }
-//    }
+    public void randomizeCodex( RobotCodex c ) {
+        for ( RobotCodex rb : mLoggedCodexes ) {
+            List<Enum<?>> enums = EnumUtils.getEnums(c.meta().getEnum(), true);
+            if ( rb.equals( c ) ) {
+                for ( Enum e : enums ) {
+                    rb.set( e, Math.random()*10 );
+                }
+            }
+        }
+    }
 }

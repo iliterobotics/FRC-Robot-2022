@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.rmi.server.ExportException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Optional;
@@ -100,11 +101,25 @@ public class CSVWriter {
                 }
                 else if ( mLogFailures == Settings.kAcceptableLogFailures ) {
                     mLog.error("---------------------CSV LOGGING DISABLED----------------------");
+                    Robot.mCSVLogger.closeWriters();
                     mLogFailures++;
                 }
             }
         } catch (IOException pE) {
             System.out.println( pE.getLocalizedMessage() );
+        }
+    }
+
+    public void close() {
+        if ( bw.isPresent() ) {
+            try {
+                bw.get().flush();
+                bw.get().close();
+            }
+            catch ( Exception e ) {
+                e.printStackTrace();
+            }
+
         }
     }
 

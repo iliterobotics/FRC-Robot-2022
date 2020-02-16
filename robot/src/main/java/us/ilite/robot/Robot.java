@@ -192,9 +192,9 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
-//        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
 //        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
@@ -206,16 +206,18 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
+        //Used to Test logging
+//        for (RobotCodex c : DATA.mLoggedCodexes ) {
+//            if (c.equals(DATA.drivetrain)) {
+//                DATA.randomizeCodex(c);
+//            }
+//        }
         commonPeriodic();
     }
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for (RobotCodex c : DATA.mLoggedCodexes ) {
-            //USE TO TEST LOGGING
-//            if ( c.equals( DATA.drivetrain ) ) {
-//                DATA.randomizeCodex( c );
-//            }
+        for ( RobotCodex c : DATA.mLoggedCodexes ) {
             if ( c.hasChanged() ) {
                 mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
             }

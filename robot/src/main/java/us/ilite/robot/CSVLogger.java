@@ -77,4 +77,10 @@ public class CSVLogger {
         }
     }
 
+    public void closeWriters() {
+        for ( CSVWriter cw : mCSVWriters ) {
+            cw.close();
+        }
+    }
+
 }
