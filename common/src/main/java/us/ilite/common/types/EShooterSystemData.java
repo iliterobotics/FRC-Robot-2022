@@ -3,6 +3,7 @@ package us.ilite.common.types;
 public enum EShooterSystemData {
     CURRENT_FLYWHEEL_VELOCITY,
     TARGET_FLYWHEEL_VELOCITY,
+
     FLYWHEEL_IS_MAX_VELOCITY,
     FLYWHEEL_DISTANCE_BASED_SPEED,
 
@@ -14,6 +15,7 @@ public enum EShooterSystemData {
 
     CURRENT_SERVO_ANGLE,
     TARGET_SERVO_ANGLE,
+
     SERVO_DISTANCE_BASED_ANGLE,
     SERVO_POTENTIOMETER_BASED_ANGLE,
 

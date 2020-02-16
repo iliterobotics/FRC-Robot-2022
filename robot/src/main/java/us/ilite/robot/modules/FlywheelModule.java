@@ -89,12 +89,6 @@ public class FlywheelModule extends Module {
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
-
-        SmartDashboard.putNumber("Flywheel Current Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FLYWHEEL_VELOCITY));
-        SmartDashboard.putNumber("Servo Current Angle", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_SERVO_ANGLE));
-        SmartDashboard.putNumber("Turret Current Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_TURRET_VELOCITY));
-        SmartDashboard.putNumber("Potentiometer Current Reading", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_POTENTIOMETER_TURNS));
-        SmartDashboard.putNumber("Feeder Current Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_FEEDER_VELOCITY));
     }
 
     @Override
