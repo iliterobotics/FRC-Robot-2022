@@ -1,12 +1,9 @@
 package us.ilite.common.types.input;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexOf;
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.Joystick;
 import us.ilite.common.Data;
-
-import java.awt.*;
 
 
 public enum ELogitech310 implements CodexOf<Double> {

@@ -14,6 +14,7 @@ public class Settings {
     public static double kControlLoopPeriod = 0.01; // seconds
 
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
+    public static int kAcceptableLogFailures = 8;
 
     public static double kNetworkTableUpdateRate = 0.01;
 
@@ -98,7 +99,7 @@ public class Settings {
         // These are applied AFTER the normal throttle reduction
         public static double kSnailModePercentThrottleReduction = 0.5;
         public static double kSnailModePercentRotateReduction = 0.4;
-        public static double kMaxAllowedVelocityMultiplier = 0.15;
+        public static double kMaxAllowedVelocityMultiplier = 1.0; //set back to lower value for safety before merging
 
         // Applied after any scaling
         public static double kDriverInputTurnMaxMagnitude = 0.5;

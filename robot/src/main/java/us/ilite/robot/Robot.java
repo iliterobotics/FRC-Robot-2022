@@ -21,7 +21,9 @@ import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
+import us.ilite.robot.network.EForwardableConnections;
 
+import java.util.Arrays;
 import java.util.TimerTask;
 
 import static us.ilite.common.types.EMatchMode.*;
@@ -35,7 +37,8 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-//    private CSVLogger mCSVLogger = new CSVLogger();
+//    public static final CSVLogger mCSVLogger = new CSVLogger();
+
     private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
@@ -64,6 +67,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+
+        Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         // Init the actual robot
         initTimer.reset();
         initTimer.start();
@@ -102,11 +107,6 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
 
-        try {
-        } catch (Exception e) {
-            mLogger.exception(e);
-        }
-
         LiveWindow.disableAllTelemetry();
 
         TimerTask shuffleupdate = new TimerTask(){
@@ -129,7 +129,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-//        mCSVLogger.start();
+        //mCSVLogger.start();
+
         MODE=AUTONOMOUS;
         mActiveController = AutonSelection.getAutonControllers().get((String) AutonSelection.getAutonControllers().keySet().toArray()[AutonSelection.mControllerNumber]);
         mActiveController.setEnabled(true);
@@ -147,6 +148,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
 //        mCSVLogger.start();
+
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -163,6 +165,7 @@ public class Robot extends TimedRobot {
         mLogger.info("Disabled Initialization");
 
         mRunningModules.shutdown(CLOCK.getCurrentTime());
+
 //        mCSVLogger.stop();
 
         if(mActiveController != null) {
@@ -177,8 +180,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
+//        mCSVLogger.start();
+
         if(mTestController == null) {
-             mTestController = TestController.getInstance();
+            mTestController = TestController.getInstance();
         }
         MODE = TEST;
         mActiveController = mTestController;
@@ -202,19 +207,27 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
+        //Used to Test logging
+//        for (RobotCodex c : DATA.mLoggedCodexes ) {
+//            if (c.equals(DATA.drivetrain)) {
+//                DATA.randomizeCodex(c);
+//            }
+//        }
         commonPeriodic();
     }
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for (RobotCodex c : DATA.mLoggedCodexes ) {
-//            mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
-        }
+//        for ( RobotCodex c : DATA.mLoggedCodexes ) {
+////            if ( c.hasChanged() ) {
+////                mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
+////            }
+////        }
         for ( RobotCodex c : DATA.mAllCodexes ) {
             c.reset();
         }
-
 //        EPowerDistPanel.map(mData.pdp, pdp);
+
         mRunningModules.readInputs(CLOCK.getCurrentTime());
         mActiveController.update(CLOCK.getCurrentTime());
         mRunningModules.setOutputs(CLOCK.getCurrentTime());
@@ -227,9 +240,7 @@ public class Robot extends TimedRobot {
             mMatchMeta = new MatchMetadata();
             int gid = mMatchMeta.hash;
             for (RobotCodex c : DATA.mAllCodexes) {
-                if ( !c.meta().getEnum().getSimpleName().equals("ELogitech310")) {
-                    c.meta().setGlobalId(gid);
-                }
+                c.meta().setGlobalId(gid);
             }
         }
     }
@@ -253,7 +264,6 @@ public class Robot extends TimedRobot {
         if (this.isTest()) {
             mRobotEnabledDisabled = "Test";
         }
-
         if (this.isEnabled()) {
             mRobotEnabledDisabled = "Enabled";
         }

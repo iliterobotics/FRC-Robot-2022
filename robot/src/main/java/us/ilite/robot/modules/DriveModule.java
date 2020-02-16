@@ -32,7 +32,8 @@ public class DriveModule extends Module {
 	// DO NOT CHANGE THE GEAR RATIO
 	public static double kGearboxRatio = (10.0 / 40.0) * (14.0 / 40.0);
 	// As of 2/9this is for omni wheels on a solid floor
-	public static double kWheelDiameterInches = 6.125;
+	//public static double kWheelDiameterInches = 6.125;
+	public static double kWheelDiameterInches = 5.875;
 	public static double kWheelCircumferenceFeet = kWheelDiameterInches*Math.PI/12.0;
 	// For position, getPosition() returns raw rotations - so convert that to feet
 	public static double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
@@ -76,7 +77,7 @@ public class DriveModule extends Module {
 			// Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
 			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
 			// Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
-			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4)
+			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
 			.slot(VELOCITY_PID_SLOT)
 			.velocityConversion(kDriveNEOVelocityFactor);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
@@ -142,6 +143,7 @@ public class DriveModule extends Module {
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
 		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
+
 //		mGyro = new ADIS16470();
 
 

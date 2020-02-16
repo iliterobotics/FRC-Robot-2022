@@ -17,7 +17,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class AutonSelection {
+    private static Map<String, Path> kAllPaths = BobUtils.getAvailablePaths();
     public static ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
+    private int mPathNumber = mAutonConfiguration.add("Path Number", 1)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 9, "block increment", 1))
+            .getEntry()
+            .getNumber(0)
+            .intValue();
     public static double mDelaySeconds = mAutonConfiguration.add("Path Delay Seconds", 0)
             .getEntry()
             .getDouble(0.0);
@@ -31,10 +38,21 @@ public class AutonSelection {
 
     public static BaseAutonController mSelectedAutonController;
     public static double mDelayCycleCount = mDelaySeconds / 0.02;
+    static {
+        int pathIndex = 0;
+        mAutonConfiguration.addPersistent("Path Selection", "Select paths by clicking on the 'Path Number' slider dot and using arrow keys").withPosition(0, 1).withSize(4, 1);
+        for (Map.Entry<String, Path> entry : kAllPaths.entrySet()) {
+            mAutonConfiguration.addPersistent(entry.getKey(), pathIndex).withSize(1, 1).withPosition(pathIndex, 2);
+            pathIndex++;
+        }
+    }
 
     public AutonSelection() {
         int displayIndex = 0;
+        // TODO - do this after selection from shuffleboard
+        //  setActivePath(kAllPaths.get((String) kAllPaths.keySet().toArray()[mPathNumber]));
         for (Map.Entry<String, BaseAutonController> entry : getAutonControllers().entrySet()) {
+            System.out.println("Adding " + entry.getKey());
             mAutonConfiguration.addPersistent(String.format("%s", displayIndex), entry.getKey())
             .withPosition(displayIndex, 0);
             displayIndex ++;

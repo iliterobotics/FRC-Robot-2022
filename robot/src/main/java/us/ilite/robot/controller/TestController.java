@@ -1,29 +1,33 @@
 package us.ilite.robot.controller;
 
-import edu.wpi.first.wpilibj.util.Color;
 import com.flybotix.hfr.util.lang.EnumUtils;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import us.ilite.common.config.InputMap;
-import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.Field2020;
+import us.ilite.common.config.InputMap;
+import us.ilite.common.types.EColorData;
+import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.*;
-import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.EHangerModuleData;
+import us.ilite.robot.modules.DJSpinnerModule;
+import us.ilite.robot.modules.Limelight;
+import us.ilite.robot.modules.PowerCellModule;
 
+import java.util.List;
+
+import static us.ilite.common.types.EPowerCellData.UNUSED;
 import static us.ilite.common.config.InputMap.OPERATOR.FIRE_POWER_CELLS;
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
+import static us.ilite.robot.Robot.DATA;
 import static us.ilite.robot.modules.DriveModule.kDriveNEOVelocityFactor;
-
-import java.util.List;
 
 public class TestController extends BaseManualController {
 
@@ -50,21 +54,7 @@ public class TestController extends BaseManualController {
     }
 
     private TestController() {
-        for (String key : db.mMappedCodex.keySet()) {
-            ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
-            List<Enum<?>> enums = EnumUtils.getEnums(db.mMappedCodex.get(key).meta().getEnum(), true);
-            enums.stream().forEach(
-                    e -> {
-                        tab.addNumber(e.name(), () -> {
-                            if (db.mMappedCodex.get(key).isSet(e)) {
-                                return db.mMappedCodex.get(key).get(e);
-                            } else {
-                                return 0d;
-                            }
-                        });
-                    }
-            );
-        }
+        db.registerAllWithShuffleboard();
     }
 
     private double mMaxSpeed = 0.0;
@@ -74,7 +64,7 @@ public class TestController extends BaseManualController {
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
 //        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
-//        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
+        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
 //        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
 //        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
@@ -162,9 +152,9 @@ public class TestController extends BaseManualController {
     }
 
     public void updateLimelightTargetLock() {
-        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
-            if (Robot.DATA.selectedTarget.isSet(ELimelightData.TY)) {
-                SmartDashboard.putNumber("Distance to Target", Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
+        if (DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
+            if (DATA.selectedTarget.isSet(ELimelightData.TY)) {
+                SmartDashboard.putNumber("Distance to Target", DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
             }
             Robot.DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
         } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
@@ -198,6 +188,7 @@ public class TestController extends BaseManualController {
         mLastTrackingType = Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
 
+    //
 
     protected void updatePowerCells(double pNow) {
         // Default to none
@@ -233,7 +224,6 @@ public class TestController extends BaseManualController {
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
         }
 
-        db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
         if(db.operatorinput.isSet(FIRE_POWER_CELLS)) {
             db.powercell.set(DESIRED_V_VELOCITY, 1.0);
             db.powercell.set(DESIRED_H_VELOCITY, 0.3);
