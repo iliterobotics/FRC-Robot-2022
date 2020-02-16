@@ -263,9 +263,7 @@ public class DriveModule extends Module {
 					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 
-					db.drivetrain.set(DESIRED_TURN_PCT, -.5);//pidOutput);
-					System.out.println("||||||||||||||||||||||||||||| " + db.drivetrain.get(DESIRED_TURN_PCT));
-					System.out.println("||||||||||||||||||||||||||||| " + db.drivetrain.get(DESIRED_THROTTLE_PCT) + "\n");
+					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
 				}
 			case VELOCITY:
 				mStartHoldingPosition = false;
