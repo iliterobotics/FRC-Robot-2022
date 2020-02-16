@@ -17,6 +17,7 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
@@ -55,7 +56,8 @@ public class Robot extends TimedRobot {
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
-//    private final AbstractController mBaseAutonController = new BaseAutonController();
+    private final AbstractController mBaseAutonController = new BaseAutonController();
+    private final AutonSelection mAutonSelection = new AutonSelection();
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
@@ -129,7 +131,7 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
 //        mCSVLogger.start();
         MODE=AUTONOMOUS;
-        mActiveController = new AutonCalibration();
+        mActiveController = mAutonSelection.getSelectedAutonController();
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
