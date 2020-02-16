@@ -3,30 +3,45 @@ package us.ilite.robot.controller;
 import com.team2363.commands.HelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.modules.EDriveState;
 
 public class BaseAutonController extends AbstractController {
 
+    protected ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
+    private double mPathDelay = mAutonConfiguration.add("Path Delay Seconds", 0).getEntry().getDouble(0.0);
+    protected double mDelayCycleCount;
+
     protected Path mActivePath = null;
     protected double mPathStartTime = 0d;
     private HelixFollowerImpl mPathFollower = null;
     private Velocities mVelocities = new Velocities();
 
+    public BaseAutonController() {
+        mDelayCycleCount = mPathDelay / .02;
+
+    }
+
     @Override
     protected void updateImpl(double pNow) {
-        if (mVelocities.isFinished) {
-            mPathFollower = null;
-        }
-        if(mPathFollower == null) {
-            stopDrivetrain(pNow);
+        if (mDelayCycleCount == 0) {
+            if (mVelocities.isFinished) {
+                mPathFollower = null;
+            }
+            if(mPathFollower == null) {
+                stopDrivetrain(pNow);
+            } else {
+                db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_HELIX);
+                db.drivetrain.set(EDriveData.L_PATH_FT_s, mVelocities.left);
+                db.drivetrain.set(EDriveData.R_PATH_FT_s, mVelocities.right);
+            }
         } else {
-            db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_HELIX);
-            db.drivetrain.set(EDriveData.L_PATH_FT_s, mVelocities.left);
-            db.drivetrain.set(EDriveData.R_PATH_FT_s, mVelocities.right);
+            mDelayCycleCount--;
         }
-
     }
 
     protected void setActivePath(Path pPath) {

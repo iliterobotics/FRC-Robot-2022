@@ -18,17 +18,16 @@ public class AutonCalibration extends BaseAutonController {
 
 
     private Map<String, Path> mPaths = BobUtils.getAvailablePaths();
-    private ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
-    private NetworkTableEntry mPathNumber = mAutonConfiguration.add("Path Number", 1)
+    private int mPathNumber = mAutonConfiguration.add("Path Number", 1)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0, "max", 9, "block increment", 1))
-            .getEntry();
-    private NetworkTableEntry mPathDelay = mAutonConfiguration.add("Path Delay Seconds", 0).getEntry();
+            .getEntry()
+            .getNumber(0)
+            .intValue();
 
 
     private final Distance mPathTotalDistance;
     private final double mMaxAllowedPathTime;
-    private double mDelayCycleCount;
 
     public AutonCalibration() {
         int pathIndex = 0;
@@ -38,8 +37,7 @@ public class AutonCalibration extends BaseAutonController {
             pathIndex++;
         }
 
-        mActivePath = mPaths.get((String) mPaths.keySet().toArray()[mPathNumber.getNumber(0).intValue()]);
-        mDelayCycleCount = mPathDelay.getDouble(0.0) / .02;
+        setActivePath(mPaths.get((String) mPaths.keySet().toArray()[mPathNumber]));
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
 
         // Time to go through path plus any delay
@@ -55,31 +53,29 @@ public class AutonCalibration extends BaseAutonController {
 
     @Override
     protected void updateImpl(double pNow) {
-        if (mDelayCycleCount == 0) {
-            if (mPathStartTime == 0) {
-                mPathStartTime = pNow;
-            }
-//          Add a time check to prevent errors when things go wrong
-            if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
-                int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
-                if(index >= 0) {
-                    db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_BASIC);
-                    db.drivetrain.set(EDriveData.L_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.LEFT_VELOCITY));
-                    db.drivetrain.set(EDriveData.R_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.RIGHT_VELOCITY));
-                } else {
-                    e();
-                    System.out.println("==== SUCCESSFULLY END AUTONOMOUS PATH ====");
-                    e();
-                    mActivePath = null;
-                }
-            } else if(mActivePath != null && pNow - mPathStartTime > mMaxAllowedPathTime) {
-                e();
-                System.out.println("==== END AUTONOMOUS PATH DUE TO TIME OVERRUN ====");
-                e();
-            }
-        } else {
-            mDelayCycleCount--;
+        if (mPathStartTime == 0) {
+            mPathStartTime = pNow;
         }
+        super.updateImpl(pNow);
+//          Add a time check to prevent errors when things go wrong
+//            if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
+//                int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
+//                if(index >= 0) {
+//                    db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_BASIC);
+//                    db.drivetrain.set(EDriveData.L_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.LEFT_VELOCITY));
+//                    db.drivetrain.set(EDriveData.R_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.RIGHT_VELOCITY));
+//                } else {
+//                    e();
+//                    System.out.println("==== SUCCESSFULLY END AUTONOMOUS PATH ====");
+//                    e();
+//                    mActivePath = null;
+//                }
+//            } else if(mActivePath != null && pNow - mPathStartTime > mMaxAllowedPathTime) {
+//                e();
+//                System.out.println("==== END AUTONOMOUS PATH DUE TO TIME OVERRUN ====");
+//                e();
+//        }
+
     }
 
     private static final void e() {
