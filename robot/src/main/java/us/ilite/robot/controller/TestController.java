@@ -22,6 +22,8 @@ import us.ilite.robot.modules.PowerCellModule;
 import java.util.List;
 
 import static us.ilite.common.types.EPowerCellData.UNUSED;
+import static us.ilite.common.config.InputMap.OPERATOR.FIRE_POWER_CELLS;
+import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 import static us.ilite.robot.Robot.DATA;
@@ -75,12 +77,12 @@ public class TestController extends BaseManualController {
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
-        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
-        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
+//        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
+//        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
+//        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
-        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
-        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
+//        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
+//        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
 //        updateArm(pNow);
 
         double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
@@ -203,13 +205,17 @@ public class TestController extends BaseManualController {
     //
 
     protected void updatePowerCells(double pNow) {
+        // Default to none
+        db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.NONE);
         // Practice bot testing, min power
         // Power of 1.0 was waaaaay too fast
         if (db.operatorinput.isSet(ELogitech310.L_BTN)) {
             db.powercell.set(UNUSED, 0.2);
+        } else {
+            db.powercell.set(UNUSED, 0.0);
         }
 
-        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
             setIntakeArmEnabled(pNow, true);
             crossedEntry = activateSerializer(pNow);
 //            if (crossedEntry && !db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER)) {
@@ -219,11 +225,23 @@ public class TestController extends BaseManualController {
 //                crossedEntry = false;
 //            }
 
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
+            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
             reverseSerializer(pNow);
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.STOW_INTAKE)) {
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW)) {
             setIntakeArmEnabled(pNow, false);
             crossedEntry = activateSerializer(pNow);
+        } else {
+            // TODO - only enable once we have set the hold gains
+//            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
+            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.NONE);
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
+        }
+
+        db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
+        if(db.operatorinput.isSet(FIRE_POWER_CELLS)) {
+            db.powercell.set(DESIRED_V_VELOCITY, 1.0);
+            db.powercell.set(DESIRED_H_VELOCITY, 0.3);
         }
 
 
@@ -278,7 +296,7 @@ public class TestController extends BaseManualController {
     }
 
     void updateDJBooth(double pNow) {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_POSITION_CONTROL)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.COLOR_POSITION)) {
             db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.getPower());
             int i = (int) db.color.get(EColorData.SENSED_COLOR);
             DJSpinnerModule.EColorMatch m = DJSpinnerModule.EColorMatch.values()[i];
@@ -308,7 +326,7 @@ public class TestController extends BaseManualController {
                 db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.POSITION.ordinal());
             }
         }
-        else if ( db.operatorinput.isSet(InputMap.OPERATOR.OPERATOR_ROTATION_CONTROL)) {
+        else if ( db.operatorinput.isSet(InputMap.OPERATOR.COLOR_ROTATION)) {
             db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.getPower());
             if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.TARGET_ROTATION_COUNT) {
                 db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.OFF.ordinal());
