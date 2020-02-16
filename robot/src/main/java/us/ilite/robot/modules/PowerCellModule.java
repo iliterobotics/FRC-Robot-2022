@@ -166,7 +166,7 @@ public class PowerCellModule extends Module {
         mIntakeRoller = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeRollerId, CANSparkMaxLowLevel.MotorType.kBrushless );
         mIntakeRoller.setInverted(true);
         mIntakeRoller.setIdleMode(CANSparkMax.IdleMode.kCoast);
-        mIntakeRoller.setSmartCurrentLimit(25);
+        mIntakeRoller.setSmartCurrentLimit(15);
 
         mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonPowerCellSerializer);
         mConveyorMotorVertical = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonVerticalID );
@@ -174,7 +174,7 @@ public class PowerCellModule extends Module {
 
         mIntakePivot = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeArm, CANSparkMaxLowLevel.MotorType.kBrushless);
         mIntakePivot.setIdleMode(CANSparkMax.IdleMode.kCoast);
-        mIntakePivot.setSecondaryCurrentLimit(15);
+        mIntakePivot.setSecondaryCurrentLimit(35);
 
         mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel);
         mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel);

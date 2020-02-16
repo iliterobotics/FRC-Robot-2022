@@ -19,7 +19,7 @@ public abstract class AbstractController {
     protected double dt = 1d;
 
 
-    public static double kIntakeRollerPower_on = 1.0;
+    public static double kIntakeRollerPower_on = 0.25;
     public static double kIntakeRollerPower_off = 0.0;
 
     public AbstractController(){
@@ -51,7 +51,7 @@ public abstract class AbstractController {
         if(pEnabled) {
             double speed = Math.max(db.drivetrain.get(L_ACTUAL_VEL_FT_s), db.drivetrain.get(R_ACTUAL_VEL_FT_s));
             if(speed <= 1.0) {
-                speed = 10.0;
+                speed = 0.3;
             }
             db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.OUT);
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_on);
@@ -67,10 +67,9 @@ public abstract class AbstractController {
      * @return
      */
     protected boolean activateSerializer(double pNow) {
-        double power =0.3;
         if (db.powercell.isSet(ENTRY_BEAM)) {
-            db.powercell.set(DESIRED_H_VELOCITY, power);
-            db.powercell.set(DESIRED_V_VELOCITY, power + 0.2);
+            db.powercell.set(DESIRED_H_VELOCITY, 0.3);
+            db.powercell.set(DESIRED_V_VELOCITY, 0.35);
             return true;
         } else {
             db.powercell.set(DESIRED_H_VELOCITY, 0.0);

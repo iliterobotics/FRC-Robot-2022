@@ -78,7 +78,7 @@ public class TestController extends BaseManualController {
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
 //        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
-//        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
+        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
 //        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
 //        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
@@ -238,7 +238,6 @@ public class TestController extends BaseManualController {
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
         }
 
-        db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
         if(db.operatorinput.isSet(FIRE_POWER_CELLS)) {
             db.powercell.set(DESIRED_V_VELOCITY, 1.0);
             db.powercell.set(DESIRED_H_VELOCITY, 0.3);
