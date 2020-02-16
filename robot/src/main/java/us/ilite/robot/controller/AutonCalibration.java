@@ -16,25 +16,6 @@ import java.util.Map;
 
 public class AutonCalibration extends BaseAutonController {
 
-    public enum DisplayPaths {
-        NONE(null),
-        LOOP(new Loop()),
-        OUR_TRENCH(new OurTrench()),
-        SQUIGGLE(new Squiggle()),
-        T_90DEG_12FT(new T_90DEG_12FT()),
-        T_180DEG_24FT(new T_180DEG_24FT()),
-        T_LINE_10_FT(new T_LINE_10_FT()),
-        T_LINE_27_FT(new T_LINE_27_FT()),
-        T_LINE_F10FT_L90DEG_F5FT_R5FT(new T_LINE_F10FT_L90DEG_F5FT_R5FT()),
-        WONKY(new Wonky()),
-        YOINK(new Yoink());
-
-        public Path path;
-
-        DisplayPaths(Path path) {
-            this.path = path;
-        }
-    }
 
     private Map<String, Path> mPaths = BobUtils.getAvailablePaths();
     private ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
@@ -57,7 +38,7 @@ public class AutonCalibration extends BaseAutonController {
             pathIndex++;
         }
 
-        mActivePath = DisplayPaths.values()[mPathNumber.getNumber(0).intValue()].path;
+        mActivePath = mPaths.get((String) mPaths.keySet().toArray()[mPathNumber.getNumber(0).intValue()]);
         mDelayCycleCount = mPathDelay.getDouble(0.0) / .02;
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
 
