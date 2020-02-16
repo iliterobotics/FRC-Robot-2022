@@ -6,7 +6,9 @@ import us.ilite.common.*;
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
+import us.ilite.robot.modules.EDriveState;
 import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
@@ -81,6 +83,12 @@ public abstract class AbstractController {
     protected void reverseSerializer(double pNow) {
         db.powercell.set(DESIRED_H_VELOCITY, -1.0);
         db.powercell.set(DESIRED_V_VELOCITY, -1.0);
+    }
+
+    protected void stopDrivetrain(double pNow) {
+        db.drivetrain.set(EDriveData.STATE, EDriveState.PERCENT_OUTPUT);
+        db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
+        db.drivetrain.set(DESIRED_TURN_PCT,0.0);
     }
 
     /**
