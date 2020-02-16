@@ -18,6 +18,9 @@ public class BaseAutonController extends AbstractController {
 
     @Override
     protected void updateImpl(double pNow) {
+        if(mPathStartTime == 0) {
+            mPathStartTime = pNow;
+        }
         if (mPathFollower != null && mPathFollower.isFinished()) {
             mPathFollower = null;
         }
@@ -40,9 +43,9 @@ public class BaseAutonController extends AbstractController {
         private double mLastDistance = 0d;
         private double mLastHeading = 0d;
         private PIDController mDistanceController = new PIDController(
-                2.0, 0.0, 0.0);
+                1.5, 0.0, 0.0);
         private PIDController mHeadingController = new PIDController(
-                0.0, 0.0, 0.0);
+                0.001, 0.0, 0.0);
         private double mPathStartTime = 0.0;
 
         /**

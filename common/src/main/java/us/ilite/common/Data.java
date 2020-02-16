@@ -34,6 +34,7 @@ public class Data {
     //Add new codexes here as we need more
 
     public static final double NULL_CODEX_VALUE = 0.0;
+    private boolean mHasRegisteredWithShuffleboard = false;
     public final RobotCodex<EGyro> imu = new RobotCodex(Double.NaN, EGyro.class);
     public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
@@ -94,7 +95,7 @@ public class Data {
     }
 
     public void registerAllWithShuffleboard() {
-
+        if(mHasRegisteredWithShuffleboard) { return ; }
         for (String key : mMappedCodex.keySet()) {
             ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
             List<Enum<?>> enums = EnumUtils.getEnums(mMappedCodex.get(key).meta().getEnum(), true);
@@ -110,6 +111,7 @@ public class Data {
                     }
             );
         }
+        mHasRegisteredWithShuffleboard = true;
     }
 
     /**

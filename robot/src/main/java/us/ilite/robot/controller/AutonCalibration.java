@@ -18,11 +18,10 @@ public class AutonCalibration extends BaseAutonController {
         db.registerAllWithShuffleboard();
         mPathTotalDistance = BobUtils.getPathTotalDistance(mPath);
         mMaxAllowedPathTime = BobUtils.getPathTotalTime(mPath) + 0.1;
-        //mActivePath = mPath;
         setActivePath(mPath);
         e();
         System.out.println("==== RUNNING AUTONOMOUS PATH ====");
-        //System.out.println("Path: " + mActivePath.getClass().getSimpleName());
+        System.out.println("Path: " + mPath.getClass().getSimpleName());
         System.out.println("Time (s): " + mMaxAllowedPathTime);
         System.out.println("Dist (ft): " + mPathTotalDistance);
         e();
@@ -31,10 +30,10 @@ public class AutonCalibration extends BaseAutonController {
     @Override
     protected void updateImpl(double pNow) {
         super.updateImpl(pNow);
-//        if(mPathStartTime == 0) {
-//            mPathStartTime = pNow;
-//        }
 //
+        if(mPathStartTime == 0) {
+            mPathStartTime = pNow;
+        }
 //        // Add a time check to prevent errors when things go wrong
 //        if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
 //            int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
