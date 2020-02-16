@@ -38,15 +38,24 @@ public class Settings {
             public static int kHangerNeoID2 = 71;
 //            public static int kTalonThreeID = 65; // Change later
             public static final int kTurretGyroID = 61; // There isn't a gyro on the BunnyBot
-            public static final int kShooterID = 66; // BunnyBot Shooter
-            public static final int kAcceleratorID = 61; // BunnyBot Conveyor
-            public static final int kTurretID = 69; // BunnyBot Hopper
             public static final int kDJSpinnerVictorID = 50;
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
             public static int kPigeonIDForFlywheel=80;
             public static int kFlywheelNeoAddress = 16;
+
+
+
+            public static final int kShooterID = 66; // BunnyBot Shooter
+            public static final int kFeederId = 61; // BunnyBot Conveyor
+            public static final int kTurretID = 69; // BunnyBot Hopper
+
+            public static int kMAXTurretId = 9;
+            public static int kMAXFeederId = 10;
+            public static int kFalconMasterId = 13;
+            public static int kFalconFollowerId = 14;
+            public static int kHoodServoId = 9; //Servo channel from Bunnybot, not finalized
 
 //            public static double kGyroCollisionThreshold = 0.0;
 
@@ -76,6 +85,7 @@ public class Settings {
         }
 
         public static class Analog {
+            public static int kHoodPot = 1; //Current bunnybot analog port
         }
 
         public static class DIO {
