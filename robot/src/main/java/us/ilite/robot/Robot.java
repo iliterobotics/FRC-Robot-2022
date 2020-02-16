@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-    private CSVLogger mCSVLogger = new CSVLogger();
+//    private CSVLogger mCSVLogger = new CSVLogger();
     private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
@@ -43,6 +43,7 @@ public class Robot extends TimedRobot {
     private PowerCellModule mIntake;
 //    private RawLimelight mRawLimelight;
 //    private DJSpinnerModule mDJSpinnerModule;
+//    private LEDControl mLEDControl;
     private SimulationModule mSimulation;
 //    private FlywheelModule mShooter;
 
@@ -74,6 +75,7 @@ public class Robot extends TimedRobot {
 //        mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
 //        mDJSpinnerModule = new DJSpinnerModule();
+//        mLEDControl = new LEDControl();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -125,7 +127,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        mCSVLogger.start();
+//        mCSVLogger.start();
         MODE=AUTONOMOUS;
         mActiveController = new AutonCalibration();
         mActiveController.setEnabled(true);
@@ -142,7 +144,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        mCSVLogger.start();
+//        mCSVLogger.start();
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -159,7 +161,7 @@ public class Robot extends TimedRobot {
         mLogger.info("Disabled Initialization");
 
         mRunningModules.shutdown(CLOCK.getCurrentTime());
-        mCSVLogger.stop();
+//        mCSVLogger.stop();
 
         if(mActiveController != null) {
             mActiveController.setEnabled(false);
@@ -188,6 +190,7 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mHanger);
         mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
+//        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }
@@ -203,7 +206,7 @@ public class Robot extends TimedRobot {
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
         for (RobotCodex c : DATA.mLoggedCodexes ) {
-            mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
+//            mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
         }
         for ( RobotCodex c : DATA.mAllCodexes ) {
             c.reset();

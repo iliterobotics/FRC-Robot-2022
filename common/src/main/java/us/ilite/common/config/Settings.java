@@ -42,6 +42,7 @@ public class Settings {
             public static final int kShooterID = 66; // BunnyBot Shooter
             public static final int kAcceleratorID = 61; // BunnyBot Conveyor
             public static final int kTurretID = 69; // BunnyBot Hopper
+            public static final int kDJSpinnerVictorID = 50;
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
@@ -61,6 +62,7 @@ public class Settings {
             public static int kMAXIntakeArm = 7;
             public static int kMAXIntakeRollerId = 8;
             public static int kTalonPowerCellSerializer = 11;
+            public static int kLEDControlCanifierID = 0;
 
             // ===== 2019 Drive =====
 //            public static  int kDriveLeftMaster = 1;
