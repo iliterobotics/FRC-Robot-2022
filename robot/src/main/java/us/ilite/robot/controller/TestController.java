@@ -110,35 +110,12 @@ public class TestController extends BaseManualController {
     }
 
     private void updateFlywheel() {
-//        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
-//            if (db.limelight.isSet(ELimelightData.TV)) {
-//                SmartDashboard.putNumber("Distance To Target", db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
-//                if (db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET) <= 50) {
-//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 100);
-//                } else {
-//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 2000);
-//                }
-//            } else {
-//                db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 1000);
-//            }
-//        } else {
-//            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
-//        }
-//
-//        if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
-//            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 1.0);
-//
-//        } else if (db.operatorinput.isSet(ELogitech310.Y_BTN)){
-//            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
-//        }
-//        else {
-//            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0.5);
-//        }
-//        if (db.operatorinput.isSet(InputMap.OPERATOR.LOCK_TARGET)) {
-//            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE);
-//        } else {
-//            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
-//        }
+        if (db.limelight.isSet(TX)) {
+            db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, -0.1 * db.limelight.get(TX));
+        } else {
+            db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
+        }
+
     }
 
     public void updateTargetTracking(double pNow) {
