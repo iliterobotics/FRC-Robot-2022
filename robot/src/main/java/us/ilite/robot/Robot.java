@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
-    private final AbstractController mBaseAutonController = new BaseAutonController();
+//    private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
