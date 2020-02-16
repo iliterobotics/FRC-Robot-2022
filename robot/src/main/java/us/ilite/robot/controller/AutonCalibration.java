@@ -15,21 +15,22 @@ import java.util.Map;
 
 public class AutonCalibration extends BaseAutonController {
 
-    public enum PATHS {
-        Loop(new Loop()),
-        OurTrench(new OurTrench()),
-        Squiggle(new Squiggle()),
+    public enum DisplayPaths {
+        NONE(null),
+        LOOP(new Loop()),
+        OUR_TRENCH(new OurTrench()),
+        SQUIGGLE(new Squiggle()),
         T_90DEG_12FT(new T_90DEG_12FT()),
         T_180DEG_24FT(new T_180DEG_24FT()),
         T_LINE_10_FT(new T_LINE_10_FT()),
         T_LINE_27_FT(new T_LINE_27_FT()),
         T_LINE_F10FT_L90DEG_F5FT_R5FT(new T_LINE_F10FT_L90DEG_F5FT_R5FT()),
-        Wonky(new Wonky()),
-        Yoink(new Yoink());
+        WONKY(new Wonky()),
+        YOINK(new Yoink());
 
-        Path path;
+        public Path path;
 
-        PATHS(Path path) {
+        DisplayPaths(Path path) {
             this.path = path;
         }
     }
@@ -43,7 +44,13 @@ public class AutonCalibration extends BaseAutonController {
     private final double mMaxAllowedPathTime;
 
     public AutonCalibration() {
-        mActivePath = PATHS.values()[mPathNumber.getNumber(0).intValue()].path;
+        mActivePath = DisplayPaths.values()[mPathNumber.getNumber(0).intValue()].path;
+        mAutonConfiguration = Shuffleboard.getTab("Auton Config");
+        mPathNumber = mAutonConfiguration.add("Path Number", 0)
+                .withWidget(BuiltInWidgets.kTextView)
+                .getEntry();
+
+        mActivePath = DisplayPaths.NONE.path;
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
         mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1;
 
@@ -60,6 +67,8 @@ public class AutonCalibration extends BaseAutonController {
         if(mPathStartTime == 0) {
             mPathStartTime = pNow;
         }
+        mPathNumber.setString(DisplayPaths.values()[((int) mPathNumber.getDouble(0))].name());
+
         // Add a time check to prevent errors when things go wrong
         if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
             int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
