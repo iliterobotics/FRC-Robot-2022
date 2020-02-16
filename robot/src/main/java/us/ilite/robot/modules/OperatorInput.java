@@ -5,9 +5,6 @@ import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.Joystick;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.input.ELogitech310;
-import us.ilite.robot.Robot;
-
-import java.util.List;
 
 public class OperatorInput extends Module {
     protected static final double
@@ -37,9 +34,8 @@ public class OperatorInput extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        System.err.println("READING JOYSTICKS");
-        ELogitech310.map(Robot.DATA.driverinput, mDriverJoystick);
-        ELogitech310.map(Robot.DATA.operatorinput, mOperatorJoystick);
+        ELogitech310.map(db.driverinput, mDriverJoystick);
+        ELogitech310.map(db.operatorinput, mOperatorJoystick);
     }
 
     @Override
