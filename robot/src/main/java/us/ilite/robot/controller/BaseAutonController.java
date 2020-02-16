@@ -1,10 +1,13 @@
 package us.ilite.robot.controller;
 
 import com.team2363.commands.HelixFollower;
+import com.team2363.commands.IliteHelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
+import us.ilite.robot.Robot;
+import us.ilite.robot.auto.paths.BobUtils;
 import us.ilite.robot.modules.EDriveState;
 
 public class BaseAutonController extends AbstractController {
@@ -12,87 +15,69 @@ public class BaseAutonController extends AbstractController {
     protected Path mActivePath = null;
     protected double mPathStartTime = 0d;
     private HelixFollowerImpl mPathFollower = null;
-    private Velocities mVelocities = new Velocities();
 
     @Override
     protected void updateImpl(double pNow) {
-        if (mVelocities.isFinished) {
+        if (mPathFollower != null && mPathFollower.isFinished()) {
             mPathFollower = null;
         }
         if(mPathFollower == null) {
             stopDrivetrain(pNow);
         } else {
-            db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_HELIX);
-            db.drivetrain.set(EDriveData.L_PATH_FT_s, mVelocities.left);
-            db.drivetrain.set(EDriveData.R_PATH_FT_s, mVelocities.right);
+            mPathFollower.execute(pNow);
         }
 
     }
 
     protected void setActivePath(Path pPath) {
         mActivePath = pPath;
-        mPathFollower = new HelixFollowerImpl(mActivePath, v -> {
-           mVelocities.left = v.left;
-           mVelocities.right = v.right;
-           mVelocities.isFinished = v.isFinished;
-        });
+        mPathFollower = new HelixFollowerImpl(mActivePath);
+        mPathFollower.initialize();
     }
 
-    private class Velocities{
-        public double left = 0;
-        public double right = 0;
-        public boolean isFinished = false;
-    }
-
-    private interface IHelixListener {
-        void update(Velocities pUpdate);
-    }
-
-    private class HelixFollowerImpl extends HelixFollower {
+    private class HelixFollowerImpl extends IliteHelixFollower {
         /** Used as a multi-threaded caching buffer */
-        private Velocities mVelocities = new Velocities();
-        private final IHelixListener mListener;
         private double mLastDistance = 0d;
         private double mLastHeading = 0d;
+        private PIDController mDistanceController = new PIDController(
+                2.0, 0.0, 0.0);
+        private PIDController mHeadingController = new PIDController(
+                0.0, 0.0, 0.0);
+        private double mPathStartTime = 0.0;
 
         /**
          * This will import the path class based on the name of the path provided
          *
          * @param path the name of the path to run
          */
-        public HelixFollowerImpl(Path path, IHelixListener pListener) {
+        public HelixFollowerImpl(Path path) {
             super(path);
-            mListener = pListener;
         }
 
         @Override
         public void resetDistance() {
-            mVelocities.right = 0;
-            mVelocities.left = 0;
-            mVelocities.isFinished = false;
+            mPathStartTime = Robot.CLOCK.getCurrentTime();
             mLastDistance = 0;
             db.drivetrain.set(EDriveData.STATE, EDriveState.RESET);
         }
 
         @Override
         public PIDController getHeadingController() {
-            return new PIDController(0.1, 0.0, 0.0);
+            return mHeadingController;
         }
 
         @Override
         public PIDController getDistanceController() {
-            return new PIDController(0.1, 0.0, 0.0);
+            return mDistanceController;
         }
 
         @Override
         public double getCurrentDistance() {
             // There is a small chance this fires after data.reset() but before the modules' readInput has run
-            if(db.drivetrain.isSet(EDriveData.L_ACTUAL_POS_FT)) {
-                mLastDistance = (db.drivetrain.get(EDriveData.L_ACTUAL_POS_FT) +
-                                db.drivetrain.get(EDriveData.R_ACTUAL_POS_FT)
-                ) / 2.0;
-            }
-            return mLastDistance;
+//                mLastDistance = (db.drivetrain.get(EDriveData.L_ACTUAL_POS_FT) +
+//                                db.drivetrain.get(EDriveData.R_ACTUAL_POS_FT)
+//                ) / 2.0;
+            return db.drivetrain.get(EDriveData.L_ACTUAL_POS_FT);
         }
 
         @Override
@@ -106,11 +91,29 @@ public class BaseAutonController extends AbstractController {
 
         @Override
         public void useOutputs(double left, double right) {
-            // Re-use the object to prevent GC
-            mVelocities.left = left;
-            mVelocities.right = right;
-            mVelocities.isFinished = isFinished();
-            mListener.update(mVelocities);
+            db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_HELIX);
+            db.drivetrain.set(EDriveData.L_PATH_FT_s, left);
+            db.drivetrain.set(EDriveData.R_PATH_FT_s, right);
+            db.drivetrain.set(EDriveData.PATH_ERR_ft, mDistanceController.getError());
+        }
+
+        protected void moveToNextSegment(double pNow) {
+            currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
+            if (currentSegment == -1)
+            {
+                isFinished = true;
+            }
+        }
+
+        public void execute(double pNow) {
+            super.execute();
+            moveToNextSegment(pNow);
+            super.calculateOutputs();
+            if(isFinished()) {
+                stopDrivetrain(0.0);
+            }
         }
     }
+
+
 }

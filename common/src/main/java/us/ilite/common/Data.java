@@ -1,9 +1,12 @@
 package us.ilite.common;
 
 import com.flybotix.hfr.codex.RobotCodex;
+import com.flybotix.hfr.util.lang.EnumUtils;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
@@ -15,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -87,6 +91,25 @@ public class Data {
 
     public Data() {
         this(true);
+    }
+
+    public void registerAllWithShuffleboard() {
+
+        for (String key : mMappedCodex.keySet()) {
+            ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
+            List<Enum<?>> enums = EnumUtils.getEnums(mMappedCodex.get(key).meta().getEnum(), true);
+            enums.stream().forEach(
+                    e -> {
+                        tab.addNumber(e.name(), () -> {
+                            if (mMappedCodex.get(key).isSet(e)) {
+                                return mMappedCodex.get(key).get(e);
+                            } else {
+                                return 0d;
+                            }
+                        });
+                    }
+            );
+        }
     }
 
     /**

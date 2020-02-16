@@ -50,21 +50,7 @@ public class TestController extends BaseManualController {
     }
 
     private TestController() {
-        for (String key : db.mMappedCodex.keySet()) {
-            ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
-            List<Enum<?>> enums = EnumUtils.getEnums(db.mMappedCodex.get(key).meta().getEnum(), true);
-            enums.stream().forEach(
-                    e -> {
-                        tab.addNumber(e.name(), () -> {
-                            if (db.mMappedCodex.get(key).isSet(e)) {
-                                return db.mMappedCodex.get(key).get(e);
-                            } else {
-                                return 0d;
-                            }
-                        });
-                    }
-            );
-        }
+        db.registerAllWithShuffleboard();
     }
 
     private double mMaxSpeed = 0.0;
@@ -74,7 +60,7 @@ public class TestController extends BaseManualController {
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
 //        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
-//        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
+        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
 //        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
 //        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
