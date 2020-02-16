@@ -19,7 +19,7 @@ public abstract class BaseManualController extends AbstractController {
 
     void updateDrivetrain(double pNow) {
         double throttle = db.driverinput.get(THROTTLE_AXIS);
-        double rotate = db.driverinput.get(TURN_AXIS);
+        double rotate = -db.driverinput.get(TURN_AXIS);
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband

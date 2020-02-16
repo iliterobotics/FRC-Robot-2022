@@ -187,12 +187,6 @@ public class DriveModule extends Module {
 		mYawPid.setOutputRange(-1, 1);
 		mYawPid.reset();
 
-//		mHoldLeftPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-//		mHoldLeftPositionPid.setOutputRange(-1, 1);
-//		mHoldLeftPositionPid.setSetpoint(0.0);
-//		mHoldRightPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-//		mHoldRightPositionPid.setOutputRange(-1, 1);
-//		mHoldRightPositionPid.setSetpoint(0.0);
 		mStartHoldingPosition = false;
 		mLeftHoldSetpoint = 0.0;
 		mRightHoldSetpoint = 0.0;
@@ -264,6 +258,7 @@ public class DriveModule extends Module {
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 
 					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
+					turn = db.drivetrain.get(DESIRED_TURN_PCT);
 				}
 			case VELOCITY:
 				mStartHoldingPosition = false;
@@ -283,21 +278,5 @@ public class DriveModule extends Module {
 				mRightMaster.set(throttle-turn);
 				break;
 		}
-	}
-
-	public void loop(double pNow) {
-//		mUpdateTimer.start();
-		EDriveState mDriveState = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
-		switch(mDriveState) {
-			case TARGET_ANGLE_LOCK:
-				break;
-			case NORMAL:
-				break;
-			default:
-				mLogger.warn("Got drivetrain state: " + mDriveState+" which is unhandled");
-				break;
-		}
-		mPreviousTime = pNow;
-//		mUpdateTimer.stop();
 	}
 }
