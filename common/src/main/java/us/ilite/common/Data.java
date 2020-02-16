@@ -1,6 +1,7 @@
 package us.ilite.common;
 
 import com.flybotix.hfr.codex.RobotCodex;
+import com.flybotix.hfr.util.lang.EnumUtils;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -11,10 +12,8 @@ import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,6 +48,9 @@ public class Data {
             driverinput,
             operatorinput,
             pdp,
+            rawLimelight,
+            selectedTarget,
+            flywheel,
             powercell,
             hanger,
             limelight,
@@ -60,7 +62,7 @@ public class Data {
     public final RobotCodex[] mLoggedCodexes = new RobotCodex[]{
             imu,
             drivetrain,
-//            driverinput,
+            driverinput,
             operatorinput,
             pdp,
             powercell,
@@ -89,25 +91,6 @@ public class Data {
         this(true);
     }
 
-    /**
-     * Makes the log file if it doesn't already exist
-     */
-    public static void handleCreation(File pFile) {
-        //Makes every folder before the file if the CSV's parent folder doesn't exist
-        if (Files.notExists(pFile.toPath())) {
-            pFile.getAbsoluteFile().getParentFile().mkdirs();
-        }
-
-        //Creates the .CSV if it doesn't exist
-        if (!pFile.exists()) {
-            try {
-                pFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public static char recieveColorFmsRelay() {
         //For testing make sure to comment out the method and
         //return a single char for the symbol of the color.
@@ -118,6 +101,17 @@ public class Data {
         } else {
             return '\u1000';
         }
+    }
 
+    //USE TO TEST LOGGING
+    public void randomizeCodex( RobotCodex c ) {
+        for ( RobotCodex rb : mLoggedCodexes ) {
+            List<Enum<?>> enums = EnumUtils.getEnums(c.meta().getEnum(), true);
+            if ( rb.equals( c ) ) {
+                for ( Enum e : enums ) {
+                    rb.set( e, Math.random()*10 );
+                }
+            }
+        }
     }
 }
