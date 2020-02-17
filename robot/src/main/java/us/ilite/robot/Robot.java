@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
 //    private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
-//    private DriveModule mDrive;
+    private DriveModule mDrive;
 //    private Limelight mLimelight;
     private PowerCellModule mIntake;
 //    private RawLimelight mRawLimelight;
@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
-//        mDrive = new DriveModule();
+        mDrive = new DriveModule();
 //        mLEDControl = new LEDControl();
         mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
@@ -164,8 +164,9 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.readInputs(0d);
-//        mDrive.readInputs(0d);
+        mDrive.readInputs(0d);
         mShooter.readInputs(0d);
+        mIntake.readInputs(0d);
         Shuffleboard.update();
     }
 
@@ -184,7 +185,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);
-//        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
         mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);

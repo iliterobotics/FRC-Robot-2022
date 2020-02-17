@@ -70,10 +70,8 @@ public class TestController extends BaseManualController {
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
 //        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
-//        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
         Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
-//        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
-//        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
+        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
 //        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
 //        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
