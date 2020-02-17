@@ -130,7 +130,7 @@ public class PowerCellModule extends Module {
 
     public enum EArmState {
         NONE(0.0, 0),
-        OUT(90.0, INTAKE_PIVOT_DOWN_SLOT),
+        OUT(95.0, INTAKE_PIVOT_DOWN_SLOT),
         // TODO - fix to UP slot
         STOW(0.0, INTAKE_PIVOT_DOWN_SLOT),
         HOLD(0.0, INTAKE_PIVOT_DOWN_SLOT);
