@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import us.ilite.robot.controller.AutonCalibration;
 import us.ilite.robot.controller.BaseAutonController;
+import us.ilite.robot.controller.LineAutonController;
 
 import java.util.*;
 
@@ -41,7 +42,7 @@ public class AutonSelection {
         for (Map.Entry<String, Path> entry : getAutonControllerFromIndex(mControllerNumber).getPathsFromController().entrySet()) {//kAllPaths.entrySet()) {
             mAutonConfiguration.addPersistent(entry.getKey(), pathIndex)
                     .withSize(2, 1)
-                    .withPosition(pathIndex, 2);
+                    .withPosition(pathIndex == 0 ? pathIndex : pathIndex + 1 , 2);
             pathIndex++;
         }
     }
@@ -54,7 +55,7 @@ public class AutonSelection {
             System.out.println("Adding " + entry.getKey());
             mAutonConfiguration.addPersistent(String.format("%s", displayIndex), entry.getKey())
                     .withSize(2, 1)
-                    .withPosition(displayIndex, 0);
+                    .withPosition(displayIndex == 0 ? displayIndex : displayIndex + 1, 0);
             displayIndex++;
         }
 
@@ -67,6 +68,7 @@ public class AutonSelection {
     public static Map<String, BaseAutonController> getAutonControllers() {
         Map<String, BaseAutonController> mControllers = new HashMap<>();
         mControllers.put("AutonCalibration", new AutonCalibration());
+        mControllers.put("LineController", new LineAutonController());
         return mControllers;
     }
 }
