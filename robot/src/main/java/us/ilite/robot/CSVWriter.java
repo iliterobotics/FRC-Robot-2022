@@ -101,7 +101,7 @@ public class CSVWriter {
                 }
                 else if ( mLogFailures == Settings.kAcceptableLogFailures ) {
                     mLog.error("---------------------CSV LOGGING DISABLED----------------------");
-                    Robot.mCSVLogger.closeWriters();
+//                    Robot.mCSVLogger.closeWriters();
                     mLogFailures++;
                 }
             }

@@ -1,5 +1,6 @@
 package us.ilite.robot.hardware;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import us.ilite.common.lib.control.ProfileGains;
@@ -19,6 +20,13 @@ public class HardwareUtils {
     public static void setGains(CANEncoder pEncoder, ProfileGains pGains) {
         pEncoder.setPositionConversionFactor(pGains.POSITION_CONVERSION_FACTOR);
         pEncoder.setVelocityConversionFactor(pGains.VELOCITY_CONVERSION_FACTOR);
+    }
+
+    public static void setGains(TalonFX pTalon, ProfileGains pGains) {
+        pTalon.config_kF(pGains.PROFILE_SLOT, pGains.F);
+        pTalon.config_kP(pGains.PROFILE_SLOT, pGains.P);
+        pTalon.config_kI(pGains.PROFILE_SLOT, pGains.I);
+        pTalon.config_kD(pGains.PROFILE_SLOT, pGains.D);
     }
 
     private HardwareUtils() {}

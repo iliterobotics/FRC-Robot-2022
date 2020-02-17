@@ -14,6 +14,8 @@ public class ProfileGains {
     public double I = 0;
     public double D = 0;
     public double F = 0;
+    public double kV = 0;
+    public double kA = 0;
 
     public double MAX_ACCEL = 0d;
     public double MAX_VELOCITY = 0d;
@@ -91,6 +93,27 @@ public class ProfileGains {
      */
     public ProfileGains maxVelocity(double gain) {
         MAX_VELOCITY = gain;
+        return this;
+    }
+
+
+    /**
+     * Builder-pattern helper for constructing
+     * @param gain
+     * @return
+     */
+    public ProfileGains kV(double gain) {
+        kV = gain;
+        return this;
+    }
+
+    /**
+     * Builder-pattern helper for constructing
+     * @param gain
+     * @return
+     */
+    public ProfileGains kA(double gain) {
+        kA = gain;
         return this;
     }
 
