@@ -3,9 +3,7 @@ package us.ilite.robot.auto.paths;
 public interface ISequence {
     boolean isFinished();
 
-    private boolean finishedWithStep() {
-        return false;
-    }
+    boolean finishedWithStep();
 
     boolean updateSequence(double pNow);
 }

@@ -130,7 +130,8 @@ public class Robot extends TimedRobot {
         //mCSVLogger.start();
 
         MODE=AUTONOMOUS;
-        mActiveController = new AutonCalibration();
+//        mActiveController = new AutonCalibration();
+        mActiveController = new ShootIntakeController();
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();

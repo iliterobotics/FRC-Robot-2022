@@ -27,8 +27,8 @@ public class SimpleSequence implements ISequence {
         return mCurrentCommandIndex == mSteps.length;
     }
 
-
-    private boolean finishedWithStep() {
+    @Override
+    public boolean finishedWithStep() {
         return mSteps[mCurrentCommandIndex].update(Robot.CLOCK.getCurrentTime());
     }
 
