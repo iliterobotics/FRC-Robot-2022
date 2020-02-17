@@ -114,6 +114,11 @@ public class Robot extends TimedRobot {
 
         initTimer.stop();
         mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
+
+        if ( !Settings.kIsLogging ) {
+            mLogger.warn("------------Not Logging to CSV------------");
+        }
+
     }
 
     /**
