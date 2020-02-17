@@ -51,7 +51,7 @@ public class AutonSelection {
     public AutonSelection() {
         int displayIndex = 0;
         // TODO - do this after selection from shuffleboard
-//          setActivePath(kAllPaths.get((String) kAllPaths.keySet().toArray()[mPathNumber]));
+        //  setActivePath(kAllPaths.get((String) kAllPaths.keySet().toArray()[mPathNumber]));
         for (Map.Entry<String, BaseAutonController> entry : getAutonControllers().entrySet()) {
             mAutonConfiguration.add(String.format("%s", displayIndex), entry.getKey())
                     .withSize(2, 1)
