@@ -10,14 +10,14 @@ import static us.ilite.robot.controller.AbstractController.kIntakeRollerPower_on
 
 public class SimpleSequence implements ISequence {
     private static int beamCounter = 0;
-    private static boolean mLastSecondaryBeamBroken = true;
+    private static boolean mLastSecondaryBeamBroken = false;
     private static boolean mSecondaryBeamBroken = false;
     private static IAutoCommand[] mSteps = {new IntakeCommand(2)};
     private static int mCurrentCommandIndex = 0;
     private double mCurrentDistance = 0;
 
     public static boolean checkBeams(){
-        mSecondaryBeamBroken = Robot.DATA.powercell.get(SECONDARY_BREAM) == 1.0;
+        mSecondaryBeamBroken = Robot.DATA.powercell.get(EXIT_BEAM) == 1.0;
         if (mSecondaryBeamBroken&&!mLastSecondaryBeamBroken) {
             beamCounter++;
         }

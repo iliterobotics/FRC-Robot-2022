@@ -21,7 +21,7 @@ public class ShootIntakeController extends BaseAutonController {
         super.updateImpl(pNow);
         int pathIndex = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
         if (pathIndex != -1 ){
-            mPathDistance = mActivePath.getPath()[pathIndex][7];
+            mPathDistance = BobUtils.getPathValueForCumulativeTime(mActivePath, pNow, mPathStartTime, BobUtils.BobPathValue.center_pos);
             SmartDashboard.putNumber("PATH DISTANCE", mPathDistance);
         }
         mSimpleSequence.updateSequence(pNow, mPathDistance);
