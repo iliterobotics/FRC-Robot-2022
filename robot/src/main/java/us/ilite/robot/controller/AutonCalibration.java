@@ -6,7 +6,6 @@ import us.ilite.common.Distance;
 import us.ilite.robot.auto.paths.*;
 
 import java.util.Map;
-import static us.ilite.robot.auto.paths.AutonSelection.mAutonConfiguration;
 
 public class AutonCalibration extends BaseAutonController {
 

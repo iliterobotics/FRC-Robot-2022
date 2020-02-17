@@ -18,7 +18,6 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
@@ -61,7 +60,7 @@ public class Robot extends TimedRobot {
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
     private final AbstractController mBaseAutonController = new BaseAutonController();
-    private final AutonSelection mAutonSelection = new AutonSelection();
+//    private final AutonSelection mAutonSelection = new AutonSelection();
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
@@ -134,7 +133,10 @@ public class Robot extends TimedRobot {
         //mCSVLogger.start();
 
         MODE=AUTONOMOUS;
-        mActiveController = new ShootIntakeController();//AutonSelection.getAutonControllers().get((String) AutonSelection.getAutonControllers().keySet().toArray()[AutonSelection.mControllerNumber]);
+        mActiveController = new ShootIntakeController();
+        //AutonSelection.getAutonControllers().get((String)
+        // AutonSelection.getAutonControllers().keySet().toArray()
+        // [AutonSelection.mControllerNumber]);
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);

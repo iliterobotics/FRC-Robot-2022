@@ -5,7 +5,6 @@ import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
-import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.BobUtils;
 import us.ilite.robot.modules.EDriveState;
@@ -22,7 +21,7 @@ public class BaseAutonController extends AbstractController {
 
     public BaseAutonController(String pPathAssociation) {
         kPathAssociation = pPathAssociation;
-        mDelayCycleCount = AutonSelection.mDelaySeconds;
+//        mDelayCycleCount = AutonSelection.mDelaySeconds;
         //setActivePath(getPathsFromController().get((String) getPathsFromController().keySet().toArray()[AutonSelection.mPathNumber]));
     }
 
