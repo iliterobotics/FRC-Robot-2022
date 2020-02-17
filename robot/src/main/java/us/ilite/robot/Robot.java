@@ -16,6 +16,7 @@ import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.controller.*;
@@ -76,6 +77,7 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
+        DATA.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , 90);
 //        mLedControl = new LEDControl();
 //        mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
@@ -133,10 +135,10 @@ public class Robot extends TimedRobot {
 
         MODE=AUTONOMOUS;
         mActiveController = AutonSelection.getAutonControllers().get((String) AutonSelection.getAutonControllers().keySet().toArray()[AutonSelection.mControllerNumber]);
-        mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mIntake);
         mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 

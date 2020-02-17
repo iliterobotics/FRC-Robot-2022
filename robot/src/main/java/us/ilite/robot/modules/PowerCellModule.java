@@ -2,9 +2,11 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
@@ -37,7 +39,7 @@ public class PowerCellModule extends Module {
     private CANSparkMax mIntakePivot;
     private CANSparkMax mIntakeRoller;
     private CANPIDController mIntakePivotCtrl;
-    private CANEncoder mIntakePivotEncoder;
+    private DutyCycleEncoder mIntakePivotEncoder;
     private CANEncoder mIntakeRollerEncoder;
 
 //    Beam Breakers
@@ -181,7 +183,7 @@ public class PowerCellModule extends Module {
         mExitBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kExitBeamChannel);
         mDigitalBeamSensors = new DigitalBeamSensor[]{mEntryBeam, mSecondaryBeam, mExitBeam};
 
-        mIntakePivotEncoder = new CANEncoder(mIntakePivot);
+        mIntakePivotEncoder = new DutyCycleEncoder(0);
         mIntakeRollerEncoder = mIntakeRoller.getEncoder();
 
         mIntakePivotCtrl = mIntakePivot.getPIDController();
