@@ -1,18 +1,19 @@
 package us.ilite.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Robot;
+import us.ilite.robot.hardware.ContinuousRotationServo;
 import us.ilite.robot.hardware.SparkMaxFactory;
 import us.ilite.robot.hardware.TalonSRXFactory;
 
@@ -20,21 +21,34 @@ import static us.ilite.common.types.EShooterSystemData.*;
 
 public class FlywheelModule extends Module {
 
+    public enum EHoodState {
+        NONE,
+        TARGET_ANGLE,
+        MANUAL
+    }
+
     // Flywheel Motors
     private TalonFX mFlywheelFalconMaster;
     private TalonFX mFlywheelFalconFollower;
     private CANSparkMax mFeeder;
     private TalonSRX mTurret;
-    private Servo mHoodServo;
+    private ContinuousRotationServo mHoodServo;
 
-    private Potentiometer mHoodPot;
+    private AnalogInput mHoodAI;
+    private AnalogPotentiometer mHoodPot;
 
     // Constants
     private static final double kHoodGearRatio = 32.0 / 20.0 * 14.0 / 360.0;//First stage was 32/20 in code but 36/20 in integration
     private static final double kTurretGearRatio = 9.0 / 72.0 * 18.0 / 160.0;
     private static final double kFlyWheelGearRatio = 36.0 / 24.0;
 
-    private static final double kHoodConversionFactor = 0;  //TODO to be determined, 0-5 pot turns to high and low angle
+
+    // Production bot 0.00175 min, 0.74664 max (normalized from AnalogPotentiometer)
+    private static final double kHoodReadingRange = 0.74664 - 0.00175;
+    private static final double kMinShotDegrees = 20.0;
+    private static final double kMaxShotDegrees = 80.0;
+    private static final double kHoodAngleRange = kMaxShotDegrees - kMinShotDegrees;
+    private static final double kHoodConversionFactor = kHoodReadingRange / kHoodAngleRange;
 
     private static final int FLYWHEEL_SLOT = 1;
     private static ProfileGains mFlywheelGains = new ProfileGains()
@@ -43,13 +57,7 @@ public class FlywheelModule extends Module {
             ;
 
 
-    private static final int SERVO_SLOT = 2;
-    private static ProfileGains mServoGains = new ProfileGains()
-            .slot(SERVO_SLOT)
-            .p(0)
-            .maxAccel(0)
-            .maxVelocity(0)
-            ;
+    private PIDController mHoodPID = new PIDController(5, 0, 0);
 
 
     private double mIntegral = 0;
@@ -68,9 +76,10 @@ public class FlywheelModule extends Module {
 
         mTurret = TalonSRXFactory.createDefaultTalon(Settings.Hardware.CAN.kSRXTurretId);
 
-        mHoodServo = new Servo(Settings.Hardware.CAN.kHoodServoId);
+        mHoodServo = new ContinuousRotationServo(Settings.Hardware.PWM.kHoodServoId).inverted(true);
 
-        mHoodPot = new AnalogPotentiometer(Settings.Hardware.Analog.kHoodPot);
+        mHoodAI = new AnalogInput(Settings.Hardware.Analog.kHoodPot);
+        mHoodPot = new AnalogPotentiometer(mHoodAI);
 
     }
     
@@ -81,39 +90,41 @@ public class FlywheelModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        Robot.DATA.flywheel.set(CURRENT_FLYWHEEL_VELOCITY, mFlywheelFalconMaster.getSelectedSensorVelocity()); //TODO needs to be converted from ticks per 100ms to RPS
-        Robot.DATA.flywheel.set(CURRENT_FEEDER_VELOCITY, mFeeder.get());
-        Robot.DATA.flywheel.set(CURRENT_HOOD_ANGLE, calcHoodAngle());
-        Robot.DATA.flywheel.set(CURRENT_POTENTIOMETER_TURNS, mHoodPot.get() * 5);
+        db.flywheel.set(CURRENT_FLYWHEEL_VELOCITY, mFlywheelFalconMaster.getSelectedSensorVelocity()); //TODO needs to be converted from ticks per 100ms to RPS
+        db.flywheel.set(CURRENT_FEEDER_VELOCITY, mFeeder.get());
+        db.flywheel.set(CURRENT_HOOD_ANGLE, mHoodPot.get() / kHoodReadingRange * kHoodAngleRange + kMinShotDegrees);
+        db.flywheel.set(POT_NORM_VALUE, mHoodPot.get());
+        db.flywheel.set(POT_RAW_VALUE, mHoodAI.getValue());
+        db.flywheel.set(HOOD_SERVO_VALUE, mHoodServo.getValue());
 
 
-//        if (Robot.DATA.limelight.isSet(ELimelightData.TV)) {
-//            Robot.DATA.flywheel.set(FLYWHEEL_DISTANCE_BASED_SPEED, calcSpeedFromDistance(distanceFromTarget));
-//            Robot.DATA.flywheel.set(SERVO_DISTANCE_BASED_ANGLE, calcAngleFromDistance(distanceFromTarget));
+//        if (db.limelight.isSet(ELimelightData.TV)) {
+//            db.flywheel.set(FLYWHEEL_DISTANCE_BASED_SPEED, calcSpeedFromDistance(distanceFromTarget));
+//            db.flywheel.set(SERVO_DISTANCE_BASED_ANGLE, calcAngleFromDistance(distanceFromTarget));
 //        } else {
-//            Robot.DATA.flywheel.set(FLYWHEEL_DISTANCE_BASED_SPEED, 2000);
-//            Robot.DATA.flywheel.set(SERVO_DISTANCE_BASED_ANGLE, 0);
+//            db.flywheel.set(FLYWHEEL_DISTANCE_BASED_SPEED, 2000);
+//            db.flywheel.set(SERVO_DISTANCE_BASED_ANGLE, 0);
 //        }
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mFlywheelFalconMaster.set(ControlMode.Velocity, Robot.DATA.flywheel.get(TARGET_FLYWHEEL_VELOCITY));
-        mFlywheelFalconFollower.set(ControlMode.Velocity, Robot.DATA.flywheel.get(TARGET_FLYWHEEL_VELOCITY));
+//        mFlywheelFalconMaster.set(ControlMode.Velocity, db.flywheel.get(TARGET_FLYWHEEL_VELOCITY));
+//        mFlywheelFalconFollower.set(ControlMode.Velocity, db.flywheel.get(TARGET_FLYWHEEL_VELOCITY));
 
-        mFeeder.set(Robot.DATA.flywheel.get(TARGET_FEEDER_VELOCITY));
+//        mFeeder.set(db.flywheel.get(TARGET_FEEDER_VELOCITY));
 
-        setTurret();
-        setHood();
+//        setTurret();
+        setHood(pNow);
 
-        hoodAnglePID(0.005, 0, 0);
+//        hoodAnglePID(0.005, 0, 0);
     }
 
     @Override
     public void shutdown(double pNow) {
-        Robot.DATA.flywheel.set(TARGET_FLYWHEEL_VELOCITY, 0);
-        Robot.DATA.flywheel.set(TARGET_FEEDER_VELOCITY, 0);
-        Robot.DATA.flywheel.set(TARGET_HOOD_ANGLE, 0);
+        db.flywheel.set(TARGET_FLYWHEEL_VELOCITY, 0);
+        db.flywheel.set(TARGET_FEEDER_VELOCITY, 0);
+        db.flywheel.set(TARGET_HOOD_ANGLE, 0);
     }
 
     private boolean isPastVelocity(double pVelocity) {
@@ -121,16 +132,24 @@ public class FlywheelModule extends Module {
         return mFlywheelFalconMaster.getSelectedSensorVelocity() >= pVelocity;
     }
 
-    private double setTurret() {
-        return 0.0; //neo smart motion, mimics elevator from 2019
-    }
+    private double setHood(double pNow) {
+        EHoodState state = db.flywheel.get(HOOD_STATE, EHoodState.class);
+        switch(state) {
+            case NONE:
+            case MANUAL:
+                mHoodServo.setServo(db.flywheel.get(FLYWHEEL_TEST));
+                break;
+            case TARGET_ANGLE:
+                double target = db.flywheel.get(TARGET_HOOD_ANGLE)* kHoodConversionFactor;
+                double current = db.flywheel.get(CURRENT_HOOD_ANGLE)* kHoodConversionFactor;
 
-    private double calcHoodAngle() {
-        return Robot.DATA.flywheel.get(CURRENT_POTENTIOMETER_TURNS) * kHoodConversionFactor;
-    }
+                double output = mHoodPID.calculate(current, target);
+                mHoodServo.setServo(output);
+                break;
+            default:
+                mHoodServo.setServo(0.0);
 
-    private double setHood() {
-        Robot.DATA.flywheel.get(TARGET_HOOD_ANGLE);
+        }
         return 0.0;
     }
 
@@ -153,13 +172,13 @@ public class FlywheelModule extends Module {
 
     private double hoodAnglePID(double pP, double pI, double pD) {
         // TODO Convert into an Angle Measurement
-        double error = pP * (Robot.DATA.flywheel.get(TARGET_HOOD_ANGLE) - Robot.DATA.flywheel.get(CURRENT_HOOD_ANGLE));
+        double error = pP * (db.flywheel.get(TARGET_HOOD_ANGLE) - db.flywheel.get(CURRENT_HOOD_ANGLE));
         double velocity = pD * mHoodServo.getSpeed();
         mIntegral += pI * mHoodServo.getSpeed();
         return error + mIntegral + velocity;
     }
 
     private void potentiometerPID() {
-        double output = Robot.DATA.flywheel.get(TARGET_HOOD_ANGLE) / 5;
+        double output = db.flywheel.get(TARGET_HOOD_ANGLE) / 5;
     }
 }

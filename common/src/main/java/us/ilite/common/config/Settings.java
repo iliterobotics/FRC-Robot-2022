@@ -54,7 +54,6 @@ public class Settings {
             public static int kMAXFeederId = 10;
             public static int kFalconMasterId = 13;
             public static int kFalconFollowerId = 14;
-            public static int kHoodServoId = 9;
 
 //            public static double kGyroCollisionThreshold = 0.0;
 
@@ -84,7 +83,7 @@ public class Settings {
         }
 
         public static class Analog {
-            public static int kHoodPot = 1; //Current bunnybot analog port
+            public static int kHoodPot = 0; //Current bunnybot analog port
         }
 
         public static class DIO {
@@ -92,6 +91,10 @@ public class Settings {
             public static int kSecondaryBeamChannel = 8; // Change later
             public static int kExitBeamChannel = 7; // Change later
             public static final int kAnglerID = 8; // BunnyBot Catapult
+        }
+
+        public static class PWM {
+            public static int kHoodServoId = 9;
         }
 
         public static class PCM {

@@ -17,6 +17,7 @@ import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DJSpinnerModule;
+import us.ilite.robot.modules.FlywheelModule;
 import us.ilite.robot.modules.Limelight;
 import us.ilite.robot.modules.PowerCellModule;
 
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static us.ilite.common.config.InputMap.OPERATOR.FIRE_POWER_CELLS;
 import static us.ilite.common.types.EPowerCellData.*;
+import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 import static us.ilite.robot.modules.DriveModule.kDriveNEOVelocityFactor;
@@ -79,8 +81,8 @@ public class TestController extends BaseManualController {
         // ========================================
 //        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
 //        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
-//        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
-        Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
+        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
+//        Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
 //        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
 //        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
 //        updateArm(pNow);
@@ -103,35 +105,43 @@ public class TestController extends BaseManualController {
 
     }
 
-    private void updateFlywheel() {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
-            if (db.limelight.isSet(ELimelightData.TV)) {
-                SmartDashboard.putNumber("Distance To Target", db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
-                if (db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET) <= 50) {
-                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 100);
-                } else {
-                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 2000);
-                }
-            } else {
-                db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 1000);
-            }
+    private void updateFlywheel(double pNow) {
+        if(db.operatorinput.isSet(ELogitech310.L_BTN)) {
+            db.flywheel.set(HOOD_STATE, FlywheelModule.EHoodState.MANUAL);
+            db.flywheel.set(FLYWHEEL_TEST, 1.0);
+        } else if(db.operatorinput.isSet(ELogitech310.R_BTN)){
+            db.flywheel.set(HOOD_STATE, FlywheelModule.EHoodState.MANUAL);
+            db.flywheel.set(FLYWHEEL_TEST, -1.0);
+        } else if(db.operatorinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS)){
+            db.flywheel.set(HOOD_STATE, FlywheelModule.EHoodState.TARGET_ANGLE);
+            db.flywheel.set(TARGET_HOOD_ANGLE, 45.0);
         } else {
-            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
+            db.flywheel.set(HOOD_STATE, FlywheelModule.EHoodState.MANUAL);
+            db.flywheel.set(FLYWHEEL_TEST, 0.0);
         }
-
-        if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
-            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 1.0);
-
-        } else if (db.operatorinput.isSet(ELogitech310.Y_BTN)){
-            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 0);
-        }
-        else {
-            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 0.5);
-        }
-//        if (db.operatorinput.isSet(InputMap.OPERATOR.LOCK_TARGET)) {
-//            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE);
+//        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
+//            if (db.limelight.isSet(ELimelightData.TV)) {
+//                SmartDashboard.putNumber("Distance To Target", db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
+//                if (db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET) <= 50) {
+//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 100);
+//                } else {
+//                    db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 2000);
+//                }
+//            } else {
+//                db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 1000);
+//            }
 //        } else {
-//            db.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
+//            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
+//        }
+//
+//        if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
+//            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 1.0);
+//
+//        } else if (db.operatorinput.isSet(ELogitech310.Y_BTN)){
+//            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 0);
+//        }
+//        else {
+//            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 0.5);
 //        }
     }
 

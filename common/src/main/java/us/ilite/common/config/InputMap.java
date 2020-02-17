@@ -45,4 +45,10 @@ public class InputMap {
                 ;
     }
 
+    public static class TEST {
+        public static final ELogitech310
+            UNUSED = ELogitech310.L_BTN
+                ;
+    }
+
 }

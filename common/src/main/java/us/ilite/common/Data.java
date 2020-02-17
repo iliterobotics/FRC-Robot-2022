@@ -60,8 +60,9 @@ public class Data {
     public final RobotCodex[] mLoggedCodexes = new RobotCodex[]{
             imu,
             drivetrain,
-//            driverinput,
+            driverinput,
             operatorinput,
+            flywheel,
             pdp,
             powercell,
             hanger,

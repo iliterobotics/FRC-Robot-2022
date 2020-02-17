@@ -1,6 +1,7 @@
 package us.ilite.common.types;
 
 public enum EShooterSystemData {
+    FLYWHEEL_TEST,
     CURRENT_FLYWHEEL_VELOCITY,      //The Current flywheel velocity read from the internal encoders (units?)
     TARGET_FLYWHEEL_VELOCITY,       //The desired flywheel velocity
 
@@ -13,7 +14,10 @@ public enum EShooterSystemData {
     CURRENT_HOOD_ANGLE,             //The current angle of the hood
     TARGET_HOOD_ANGLE,              //The desired angle of the hood
 
-    CURRENT_POTENTIOMETER_TURNS,    //The current potentiometer reading (0-5 turns)
+    HOOD_STATE,
+    HOOD_SERVO_VALUE,
+    POT_NORM_VALUE,
+    POT_RAW_VALUE,
 
     FLYWHEEL_IS_MAX_VELOCITY,
     FLYWHEEL_DISTANCE_BASED_SPEED,

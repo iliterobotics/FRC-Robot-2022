@@ -36,19 +36,19 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
 //    private CSVLogger mCSVLogger = new CSVLogger();
-    private HangerModule mHanger = new HangerModule();
+//    private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
-    private DriveModule mDrive;
-    private Limelight mLimelight;
-    private PowerCellModule mIntake;
-    private RawLimelight mRawLimelight;
+//    private DriveModule mDrive;
+//    private Limelight mLimelight;
+//    private PowerCellModule mIntake;
+//    private RawLimelight mRawLimelight;
 //    private DJSpinnerModule mDJSpinnerModule;
-    private LEDControl mLEDControl;
+//    private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
 
-    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
+//    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -67,12 +67,12 @@ public class Robot extends TimedRobot {
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
-        mDrive = new DriveModule();
-        mLEDControl = new LEDControl();
+//        mDrive = new DriveModule();
+//        mLEDControl = new LEDControl();
         mShooter = new FlywheelModule();
-        mIntake = new PowerCellModule();
-        mLimelight = new Limelight();
-        mRawLimelight = new RawLimelight();
+//        mIntake = new PowerCellModule();
+//        mLimelight = new Limelight();
+//        mRawLimelight = new RawLimelight();
 //        mDJSpinnerModule = new DJSpinnerModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
@@ -105,11 +105,6 @@ public class Robot extends TimedRobot {
 
         LiveWindow.disableAllTelemetry();
 
-        TimerTask shuffleupdate = new TimerTask(){
-            public void run(){Shuffleboard.update();}
-        };
-        new java.util.Timer().scheduleAtFixedRate(shuffleupdate, 15000, 1000);
-
         initTimer.stop();
         mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
     }
@@ -131,7 +126,7 @@ public class Robot extends TimedRobot {
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
-        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 
@@ -169,6 +164,9 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.readInputs(0d);
+//        mDrive.readInputs(0d);
+        mShooter.readInputs(0d);
+        Shuffleboard.update();
     }
 
     @Override
@@ -182,13 +180,13 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
-        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
-        mRunningModules.addModule(mLEDControl);
+//        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }
