@@ -19,6 +19,7 @@ public class AutonCalibration extends BaseAutonController {
 
 
     public AutonCalibration() {
+        super("kate");
         db.registerAllWithShuffleboard();
         setActivePath(mPath);
         // Time to go through path plus any delay

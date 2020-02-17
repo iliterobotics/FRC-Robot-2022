@@ -10,16 +10,23 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.BobUtils;
 import us.ilite.robot.modules.EDriveState;
 
+import java.util.Map;
+
 public class BaseAutonController extends AbstractController {
 
     protected double mDelayCycleCount;
-
     protected Path mActivePath = null;
     protected double mPathStartTime = 0d;
     private HelixFollowerImpl mPathFollower = null;
+    private final String kPathAssociation;
+
+    public BaseAutonController(String pPathAssociation) {
+        kPathAssociation = pPathAssociation;
+        mDelayCycleCount = AutonSelection.mDelaySeconds;
+    }
 
     public BaseAutonController() {
-        mDelayCycleCount = AutonSelection.mDelaySeconds;
+        this("DEFAULT");
     }
 
     @Override
@@ -41,6 +48,18 @@ public class BaseAutonController extends AbstractController {
         mActivePath = pPath;
         mPathFollower = new HelixFollowerImpl(mActivePath);
         mPathFollower.initialize();
+    }
+
+    public Map<String, Path> getPathsFromController() {
+        Map<String, Path> mAvailablePaths = BobUtils.getAvailablePaths();
+        for (int i = 0; i < mAvailablePaths.entrySet().toArray().length - 1; i++) {
+            Map.Entry<String, Path> entry = (Map.Entry<String, Path>) mAvailablePaths.entrySet().toArray()[i];
+            if (!entry.getKey().toLowerCase().contains(kPathAssociation.toLowerCase())) {
+                mAvailablePaths.remove(entry.getKey());
+                i--;
+            }
+        }
+        return mAvailablePaths;
     }
 
     private class HelixFollowerImpl extends IliteHelixFollower {

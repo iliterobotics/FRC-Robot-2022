@@ -1,19 +1,12 @@
 package us.ilite.robot.auto.paths;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
-import com.flybotix.hfr.codex.CodexOf;
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import org.reflections.Reflections;
-import us.ilite.common.config.Settings;
-import us.ilite.common.types.EAutonSelectionData;
-import us.ilite.robot.Robot;
 import us.ilite.robot.controller.AutonCalibration;
 import us.ilite.robot.controller.BaseAutonController;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class AutonSelection {
@@ -33,7 +26,7 @@ public class AutonSelection {
 
     private int mPathNumber = mAutonConfiguration.add("Path Number", 0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0, "max", 9, "block increment", 1))
+            .withProperties(Map.of("min", 0, "max", getAutonControllerFromIndex(mControllerNumber).getPathsFromController().size() - 1, "block increment", 1))
             .withSize(2, 1)
             .withPosition(0, 3)
             .getEntry()
@@ -45,7 +38,7 @@ public class AutonSelection {
     static {
         int pathIndex = 0;
         mAutonConfiguration.addPersistent("Path Selection", "Select controller/path by clicking on the slider dot and using arrow keys").withPosition(6, 0).withSize(4, 1);
-        for (Map.Entry<String, Path> entry : kAllPaths.entrySet()) {
+        for (Map.Entry<String, Path> entry : getAutonControllerFromIndex(mControllerNumber).getPathsFromController().entrySet()) {//kAllPaths.entrySet()) {
             mAutonConfiguration.addPersistent(entry.getKey(), pathIndex)
                     .withSize(2, 1)
                     .withPosition(pathIndex, 2);
@@ -56,38 +49,20 @@ public class AutonSelection {
     public AutonSelection() {
         int displayIndex = 0;
         // TODO - do this after selection from shuffleboard
-        //  setActivePath(kAllPaths.get((String) kAllPaths.keySet().toArray()[mPathNumber]));
+//          setActivePath(kAllPaths.get((String) kAllPaths.keySet().toArray()[mPathNumber]));
         for (Map.Entry<String, BaseAutonController> entry : getAutonControllers().entrySet()) {
             System.out.println("Adding " + entry.getKey());
             mAutonConfiguration.addPersistent(String.format("%s", displayIndex), entry.getKey())
                     .withSize(2, 1)
                     .withPosition(displayIndex, 0);
-            displayIndex ++;
+            displayIndex++;
         }
-//        mSelectedAutonController = getAutonControllers().get((String) getAutonControllers().keySet().toArray()[mControllerNumber]);
-//        Robot.DATA.autonSelection.set(EAutonSelectionData.DELAY_COUNT_CYCLES, mDelayCycleCount);
+
     }
 
-//    private static Set<Class<? extends BaseAutonController>> getControllers() {
-//        Reflections reflections = new Reflections(Settings.CONTROLLER_PATH_PACKAGE);
-//        return getControllers(reflections);
-//    }
-//
-//    private static Set<Class<? extends BaseAutonController>> getControllers(Reflections reflections) {
-//        if (reflections == null) {
-//            return Collections.emptySet();
-//        }
-//        return reflections.getSubTypesOf(BaseAutonController.class);
-//    }
-//
-//    private static List<BaseAutonController> getAutonControllers() {
-//        ArrayList<BaseAutonController> mControllers = new ArrayList<>();
-//        for (Class<?> c : getControllers()) {
-//            try {
-//
-//            }
-//        }
-//    }
+    public static BaseAutonController getAutonControllerFromIndex(int index) {
+        return getAutonControllers().get((String) getAutonControllers().keySet().toArray()[index]);
+    }
 
     public static Map<String, BaseAutonController> getAutonControllers() {
         Map<String, BaseAutonController> mControllers = new HashMap<>();
