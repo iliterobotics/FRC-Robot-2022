@@ -20,7 +20,9 @@ import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
+import us.ilite.robot.network.EForwardableConnections;
 
+import java.util.Arrays;
 import java.util.TimerTask;
 
 import static us.ilite.common.types.EMatchMode.*;
@@ -63,6 +65,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+
+        Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         // Init the actual robot
         initTimer.reset();
         initTimer.start();
@@ -100,11 +104,6 @@ public class Robot extends TimedRobot {
         CodexMetadata.overrideTimeProvider(provider);
 
         mRunningModules.clearModules();
-
-        try {
-        } catch (Exception e) {
-            mLogger.exception(e);
-        }
 
         LiveWindow.disableAllTelemetry();
 

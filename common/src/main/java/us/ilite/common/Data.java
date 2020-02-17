@@ -5,6 +5,8 @@ import com.flybotix.hfr.util.lang.EnumUtils;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
@@ -12,6 +14,9 @@ import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +34,7 @@ public class Data {
     //Add new codexes here as we need more
 
     public static final double NULL_CODEX_VALUE = 0.0;
+    private boolean mHasRegisteredWithShuffleboard = false;
     public final RobotCodex<EGyro> imu = new RobotCodex(Double.NaN, EGyro.class);
     public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
@@ -89,6 +95,45 @@ public class Data {
 
     public Data() {
         this(true);
+    }
+
+    public void registerAllWithShuffleboard() {
+        if(mHasRegisteredWithShuffleboard) { return ; }
+        for (String key : mMappedCodex.keySet()) {
+            ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
+            List<Enum<?>> enums = EnumUtils.getEnums(mMappedCodex.get(key).meta().getEnum(), true);
+            enums.stream().forEach(
+                    e -> {
+                        tab.addNumber(e.name(), () -> {
+                            if (mMappedCodex.get(key).isSet(e)) {
+                                return mMappedCodex.get(key).get(e);
+                            } else {
+                                return 0d;
+                            }
+                        });
+                    }
+            );
+        }
+        mHasRegisteredWithShuffleboard = true;
+    }
+
+    /**
+     * Makes the log file if it doesn't already exist
+     */
+    public static void handleCreation(File pFile) {
+        //Makes every folder before the file if the CSV's parent folder doesn't exist
+        if (Files.notExists(pFile.toPath())) {
+            pFile.getAbsoluteFile().getParentFile().mkdirs();
+        }
+
+        //Creates the .CSV if it doesn't exist
+        if (!pFile.exists()) {
+            try {
+                pFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static char recieveColorFmsRelay() {
