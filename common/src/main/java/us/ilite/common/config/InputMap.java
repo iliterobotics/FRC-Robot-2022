@@ -47,9 +47,14 @@ public class InputMap {
 
     public static class FLYWHEEL {
         public static final ELogitech310
-                FIRE_POWER_CELLS = ELogitech310.L_BTN,
+                HOOD = ELogitech310.COMBINED_TRIGGER_AXIS,
+                HOOD_TO_ANGLE = ELogitech310.Y_BTN,
+                TEST_FIRE = ELogitech310.L_BTN,
                 FLYWHEEL_SPINUP_TEST = ELogitech310.A_BTN,
-                FLYWHEEL_VELOCITY_TEST = ELogitech310.Y_BTN,
+                FLYWHEEL_VELOCITY_10_TEST = ELogitech310.DPAD_UP,
+                FLYWHEEL_VELOCITY_20_TEST = ELogitech310.DPAD_RIGHT,
+                FLYWHEEL_VELOCITY_30_TEST = ELogitech310.DPAD_DOWN,
+                FLYWHEEL_VELOCITY_40_TEST = ELogitech310.DPAD_LEFT,
                 FEEDER_SPINUP_TEST = ELogitech310.Y_BTN,
                 FLYWHEEL_SPINUP_AXIS = ELogitech310.RIGHT_TRIGGER_AXIS
         ;

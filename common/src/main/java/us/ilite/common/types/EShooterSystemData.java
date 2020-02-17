@@ -1,7 +1,7 @@
 package us.ilite.common.types;
 
 public enum EShooterSystemData {
-    FLYWHEEL_TEST,
+    HOOD_OPEN_LOOP,
     CURRENT_BALL_VELOCITY,      //The Current power cell velocity read from the internal encoders (units?)
     TARGET_BALL_VELOCITY,       //The desired power cell velocity
 

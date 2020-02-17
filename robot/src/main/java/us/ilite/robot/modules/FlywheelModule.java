@@ -1,14 +1,11 @@
 package us.ilite.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.*;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -18,6 +15,7 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
 import us.ilite.common.lib.util.Utils;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.robot.Enums;
 import us.ilite.robot.hardware.ContinuousRotationServo;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
@@ -27,21 +25,10 @@ import static us.ilite.common.types.EShooterSystemData.*;
 
 public class FlywheelModule extends Module {
 
-    public enum EHoodState {
-        NONE,
-        TARGET_ANGLE,
-        MANUAL
-    }
 
     public enum EHoodSensorError {
         NONE,
         INVALID_POTENTIOMETER_READING
-    }
-
-    public enum EFlywheelWheelState {
-        NONE,
-        OPEN_LOOP,
-        VELOCITY,
     }
 
     // Flywheel Motors
@@ -51,8 +38,12 @@ public class FlywheelModule extends Module {
     private TalonSRX mTurret;
     private ContinuousRotationServo mHoodServo;
 
-    private AnalogInput mHoodAI;
-    private AnalogPotentiometer mHoodPot;
+    // These were for direct RIO connections
+//    private AnalogInput mHoodAI;
+//    private AnalogPotentiometer mHoodPot;
+
+    // This is for the feeder MAX connection
+    private CANAnalog mHoodPot;
 
     // Constants
     private static final double kHoodGearRatio = 32.0 / 20.0 * 14.0 / 360.0;//First stage was 32/20 in code but 36/20 in integration
@@ -63,9 +54,13 @@ public class FlywheelModule extends Module {
 
 
     // Production bot 0.00175 min, 0.74664 max (normalized from AnalogPotentiometer)
-    private static final double kHoodReadingRange = 0.74664 - 0.00175;
-    private static final double kMinShotDegrees = 20.0;
-    private static final double kMaxShotDegrees = 80.0;
+//    private static final double kHoodReadingRange = 0.74664 - 0.00175;
+    // Practice & Production have the same min reading
+    private static final double kHoodMinReading = 0.00175;
+    // Max reading taken from practice bot while connected to MAX - needs updating on production bot
+    private static final double kHoodReadingRange = 1.637 - kHoodMinReading;
+    private static final double kMinShotDegrees = 90.0 - 66.0;
+    private static final double kMaxShotDegrees = 90.0 - 14.0;
     private static final double kHoodAngleRange = kMaxShotDegrees - kMinShotDegrees;
     private static final double kHoodConversionFactor = kHoodReadingRange / kHoodAngleRange;
     private final FilteredAverage mPotentiometerReadings = FilteredAverage.filteredAverageForTime(0.1);
@@ -74,16 +69,14 @@ public class FlywheelModule extends Module {
     private static double kRadiansPerSecToTalonTicksPer100ms = (2*Math.PI) / 2048.0 / 0.1;
     // https://docs.google.com/spreadsheets/d/1Po6exzGvfr0rMWMWVSyqxf49ZMSfGoYn/edit#gid=1858991275
     // Converts from desired BALL (not wheel) velocity to Falcon ticks per 100ms
-    private static double kVelocityConversion = (2048.0 / 600.0) / (kFlyWheelGearRatio * kFlywheelDiameterInches * Math.PI / 12.0 / 60.0);
+    private static double kMOISlipFactor = 1.25;
+    private static double kVelocityConversion = kMOISlipFactor * (2048.0 / 600.0) / (kFlyWheelGearRatio * kFlywheelDiameterInches * Math.PI / 12.0 / 60.0) * 2.0;
 
     private static final int FLYWHEEL_SLOT = 0;
     private static ProfileGains kFlywheelGains = new ProfileGains()
             .slot(FLYWHEEL_SLOT)
-            .p(0.01)
-            .f(0.25)
-            // Units are RADIANS
-//            .p(0.0497)
-//            .f(0.018)
+            .p(0.05)
+            .f(0.0575)
 //            .kA(0.00165)
 //            .kV(0.018)
             ;
@@ -96,28 +89,26 @@ public class FlywheelModule extends Module {
     public FlywheelModule() {
         SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
         SmartDashboard.putNumber("kVelocityConversion",kVelocityConversion);
-        /* select integ-sensor for PID0 (it doesn't matter if PID is actually used) */
-        /* config all the settings */
         mFlywheelFalconMaster = new TalonFX(Settings.Hardware.CAN.kFalconMasterId);
         mFlywheelFalconMaster.setNeutralMode(NeutralMode.Coast);
         mFlywheelFalconMaster.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
         mFlywheelFalconFollower = new TalonFX(Settings.Hardware.CAN.kFalconFollowerId);
-        mFlywheelFalconFollower.follow(mFlywheelFalconMaster);
         mFlywheelFalconFollower.setNeutralMode(NeutralMode.Coast);
         mFlywheelFalconFollower.setInverted(true);
         mFlywheelFalconFollower.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-//        HardwareUtils.setGains(mFlywheelFalconFollower, kFlywheelGains);
 
         mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
         mFeeder.setSmartCurrentLimit(30);
 
+
         mTurret = TalonSRXFactory.createDefaultTalon(Settings.Hardware.CAN.kSRXTurretId);
 
-//        mHoodServo = new ContinuousRotationServo(Settings.Hardware.PWM.kHoodServoId).inverted(true);
+        mHoodServo = new ContinuousRotationServo(Settings.Hardware.PWM.kHoodServoId).inverted(true);
+        mHoodPot = mFeeder.getAnalog(CANAnalog.AnalogMode.kAbsolute);
 
-        mHoodAI = new AnalogInput(Settings.Hardware.Analog.kHoodPot);
-        mHoodPot = new AnalogPotentiometer(mHoodAI);
+//        mHoodAI = new AnalogInput(Settings.Hardware.Analog.kHoodPot);
+//        mHoodPot = new AnalogPotentiometer(mHoodAI);
 
     }
     
@@ -132,25 +123,28 @@ public class FlywheelModule extends Module {
     public void readInputs(double pNow) {
         db.flywheel.set(CURRENT_BALL_VELOCITY, mFlywheelFalconMaster.getSelectedSensorVelocity() / kVelocityConversion);
         db.flywheel.set(CURRENT_FEEDER_VELOCITY, mFeeder.get());
-        db.flywheel.set(CURRENT_HOOD_ANGLE, mHoodPot.get() / kHoodReadingRange * kHoodAngleRange + kMinShotDegrees);
-        db.flywheel.set(POT_NORM_VALUE, mHoodPot.get());
-        db.flywheel.set(POT_RAW_VALUE, mHoodAI.getValue());
-//        db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
-//        db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
-        mPotentiometerReadings.addNumber(mHoodAI.getValue());
+        double position = mHoodPot.getPosition();
+        db.flywheel.set(POT_RAW_VALUE, position);
+        db.flywheel.set(CURRENT_HOOD_ANGLE, convertToHoodAngle(position));
+//        db.flywheel.set(POT_NORM_VALUE, mHoodPot.get());
+//        db.flywheel.set(POT_RAW_VALUE, mHoodAI.getValue());
+        db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
+        db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
+//        mPotentiometerReadings.addNumber(mHoodAI.getValue());
 
-        double cur = mHoodAI.getValue();
-        double avg = mPotentiometerReadings.getAverage();
-        if(
-                mHoodServo != null &&
-                Utils.isWithinTolerance(avg, cur,0.5) &&
-                Math.abs(mHoodServo.getLastValue()) > 0.1
-        ) {
-            db.flywheel.set(HOOD_SENSOR_ERROR, EHoodSensorError.INVALID_POTENTIOMETER_READING);
-        } else {
-            db.flywheel.set(HOOD_SENSOR_ERROR, EHoodSensorError.NONE);
-        }
-        db.flywheel.set(POT_AVG_VALUE, avg);
+//        double cur = mHoodAI.getValue();
+//        double avg = mPotentiometerReadings.getAverage();
+//        if(
+//                mHoodServo != null &&
+//                Utils.isWithinTolerance(avg, cur,0.5) &&
+//                Math.abs(mHoodServo.getLastValue()) > 0.1
+//        ) {
+////            db.flywheel.set(HOOD_SENSOR_ERROR, EHoodSensorError.INVALID_POTENTIOMETER_READING);
+//            db.flywheel.set(HOOD_SENSOR_ERROR, EHoodSensorError.NONE);
+//        } else {
+//            db.flywheel.set(HOOD_SENSOR_ERROR, EHoodSensorError.NONE);
+//        }
+//        db.flywheel.set(POT_AVG_VALUE, avg);
 
 //        if (db.limelight.isSet(ELimelightData.TV)) {
 //            db.flywheel.set(FLYWHEEL_DISTANCE_BASED_SPEED, calcSpeedFromDistance(distanceFromTarget));
@@ -163,17 +157,10 @@ public class FlywheelModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-//        mFlywheelFalconMaster.set(ControlMode.Velocity, db.flywheel.get(TARGET_FLYWHEEL_VELOCITY));
-//        mFlywheelFalconFollower.set(ControlMode.Velocity, db.flywheel.get(TARGET_FLYWHEEL_VELOCITY));
-
-//        mFeeder.set(db.flywheel.get(TARGET_FEEDER_VELOCITY));
-
         setFlywheel();
         setFeeder();
 //        setTurret();
-//        setHood(pNow);
-
-//        hoodAnglePID(0.005, 0, 0);
+        setHood(pNow);
     }
 
     @Override
@@ -189,12 +176,12 @@ public class FlywheelModule extends Module {
     }
 
     private void setFeeder() {
-        mFeeder.set(db.flywheel.get(FEEDER_OUTPUT_OPEN_LOOP));
+        mFeeder.setVoltage(db.flywheel.get(FEEDER_OUTPUT_OPEN_LOOP) / 12.0);
     }
 
     private void setFlywheel() {
-        EFlywheelWheelState state = db.flywheel.get(FLYWHEEL_WHEEL_STATE, EFlywheelWheelState.class);
-        if(state == null) state = EFlywheelWheelState.NONE;
+        Enums.FlywheelWheelState state = db.flywheel.get(FLYWHEEL_WHEEL_STATE, Enums.FlywheelWheelState.class);
+        if(state == null) state = Enums.FlywheelWheelState.NONE;
         switch (state) {
             case OPEN_LOOP:
                 double l = db.flywheel.get(FLYWHEEL_OPEN_LOOP);
@@ -202,14 +189,10 @@ public class FlywheelModule extends Module {
                 mFlywheelFalconFollower.set(TalonFXControlMode.PercentOutput, l);
                 break;
             case VELOCITY:
-//                if(db.flywheel.isSet(TARGET_FLYWHEEL_VELOCITY)) {
-                    double flywheelOutput = db.flywheel.get(TARGET_BALL_VELOCITY) * kVelocityConversion;
-                    SmartDashboard.putNumber("Flywheel Raw Output", flywheelOutput);
-                    mFlywheelFalconMaster.set(TalonFXControlMode.Velocity, flywheelOutput);
-//                } else {
-//                    mFlywheelFalconMaster.set(TalonFXControlMode.PercentOutput, 0.0);
-//                    mFlywheelFalconMaster.set(TalonFXControlMode.PercentOutput, 0.0);
-//                }
+                double flywheelOutput = db.flywheel.get(TARGET_BALL_VELOCITY) * kVelocityConversion;
+                SmartDashboard.putNumber("Flywheel Raw Output", flywheelOutput);
+                mFlywheelFalconMaster.set(TalonFXControlMode.Velocity, flywheelOutput);
+                mFlywheelFalconFollower.set(TalonFXControlMode.Velocity, flywheelOutput);
                 break;
             case NONE:
             default:
@@ -218,17 +201,27 @@ public class FlywheelModule extends Module {
         }
     }
 
+    private double convertToHoodAngle(double pPotentiometerReading) {
+//        return 90.0 - (pPotentiometerReading-kHoodMinReading) / kHoodReadingRange * kHoodAngleRange;
+        return 90.0 - pPotentiometerReading / kHoodConversionFactor - kMinShotDegrees;
+    }
+
+
+    private double convertFromHoodAngle(double pHoodAngle) {
+        return (90.0-pHoodAngle - kMinShotDegrees) * kHoodConversionFactor;
+    }
+
     private double setHood(double pNow) {
-        EHoodState state = db.flywheel.get(HOOD_STATE, EHoodState.class);
-        if(state == null) state = EHoodState.NONE;
+        Enums.HoodState state = db.flywheel.get(HOOD_STATE, Enums.HoodState.class);
+        if(state == null) state = Enums.HoodState.NONE;
 
         switch(state) {
             case MANUAL:
-                mHoodServo.setServo(db.flywheel.get(FLYWHEEL_TEST));
+                mHoodServo.setServo(db.flywheel.get(HOOD_OPEN_LOOP));
                 break;
             case TARGET_ANGLE:
-                double target = db.flywheel.get(TARGET_HOOD_ANGLE)* kHoodConversionFactor;
-                double current = db.flywheel.get(CURRENT_HOOD_ANGLE)* kHoodConversionFactor;
+                double target = convertFromHoodAngle(db.flywheel.get(TARGET_HOOD_ANGLE));
+                double current = convertFromHoodAngle(db.flywheel.get(CURRENT_HOOD_ANGLE));
 
                 double output = mHoodPID.calculate(current, target);
                 mHoodServo.setServo(output);
@@ -258,15 +251,5 @@ public class FlywheelModule extends Module {
 //                + 68.2;
 //    }
 
-    private double hoodAnglePID(double pP, double pI, double pD) {
-        // TODO Convert into an Angle Measurement
-        double error = pP * (db.flywheel.get(TARGET_HOOD_ANGLE) - db.flywheel.get(CURRENT_HOOD_ANGLE));
-        double velocity = pD * mHoodServo.getSpeed();
-        mIntegral += pI * mHoodServo.getSpeed();
-        return error + mIntegral + velocity;
-    }
 
-    private void potentiometerPID() {
-        double output = db.flywheel.get(TARGET_HOOD_ANGLE) / 5;
-    }
 }
