@@ -4,11 +4,14 @@ import com.flybotix.hfr.codex.RobotCodex;
 import us.ilite.common.*;
 
 import static us.ilite.common.types.EPowerCellData.*;
+import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.EDriveState;
+import us.ilite.robot.modules.FlywheelModule;
 import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
@@ -60,6 +63,7 @@ public abstract class AbstractController {
         } else {
             db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_off);
+
         }
     }
 
@@ -98,6 +102,19 @@ public abstract class AbstractController {
     public final void setEnabled(boolean pEnabled) {
         mCycleCount = 0;
         mEnabled = pEnabled;
+    }
+
+    /**
+     * Set the flywheel to closed loop and go to target speeds/angles for all relevant
+     * sub systems. These speeds/angles are robot-relative and human-readable.
+     * @param pSpeed
+     */
+    protected final void setFlywheelClosedLoop(Enums.FlywheelSpeeds pSpeed) {
+        db.flywheel.set(FLYWHEEL_WHEEL_STATE, pSpeed.wheelstate);
+        db.flywheel.set(TARGET_BALL_VELOCITY, pSpeed.speed);
+        db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
+        db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
+        db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, pSpeed.feeder);
     }
 
     protected abstract void updateImpl(double pNow);

@@ -70,6 +70,7 @@ public class Data {
             drivetrain,
             driverinput,
             operatorinput,
+            flywheel,
             pdp,
             powercell,
             hanger,

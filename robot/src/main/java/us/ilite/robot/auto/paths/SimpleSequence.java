@@ -17,8 +17,8 @@ public class SimpleSequence implements ISequence {
     private double mCurrentDistance = 0;
 
     public static boolean checkBeams(){
-        mSecondaryBeamBroken = Robot.DATA.powercell.get(ENTRY_BEAM) == 1.0;
-        if (mSecondaryBeamBroken && !mLastSecondaryBeamBroken) {
+        mSecondaryBeamBroken = Robot.DATA.powercell.get(EXIT_BEAM) == 1.0;
+        if (mSecondaryBeamBroken&&!mLastSecondaryBeamBroken) {
             beamCounter++;
         }
         mLastSecondaryBeamBroken = mSecondaryBeamBroken;
@@ -77,6 +77,8 @@ public class SimpleSequence implements ISequence {
 
                 return checkBeams();
             } else {
+                Robot.DATA.powercell.set(DESIRED_H_VELOCITY, 0.0);
+                Robot.DATA.powercell.set(DESIRED_V_VELOCITY, 0.0);
 //                Robot.DATA.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
             }
             return false;

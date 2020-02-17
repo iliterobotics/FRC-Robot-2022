@@ -88,7 +88,7 @@ public class CSVWriter {
                     mLogFailures++;
                     try {
                         file = file();
-                        if ( file != null ) {
+                        if ( file != null && file.exists()) {
                             bw = Optional.of( new BufferedWriter( new FileWriter( file ) ) );
                         }
                         else {
@@ -101,7 +101,7 @@ public class CSVWriter {
                 }
                 else if ( mLogFailures == Settings.kAcceptableLogFailures ) {
                     mLog.error("---------------------CSV LOGGING DISABLED----------------------");
-                    Robot.mCSVLogger.closeWriters();
+//                    Robot.mCSVLogger.closeWriters();
                     mLogFailures++;
                 }
             }
