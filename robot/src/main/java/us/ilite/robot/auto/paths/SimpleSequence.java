@@ -4,14 +4,23 @@ import us.ilite.common.types.EPowerCellData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.commands.IAutoCommand;
 import us.ilite.robot.commands.ICommand;
+import us.ilite.robot.controller.AbstractController;
+import us.ilite.robot.modules.PowerCellModule;
 
 import javax.swing.*;
+
+import static us.ilite.common.types.EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S;
+import static us.ilite.common.types.EPowerCellData.INTAKE_STATE;
+import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
+import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
+import static us.ilite.robot.controller.AbstractController.kIntakeRollerPower_off;
+import static us.ilite.robot.controller.AbstractController.kIntakeRollerPower_on;
 
 public class SimpleSequence implements ISequence {
     private static int beamCounter = 0;
     private static boolean mLastEntryBeamBroken = false;
     private static boolean mEntryBeamBroken = false;
-    private static IAutoCommand[] mSteps = {new IntakeCommand(0.0)};
+    private static IAutoCommand[] mSteps = {new IntakeCommand(2)};
     private static int mCurrentCommandIndex = 0;
     private double mCurrentDistance = 0;
 
@@ -60,10 +69,20 @@ public class SimpleSequence implements ISequence {
 
         @Override
         public boolean update(double pNow) {
-            if ( mCurrentDistance == mActivationDistance ) {
-                Robot.DATA.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , 0);
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_H_VELOCITY , 0.5);
-                Robot.DATA.powercell.set(EPowerCellData.DESIRED_V_VELOCITY , 0.5);
+            if (mCurrentDistance >= mActivationDistance ) {
+                System.out.println("WORKING__________________________");
+//                Robot.DATA.powercell.set(EPowerCellData.INTAKE_STATE , PowerCellModule.EArmState.STOW);
+//                Robot.DATA.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , 0);
+//                Robot.DATA.powercell.set(EPowerCellData.DESIRED_H_VELOCITY , 0.5);
+//                Robot.DATA.powercell.set(EPowerCellData.DESIRED_V_VELOCITY , 0.5);
+
+                double speed = Math.max(Robot.DATA.drivetrain.get(L_ACTUAL_VEL_FT_s), Robot.DATA.drivetrain.get(R_ACTUAL_VEL_FT_s));
+                if(speed <= 1.0) {
+                    speed = 0.3;
+                }
+                Robot.DATA.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.OUT);
+                Robot.DATA.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_on);
+
                 return checkBeams();
             }
             return false;

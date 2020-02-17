@@ -2,6 +2,7 @@ package us.ilite.robot.controller;
 
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.BobUtils;
 import us.ilite.robot.auto.paths.SimpleSequence;
@@ -20,7 +21,6 @@ public class ShootIntakeController extends BaseAutonController {
         int pathIndex = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
         if (pathIndex != -1 ){
             mPathDistance = mActivePath.getPath()[pathIndex][7];
-        } else {
             SmartDashboard.putNumber("PATH DISTANCE", mPathDistance);
             mSimpleSequence.updateSequence(pNow, mPathDistance);
         }
