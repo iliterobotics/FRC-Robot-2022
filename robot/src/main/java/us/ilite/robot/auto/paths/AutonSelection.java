@@ -35,14 +35,15 @@ public class AutonSelection {
             .intValue();
 
     public static BaseAutonController mSelectedAutonController;
+    public static BaseAutonController mPreviouslySelectedAutonController;
     public static double mDelayCycleCount = mDelaySeconds / 0.02;
     static {
-        int pathIndex = 0;
         mAutonConfiguration.addPersistent("Path Selection", "Select controller/path by clicking on the slider dot and using arrow keys").withPosition(6, 0).withSize(4, 1);
-        for (Map.Entry<String, Path> entry : getAutonControllerFromIndex(mControllerNumber).getPathsFromController().entrySet()) {//kAllPaths.entrySet()) {
-            mAutonConfiguration.addPersistent(entry.getKey(), pathIndex)
+        int pathIndex = 0;
+        for (Map.Entry<String, Path> entry : getAutonControllerFromIndex(mControllerNumber).getPathsFromController().entrySet()) {
+            mAutonConfiguration.add(entry.getKey(), pathIndex)
                     .withSize(2, 1)
-                    .withPosition(pathIndex == 0 ? pathIndex : pathIndex + 1 , 2);
+                    .withPosition(2 * pathIndex, 2).getEntry().clearPersistent();
             pathIndex++;
         }
     }
@@ -52,10 +53,9 @@ public class AutonSelection {
         // TODO - do this after selection from shuffleboard
 //          setActivePath(kAllPaths.get((String) kAllPaths.keySet().toArray()[mPathNumber]));
         for (Map.Entry<String, BaseAutonController> entry : getAutonControllers().entrySet()) {
-            System.out.println("Adding " + entry.getKey());
-            mAutonConfiguration.addPersistent(String.format("%s", displayIndex), entry.getKey())
+            mAutonConfiguration.add(String.format("%s", displayIndex), entry.getKey())
                     .withSize(2, 1)
-                    .withPosition(displayIndex == 0 ? displayIndex : displayIndex + 1, 0);
+                    .withPosition(2 * displayIndex, 0).getEntry().clearPersistent();
             displayIndex++;
         }
 
