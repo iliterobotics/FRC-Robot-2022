@@ -19,30 +19,36 @@ import java.util.*;
 public class AutonSelection {
     private static Map<String, Path> kAllPaths = BobUtils.getAvailablePaths();
     public static ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
-    private int mPathNumber = mAutonConfiguration.add("Path Number", 1)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0, "max", 9, "block increment", 1))
-            .getEntry()
-            .getNumber(0)
-            .intValue();
-    public static double mDelaySeconds = mAutonConfiguration.add("Path Delay Seconds", 0)
-            .getEntry()
-            .getDouble(0.0);
-
     public static Integer mControllerNumber = mAutonConfiguration.add("Controller Number", 0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0, "max", getAutonControllers().size(), "block increment", 1))
+            .withProperties(Map.of("min", 0, "max", getAutonControllers().size() - 1, "block increment", 1))
             .withSize(4, 1)
             .withPosition(0, 1)
             .getEntry().getNumber(0).intValue();
+
+    public static double mDelaySeconds = mAutonConfiguration.add("Path Delay Seconds", 0)
+            .withPosition(2, 3)
+            .getEntry()
+            .getDouble(0.0);
+
+    private int mPathNumber = mAutonConfiguration.add("Path Number", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 9, "block increment", 1))
+            .withSize(2, 1)
+            .withPosition(0, 3)
+            .getEntry()
+            .getNumber(0)
+            .intValue();
 
     public static BaseAutonController mSelectedAutonController;
     public static double mDelayCycleCount = mDelaySeconds / 0.02;
     static {
         int pathIndex = 0;
-        mAutonConfiguration.addPersistent("Path Selection", "Select paths by clicking on the 'Path Number' slider dot and using arrow keys").withPosition(0, 1).withSize(4, 1);
+        mAutonConfiguration.addPersistent("Path Selection", "Select controller/path by clicking on the slider dot and using arrow keys").withPosition(6, 0).withSize(4, 1);
         for (Map.Entry<String, Path> entry : kAllPaths.entrySet()) {
-            mAutonConfiguration.addPersistent(entry.getKey(), pathIndex).withSize(1, 1).withPosition(pathIndex, 2);
+            mAutonConfiguration.addPersistent(entry.getKey(), pathIndex)
+                    .withSize(2, 1)
+                    .withPosition(pathIndex, 2);
             pathIndex++;
         }
     }
@@ -54,7 +60,8 @@ public class AutonSelection {
         for (Map.Entry<String, BaseAutonController> entry : getAutonControllers().entrySet()) {
             System.out.println("Adding " + entry.getKey());
             mAutonConfiguration.addPersistent(String.format("%s", displayIndex), entry.getKey())
-            .withPosition(displayIndex, 0);
+                    .withSize(2, 1)
+                    .withPosition(displayIndex, 0);
             displayIndex ++;
         }
 //        mSelectedAutonController = getAutonControllers().get((String) getAutonControllers().keySet().toArray()[mControllerNumber]);

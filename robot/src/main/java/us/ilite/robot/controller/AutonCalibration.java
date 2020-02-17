@@ -19,13 +19,11 @@ public class AutonCalibration extends BaseAutonController {
 
 
     public AutonCalibration() {
-        mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
-
-        // Time to go through path plus any delay
-        mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1 + (mDelayCycleCount * .02);
-
         db.registerAllWithShuffleboard();
         setActivePath(mPath);
+        // Time to go through path plus any delay
+        mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1 + (mDelayCycleCount * .02);
+        mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
         e();
         System.out.println("==== RUNNING AUTONOMOUS PATH ====");
         System.out.println("Path: " + mPath.getClass().getSimpleName());
@@ -46,7 +44,7 @@ public class AutonCalibration extends BaseAutonController {
 //                db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_BASIC);
 //                db.drivetrain.set(EDriveData.L_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.LEFT_VELOCITY));
 //                db.drivetrain.set(EDriveData.R_PATH_FT_s, mActivePath.getValue(index, Path.SegmentValue.RIGHT_VELOCITY));
-//            } else {
+//            } else {b
 //                e();
 //                System.out.println("==== SUCCESSFULLY END AUTONOMOUS PATH ====");
 //                e();
