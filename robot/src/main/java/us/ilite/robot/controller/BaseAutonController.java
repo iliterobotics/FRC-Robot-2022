@@ -48,6 +48,7 @@ public class BaseAutonController extends AbstractController {
                 0.001, 0.0, 0.0);
         private double mPathStartTime = 0.0;
 
+
         /**
          * This will import the path class based on the name of the path provided
          *

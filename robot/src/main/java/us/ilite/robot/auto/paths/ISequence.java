@@ -5,5 +5,5 @@ public interface ISequence {
 
     boolean finishedWithStep();
 
-    boolean updateSequence(double pNow);
+    boolean updateSequence(double pNow, double pDistanceTraveled);
 }
