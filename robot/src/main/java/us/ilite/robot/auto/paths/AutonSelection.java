@@ -24,7 +24,7 @@ public class AutonSelection {
             .getEntry()
             .getDouble(0.0);
 
-    private int mPathNumber = mAutonConfiguration.add("Path Number", 0)
+    public static int mPathNumber = mAutonConfiguration.add("Path Number", 0)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0, "max", getAutonControllerFromIndex(mControllerNumber).getPathsFromController().size() - 1, "block increment", 1))
             .withSize(2, 1)

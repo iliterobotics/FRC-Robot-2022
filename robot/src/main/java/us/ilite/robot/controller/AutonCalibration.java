@@ -21,7 +21,6 @@ public class AutonCalibration extends BaseAutonController {
     public AutonCalibration() {
         super("kate");
         db.registerAllWithShuffleboard();
-        setActivePath(mPath);
         // Time to go through path plus any delay
         mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1 + (mDelayCycleCount * .02);
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
@@ -38,6 +37,7 @@ public class AutonCalibration extends BaseAutonController {
         if (mPathStartTime == 0) {
             mPathStartTime = pNow;
         }
+        super.updateImpl(pNow);
 //        // Add a time check to prevent errors when things go wrong
 //        if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
 //            int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);

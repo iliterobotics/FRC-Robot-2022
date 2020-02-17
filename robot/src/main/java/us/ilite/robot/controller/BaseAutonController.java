@@ -23,6 +23,7 @@ public class BaseAutonController extends AbstractController {
     public BaseAutonController(String pPathAssociation) {
         kPathAssociation = pPathAssociation;
         mDelayCycleCount = AutonSelection.mDelaySeconds;
+        setActivePath(getPathsFromController().get((String) getPathsFromController().keySet().toArray()[AutonSelection.mPathNumber]));
     }
 
     public BaseAutonController() {
