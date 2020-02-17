@@ -52,8 +52,7 @@ public class Settings {
 
             public static int kSRXTurretId = 9;
             public static int kMAXFeederId = 10;
-            public static int kFalconMasterId = 13;
-            public static int kFalconFollowerId = 14;
+            public static int kLEDControlCanifierID = 0;
 
 //            public static double kGyroCollisionThreshold = 0.0;
 
@@ -72,7 +71,8 @@ public class Settings {
             public static int kMAXIntakeArm = 8;
             public static int kTalonPowerCellSerializer = 11;
             public static int kTalonVerticalID = 12;
-            public static int kLEDControlCanifierID = 0;
+            public static int kFalconMasterId = 13;
+            public static int kFalconFollowerId = 14;
 
             // ===== 2019 Drive =====
 //            public static  int kDriveLeftMaster = 1;

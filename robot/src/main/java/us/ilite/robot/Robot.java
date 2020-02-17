@@ -6,10 +6,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +15,7 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
@@ -57,6 +55,7 @@ public class Robot extends TimedRobot {
     private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
     private TestController mTestController;
+    private Joystick mTestJoystick;
 
 
     @Override
@@ -174,6 +173,9 @@ public class Robot extends TimedRobot {
         if(mTestController == null) {
              mTestController = TestController.getInstance();
         }
+        if(mTestJoystick == null) {
+            mTestJoystick = new Joystick(2);
+        }
         MODE = TEST;
         mActiveController = mTestController;
         mActiveController.setEnabled(true);
@@ -196,6 +198,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
+        ELogitech310.map(DATA.testinput, mTestJoystick);
         commonPeriodic();
     }
 

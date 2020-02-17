@@ -28,13 +28,13 @@ public class InputMap {
 
     public static class OPERATOR {
         public static  final ELogitech310
-                // DO NOT CHANGE THESE
-                INTAKE_ACTIVATE = ELogitech310.A_BTN,
-                INTAKE_REVERSE = ELogitech310.X_BTN,
-                INTAKE_STOW = ELogitech310.B_BTN,
-                FIRE_POWER_CELLS = ELogitech310.Y_BTN,
+        // DO NOT CHANGE THESE
+        INTAKE_ACTIVATE = ELogitech310.A_BTN,
+        INTAKE_REVERSE = ELogitech310.X_BTN,
+        INTAKE_STOW = ELogitech310.B_BTN,
+        FIRE_POWER_CELLS = ELogitech310.Y_BTN,
 
-        // PUT TEST ITEMS BELOW
+                // PUT TEST ITEMS BELOW
         BEGIN_HANG = ELogitech310.START,
         RELEASE_HANG = ELogitech310.START,
         COLOR_POSITION = ELogitech310.START,
@@ -47,8 +47,9 @@ public class InputMap {
 
     public static class TEST {
         public static final ELogitech310
-            UNUSED = ELogitech310.L_BTN
-                ;
+            FLYWHEEL_SPINUP_TEST = ELogitech310.A_BTN,
+            FLYWHEEL_VELOCITY_TEST = ELogitech310.Y_BTN,
+            FLYWHEEL_SPINUP_AXIS = ELogitech310.RIGHT_TRIGGER_AXIS
+        ;
     }
-
 }
