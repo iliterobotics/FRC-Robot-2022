@@ -23,8 +23,8 @@ public class ShootIntakeController extends BaseAutonController {
         if (pathIndex != -1 ){
             mPathDistance = mActivePath.getPath()[pathIndex][7];
             SmartDashboard.putNumber("PATH DISTANCE", mPathDistance);
+            mSimpleSequence.updateSequence(pNow, mPathDistance);
         }
-        mSimpleSequence.updateSequence(pNow, mPathDistance);
     }
 
 }
