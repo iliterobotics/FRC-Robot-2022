@@ -110,22 +110,30 @@ public class TestController extends BaseManualController {
         }
 
 
-
+        Enums.FlywheelSpeeds state = Enums.FlywheelSpeeds.OFF;
         if(flywheelinput.isSet(InputMap.FLYWHEEL.FEEDER_SPINUP_TEST)) {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.75);
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_SPINUP_TEST)) {
             db.flywheel.set(FLYWHEEL_WHEEL_STATE, Enums.FlywheelWheelState.OPEN_LOOP);
             db.flywheel.set(FLYWHEEL_OPEN_LOOP, 0.2);
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_10_TEST)) {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.CLOSE);
+            state = Enums.FlywheelSpeeds.CLOSE;
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_20_TEST)) {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.INITIATION_LINE);
+            state = Enums.FlywheelSpeeds.INITIATION_LINE;
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_30_TEST)) {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.FAR);
+            state = Enums.FlywheelSpeeds.FAR;
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_40_TEST)) {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.FAR_TRENCH);
+            state = Enums.FlywheelSpeeds.FAR_TRENCH;
         } else {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
+            state = Enums.FlywheelSpeeds.OFF;
+        }
+        db.flywheel.set(FLYWHEEL_SPEED_STATE, state);
+        setFlywheelClosedLoop(state);
+        if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
+            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
+            db.flywheel.set(TARGET_FEEDER_VELOCITY_RPM, state.feeder * 11000.0);
+        } else {
+            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.0);
         }
 //        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
 //            if (db.limelight.isSet(ELimelightData.TV)) {
@@ -195,7 +203,7 @@ public class TestController extends BaseManualController {
         // Default to none
         db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.NONE);
 
-        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE) || flywheelinput.isSet(InputMap.FLYWHEEL.BASIC_INTAKE)) {
             setIntakeArmEnabled(pNow, true);
             crossedEntry = activateSerializer(pNow);
 //            if (crossedEntry && !db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER)) {
@@ -205,10 +213,10 @@ public class TestController extends BaseManualController {
 //                crossedEntry = false;
 //            }
 
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE) || flywheelinput.isSet(InputMap.FLYWHEEL.REVERSE_INTAKE)) {
             db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
             reverseSerializer(pNow);
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW)) {
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW) || flywheelinput.isSet(InputMap.FLYWHEEL.INTAKE_STOW)) {
             setIntakeArmEnabled(pNow, false);
             crossedEntry = activateSerializer(pNow);
         } else {
@@ -218,7 +226,7 @@ public class TestController extends BaseManualController {
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
         }
 
-        if(db.operatorinput.isSet(FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) {
+        if((db.operatorinput.isSet(FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) && isFlywheelUpToSpeed() && isFeederUpToSpeed()) {
             db.powercell.set(DESIRED_V_VELOCITY, 0.6);
             db.powercell.set(DESIRED_H_VELOCITY, 0.5);
         }

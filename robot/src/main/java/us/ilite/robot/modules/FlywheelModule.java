@@ -6,14 +6,11 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.*;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
-import us.ilite.common.lib.util.Utils;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Enums;
 import us.ilite.robot.hardware.ContinuousRotationServo;
@@ -81,7 +78,7 @@ public class FlywheelModule extends Module {
 //            .kV(0.018)
             ;
     private PIDController mHoodPID = new PIDController(5, 0, 0);
-
+    private CANEncoder mFeederInternalEncoder;
 
     private double mIntegral = 0;
     private final int kFlywheelFalconPIDSlot = 0;
@@ -99,6 +96,7 @@ public class FlywheelModule extends Module {
         mFlywheelFalconFollower.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
         mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mFeederInternalEncoder = new CANEncoder(mFeeder);
         mFeeder.setSmartCurrentLimit(30);
 
 
@@ -122,7 +120,7 @@ public class FlywheelModule extends Module {
     @Override
     public void readInputs(double pNow) {
         db.flywheel.set(CURRENT_BALL_VELOCITY, mFlywheelFalconMaster.getSelectedSensorVelocity() / kVelocityConversion);
-        db.flywheel.set(CURRENT_FEEDER_VELOCITY, mFeeder.get());
+        db.flywheel.set(CURRENT_FEEDER_VELOCITY_RPM, mFeederInternalEncoder.getVelocity());
         double position = mHoodPot.getPosition();
         db.flywheel.set(POT_RAW_VALUE, position);
         db.flywheel.set(CURRENT_HOOD_ANGLE, convertToHoodAngle(position));
@@ -170,13 +168,10 @@ public class FlywheelModule extends Module {
 //        db.flywheel.set(TARGET_HOOD_ANGLE, 0);
     }
 
-    private boolean isPastVelocity(double pVelocity) {
-        // TODO Convert ticks per 100 ms to rpm
-        return mFlywheelFalconMaster.getSelectedSensorVelocity() >= pVelocity;
-    }
-
     private void setFeeder() {
-        mFeeder.setVoltage(db.flywheel.get(FEEDER_OUTPUT_OPEN_LOOP) / 12.0);
+        // Cannot set voltage mode if an external sensor is attached
+//        mFeeder.setVoltage(db.flywheel.get(FEEDER_OUTPUT_OPEN_LOOP) / 12.0);
+        mFeeder.set(db.flywheel.get(FEEDER_OUTPUT_OPEN_LOOP));
     }
 
     private void setFlywheel() {
@@ -202,7 +197,6 @@ public class FlywheelModule extends Module {
     }
 
     private double convertToHoodAngle(double pPotentiometerReading) {
-//        return 90.0 - (pPotentiometerReading-kHoodMinReading) / kHoodReadingRange * kHoodAngleRange;
         return 90.0 - pPotentiometerReading / kHoodConversionFactor - kMinShotDegrees;
     }
 

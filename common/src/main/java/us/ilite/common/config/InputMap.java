@@ -45,12 +45,16 @@ public class InputMap {
                 ;
     }
 
+    // For flywheel tuning, Joystick port 2 (driver's station row 3)
     public static class FLYWHEEL {
         public static final ELogitech310
                 HOOD = ELogitech310.COMBINED_TRIGGER_AXIS,
                 HOOD_TO_ANGLE = ELogitech310.Y_BTN,
                 TEST_FIRE = ELogitech310.L_BTN,
-                FLYWHEEL_SPINUP_TEST = ELogitech310.A_BTN,
+                BASIC_INTAKE = ELogitech310.B_BTN,
+                INTAKE_STOW = ELogitech310.A_BTN,
+                REVERSE_INTAKE = ELogitech310.X_BTN,
+                FLYWHEEL_SPINUP_TEST = ELogitech310.START,
                 FLYWHEEL_VELOCITY_10_TEST = ELogitech310.DPAD_UP,
                 FLYWHEEL_VELOCITY_20_TEST = ELogitech310.DPAD_RIGHT,
                 FLYWHEEL_VELOCITY_30_TEST = ELogitech310.DPAD_DOWN,
@@ -58,5 +62,22 @@ public class InputMap {
                 FEEDER_SPINUP_TEST = ELogitech310.Y_BTN,
                 FLYWHEEL_SPINUP_AXIS = ELogitech310.RIGHT_TRIGGER_AXIS
         ;
+    }
+
+    public static class LIMELIGHT {
+        public static final ELogitech310
+                HOOD = ELogitech310.COMBINED_TRIGGER_AXIS,
+                HOOD_TO_ANGLE = ELogitech310.Y_BTN,
+                TEST_FIRE = ELogitech310.L_BTN,
+                BASIC_INTAKE = ELogitech310.B_BTN,
+                REVERSE_INTAKE = ELogitech310.X_BTN,
+                FLYWHEEL_SPINUP_TEST = ELogitech310.A_BTN,
+                FLYWHEEL_VELOCITY_10_TEST = ELogitech310.DPAD_UP,
+                FLYWHEEL_VELOCITY_20_TEST = ELogitech310.DPAD_RIGHT,
+                FLYWHEEL_VELOCITY_30_TEST = ELogitech310.DPAD_DOWN,
+                FLYWHEEL_VELOCITY_40_TEST = ELogitech310.DPAD_LEFT,
+                FEEDER_SPINUP_TEST = ELogitech310.Y_BTN,
+                FLYWHEEL_SPINUP_AXIS = ELogitech310.RIGHT_TRIGGER_AXIS
+                        ;
     }
 }

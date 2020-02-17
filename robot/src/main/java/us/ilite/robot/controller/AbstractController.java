@@ -11,7 +11,6 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.EDriveState;
-import us.ilite.robot.modules.FlywheelModule;
 import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public abstract class AbstractController {
     protected double dt = 1d;
 
 
-    public static double kIntakeRollerPower_on = 0.25;
+    public static double kIntakeRollerPower_on = 0.5;
     public static double kIntakeRollerPower_off = 0.0;
 
     public AbstractController(){
@@ -113,7 +112,17 @@ public abstract class AbstractController {
         db.flywheel.set(TARGET_BALL_VELOCITY, pSpeed.speed);
         db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
         db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
-        db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, pSpeed.feeder);
+    }
+
+
+    protected boolean isFlywheelUpToSpeed() {
+        return db.flywheel.get(TARGET_BALL_VELOCITY) > 0.0 &&
+                db.flywheel.get(CURRENT_BALL_VELOCITY) >= db.flywheel.get(TARGET_BALL_VELOCITY) - 1.0;
+    }
+
+    protected boolean isFeederUpToSpeed() {
+        return db.flywheel.get(TARGET_FEEDER_VELOCITY_RPM) > 0.0 &&
+                db.flywheel.get(CURRENT_FEEDER_VELOCITY_RPM) >= db.flywheel.get(TARGET_FEEDER_VELOCITY_RPM)*0.9;
     }
 
     protected abstract void updateImpl(double pNow);
