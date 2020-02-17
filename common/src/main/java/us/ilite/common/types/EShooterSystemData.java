@@ -15,9 +15,12 @@ public enum EShooterSystemData {
     TARGET_HOOD_ANGLE,              //The desired angle of the hood
 
     HOOD_STATE,
-    HOOD_SERVO_VALUE,
+    HOOD_SENSOR_ERROR,
+    HOOD_SERVO_RAW_VALUE, // TODO - prune
+    HOOD_SERVO_LAST_VALUE, // TODO - prune
     POT_NORM_VALUE,
-    POT_RAW_VALUE,
+    POT_AVG_VALUE,
+    POT_RAW_VALUE, // TODO - prune
 
     FLYWHEEL_IS_MAX_VELOCITY,
     FLYWHEEL_DISTANCE_BASED_SPEED,

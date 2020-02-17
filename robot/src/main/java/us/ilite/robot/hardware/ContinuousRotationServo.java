@@ -7,6 +7,7 @@ public class ContinuousRotationServo extends Servo {
     private static final double OFF = 0.5;
     private boolean mIsInverted = false;
     private double mOutputValue = OFF;
+    private double mLastValue = 0.0d;
 
     /**
      * Constructor.<br>
@@ -26,8 +27,12 @@ public class ContinuousRotationServo extends Servo {
         return this;
     }
 
-    public double getValue() {
+    public double getRawOutputValue() {
         return mOutputValue;
+    }
+
+    public double getLastValue() {
+        return mLastValue;
     }
 
     /**
@@ -43,7 +48,9 @@ public class ContinuousRotationServo extends Servo {
         // 1.0 --> 1.0
         if(Double.isNaN(value)) {
             mOutputValue = OFF;
+            mLastValue = 0.0;
         } else {
+            mLastValue = value;
             mOutputValue = (Utils.clamp(value, -1.0, 1.0) * (mIsInverted ? -1.0 : 1.0)/2.0 + 0.5);
         }
         set(mOutputValue);

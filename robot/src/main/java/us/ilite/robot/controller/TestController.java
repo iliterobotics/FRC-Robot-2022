@@ -106,7 +106,9 @@ public class TestController extends BaseManualController {
     }
 
     private void updateFlywheel(double pNow) {
-        if(db.operatorinput.isSet(ELogitech310.L_BTN)) {
+        if(db.flywheel.isSet(HOOD_SENSOR_ERROR)) {
+            db.flywheel.set(HOOD_STATE, FlywheelModule.EHoodState.NONE);
+        } else if(db.operatorinput.isSet(ELogitech310.L_BTN)) {
             db.flywheel.set(HOOD_STATE, FlywheelModule.EHoodState.MANUAL);
             db.flywheel.set(FLYWHEEL_TEST, 1.0);
         } else if(db.operatorinput.isSet(ELogitech310.R_BTN)){

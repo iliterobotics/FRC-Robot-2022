@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.lib.util.FilteredAverage;
+import us.ilite.common.lib.util.Utils;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.EShooterSystemData;
-import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.ContinuousRotationServo;
 import us.ilite.robot.hardware.SparkMaxFactory;
 import us.ilite.robot.hardware.TalonSRXFactory;
@@ -25,6 +25,11 @@ public class FlywheelModule extends Module {
         NONE,
         TARGET_ANGLE,
         MANUAL
+    }
+
+    public enum EHoodSensorError {
+        NONE,
+        INVALID_POTENTIOMETER_READING
     }
 
     // Flywheel Motors
@@ -49,6 +54,7 @@ public class FlywheelModule extends Module {
     private static final double kMaxShotDegrees = 80.0;
     private static final double kHoodAngleRange = kMaxShotDegrees - kMinShotDegrees;
     private static final double kHoodConversionFactor = kHoodReadingRange / kHoodAngleRange;
+    private final FilteredAverage mPotentiometerReadings = FilteredAverage.filteredAverageForTime(0.1);
 
     private static final int FLYWHEEL_SLOT = 1;
     private static ProfileGains mFlywheelGains = new ProfileGains()
@@ -95,8 +101,20 @@ public class FlywheelModule extends Module {
         db.flywheel.set(CURRENT_HOOD_ANGLE, mHoodPot.get() / kHoodReadingRange * kHoodAngleRange + kMinShotDegrees);
         db.flywheel.set(POT_NORM_VALUE, mHoodPot.get());
         db.flywheel.set(POT_RAW_VALUE, mHoodAI.getValue());
-        db.flywheel.set(HOOD_SERVO_VALUE, mHoodServo.getValue());
+        db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
+        db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
+        mPotentiometerReadings.addNumber(mHoodAI.getValue());
 
+        double cur = mHoodAI.getValue();
+        double avg = mPotentiometerReadings.getAverage();
+        if(
+                Utils.isWithinTolerance(avg, cur,0.5) && Math.abs(mHoodServo.getLastValue()) > 0.1
+        ) {
+            db.flywheel.set(HOOD_SENSOR_ERROR, EHoodSensorError.INVALID_POTENTIOMETER_READING);
+        } else {
+            db.flywheel.set(HOOD_SENSOR_ERROR, EHoodSensorError.NONE);
+        }
+        db.flywheel.set(POT_AVG_VALUE, avg);
 
 //        if (db.limelight.isSet(ELimelightData.TV)) {
 //            db.flywheel.set(FLYWHEEL_DISTANCE_BASED_SPEED, calcSpeedFromDistance(distanceFromTarget));
@@ -134,8 +152,9 @@ public class FlywheelModule extends Module {
 
     private double setHood(double pNow) {
         EHoodState state = db.flywheel.get(HOOD_STATE, EHoodState.class);
+        if(state == null) state = EHoodState.NONE;
+
         switch(state) {
-            case NONE:
             case MANUAL:
                 mHoodServo.setServo(db.flywheel.get(FLYWHEEL_TEST));
                 break;
@@ -146,6 +165,7 @@ public class FlywheelModule extends Module {
                 double output = mHoodPID.calculate(current, target);
                 mHoodServo.setServo(output);
                 break;
+            case NONE:
             default:
                 mHoodServo.setServo(0.0);
 
