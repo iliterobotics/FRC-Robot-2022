@@ -18,6 +18,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
@@ -37,7 +38,7 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-    public static final CSVLogger mCSVLogger = new CSVLogger();
+//    public static final CSVLogger mCSVLogger = new CSVLogger();
 
     private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
@@ -60,6 +61,7 @@ public class Robot extends TimedRobot {
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
     private final AbstractController mBaseAutonController = new BaseAutonController();
+    private final AutonSelection mAutonSelection = new AutonSelection();
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
@@ -132,9 +134,7 @@ public class Robot extends TimedRobot {
         //mCSVLogger.start();
 
         MODE=AUTONOMOUS;
-//        mActiveController = new AutonCalibration();
-        mActiveController = new ShootIntakeController();
-        mActiveController.setEnabled(true);
+        mActiveController = AutonSelection.getAutonControllers().get((String) AutonSelection.getAutonControllers().keySet().toArray()[AutonSelection.mControllerNumber]);
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);
@@ -149,7 +149,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        mCSVLogger.start();
+//        mCSVLogger.start();
 
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
@@ -182,7 +182,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        mCSVLogger.start();
+//        mCSVLogger.start();
 
         if(mTestController == null) {
             mTestController = TestController.getInstance();
@@ -220,11 +220,11 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for ( RobotCodex c : DATA.mLoggedCodexes ) {
-            if ( c.hasChanged() ) {
-                mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
-            }
-        }
+//        for ( RobotCodex c : DATA.mLoggedCodexes ) {
+////            if ( c.hasChanged() ) {
+////                mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
+////            }
+////        }
         for ( RobotCodex c : DATA.mAllCodexes ) {
             c.reset();
         }

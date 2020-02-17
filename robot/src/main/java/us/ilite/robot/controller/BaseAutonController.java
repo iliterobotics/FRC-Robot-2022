@@ -1,20 +1,34 @@
 package us.ilite.robot.controller;
 
-import com.team2363.commands.HelixFollower;
 import com.team2363.commands.IliteHelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
+import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.BobUtils;
 import us.ilite.robot.modules.EDriveState;
 
+import java.util.Map;
+
 public class BaseAutonController extends AbstractController {
 
+    protected double mDelayCycleCount;
     protected Path mActivePath = null;
     protected double mPathStartTime = 0d;
     private HelixFollowerImpl mPathFollower = null;
+    private final String kPathAssociation;
+
+    public BaseAutonController(String pPathAssociation) {
+        kPathAssociation = pPathAssociation;
+        mDelayCycleCount = AutonSelection.mDelaySeconds;
+        setActivePath(getPathsFromController().get((String) getPathsFromController().keySet().toArray()[AutonSelection.mPathNumber]));
+    }
+
+    public BaseAutonController() {
+        this("DEFAULT");
+    }
 
     @Override
     protected void updateImpl(double pNow) {
@@ -29,13 +43,24 @@ public class BaseAutonController extends AbstractController {
         } else {
             mPathFollower.execute(pNow);
         }
-
     }
 
     protected void setActivePath(Path pPath) {
         mActivePath = pPath;
         mPathFollower = new HelixFollowerImpl(mActivePath);
         mPathFollower.initialize();
+    }
+
+    public Map<String, Path> getPathsFromController() {
+        Map<String, Path> mAvailablePaths = BobUtils.getAvailablePaths();
+        for (int i = 0; i < mAvailablePaths.entrySet().toArray().length - 1; i++) {
+            Map.Entry<String, Path> entry = (Map.Entry<String, Path>) mAvailablePaths.entrySet().toArray()[i];
+            if (!entry.getKey().toLowerCase().contains(kPathAssociation.toLowerCase())) {
+                mAvailablePaths.remove(entry.getKey());
+                i--;
+            }
+        }
+        return mAvailablePaths;
     }
 
     private class HelixFollowerImpl extends IliteHelixFollower {
