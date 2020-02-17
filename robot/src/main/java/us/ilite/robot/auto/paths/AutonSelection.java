@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import us.ilite.robot.controller.AutonCalibration;
 import us.ilite.robot.controller.BaseAutonController;
 import us.ilite.robot.controller.LineAutonController;
+import us.ilite.robot.controller.ShootIntakeController;
 
 import java.util.*;
 
@@ -69,6 +70,7 @@ public class AutonSelection {
         Map<String, BaseAutonController> mControllers = new HashMap<>();
         mControllers.put("AutonCalibration", new AutonCalibration());
         mControllers.put("LineController", new LineAutonController());
+        mControllers.put("ShootIntakeController", new ShootIntakeController());
         return mControllers;
     }
 }
