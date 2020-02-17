@@ -45,11 +45,13 @@ public class InputMap {
                 ;
     }
 
-    public static class TEST {
+    public static class FLYWHEEL {
         public static final ELogitech310
-            FLYWHEEL_SPINUP_TEST = ELogitech310.A_BTN,
-            FLYWHEEL_VELOCITY_TEST = ELogitech310.Y_BTN,
-            FLYWHEEL_SPINUP_AXIS = ELogitech310.RIGHT_TRIGGER_AXIS
+                FIRE_POWER_CELLS = ELogitech310.L_BTN,
+                FLYWHEEL_SPINUP_TEST = ELogitech310.A_BTN,
+                FLYWHEEL_VELOCITY_TEST = ELogitech310.Y_BTN,
+                FEEDER_SPINUP_TEST = ELogitech310.Y_BTN,
+                FLYWHEEL_SPINUP_AXIS = ELogitech310.RIGHT_TRIGGER_AXIS
         ;
     }
 }

@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
 
 //    private DriveModule mDrive;
 //    private Limelight mLimelight;
-//    private PowerCellModule mIntake;
+    private PowerCellModule mIntake;
 //    private RawLimelight mRawLimelight;
 //    private DJSpinnerModule mDJSpinnerModule;
 //    private LEDControl mLEDControl;
@@ -55,7 +55,6 @@ public class Robot extends TimedRobot {
     private final AbstractController mBaseAutonController = new BaseAutonController();
     private AbstractController mActiveController = null;
     private TestController mTestController;
-    private Joystick mTestJoystick;
 
 
     @Override
@@ -69,7 +68,7 @@ public class Robot extends TimedRobot {
 //        mDrive = new DriveModule();
 //        mLEDControl = new LEDControl();
         mShooter = new FlywheelModule();
-//        mIntake = new PowerCellModule();
+        mIntake = new PowerCellModule();
 //        mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
 //        mDJSpinnerModule = new DJSpinnerModule();
@@ -173,9 +172,6 @@ public class Robot extends TimedRobot {
         if(mTestController == null) {
              mTestController = TestController.getInstance();
         }
-        if(mTestJoystick == null) {
-            mTestJoystick = new Joystick(2);
-        }
         MODE = TEST;
         mActiveController = mTestController;
         mActiveController.setEnabled(true);
@@ -186,7 +182,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mShooter);
 //        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
 //        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
@@ -198,7 +194,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-        ELogitech310.map(DATA.testinput, mTestJoystick);
         commonPeriodic();
     }
 

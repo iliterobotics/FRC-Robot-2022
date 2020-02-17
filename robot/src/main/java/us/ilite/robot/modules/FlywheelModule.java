@@ -3,6 +3,7 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -72,6 +73,7 @@ public class FlywheelModule extends Module {
 
     private static double kRadiansPerSecToTalonTicksPer100ms = (2*Math.PI) / 2048.0 / 0.1;
     // https://docs.google.com/spreadsheets/d/1Po6exzGvfr0rMWMWVSyqxf49ZMSfGoYn/edit#gid=1858991275
+    // Converts from desired BALL (not wheel) velocity to Falcon ticks per 100ms
     private static double kVelocityConversion = (2048.0 / 600.0) / (kFlyWheelGearRatio * kFlywheelDiameterInches * Math.PI / 12.0 / 60.0);
 
     private static final int FLYWHEEL_SLOT = 0;
@@ -94,23 +96,21 @@ public class FlywheelModule extends Module {
     public FlywheelModule() {
         SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
         SmartDashboard.putNumber("kVelocityConversion",kVelocityConversion);
-        TalonFXConfiguration configs = new TalonFXConfiguration();
         /* select integ-sensor for PID0 (it doesn't matter if PID is actually used) */
-        configs.primaryPID.selectedFeedbackSensor = FeedbackDevice.IntegratedSensor;
         /* config all the settings */
         mFlywheelFalconMaster = new TalonFX(Settings.Hardware.CAN.kFalconMasterId);
-        mFlywheelFalconMaster.configFactoryDefault();
-        mFlywheelFalconMaster.configAllSettings(configs);
         mFlywheelFalconMaster.setNeutralMode(NeutralMode.Coast);
+        mFlywheelFalconMaster.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
         mFlywheelFalconFollower = new TalonFX(Settings.Hardware.CAN.kFalconFollowerId);
-        mFlywheelFalconFollower.configFactoryDefault();
-        mFlywheelFalconFollower.configAllSettings(configs);
+        mFlywheelFalconFollower.follow(mFlywheelFalconMaster);
         mFlywheelFalconFollower.setNeutralMode(NeutralMode.Coast);
         mFlywheelFalconFollower.setInverted(true);
-        HardwareUtils.setGains(mFlywheelFalconFollower, kFlywheelGains);
+        mFlywheelFalconFollower.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+//        HardwareUtils.setGains(mFlywheelFalconFollower, kFlywheelGains);
 
         mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mFeeder.setSmartCurrentLimit(30);
 
         mTurret = TalonSRXFactory.createDefaultTalon(Settings.Hardware.CAN.kSRXTurretId);
 
@@ -130,7 +130,7 @@ public class FlywheelModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        db.flywheel.set(CURRENT_FLYWHEEL_VELOCITY, mFlywheelFalconMaster.getSelectedSensorVelocity() / kVelocityConversion);
+        db.flywheel.set(CURRENT_BALL_VELOCITY, mFlywheelFalconMaster.getSelectedSensorVelocity() / kVelocityConversion);
         db.flywheel.set(CURRENT_FEEDER_VELOCITY, mFeeder.get());
         db.flywheel.set(CURRENT_HOOD_ANGLE, mHoodPot.get() / kHoodReadingRange * kHoodAngleRange + kMinShotDegrees);
         db.flywheel.set(POT_NORM_VALUE, mHoodPot.get());
@@ -169,6 +169,7 @@ public class FlywheelModule extends Module {
 //        mFeeder.set(db.flywheel.get(TARGET_FEEDER_VELOCITY));
 
         setFlywheel();
+        setFeeder();
 //        setTurret();
 //        setHood(pNow);
 
@@ -177,14 +178,18 @@ public class FlywheelModule extends Module {
 
     @Override
     public void shutdown(double pNow) {
-        db.flywheel.set(TARGET_FLYWHEEL_VELOCITY, 0);
-        db.flywheel.set(TARGET_FEEDER_VELOCITY, 0);
-        db.flywheel.set(TARGET_HOOD_ANGLE, 0);
+//        db.flywheel.set(TARGET_BALL_VELOCITY, 0);
+//        db.flywheel.set(TARGET_FEEDER_VELOCITY, 0);
+//        db.flywheel.set(TARGET_HOOD_ANGLE, 0);
     }
 
     private boolean isPastVelocity(double pVelocity) {
         // TODO Convert ticks per 100 ms to rpm
         return mFlywheelFalconMaster.getSelectedSensorVelocity() >= pVelocity;
+    }
+
+    private void setFeeder() {
+        mFeeder.set(db.flywheel.get(FEEDER_OUTPUT_OPEN_LOOP));
     }
 
     private void setFlywheel() {
@@ -197,17 +202,15 @@ public class FlywheelModule extends Module {
                 mFlywheelFalconFollower.set(TalonFXControlMode.PercentOutput, l);
                 break;
             case VELOCITY:
-                if(db.flywheel.isSet(TARGET_FLYWHEEL_VELOCITY)){
-                    double flywheelOutput = db.flywheel.get(TARGET_FLYWHEEL_VELOCITY) * kVelocityConversion;
+//                if(db.flywheel.isSet(TARGET_FLYWHEEL_VELOCITY)) {
+                    double flywheelOutput = db.flywheel.get(TARGET_BALL_VELOCITY) * kVelocityConversion;
                     SmartDashboard.putNumber("Flywheel Raw Output", flywheelOutput);
-                    mFlywheelFalconMaster.selectProfileSlot(FLYWHEEL_SLOT, 0);
                     mFlywheelFalconMaster.set(TalonFXControlMode.Velocity, flywheelOutput);
-//                    mFlywheelFalconFollower.selectProfileSlot(FLYWHEEL_SLOT, 0);
-//                    mFlywheelFalconFollower.set(TalonFXControlMode.Velocity, flywheelOutput);
-                } else {
-                    mFlywheelFalconMaster.set(TalonFXControlMode.PercentOutput, 0.0);
-                    mFlywheelFalconMaster.set(TalonFXControlMode.PercentOutput, 0.0);
-                }
+//                } else {
+//                    mFlywheelFalconMaster.set(TalonFXControlMode.PercentOutput, 0.0);
+//                    mFlywheelFalconMaster.set(TalonFXControlMode.PercentOutput, 0.0);
+//                }
+                break;
             case NONE:
             default:
                 mFlywheelFalconMaster.set(TalonFXControlMode.PercentOutput, 0.0);

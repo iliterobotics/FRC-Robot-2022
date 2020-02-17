@@ -48,7 +48,6 @@ public class Settings {
 
 
             public static final int kShooterID = 66; // BunnyBot Shooter
-            public static final int kFeederId = 61; // BunnyBot Conveyor
 
             public static int kSRXTurretId = 9;
             public static int kMAXFeederId = 10;
@@ -69,6 +68,7 @@ public class Settings {
 
             public static int kMAXIntakeRollerId = 7;
             public static int kMAXIntakeArm = 8;
+            public static int kFeederId = 10;
             public static int kTalonPowerCellSerializer = 11;
             public static int kTalonVerticalID = 12;
             public static int kFalconMasterId = 13;

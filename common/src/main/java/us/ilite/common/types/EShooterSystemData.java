@@ -2,8 +2,8 @@ package us.ilite.common.types;
 
 public enum EShooterSystemData {
     FLYWHEEL_TEST,
-    CURRENT_FLYWHEEL_VELOCITY,      //The Current flywheel velocity read from the internal encoders (units?)
-    TARGET_FLYWHEEL_VELOCITY,       //The desired flywheel velocity
+    CURRENT_BALL_VELOCITY,      //The Current power cell velocity read from the internal encoders (units?)
+    TARGET_BALL_VELOCITY,       //The desired power cell velocity
 
     CURRENT_FEEDER_VELOCITY,        //The current feeder velocity read by the internal encoder (units?)
     TARGET_FEEDER_VELOCITY,         //The desired feeder velocity
@@ -13,6 +13,8 @@ public enum EShooterSystemData {
 
     CURRENT_HOOD_ANGLE,             //The current angle of the hood
     TARGET_HOOD_ANGLE,              //The desired angle of the hood
+
+    FEEDER_OUTPUT_OPEN_LOOP,
 
     HOOD_STATE,
     HOOD_SENSOR_ERROR,
