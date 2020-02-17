@@ -8,12 +8,14 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.BobUtils;
+import us.ilite.robot.auto.paths.SimpleSequence;
 import us.ilite.robot.modules.EDriveState;
 
 public class ShootIntakeController extends BaseAutonController {
     protected Path mActivePath = null;
     protected double mPathStartTime = 0d;
     private HelixFollowerImpl mPathFollower = null;
+    private SimpleSequence mSimpleSequence = new SimpleSequence();
     @Override
     protected void updateImpl(double pNow) {
         if(mPathStartTime == 0) {
@@ -96,6 +98,7 @@ public class ShootIntakeController extends BaseAutonController {
 
         public void execute(double pNow) {
             super.execute();
+            mSimpleSequence.updateSequence(pNow);
             moveToNextSegment(pNow);
             super.calculateOutputs();
             if(isFinished()) {
