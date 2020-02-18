@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-//    private CSVLogger mCSVLogger = new CSVLogger();
+    public static final CSVLogger mCSVLogger = new CSVLogger( Settings.kIsLogging );
 //    private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
@@ -104,6 +104,11 @@ public class Robot extends TimedRobot {
 
         initTimer.stop();
         mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
+
+        if ( !Settings.kIsLogging ) {
+            mLogger.warn("------------Not Logging to CSV------------");
+        }
+
     }
 
     /**
@@ -117,7 +122,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        //mCSVLogger.start();
+//        if ( Settings.kIsLogging ) {
+//            mCSVLogger.start();
+//        }
 
         MODE=AUTONOMOUS;
         mActiveController = new AutonCalibration();
@@ -135,7 +142,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-//        mCSVLogger.start();
+        if ( Settings.kIsLogging ){
+            mCSVLogger.start();
+        }
 
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
@@ -172,7 +181,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-//        mCSVLogger.start();
+        if ( Settings.kIsLogging ){
+            mCSVLogger.start();
+        }
 
         if(mTestController == null) {
             mTestController = TestController.getInstance();
@@ -210,11 +221,13 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-//        for ( RobotCodex c : DATA.mLoggedCodexes ) {
-//            if ( c.hasChanged() ) {
-//                mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
-//            }
-//        }
+        if ( Settings.kIsLogging ) {
+            for ( RobotCodex c : DATA.mLoggedCodexes ) {
+                if ( c.hasChanged() ) {
+                    mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
+                }
+            }
+        }
         for ( RobotCodex c : DATA.mAllCodexes ) {
             c.reset();
         }

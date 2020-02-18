@@ -48,9 +48,7 @@ public class CSVWriter {
             if ( file != null ) {
                 bw = Optional.of( new BufferedWriter( new FileWriter( file ) ) );
             }
-        } catch ( Exception e ) {
-            e.printStackTrace();
-        }
+        } catch ( Exception e ) {}
 
         if ( eventName.length() <= 0 ) {
             // event name format: MM-DD-YYYY_HH-MM-SS
@@ -68,14 +66,11 @@ public class CSVWriter {
         if(!pFile.exists()) {
             try {
                 pFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            } catch (IOException e) {}
         }
     }
 
     public void log( String s ) {
-
         try {
             if ( bw.isPresent() ) {
                 bw.get().append(s);
@@ -86,18 +81,6 @@ public class CSVWriter {
                     mLog.error("Failure with logging codex: " + mCodex.meta().getEnum().getSimpleName() );
                     mLog.error( "Could not find Path:  (Path to USB)  on roborio! Try plugging in the USB." );
                     mLogFailures++;
-                    try {
-                        file = file();
-                        if ( file != null ) {
-                            bw = Optional.of( new BufferedWriter( new FileWriter( file ) ) );
-                        }
-                        else {
-                            bw = Optional.empty();
-                        }
-                    }
-                    catch( Exception e ) {
-                        e.printStackTrace();
-                    }
                 }
                 else if ( mLogFailures == Settings.kAcceptableLogFailures ) {
                     mLog.error("---------------------CSV LOGGING DISABLED----------------------");
@@ -105,9 +88,7 @@ public class CSVWriter {
                     mLogFailures++;
                 }
             }
-        } catch (IOException pE) {
-            System.out.println( pE.getLocalizedMessage() );
-        }
+        } catch (IOException pE) {}
     }
 
     public void close() {
@@ -116,9 +97,7 @@ public class CSVWriter {
                 bw.get().flush();
                 bw.get().close();
             }
-            catch ( Exception e ) {
-                e.printStackTrace();
-            }
+            catch ( Exception e ) {}
 
         }
     }
@@ -142,6 +121,7 @@ public class CSVWriter {
 //        }
 
         //THIS CODE IS USED FOR A MULTI-PARTITION DRIVE AND FINDING IT'S LOCATION IN THE ROBORIO FILE DIRECTORIES
+        //It is also needed for re-discovering the usb when the roborio resets
         String dir = "";
         char[] letters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
         for ( char c : letters ) {
@@ -179,13 +159,8 @@ public class CSVWriter {
                     DriverStation.getInstance().getMatchNumber()
             ));
         }
-
         mLog.error("Creating log file at ", file.toPath());
 
         return file;
-//        }
-
-//        mLog.error("Did not make log file for: " + mCodex.meta().getEnum().getSimpleName());
-//        return null;
     }
 }
