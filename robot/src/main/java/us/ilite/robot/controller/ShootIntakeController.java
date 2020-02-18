@@ -1,10 +1,7 @@
 package us.ilite.robot.controller;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.robot.auto.paths.BobUtils;
-import us.ilite.robot.auto.paths.SimplePath;
-import us.ilite.robot.auto.paths.SimpleSequence;
-import us.ilite.robot.auto.paths.T_LINE_27_FT;
+import us.ilite.robot.auto.paths.*;
 
 public class ShootIntakeController extends BaseAutonController {
     private double mPathDistance = 0d;
@@ -13,6 +10,7 @@ public class ShootIntakeController extends BaseAutonController {
 
     public ShootIntakeController() {
         setActivePath(new SimplePath());
+//        setActivePath(new StealsBallsAndRun());
     }
     @Override
     protected void updateImpl(double pNow) {
