@@ -6,9 +6,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,6 +15,7 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
@@ -37,8 +36,7 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     public static final CSVLogger mCSVLogger = new CSVLogger( Settings.kIsLogging );
-
-    private HangerModule mHanger = new HangerModule();
+//    private HangerModule mHanger = new HangerModule();
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
@@ -48,13 +46,11 @@ public class Robot extends TimedRobot {
 //    private DJSpinnerModule mDJSpinnerModule;
 //    private LEDControl mLEDControl;
     private SimulationModule mSimulation;
-//    private FlywheelModule mShooter;
+    private FlywheelModule mShooter;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private OperatorInput mOI;
-//    private LEDControl mLedControl;
-
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
@@ -74,13 +70,12 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-//        mLedControl = new LEDControl();
-//        mShooter = new FlywheelModule();
+//        mLEDControl = new LEDControl();
+        mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
 //        mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
 //        mDJSpinnerModule = new DJSpinnerModule();
-//        mLEDControl = new LEDControl();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -106,11 +101,6 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
 
         LiveWindow.disableAllTelemetry();
-
-        TimerTask shuffleupdate = new TimerTask(){
-            public void run(){Shuffleboard.update();}
-        };
-        new java.util.Timer().scheduleAtFixedRate(shuffleupdate, 15000, 1000);
 
         initTimer.stop();
         mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
@@ -141,7 +131,7 @@ public class Robot extends TimedRobot {
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
-        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 
@@ -183,6 +173,10 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.readInputs(0d);
+        mDrive.readInputs(0d);
+        mShooter.readInputs(0d);
+        mIntake.readInputs(0d);
+        Shuffleboard.update();
     }
 
     @Override
@@ -201,7 +195,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
-//        mRunningModules.addModule(mShooter);
+        mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
         mRunningModules.addModule(mIntake);
