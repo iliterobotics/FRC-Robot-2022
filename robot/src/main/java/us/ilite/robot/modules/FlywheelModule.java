@@ -12,7 +12,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.robot.Enums;
+import static us.ilite.robot.Enums.*;
 import us.ilite.robot.hardware.ContinuousRotationServo;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
@@ -21,12 +21,6 @@ import us.ilite.robot.hardware.TalonSRXFactory;
 import static us.ilite.common.types.EShooterSystemData.*;
 
 public class FlywheelModule extends Module {
-
-
-    public enum EHoodSensorError {
-        NONE,
-        INVALID_POTENTIOMETER_READING
-    }
 
     // Flywheel Motors
     private TalonFX mFlywheelFalconMaster;
@@ -175,8 +169,8 @@ public class FlywheelModule extends Module {
     }
 
     private void setFlywheel() {
-        Enums.FlywheelWheelState state = db.flywheel.get(FLYWHEEL_WHEEL_STATE, Enums.FlywheelWheelState.class);
-        if(state == null) state = Enums.FlywheelWheelState.NONE;
+        FlywheelWheelState state = db.flywheel.get(FLYWHEEL_WHEEL_STATE, FlywheelWheelState.class);
+        if(state == null) state = FlywheelWheelState.NONE;
         switch (state) {
             case OPEN_LOOP:
                 double l = db.flywheel.get(FLYWHEEL_OPEN_LOOP);
@@ -206,8 +200,8 @@ public class FlywheelModule extends Module {
     }
 
     private double setHood(double pNow) {
-        Enums.HoodState state = db.flywheel.get(HOOD_STATE, Enums.HoodState.class);
-        if(state == null) state = Enums.HoodState.NONE;
+        HoodState state = db.flywheel.get(HOOD_STATE, HoodState.class);
+        if(state == null) state = HoodState.NONE;
 
         switch(state) {
             case MANUAL:

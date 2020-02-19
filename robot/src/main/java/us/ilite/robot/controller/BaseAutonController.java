@@ -8,7 +8,7 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.BobUtils;
-import us.ilite.robot.modules.EDriveState;
+import static us.ilite.robot.Enums.*;
 
 public class BaseAutonController extends AbstractController {
 

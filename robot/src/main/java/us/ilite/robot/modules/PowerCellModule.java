@@ -14,6 +14,7 @@ import us.ilite.common.types.EPowerCellData;
 import static us.ilite.common.types.EPowerCellData.*;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Robot;
+import static us.ilite.robot.Enums.*;
 import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
@@ -109,54 +110,6 @@ public class PowerCellModule extends Module {
 
 
     private ILog mLog = Logger.createLog(this.getClass());
-
-
-    public enum EIntakeState {
-        //TODO find velocities
-        INTAKE (0.1),
-        STOP (0.0),
-        REVERSE (-0.1);
-
-        double pPower;
-
-        EIntakeState (double pPower) {
-            this.pPower = pPower;
-        }
-
-        public double getPower() {
-            return pPower;
-        }
-    }
-
-    public enum EArmState {
-        NONE(0.0, 0),
-        OUT(95.0, INTAKE_PIVOT_DOWN_SLOT),
-        // TODO - fix to UP slot
-        STOW(0.0, INTAKE_PIVOT_DOWN_SLOT),
-        HOLD(0.0, INTAKE_PIVOT_DOWN_SLOT);
-
-        public double angle;
-        public int slot;
-
-        EArmState (double angle, int slot) {
-            this.angle = angle;
-        }
-    }
-
-    public enum EIndexingState {
-        BROKEN (true),
-        NOT_BROKEN(false);
-
-        boolean broken;
-
-        EIndexingState(boolean broken) {
-            this.broken = broken;
-        }
-
-        public boolean getState(){
-            return this.broken;
-        }
-    }
 
     public PowerCellModule() {
         mIntakeState = EIntakeState.STOP;

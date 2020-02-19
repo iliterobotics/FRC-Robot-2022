@@ -4,7 +4,7 @@ import com.team319.trajectory.Path;
 import us.ilite.common.Distance;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.auto.paths.*;
-import us.ilite.robot.modules.EDriveState;
+import static us.ilite.robot.Enums.*;
 
 public class AutonCalibration extends BaseAutonController {
 
