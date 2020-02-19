@@ -10,7 +10,7 @@ import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.EDriveState;
+import static us.ilite.robot.Enums.*;
 import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
@@ -57,10 +57,10 @@ public abstract class AbstractController {
             if(speed <= 1.0) {
                 speed = 0.3;
             }
-            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.OUT);
+            db.powercell.set(INTAKE_STATE, EArmState.OUT);
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_on);
         } else {
-            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
+            db.powercell.set(INTAKE_STATE, EArmState.STOW);
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_off);
         }
     }

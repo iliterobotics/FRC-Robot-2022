@@ -3,7 +3,7 @@ package us.ilite.robot.controller;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.robot.modules.DriveMessage;
-import us.ilite.robot.modules.EDriveState;
+import static us.ilite.robot.Enums.*;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
 import static us.ilite.common.config.InputMap.DRIVER.SUB_WARP_AXIS;
