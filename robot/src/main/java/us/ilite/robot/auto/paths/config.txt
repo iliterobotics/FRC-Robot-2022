@@ -1,0 +1,8 @@
+3.3333
+2.9167
+2.17
+3.0
+6.0
+CLASS
+us.ilite.robot.auto.paths
+../robot/src/main/java/us/ilite/robot/auto/paths/
