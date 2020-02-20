@@ -5,8 +5,8 @@ public enum EShooterSystemData {
     CURRENT_BALL_VELOCITY,      //The Current power cell velocity read from the internal encoders (units?)
     TARGET_BALL_VELOCITY,       //The desired power cell velocity
 
-    CURRENT_FEEDER_VELOCITY,        //The current feeder velocity read by the internal encoder (units?)
-    TARGET_FEEDER_VELOCITY,         //The desired feeder velocity
+    CURRENT_FEEDER_VELOCITY_RPM,        //The current feeder velocity read by the internal encoder (units?)
+    TARGET_FEEDER_VELOCITY_RPM,         //The desired feeder velocity
 
     CURRENT_TURRET_ANGLE,           //The current angle of the turret (deg)
     DESIRED_TURRET_ANGLE,           //The desired angle of the turret
@@ -15,6 +15,7 @@ public enum EShooterSystemData {
     TARGET_HOOD_ANGLE,              //The desired angle of the hood
 
     FEEDER_OUTPUT_OPEN_LOOP,
+    FLYWHEEL_SPEED_STATE,
 
     HOOD_STATE,
     HOOD_SENSOR_ERROR,

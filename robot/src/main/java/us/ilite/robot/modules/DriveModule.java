@@ -19,6 +19,7 @@ import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
 import us.ilite.robot.Robot;
+import static us.ilite.robot.Enums.*;
 import us.ilite.robot.hardware.*;
 
 /**

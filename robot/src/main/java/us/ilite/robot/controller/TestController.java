@@ -17,9 +17,8 @@ import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DJSpinnerModule;
-import us.ilite.robot.modules.FlywheelModule;
 import us.ilite.robot.modules.Limelight;
-import us.ilite.robot.modules.PowerCellModule;
+import static us.ilite.robot.Enums.*;
 
 import static us.ilite.common.config.InputMap.OPERATOR.FIRE_POWER_CELLS;
 import static us.ilite.common.types.EPowerCellData.*;
@@ -39,8 +38,8 @@ public class TestController extends BaseManualController {
     private double mLimelightZoomThreshold = 7.0;
     private double mStartTime;
 
-    private PowerCellModule.EIntakeState mIntakeState;
-    private PowerCellModule.EArmState mArmState;
+    private EIntakeState mIntakeState;
+    private EArmState mArmState;
     private double mPreviousTime;
     private double mGoalBeamCountBroken = 0;
     private boolean crossedEntry = false;
@@ -110,22 +109,30 @@ public class TestController extends BaseManualController {
         }
 
 
-
+        Enums.FlywheelSpeeds state = Enums.FlywheelSpeeds.OFF;
         if(flywheelinput.isSet(InputMap.FLYWHEEL.FEEDER_SPINUP_TEST)) {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.75);
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_SPINUP_TEST)) {
             db.flywheel.set(FLYWHEEL_WHEEL_STATE, Enums.FlywheelWheelState.OPEN_LOOP);
             db.flywheel.set(FLYWHEEL_OPEN_LOOP, 0.2);
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_10_TEST)) {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.CLOSE);
+            state = Enums.FlywheelSpeeds.CLOSE;
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_20_TEST)) {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.INITIATION_LINE);
+            state = Enums.FlywheelSpeeds.INITIATION_LINE;
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_30_TEST)) {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.FAR);
+            state = Enums.FlywheelSpeeds.FAR;
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_40_TEST)) {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.FAR_TRENCH);
+            state = Enums.FlywheelSpeeds.FAR_TRENCH;
         } else {
-            setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
+            state = Enums.FlywheelSpeeds.OFF;
+        }
+        db.flywheel.set(FLYWHEEL_SPEED_STATE, state);
+        setFlywheelClosedLoop(state);
+        if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
+            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
+            db.flywheel.set(TARGET_FEEDER_VELOCITY_RPM, state.feeder * 11000.0);
+        } else {
+            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.0);
         }
 //        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
 //            if (db.limelight.isSet(ELimelightData.TV)) {
@@ -193,9 +200,9 @@ public class TestController extends BaseManualController {
 
     protected void updatePowerCells(double pNow) {
         // Default to none
-        db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.NONE);
+        db.powercell.set(INTAKE_STATE, EArmState.NONE);
 
-        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE) || flywheelinput.isSet(InputMap.FLYWHEEL.BASIC_INTAKE)) {
             setIntakeArmEnabled(pNow, true);
             crossedEntry = activateSerializer(pNow);
 //            if (crossedEntry && !db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER)) {
@@ -205,20 +212,20 @@ public class TestController extends BaseManualController {
 //                crossedEntry = false;
 //            }
 
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
-            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.STOW);
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE) || flywheelinput.isSet(InputMap.FLYWHEEL.REVERSE_INTAKE)) {
+            db.powercell.set(INTAKE_STATE, EArmState.STOW);
             reverseSerializer(pNow);
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW)) {
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW) || flywheelinput.isSet(InputMap.FLYWHEEL.INTAKE_STOW)) {
             setIntakeArmEnabled(pNow, false);
             crossedEntry = activateSerializer(pNow);
         } else {
             // TODO - only enable once we have set the hold gains
 //            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
-            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.NONE);
+            db.powercell.set(INTAKE_STATE, EArmState.NONE);
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
         }
 
-        if(db.operatorinput.isSet(FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) {
+        if((db.operatorinput.isSet(FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) && isFlywheelUpToSpeed() && isFeederUpToSpeed()) {
             db.powercell.set(DESIRED_V_VELOCITY, 0.6);
             db.powercell.set(DESIRED_H_VELOCITY, 0.5);
         }
@@ -276,22 +283,22 @@ public class TestController extends BaseManualController {
 
     void updateDJBooth(double pNow) {
         if (db.operatorinput.isSet(InputMap.OPERATOR.COLOR_POSITION)) {
-            db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.getPower());
+            db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.POSITION.getPower());
             int i = (int) db.color.get(EColorData.SENSED_COLOR);
-            DJSpinnerModule.EColorMatch m = DJSpinnerModule.EColorMatch.values()[i];
+            EColorMatch m = EColorMatch.values()[i];
             Color DJ_COLOR = null;
             switch (db.recieveColorFmsRelay()) {
                 case 'B':
-                    DJ_COLOR = DJSpinnerModule.EColorMatch.BLUE.color;
+                    DJ_COLOR = EColorMatch.BLUE.color;
                     break;
                 case 'G':
-                    DJ_COLOR = DJSpinnerModule.EColorMatch.GREEN.color;
+                    DJ_COLOR = EColorMatch.GREEN.color;
                     break;
                 case 'R':
-                    DJ_COLOR = DJSpinnerModule.EColorMatch.RED.color;
+                    DJ_COLOR = EColorMatch.RED.color;
                     break;
                 case 'Y':
-                    DJ_COLOR = DJSpinnerModule.EColorMatch.YELLOW.color;
+                    DJ_COLOR = EColorMatch.YELLOW.color;
                     break;
                 default:
                     DJ_COLOR = null;
@@ -299,20 +306,20 @@ public class TestController extends BaseManualController {
             }
             if (m.color.equals(DJ_COLOR)) {
                 //TODO stop using the module for the desired power
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.getPower());
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.OFF.getPower());
             } else {
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.POSITION.getPower());
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.POSITION.ordinal());
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.POSITION.getPower());
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.POSITION.ordinal());
             }
         }
         else if ( db.operatorinput.isSet(InputMap.OPERATOR.COLOR_ROTATION)) {
-            db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.getPower());
+            db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.ROTATION.getPower());
             if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.TARGET_ROTATION_COUNT) {
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.OFF.ordinal());
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.OFF.getPower());
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.OFF.ordinal());
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.OFF.getPower());
             } else {
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, DJSpinnerModule.EColorWheelState.ROTATION.ordinal());
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, DJSpinnerModule.EColorWheelState.ROTATION.getPower());
+                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.ROTATION.ordinal());
+                db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.ROTATION.getPower());
             }
         }
 

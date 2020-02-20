@@ -7,7 +7,7 @@ import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.DriveModule;
-import us.ilite.robot.modules.EDriveState;
+import static us.ilite.robot.Enums.*;
 import us.ilite.robot.modules.IThrottleProvider;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
