@@ -1,6 +1,9 @@
 package us.ilite.common.lib.util;
 
+import us.ilite.common.config.Settings;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class FilteredAverage {
@@ -51,5 +54,16 @@ public class FilteredAverage {
 
   public void clear() {
       mNumbers.clear();
+  }
+
+    /**
+     * @param pTime in seconds
+     * @return a running average that should contains the last pTime seconds' worth of data
+     */
+  public static FilteredAverage filteredAverageForTime(double pTime) {
+      int numCycles = (int)(pTime / Settings.kControlLoopPeriod);
+      double[] gains = new double[numCycles];
+      Arrays.fill(gains, 1.0 / (double)numCycles);
+      return new FilteredAverage(gains);
   }
 }

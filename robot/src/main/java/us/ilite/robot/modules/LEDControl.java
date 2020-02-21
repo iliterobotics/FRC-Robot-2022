@@ -4,8 +4,9 @@ import com.ctre.phoenix.CANifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.Settings;
+
 import us.ilite.common.types.EColorData;
-import static us.ilite.robot.modules.DJSpinnerModule.*;
+import static us.ilite.robot.Enums.*;
 
 public class LEDControl extends Module {
 

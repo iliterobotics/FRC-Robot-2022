@@ -9,7 +9,7 @@ public class SimulationModule extends Module {
     private double direction = 0d;
     private double lastAngle = 0d;
     private double currentAngle = 0d;
-    private Potentiometer mHoodPot;
+//    private Potentiometer mHoodPot;
     private double currentPositionDeg = 0d;
     private double currentVelocityDegPerSec = 0d;
     private double lasttime = 0d;
@@ -23,7 +23,7 @@ public class SimulationModule extends Module {
     private Servo mHoodServo;
 
     public SimulationModule() {
-        mHoodPot = new AnalogPotentiometer(0, 360, 0);
+//        mHoodPot = new AnalogPotentiometer(0);
         mHoodServo = new Servo(0);
         SmartDashboard.putNumber("RAW POT", 0d);
     }
@@ -31,13 +31,11 @@ public class SimulationModule extends Module {
     @Override
     public void readInputs(double pNow) {
         doPhysics(pNow);
-        currentAngle = mHoodPot.get();
+        currentAngle = 0;
         currentPositionDeg += currentAngle - lastAngle;
         currentVelocityDegPerSec = (currentAngle - lastAngle) / (lasttime - pNow);
         direction = Math.signum(currentAngle - lastAngle);
     }
-
-    @Override
     public void setOutputs(double pNow) {
         lastAngle = currentAngle;
         lasttime = pNow;

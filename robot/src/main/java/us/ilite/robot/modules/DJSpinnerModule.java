@@ -15,79 +15,18 @@ import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EColorData;
 import us.ilite.robot.hardware.TalonSRXFactory;
+import static us.ilite.robot.Enums.*;
 
 public class DJSpinnerModule extends Module {
 
     public static final double TARGET_ROTATION_COUNT = 32.0;
     private ILog mLog = Logger.createLog( this.getClass());
 
-    public enum EColorMatch {
-        RED( 0.561, 0.232, 0.114 ),
-        YELLOW( 0.361, 0.524, 0.113 ),
-        BLUE(  0.143, 0.427, 0.429 ),
-        GREEN(  0.197, 0.561, 0.240 ),
-        NONE(0, 0, 0 );
-        public Color color;
-        public double r;
-        public double g;
-        public double b;
 
-        EColorMatch(double r, double g, double b) {
-            color = new Color(r,g,b);
-        }
-
-        public Color getColorMatch() {
-            return ColorMatch.makeColor(r, g, b);
-        }
-
-        public EColorMatch nextColor() {
-            if(this.ordinal() == GREEN.ordinal()) {
-                return RED;
-            } else if (this.ordinal() == NONE.ordinal() ){
-                return NONE;
-            }
-            else {
-                return EColorMatch.values()[ordinal()+1];
-            }
-        }
-
-        public static EColorMatch from(ColorMatchResult pResult) {
-            for(EColorMatch cm : values()) {
-                if(equal(cm.color, pResult.color)) {
-                    return cm;
-                }
-            }
-            return NONE;
-        }
-
-        private static boolean equal(Color a, Color b) {
-            //TODO - this is where we put the thresholding for different color
-            // e.g. if abs(a.red - b.red) <= 0.1 then they are close
-            return a.equals(b);
-        }
-    }
 
     public enum EIsFinished {
         YES,
         NO
-    }
-
-    public enum EColorWheelState {
-        OFF (0.0),
-        ROTATION (0.2),
-        POSITION (0.2);
-
-        public double power;
-        private EColorWheelState(double _power) {
-            power = _power;
-        }
-
-        public double getPower(){
-            return this.power;
-        }
-        public static EColorWheelState valueOf(double pOrdinal) {
-            return values()[(int)pOrdinal];
-        }
     }
 
     private VictorSPX mVictor;

@@ -73,7 +73,7 @@ public class Limelight extends Module implements ITargetDataProvider {
 //        mVisionTarget = Field2020.FieldElement.values()[Robot.DATA.limelight.get(TARGET_ID).intValue()];
 
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
-        Robot.DATA.limelight.set(TV, targetValid ? 1.0d : null);
+        Robot.DATA.limelight.set(TV, targetValid ? 1.0d : 0d);
 
         if(targetValid) {
             Robot.DATA.limelight.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));

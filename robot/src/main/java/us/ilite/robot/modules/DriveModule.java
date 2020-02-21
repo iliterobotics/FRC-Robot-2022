@@ -19,6 +19,7 @@ import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
 import us.ilite.robot.Robot;
+import static us.ilite.robot.Enums.*;
 import us.ilite.robot.hardware.*;
 
 /**
@@ -32,7 +33,8 @@ public class DriveModule extends Module {
 	// DO NOT CHANGE THE GEAR RATIO
 	public static double kGearboxRatio = (10.0 / 40.0) * (14.0 / 40.0);
 	// As of 2/9this is for omni wheels on a solid floor
-	public static double kWheelDiameterInches = 6.125;
+	//public static double kWheelDiameterInches = 6.125;
+	public static double kWheelDiameterInches = 5.875;
 	public static double kWheelCircumferenceFeet = kWheelDiameterInches*Math.PI/12.0;
 	// For position, getPosition() returns raw rotations - so convert that to feet
 	public static double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
@@ -69,16 +71,16 @@ public class DriveModule extends Module {
 			.p(1.0).maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
 			.maxAccel(56760d)
 			.slot(POSITION_PID_SLOT)
-			.conversion(kDriveNEOPositionFactor);
+			.velocityConversion(kDriveNEOPositionFactor);
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
 			.p(0.0001)
 			// Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
 			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
 			// Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
-			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4)
+			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
 			.slot(VELOCITY_PID_SLOT)
-			.conversion(kDriveNEOVelocityFactor);
+			.velocityConversion(kDriveNEOVelocityFactor);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
 
@@ -141,8 +143,9 @@ public class DriveModule extends Module {
 		mRightCtrl.setOutputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
-//		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
-		mGyro = new ADIS16470();
+		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
+
+//		mGyro = new ADIS16470();
 
 
 		HardwareUtils.setGains(mLeftCtrl, vPID);
@@ -183,8 +186,7 @@ public class DriveModule extends Module {
 		mHoldRightPositionPid.setSetpoint(0.0);
 		mStartHoldingPosition = false;
 
-		mLeftEncoder.setPosition(0.0);
-		mRightEncoder.setPosition(0.0);
+		reset();
 		HardwareUtils.setGains(mLeftCtrl, vPID);
 		HardwareUtils.setGains(mRightCtrl, vPID);
 		HardwareUtils.setGains(mLeftCtrl, dPID);
@@ -218,6 +220,9 @@ public class DriveModule extends Module {
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
+			case RESET:
+				reset();
+				break;
 //			case HOLD:
 //				if (!mStartHoldingPosition) {
 //					mHoldLeftPositionPid.setSetpoint(db.drivetrain.get(LEFT_POS_INCHES));
@@ -247,6 +252,7 @@ public class DriveModule extends Module {
 				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				break;
 			case PATH_FOLLOWING_BASIC:
+			case PATH_FOLLOWING_HELIX:
 				mLeftCtrl.setReference(db.drivetrain.get(L_PATH_FT_s) / kDriveNEOVelocityFactor, kVelocity, VELOCITY_PID_SLOT, 0);
 				mRightCtrl.setReference(db.drivetrain.get(R_PATH_FT_s) / kDriveNEOVelocityFactor, kVelocity, VELOCITY_PID_SLOT, 0);
 				break;
@@ -255,6 +261,11 @@ public class DriveModule extends Module {
 				mRightMaster.set(throttle-turn);
 				break;
 		}
+	}
+
+	private void reset() {
+		mLeftEncoder.setPosition(0.0);
+		mRightEncoder.setPosition(0.0);
 	}
 
 	public void loop(double pNow) {
