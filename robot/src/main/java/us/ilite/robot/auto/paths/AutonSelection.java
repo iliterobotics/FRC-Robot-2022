@@ -15,7 +15,7 @@ public class AutonSelection {
     public static ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
 
     public static double mDelaySeconds = mAutonConfiguration.add("Path Delay Seconds", 0)
-            .withPosition(2, 3)
+            .withPosition(2, 0)
             .getEntry()
             .getDouble(0.0);
 
@@ -36,11 +36,13 @@ public class AutonSelection {
     }
 
     public void updateAutonControllers() {
+        mSendableAutonControllers.setDefaultOption("Default - Auton Calibration", new AutonCalibration());
         for (BaseAutonController c : mAutonControllers) {
             mSendableAutonControllers.addOption(c.getClass().getSimpleName(), c);
         }
-        mSendableAutonControllers.setDefaultOption("Default - Auton Calibration", new AutonCalibration());
-        mAutonConfiguration.add("Choose Auton Controller", mSendableAutonControllers);
+        mAutonConfiguration.add("Choose Auton Controller", mSendableAutonControllers)
+            .withPosition(0, 0)
+            .withSize(2, 1);
     }
 
     public BaseAutonController getSelectedAutonController() {
