@@ -11,7 +11,6 @@ import us.ilite.robot.controller.*;
 import java.util.*;
 
 public class AutonSelection {
-    private static Map<String, Path> kAllPaths = BobUtils.getAvailablePaths();
     public static ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Config");
 
     public static double mDelaySeconds = mAutonConfiguration.add("Path Delay Seconds", 0)

@@ -41,16 +41,20 @@ public class BaseAutonController extends AbstractController {
 
     @Override
     protected void updateImpl(double pNow) {
-        if(mPathStartTime == 0) {
-            mPathStartTime = pNow;
-        }
-        if (mPathFollower != null && mPathFollower.isFinished()) {
-            mPathFollower = null;
-        }
-        if(mPathFollower == null) {
-            stopDrivetrain(pNow);
+        if (mDelayCycleCount == 0) {
+            if (mPathStartTime == 0) {
+                mPathStartTime = pNow;
+            }
+            if (mPathFollower != null && mPathFollower.isFinished()) {
+                mPathFollower = null;
+            }
+            if (mPathFollower == null) {
+                stopDrivetrain(pNow);
+            } else {
+                mPathFollower.execute(pNow);
+            }
         } else {
-            mPathFollower.execute(pNow);
+            mDelayCycleCount--;
         }
     }
 
