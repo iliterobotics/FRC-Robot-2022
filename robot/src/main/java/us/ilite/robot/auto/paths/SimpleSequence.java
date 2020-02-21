@@ -80,7 +80,7 @@ public class SimpleSequence implements ISequence {
                 if(speed <= 1.0) {
                     speed = 0.3;
                 }
-                Robot.DATA.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.OUT);
+//                Robot.DATA.powercell.set(INTAKE_STATE, PowerCellModule.EArm.OUT);
                 Robot.DATA.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_on);
 
                 return checkBeams();

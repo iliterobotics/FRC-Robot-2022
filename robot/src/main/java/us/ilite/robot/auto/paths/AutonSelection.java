@@ -36,7 +36,6 @@ public class AutonSelection {
 
     public static double mDelayCycleCount = mDelaySeconds / 0.02;
 
-    private BaseAutonController mPreviouslySelectedAutonController;
     private SendableChooser<BaseAutonController> mSendableAutonControllers = new SendableChooser<>();
     private SendableChooser<Path> mSendablePaths = new SendableChooser<>();
     /**
