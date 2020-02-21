@@ -309,7 +309,6 @@ public class TestController extends BaseManualController {
                     DJ_COLOR = null;
                     break;
             }
-
             if ( DJ_COLOR == null ) {
                 DriverStation.reportError("NO FMS RELAY RECEIVED! SWITCHING TO MANUAL!", false );
                 db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.POSITION.power);

@@ -138,35 +138,39 @@ public class LEDControl extends Module {
     /**
      * Updates LED strip based on mechanism states. We check mechanisms in order of lowest to highest priority.
      */
-    public void update(double pNow) {
+    public void update() {
         Message lastMsg = this.mCurrentMessage;
         this.mCurrentMessage = Message.NONE;
 
         //TODO implement CurrentLimiting() in modules
         
 
-        EColorMatch color = EColorMatch.values()[(int)(double)db.color.get(EColorData.SENSED_COLOR)];
-        boolean isDone = (EColorWheelState.valueOf(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE)) == EColorWheelState.OFF);
+        if ( (db.color.get(EColorData.DESIRED_MOTOR_POWER) == EColorWheelState.POSITION.power ||
+                db.color.get(EColorData.DESIRED_MOTOR_POWER) == EColorWheelState.ROTATION.power) ) {
 
+            EColorMatch color = EColorMatch.values()[(int)db.color.get(EColorData.SENSED_COLOR)];
+            boolean isDone = (EColorWheelState.valueOf(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE)) == EColorWheelState.OFF);
 
-        if (color == EColorMatch.BLUE && !isDone) {
-            mCurrentMessage = Message.ON_BLUE;
-        } else if (color == EColorMatch.RED && !isDone) {
-            mCurrentMessage = Message.ON_RED;
-        } else if (color == EColorMatch.GREEN && !isDone) {
-            mCurrentMessage = Message.ON_GREEN;
-        } else if (color == EColorMatch.YELLOW && !isDone) {
-            mCurrentMessage = Message.ON_YELLOW;
+            if (color == EColorMatch.BLUE && !isDone) {
+                mCurrentMessage = Message.ON_BLUE;
+            } else if (color == EColorMatch.RED && !isDone) {
+                mCurrentMessage = Message.ON_RED;
+            } else if (color == EColorMatch.GREEN && !isDone) {
+                mCurrentMessage = Message.ON_GREEN;
+            } else if (color == EColorMatch.YELLOW && !isDone) {
+                mCurrentMessage = Message.ON_YELLOW;
+            }
+            else if (color == EColorMatch.BLUE && isDone) {
+                mCurrentMessage = Message.FINISHED_ON_BLUE;
+            } else if (color == EColorMatch.RED && isDone) {
+                mCurrentMessage = Message.FINISHED_ON_RED;
+            } else if (color == EColorMatch.GREEN && isDone) {
+                mCurrentMessage = Message.FINISHED_ON_GREEN;
+            } else if (color == EColorMatch.YELLOW && isDone) {
+                mCurrentMessage = Message.FINISHED_ON_YELLOW;
+            }
         }
-        else if (color == EColorMatch.BLUE && isDone) {
-            mCurrentMessage = Message.FINISHED_ON_BLUE;
-        } else if (color == EColorMatch.RED && isDone) {
-            mCurrentMessage = Message.FINISHED_ON_RED;
-        } else if (color == EColorMatch.GREEN && isDone) {
-            mCurrentMessage = Message.FINISHED_ON_GREEN;
-        } else if (color == EColorMatch.YELLOW && isDone) {
-            mCurrentMessage = Message.FINISHED_ON_YELLOW;
-        }
+
 
 //        if ( Math.abs( red - LEDColor.RED.getColor().getR() ) <= 10  &&
 //                Math.abs( green - LEDColor.RED.getColor().getG() ) <= 10  &&
@@ -250,7 +254,7 @@ public class LEDControl extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-
+        update();
     }
 
     public void shutdown(double pNow) {

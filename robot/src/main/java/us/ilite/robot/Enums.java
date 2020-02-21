@@ -71,7 +71,7 @@ public class Enums {
 
     public enum EColorWheelState {
         OFF (0.0),
-        ROTATION (0.2),
+        ROTATION (0.4),
         POSITION (0.2);
 
         public double power;

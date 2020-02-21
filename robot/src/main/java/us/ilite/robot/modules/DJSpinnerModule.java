@@ -22,13 +22,6 @@ public class DJSpinnerModule extends Module {
     public static final double TARGET_ROTATION_COUNT = 32.0;
     private ILog mLog = Logger.createLog( this.getClass());
 
-
-
-    public enum EIsFinished {
-        YES,
-        NO
-    }
-
     private VictorSPX mVictor;
     private ColorSensorV3 mColorSensorV3;
     private final ColorMatch mColorMatcher = new ColorMatch();
@@ -91,7 +84,7 @@ public class DJSpinnerModule extends Module {
             if (eLastColorState.nextColor() == eCurrentColorState) {
                 mColorChangeCounter++;
             }
-            else if ( eCurrentColorState != eLastColorState ) {
+            else if ( eCurrentColorState.equals(eLastColorState) ) {
                 mUpdatingFlag = true;
                 eCurrentColorState = eLastColorState;
             }
