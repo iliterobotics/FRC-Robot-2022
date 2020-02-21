@@ -1,7 +1,6 @@
 package us.ilite.robot.controller;
 
 import com.team319.trajectory.Path;
-import us.ilite.common.Distance;
 import us.ilite.robot.auto.paths.*;
 
 public class AutonCalibration extends BaseAutonController {

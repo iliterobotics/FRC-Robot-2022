@@ -64,6 +64,10 @@ public class ModuleList extends Module {
     }
 
     public void addModule(Module pModule) {
+        if(pModule == null) {
+            throw new IllegalArgumentException("the module is null!");
+        }
+
         mModules.add(pModule);
     }
 

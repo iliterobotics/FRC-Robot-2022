@@ -11,12 +11,14 @@ import us.ilite.common.lib.control.ProfileGains;
  */
 public class Settings {
 
-    public static double kControlLoopPeriod = 0.01; // seconds
+    public static double kControlLoopPeriod = 0.02; // seconds
 
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
     public static int kAcceptableLogFailures = 8;
 
     public static double kNetworkTableUpdateRate = 0.01;
+
+    public static boolean kIsLogging = true; // decide whether or not to log
 
     public static double kDJOutput = .25;
 
@@ -41,12 +43,20 @@ public class Settings {
             public static int kHangerNeoID2 = 71;
 //            public static int kTalonThreeID = 65; // Change later
             public static final int kTurretGyroID = 61; // There isn't a gyro on the BunnyBot
-            public static final int kShooterID = 66; // BunnyBot Shooter
-            public static final int kAcceleratorID = 61; // BunnyBot Conveyor
-            public static final int kTurretID = 69; // BunnyBot Hopper
             public static final int kDJSpinnerVictorID = 50;
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
+
+            public static int kPigeonIDForFlywheel=80;
+            public static int kFlywheelNeoAddress = 16;
+
+
+
+            public static final int kShooterID = 66; // BunnyBot Shooter
+
+            public static int kSRXTurretId = 9;
+            public static int kMAXFeederId = 10;
+            public static int kLEDControlCanifierID = 0;
 
 //            public static double kGyroCollisionThreshold = 0.0;
 
@@ -63,9 +73,11 @@ public class Settings {
 
             public static int kMAXIntakeRollerId = 7;
             public static int kMAXIntakeArm = 8;
+            public static int kFeederId = 10;
             public static int kTalonPowerCellSerializer = 11;
             public static int kTalonVerticalID = 12;
-            public static int kLEDControlCanifierID = 0;
+            public static int kFalconMasterId = 13;
+            public static int kFalconFollowerId = 14;
 
             // ===== 2019 Drive =====
             public static  int kDriveLeftMaster = 1;
@@ -76,6 +88,7 @@ public class Settings {
         }
 
         public static class Analog {
+            public static int kHoodPot = 0; //Current bunnybot analog port
         }
 
         public static class DIO {
@@ -83,6 +96,10 @@ public class Settings {
             public static int kSecondaryBeamChannel = 8; // Change later
             public static int kExitBeamChannel = 7; // Change later
             public static final int kAnglerID = 8; // BunnyBot Catapult
+        }
+
+        public static class PWM {
+            public static int kHoodServoId = 9;
         }
 
         public static class PCM {
