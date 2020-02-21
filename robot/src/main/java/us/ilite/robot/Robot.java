@@ -132,7 +132,7 @@ public class Robot extends TimedRobot {
 
         MODE=AUTONOMOUS;
         mActiveController = mAutonSelection.getSelectedAutonController();
-
+        mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);
         mRunningModules.addModule(mIntake);
