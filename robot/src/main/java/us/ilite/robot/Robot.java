@@ -127,11 +127,11 @@ public class Robot extends TimedRobot {
 //        }
 
         MODE=AUTONOMOUS;
-        mActiveController = new AutonCalibration();
+        mActiveController = new YoinkController(CLOCK.getCurrentTime());
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
-//        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 

@@ -14,7 +14,7 @@ public class BaseAutonController extends AbstractController {
 
     protected Path mActivePath = null;
     protected double mPathStartTime = 0d;
-    private HelixFollowerImpl mPathFollower = null;
+    protected HelixFollowerImpl mPathFollower = null;
 
     @Override
     protected void updateImpl(double pNow) {
@@ -38,7 +38,7 @@ public class BaseAutonController extends AbstractController {
         mPathFollower.initialize();
     }
 
-    private class HelixFollowerImpl extends IliteHelixFollower {
+    protected class HelixFollowerImpl extends IliteHelixFollower {
         /** Used as a multi-threaded caching buffer */
         private double mLastDistance = 0d;
         private double mLastHeading = 0d;
