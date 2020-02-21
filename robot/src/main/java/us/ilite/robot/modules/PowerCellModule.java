@@ -196,7 +196,7 @@ public class PowerCellModule extends Module {
 //        HardwareUtils.setGains(mIntakePivotEncoder, mIntakePivotUpGains);
         HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotDownGains);
 //        HardwareUtils.setGains(mIntakePivotEncoder, mIntakePivotDownGains);
-        mIntakePivotEncoder.setPosition(0.0);
+        mIntakePivotEncoder.reset();
         mIntakePivotCtrl.setOutputRange(0.0, 95.0);
         SmartDashboard.putNumber("Rotation Conversion (deg)", mIntakePivotDownGains.POSITION_CONVERSION_FACTOR);
         SmartDashboard.putNumber("Max Rotation Speed (deg/s)", kMaxIntakePivotVelocityDeg_s * kPivotVelocityConversion);
@@ -210,7 +210,7 @@ public class PowerCellModule extends Module {
         db.powercell.set(CURRENT_AMOUNT_OF_SENSORS_BROKEN, List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count());
         db.powercell.set(INTAKE_ROLLER_CURRENT, mIntakeRoller.getOutputCurrent());
         db.powercell.set(CURRENT_INTAKE_VELOCITY_FT_S, mIntakeRollerEncoder.getVelocity());
-        db.powercell.set(CURRENT_ARM_ANGLE , mIntakePivotEncoder.getPosition() * kPivotConversion);
+        db.powercell.set(CURRENT_ARM_ANGLE , mIntakePivotEncoder.getDistance() * kPivotConversion);
         db.powercell.set(SERIALIZER_CURRENT, mConveyorMotorHorizontal.getStatorCurrent());
         db.powercell.set(VERTICAL_CURRENT, mConveyorMotorVertical.getStatorCurrent());
         db.powercell.set(INTAKE_PIVOT_CURRENT, mIntakePivot.getOutputCurrent());

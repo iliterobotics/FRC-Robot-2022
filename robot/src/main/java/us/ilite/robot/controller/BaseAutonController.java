@@ -3,6 +3,7 @@ package us.ilite.robot.controller;
 import com.team2363.commands.IliteHelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
+import us.ilite.common.Distance;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.auto.paths.AutonSelection;
@@ -18,20 +19,29 @@ public class BaseAutonController extends AbstractController {
     protected Path mActivePath = null;
     protected double mPathStartTime = 0d;
     private HelixFollowerImpl mPathFollower = null;
-    private final String kPathAssociation;
+    private final Distance mPathTotalDistance;
+    private final double mMaxAllowedPathTime;
 
-    public BaseAutonController(String pPathAssociation) {
-        kPathAssociation = pPathAssociation;
+
+    public BaseAutonController(Path pActivePath) {
+        setActivePath(pActivePath);
         mDelayCycleCount = AutonSelection.mDelaySeconds;
-        setActivePath(getPathsFromController().get((String) getPathsFromController().keySet().toArray()[AutonSelection.mPathNumber]));
-    }
 
-    public BaseAutonController() {
-        this("DEFAULT");
+        mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1 + (mDelayCycleCount * .02);
+        mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
+        e();
+        System.out.println("==== RUNNING AUTONOMOUS PATH ====");
+        System.out.println("Path: " + mActivePath.getClass().getSimpleName());
+        System.out.println("Time (s): " + mMaxAllowedPathTime);
+        System.out.println("Dist (ft): " + mPathTotalDistance);
+        e();
+
+        db.registerAllWithShuffleboard();
     }
 
     @Override
     protected void updateImpl(double pNow) {
+        System.out.println("--------------------------------------------");
         if(mPathStartTime == 0) {
             mPathStartTime = pNow;
         }
@@ -41,6 +51,7 @@ public class BaseAutonController extends AbstractController {
         if(mPathFollower == null) {
             stopDrivetrain(pNow);
         } else {
+            System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||");
             mPathFollower.execute(pNow);
         }
     }
@@ -51,16 +62,8 @@ public class BaseAutonController extends AbstractController {
         mPathFollower.initialize();
     }
 
-    public Map<String, Path> getPathsFromController() {
-        Map<String, Path> mAvailablePaths = BobUtils.getAvailablePaths();
-        for (int i = 0; i < mAvailablePaths.entrySet().toArray().length - 1; i++) {
-            Map.Entry<String, Path> entry = (Map.Entry<String, Path>) mAvailablePaths.entrySet().toArray()[i];
-            if (!entry.getKey().toLowerCase().contains(kPathAssociation.toLowerCase())) {
-                mAvailablePaths.remove(entry.getKey());
-                i--;
-            }
-        }
-        return mAvailablePaths;
+    private static final void e() {
+        System.out.println("================================================");
     }
 
     private class HelixFollowerImpl extends IliteHelixFollower {

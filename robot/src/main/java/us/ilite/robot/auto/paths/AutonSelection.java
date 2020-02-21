@@ -34,21 +34,18 @@ public class AutonSelection {
 //            .getNumber(0)
 //            .intValue();
 
-    public static BaseAutonController mSelectedAutonController;
-    public static BaseAutonController mPreviouslySelectedAutonController;
     public static double mDelayCycleCount = mDelaySeconds / 0.02;
 
+    private BaseAutonController mPreviouslySelectedAutonController;
     private SendableChooser<BaseAutonController> mSendableAutonControllers = new SendableChooser<>();
     private SendableChooser<Path> mSendablePaths = new SendableChooser<>();
     /**
-     * Update these Test Controllers and Paths whenever new ones are added
+     * Update these Auton Controllers whenever new ones are added
      */
     private BaseAutonController[] mAutonControllers = {
             new LineAutonController(),
             new ShootIntakeController()
     };
-
-    private Path[] mAutonPaths = (Path[]) BobUtils.getAvailablePaths().values().toArray();
 
 //    static {
 //        mAutonConfiguration.addPersistent("Path Selection", "Select controller/path by clicking on the slider dot and using arrow keys").withPosition(6, 0).withSize(4, 1);
@@ -72,7 +69,6 @@ public class AutonSelection {
 //            displayIndex++;
 //        }
         updateAutonControllers();
-        updatePaths();
     }
 
 //    public static BaseAutonController getAutonControllerFromIndex(int index) {
@@ -90,13 +86,11 @@ public class AutonSelection {
         for (BaseAutonController c : mAutonControllers) {
             mSendableAutonControllers.addOption(c.getClass().getSimpleName(), c);
         }
+        mSendableAutonControllers.setDefaultOption("Default - Auton Calibration", new AutonCalibration());
         mAutonConfiguration.add("Choose Auton Controller", mSendableAutonControllers);
     }
 
-    public void updatePaths() {
-        for (Path p : mAutonPaths) {
-            mSendablePaths.addOption(p.getClass().getSimpleName(), p);
-        }
-        mAutonConfiguration.add("Choose Your Path", mSendablePaths);
+    public BaseAutonController getSelectedAutonController() {
+        return mSendableAutonControllers.getSelected();
     }
 }

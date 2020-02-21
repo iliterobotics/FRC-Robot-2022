@@ -60,8 +60,8 @@ public class Robot extends TimedRobot {
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
-    private final AbstractController mBaseAutonController = new BaseAutonController();
-    private final AutonSelection mAutonSelection = new AutonSelection();
+//    private final AbstractController mBaseAutonController = new BaseAutonController();
+    public static final AutonSelection mAutonSelection = new AutonSelection();
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
@@ -134,7 +134,7 @@ public class Robot extends TimedRobot {
         //mCSVLogger.start();
 
         MODE=AUTONOMOUS;
-        mActiveController = AutonSelection.getAutonControllers().get((String) AutonSelection.getAutonControllers().keySet().toArray()[AutonSelection.mControllerNumber]);
+        mActiveController = mAutonSelection.getSelectedAutonController();
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);
