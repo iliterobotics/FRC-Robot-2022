@@ -18,7 +18,7 @@ public class Settings {
 
     public static double kNetworkTableUpdateRate = 0.01;
 
-    public static boolean kIsLogging = true; // decide whether or not to log
+    public static boolean kIsLogging = false; // decide whether or not to log
 
     public static double kDJOutput = .25;
 

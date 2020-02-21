@@ -37,9 +37,11 @@ public class InputMap {
                 // PUT TEST ITEMS BELOW
         BEGIN_HANG = ELogitech310.START,
         RELEASE_HANG = ELogitech310.START,
-        COLOR_POSITION = ELogitech310.START,
+//        COLOR_POSITION = ELogitech310.START,
+        COLOR_POSITION = ELogitech310.R_BTN,
         FLYWHEEL_AXIS = ELogitech310.START,
-        COLOR_ROTATION = ELogitech310.START,
+//        COLOR_ROTATION = ELogitech310.START,
+        COLOR_ROTATION = ELogitech310.L_BTN,
         SHOOT_FLYWHEEL = ELogitech310.A_BTN,
         LOWER_ARM = ELogitech310.START
                 ;

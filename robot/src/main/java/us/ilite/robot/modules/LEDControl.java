@@ -113,9 +113,7 @@ public class LEDControl extends Module {
     }
 
 
-    public LEDControl(/*DJBoothPositionControl pDjBoothPositionControl, DJBoothRotationControl pDjBoothRotationControl */) {
-//        this.mDjBoothPositionControl = pDjBoothPositionControl;
-//        this.mDjBoothRotationControl = pDjBoothRotationControl;
+    public LEDControl() {
 
         this.mCurrentMessage = Message.NONE;
         this.mLedOn = true;
@@ -123,6 +121,7 @@ public class LEDControl extends Module {
         this.mBlinkTimer = new Timer();
         this.mBlinkTimer.reset();
         mCanifier = new CANifier(Settings.Hardware.CAN.kLEDControlCanifierID);
+
     }
 
 
@@ -170,28 +169,6 @@ public class LEDControl extends Module {
                 mCurrentMessage = Message.FINISHED_ON_YELLOW;
             }
         }
-
-
-//        if ( Math.abs( red - LEDColor.RED.getColor().getR() ) <= 10  &&
-//                Math.abs( green - LEDColor.RED.getColor().getG() ) <= 10  &&
-//                Math.abs(blue - LEDColor.RED.getColor().getB()) <= 10 ) {
-//            mCurrentMessage = Message.ON_RED;
-//        }
-//        else if ( Math.abs( red - LEDColor.BLUE.getColor().getR() ) <= 10  &&
-//                Math.abs( green - LEDColor.BLUE.getColor().getG() ) <= 10  &&
-//                Math.abs(blue - LEDColor.BLUE.getColor().getB()) <= 10) {
-//            mCurrentMessage = Message.ON_BLUE;
-//        }
-//        else if ( Math.abs( red - LEDColor.GREEN.getColor().getR() ) <= 10  &&
-//                Math.abs( green - LEDColor.GREEN.getColor().getG() ) <= 10  &&
-//                Math.abs(blue - LEDColor.GREEN.getColor().getB()) <= 10) {
-//            mCurrentMessage = Message.ON_GREEN;
-//        }
-//        else if ( Math.abs( red - LEDColor.YELLOW.getColor().getR() ) <= 10  &&
-//                Math.abs( green - LEDColor.YELLOW.getColor().getG() ) <= 10  &&
-//                Math.abs(blue - LEDColor.YELLOW.getColor().getB()) <= 10) {
-//            mCurrentMessage = Message.ON_YELLOW;
-//        }
 
         // Did the message change?
         if ( lastMsg != this.mCurrentMessage ) {
