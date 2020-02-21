@@ -24,7 +24,6 @@ public class BaseAutonController extends AbstractController {
 
 
     public BaseAutonController(Path pActivePath) {
-        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         setActivePath(pActivePath);
         mDelayCycleCount = AutonSelection.mDelaySeconds;
 
@@ -43,18 +42,14 @@ public class BaseAutonController extends AbstractController {
     @Override
     protected void updateImpl(double pNow) {
         if(mPathStartTime == 0) {
-            System.out.println("--------------------------------------------");
             mPathStartTime = pNow;
         }
         if (mPathFollower != null && mPathFollower.isFinished()) {
-            System.out.println("000000000000000000000000000000000000000000000000");
             mPathFollower = null;
         }
         if(mPathFollower == null) {
-            System.out.println("111111111111111111111111111111111111111111111111");
             stopDrivetrain(pNow);
         } else {
-            System.out.println("22222222222222222222222222222222222222222222222222");
             mPathFollower.execute(pNow);
         }
     }
