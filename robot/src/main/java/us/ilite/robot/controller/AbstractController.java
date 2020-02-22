@@ -114,6 +114,10 @@ public abstract class AbstractController {
         db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
     }
 
+    protected final void setFeederClosedLoop(Enums.FlywheelSpeeds pFlywheelSpeed) {
+        db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, pFlywheelSpeed.feeder);
+        db.flywheel.set(TARGET_FEEDER_VELOCITY_RPM, pFlywheelSpeed.feeder * 11000.0);
+    }
 
     protected boolean isFlywheelUpToSpeed() {
         return db.flywheel.get(TARGET_BALL_VELOCITY) > 0.0 &&
