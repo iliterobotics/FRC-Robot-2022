@@ -27,7 +27,6 @@ import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
-import static us.ilite.robot.Robot.DATA;
 import static us.ilite.robot.modules.DriveModule.kDriveNEOVelocityFactor;
 
 public class TestController extends BaseManualController {
@@ -41,7 +40,9 @@ public class TestController extends BaseManualController {
     private double mLimelightGoalThreshold = 5.0;
     private Double mLastTrackingType = 0d;
     private Joystick mFlywheelJoystick;
+    private Joystick mLimelightJoystick;
     public final RobotCodex<ELogitech310> flywheelinput = new RobotCodex(Data.NULL_CODEX_VALUE, ELogitech310.class);
+    public final RobotCodex<ELogitech310> limelightinput = new RobotCodex(Data.NULL_CODEX_VALUE, ELogitech310.class);
 
     private double mStartTime;
 
@@ -64,6 +65,7 @@ public class TestController extends BaseManualController {
 
     private TestController() {
         mFlywheelJoystick = new Joystick(2);
+        mLimelightJoystick = new Joystick(3);
         db.registerAllWithShuffleboard();
     }
 
@@ -71,11 +73,12 @@ public class TestController extends BaseManualController {
     private double mMaxYaw = 0.0;
     protected void updateImpl(double pNow) {
         ELogitech310.map(flywheelinput, mFlywheelJoystick);
+        ELogitech310.map(limelightinput, mLimelightJoystick);
 
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-//        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateLimelightTargetLock());
+        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateTargetTracking(pNow));
         Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
         Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
@@ -170,9 +173,9 @@ public class TestController extends BaseManualController {
     public void updateTargetTracking(double pNow) {
         boolean isOffset = !(Robot.DATA.limelight.get(TS) > 0 - mLimelightGoalThreshold || Robot.DATA.limelight.get(TS) < -90 + mLimelightGoalThreshold);
 
-        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
+        if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_TARGET)) {
             Robot.DATA.limelight.set(TARGET_ID, (Field2020.FieldElement.TARGET.id()));
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM)) {
+        } else if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_TARGET_ZOOM)) {
             if (Robot.DATA.limelight.isSet(TY)) {
                 if (Math.abs(Robot.DATA.limelight.get(TX)) < mLimelightZoomThreshold) {
                     Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET_ZOOM.id());
@@ -191,11 +194,11 @@ public class TestController extends BaseManualController {
     }
 
     public void updateGroundTracking(double pNow) {
-        if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL)) {
+        if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_BALL)) {
             Robot.DATA.groundTracking.set(TARGET_ID, Field2020.FieldElement.BALL.id());
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_DUAL)) {
+        } else if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_BALL_DUAL)) {
             Robot.DATA.groundTracking.set(TARGET_ID, Field2020.FieldElement.BALL_DUAL.id());
-        } else if (Robot.DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_BALL_TRI)) {
+        } else if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_BALL_TRI)) {
             Robot.DATA.groundTracking.set(TARGET_ID, Field2020.FieldElement.BALL_TRI.id());
         } else {
             Robot.DATA.groundTracking.set(TARGET_ID, RawLimelight.NONE.id());

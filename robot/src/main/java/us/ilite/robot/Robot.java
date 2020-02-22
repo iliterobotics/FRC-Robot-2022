@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
 //        mLEDControl = new LEDControl();
         mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
-//        mLimelight = new Limelight();
+        mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
 //        mDJSpinnerModule = new DJSpinnerModule();
         if(IS_SIMULATED) {
@@ -195,8 +195,8 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mLimelight);
-        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
