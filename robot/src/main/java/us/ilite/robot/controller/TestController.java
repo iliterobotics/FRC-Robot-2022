@@ -20,7 +20,6 @@ import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
 import static us.ilite.robot.Enums.*;
 
-import static us.ilite.common.config.InputMap.OPERATOR.FIRE_POWER_CELLS;
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
@@ -225,7 +224,7 @@ public class TestController extends BaseManualController {
             db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
         }
 
-        if((db.operatorinput.isSet(FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) && isFlywheelUpToSpeed() && isFeederUpToSpeed()) {
+        if((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) && isFlywheelUpToSpeed() && isFeederUpToSpeed()) {
             db.powercell.set(DESIRED_V_VELOCITY, 0.6);
             db.powercell.set(DESIRED_H_VELOCITY, 0.5);
         }
