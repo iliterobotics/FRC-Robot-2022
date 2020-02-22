@@ -41,6 +41,7 @@ public class BaseAutonController extends AbstractController {
 
     @Override
     protected void updateImpl(double pNow) {
+        System.out.println("|||||||||||||||||||||||||||| DESIRED TIME PAUSED" + AutonSelection.mDelaySeconds);
         if (mDelayCycleCount <= 0) {
             if (!mInitializedPathFollower) {
                 mPathFollower.initialize();

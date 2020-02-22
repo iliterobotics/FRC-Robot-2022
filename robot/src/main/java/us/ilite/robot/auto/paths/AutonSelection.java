@@ -27,7 +27,7 @@ public class AutonSelection {
     };
 
     public AutonSelection() {
-       mDelaySeconds = ((Double) (mAutonConfiguration.add("Path Delay Seconds", 3)
+       mDelaySeconds = ((Double) (mAutonConfiguration.add("Path Delay Seconds", 0)
                 .withPosition(2, 0)
                 .getEntry()
                 .getDouble(0.0)))
@@ -35,7 +35,7 @@ public class AutonSelection {
 
         mSendableAutonControllers.setDefaultOption("Default - Auton Calibration", AutonCalibration.class);
         for (Class<?> c : mAutonControllers) {
-            mSendableAutonControllers.addOption(c.getClass().getSimpleName(), c);
+            mSendableAutonControllers.addOption(c.getSimpleName(), c);
         }
 
         mAutonConfiguration.add("Choose Auton Controller", mSendableAutonControllers)
