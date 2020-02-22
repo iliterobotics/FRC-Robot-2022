@@ -77,8 +77,8 @@ public abstract class AbstractController {
     protected void activateSerializer(double pNow) {
         mEntryLatch.update(db.powercell.isSet(ENTRY_BEAM));
         mSecondaryLatch.update(db.powercell.isSet(H_BEAM));
-        if(mNumBalls > 3) {
-            if (db.powercell.isSet(ENTRY_BEAM) && mNumBalls <= 5) {
+        if(mNumBalls >= 3) {
+            if (db.powercell.isSet(ENTRY_BEAM) && mNumBalls < 5) {
                 db.powercell.set(SET_H_pct, 0.3);
             } else {
                 db.powercell.set(SET_H_pct, 0.0);
@@ -92,10 +92,10 @@ public abstract class AbstractController {
             if (mSecondaryLatch.get() == XorLatch.State.XOR) {
                 // Ball has entered but not exited
                 db.powercell.set(SET_H_pct, 0.0);
-                db.powercell.set(SET_V_pct, 0.45);
+                db.powercell.set(SET_V_pct, 0.35);
             } else if (mSecondaryLatch.get() == XorLatch.State.NONE) {
                 // Ball has not entered
-                db.powercell.set(SET_H_pct, 0.3);
+                db.powercell.set(SET_H_pct, 0.25);
                 db.powercell.set(SET_V_pct, 0.0);
             } else {
                 // Ball has exited
@@ -113,6 +113,7 @@ public abstract class AbstractController {
     protected void reverseSerializer(double pNow) {
         db.powercell.set(SET_H_pct, -1.0);
         db.powercell.set(SET_V_pct, -0.5);
+        db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP,-0.75);
     }
 
     protected void stopDrivetrain(double pNow) {
