@@ -198,13 +198,18 @@ public class TestController extends BaseManualController {
     //
 
     protected void updatePowerCells(double pNow) {
+        if(flywheelinput.isSet(ELogitech310.START)) {
+            mNumBalls = 0;
+            mEntryLatch.reset();
+            mSecondaryLatch.reset();
+        }
         // Default to none
         db.powercell.set(INTAKE_STATE, EArmState.NONE);
 
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE) || flywheelinput.isSet(InputMap.FLYWHEEL.BASIC_INTAKE)) {
             System.out.println("Enabling Intake");
             setIntakeArmEnabled(pNow, true);
-            crossedEntry = activateSerializer(pNow);
+            activateSerializer(pNow);
 //            if (crossedEntry && !db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER)) {
 //                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, power);
 //                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, power);
@@ -217,7 +222,7 @@ public class TestController extends BaseManualController {
             reverseSerializer(pNow);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW) || flywheelinput.isSet(InputMap.FLYWHEEL.INTAKE_STOW)) {
             setIntakeArmEnabled(pNow, false);
-            crossedEntry = activateSerializer(pNow);
+            activateSerializer(pNow);
         } else {
             // TODO - only enable once we have set the hold gains
 //            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);

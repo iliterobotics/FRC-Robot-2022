@@ -1,12 +1,15 @@
 package us.ilite.robot.controller;
 
 import com.flybotix.hfr.codex.RobotCodex;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.*;
 
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
+import us.ilite.common.lib.util.Latch;
+import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
 import static us.ilite.robot.Enums.*;
@@ -23,6 +26,9 @@ public abstract class AbstractController {
 
     public static double kIntakeRollerPower_on = 0.5;
     public static double kIntakeRollerPower_off = 0.0;
+    protected final XorLatch mSecondaryLatch = new XorLatch();
+    protected final XorLatch mEntryLatch = new XorLatch();
+    protected int mNumBalls = 0;
 
     public AbstractController(){
 
@@ -63,26 +69,50 @@ public abstract class AbstractController {
         }
     }
 
+
     /**
-     * Activates the serializer based upon the beam breaks. Assumes all other conditions are met.
-     * @param pNow
-     * @return
+     * Activates the serializer based upon the beam breaker states
+     * @param pNow - current timestamp
      */
-    protected boolean activateSerializer(double pNow) {
-        if (db.powercell.isSet(ENTRY_BEAM)) {
-            db.powercell.set(SET_H_pct, 0.3);
-            db.powercell.set(SET_V_pct, 0.35);
-            return true;
+    protected void activateSerializer(double pNow) {
+        mEntryLatch.update(db.powercell.isSet(ENTRY_BEAM));
+        mSecondaryLatch.update(db.powercell.isSet(H_BEAM));
+        if(mNumBalls > 3) {
+            if (db.powercell.isSet(ENTRY_BEAM)) {
+                db.powercell.set(SET_H_pct, 0.3);
+            } else {
+                db.powercell.set(SET_H_pct, 0.0);
+                db.powercell.set(SET_V_pct, 0.0);
+            }
+            if(mEntryLatch.get() == XorLatch.State.BOTH) {
+                mNumBalls++;
+                mEntryLatch.reset();
+            }
         } else {
-            db.powercell.set(SET_H_pct, 0.0);
-            db.powercell.set(SET_V_pct, 0.0);
-            return false;
+            if (mSecondaryLatch.get() == XorLatch.State.XOR) {
+                // Ball has entered but not exited
+                db.powercell.set(SET_H_pct, 0.0);
+                db.powercell.set(SET_V_pct, 0.4);
+            } else if (mSecondaryLatch.get() == XorLatch.State.NONE) {
+                // Ball has not entered
+                db.powercell.set(SET_H_pct, 0.4);
+                db.powercell.set(SET_V_pct, 0.0);
+            } else {
+                // Ball has exited
+                db.powercell.set(SET_H_pct, 0.0);
+                db.powercell.set(SET_V_pct, 0.0);
+                mSecondaryLatch.reset();
+                mNumBalls++;
+            }
         }
+        SmartDashboard.putString("Entry State", mEntryLatch.get().name());
+        SmartDashboard.putString("Secon State", mSecondaryLatch.get().name());
+        SmartDashboard.putNumber("# Balls", mNumBalls);
     }
 
     protected void reverseSerializer(double pNow) {
         db.powercell.set(SET_H_pct, -1.0);
-        db.powercell.set(SET_V_pct, -1.0);
+        db.powercell.set(SET_V_pct, -0.5);
     }
 
     protected void stopDrivetrain(double pNow) {
@@ -115,12 +145,12 @@ public abstract class AbstractController {
 
     protected boolean isFlywheelUpToSpeed() {
         return db.flywheel.get(SET_BALL_VELOCITY_ft_s) > 0.0 &&
-                db.flywheel.get(SET_BALL_VELOCITY_ft_s) >= db.flywheel.get(BALL_VELOCITY_ft_s) - 1.0;
+                db.flywheel.get(SET_BALL_VELOCITY_ft_s) >= db.flywheel.get(BALL_VELOCITY_ft_s) - 2.0;
     }
 
     protected boolean isFeederUpToSpeed() {
         return db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
-                db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.9;
+                db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8;
     }
 
     protected abstract void updateImpl(double pNow);

@@ -107,7 +107,7 @@ public class PowerCellModule extends Module {
 
         mIntakePivot = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeArm, CANSparkMaxLowLevel.MotorType.kBrushless);
         mIntakePivot.setIdleMode(CANSparkMax.IdleMode.kCoast);
-        mIntakePivot.setSecondaryCurrentLimit(35);
+        mIntakePivot.setSecondaryCurrentLimit(50);
 
         mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel);
         mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel);
