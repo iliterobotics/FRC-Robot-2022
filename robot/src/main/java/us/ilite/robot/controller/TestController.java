@@ -202,8 +202,6 @@ public class TestController extends BaseManualController {
         mLastTrackingType = Robot.DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
     }
 
-    //
-
     protected void updatePowerCells(double pNow) {
         // Default to none
         db.powercell.set(INTAKE_STATE, EArmState.NONE);
@@ -235,8 +233,7 @@ public class TestController extends BaseManualController {
             db.powercell.set(DESIRED_V_VELOCITY, 0.6);
             db.powercell.set(DESIRED_H_VELOCITY, 0.5);
         }
-
-
+        
 //        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
 ////            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
 ////            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());

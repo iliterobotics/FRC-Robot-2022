@@ -2,7 +2,6 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
@@ -61,9 +60,9 @@ public class DJSpinnerModule extends Module {
     @Override
     public void readInputs(double pNow) {
         Color c = mColorSensorV3.getColor();
-        db.color.set(EColorData.MEAURED_BLUE, c.blue);
-        db.color.set(EColorData.MEAURED_GREEN, c.green);
-        db.color.set(EColorData.MEAURED_RED, c.red);
+        db.color.set(EColorData.MEASURED_BLUE, c.blue);
+        db.color.set(EColorData.MEASURED_GREEN, c.green);
+        db.color.set(EColorData.MEASURED_RED, c.red);
         ColorMatchResult match = mColorMatcher.matchClosestColor(c);
         db.color.set(EColorData.SENSED_COLOR, EColorMatch.from(match));
         if ( !mUpdatingFlag ) {
