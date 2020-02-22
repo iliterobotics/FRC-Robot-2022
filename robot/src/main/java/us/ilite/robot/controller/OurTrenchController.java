@@ -27,7 +27,7 @@ public class OurTrenchController extends BaseAutonController {
         super.updateImpl(pNow);
         db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.5);
         if (isAtDistance(mTargetDistance)){
-            db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.5);
+            stopDrivetrain(pNow);
             mIsFirstLegDone = true;
         }
         activateSerializer(pNow);
