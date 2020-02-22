@@ -111,17 +111,7 @@ public class TestController extends BaseManualController {
 
     }
 
-    private void firingSequence(FlywheelSpeeds speed) {
-        db.flywheel.set(BALL_VELOCITY_ft_s, speed.speed);
-        if (isFlywheelUpToSpeed()) {
-            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, speed.feeder);
-            if (isFeederUpToSpeed()) {
-                db.powercell.set(SET_V_pct, 0.5);
-            } else {
-                db.powercell.set(SET_V_pct, 0);
-            }
-        }
-    }
+
 
     private void updateFlywheel(double pNow) {
 

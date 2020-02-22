@@ -54,7 +54,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
             currentState = Enums.FlywheelSpeeds.CLOSE;
         }
 
-        if(db.operatorinput.isSet(InputMap.OPERATOR.AIM) || db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
+        if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
+            super.firingSequence(currentState);
+//            super.setFlywheelClosedLoop(currentState);
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.AIM)) {
             super.setFlywheelClosedLoop(currentState);
         } else {
             super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
@@ -116,11 +119,11 @@ public class TeleopController extends BaseManualController { //copied from TestC
             db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
             db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
         }
-
-        if ((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) && isFlywheelUpToSpeed() && isFeederUpToSpeed())) {
-            db.powercell.set(SET_V_pct, 0.6);
-            db.powercell.set(SET_H_pct, 0.5);
-        }
+//
+//        if ((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) && isFlywheelUpToSpeed() && isFeederUpToSpeed())) {
+//            db.powercell.set(SET_V_pct, 0.6);
+//            db.powercell.set(SET_H_pct, 0.5);
+//        }
     }
 
 //    void updateDJBooth(double pNow) {
