@@ -29,7 +29,7 @@ public class Field2020 {
     public enum FieldElement implements IFieldComponent {
 
         TARGET(12d,1),
-        LINE(0d,5),
+        LINE(0d,5), //TODO detemine why these they have the same pipeline
         OUTER_GOAL(98.25, 0),
         POWER_CELL(0.0, 0),
         TARGET_ZOOM(0d, 2),
