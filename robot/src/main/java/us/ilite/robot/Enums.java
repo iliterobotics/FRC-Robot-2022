@@ -104,7 +104,7 @@ public class Enums {
     public enum FlywheelWheelState {
         NONE,
         OPEN_LOOP,
-        VELOCITY,
+        VELOCITY
     }
 
     /**
