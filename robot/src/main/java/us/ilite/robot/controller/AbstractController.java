@@ -69,6 +69,12 @@ public abstract class AbstractController {
         }
     }
 
+    protected final void resetSerializerState() {
+        mEntryLatch.reset();
+        mSecondaryLatch.reset();
+        mNumBalls = 0;
+    }
+
 
     /**
      * Activates the serializer based upon the beam breaker states

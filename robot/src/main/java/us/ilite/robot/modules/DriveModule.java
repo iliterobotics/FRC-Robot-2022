@@ -163,6 +163,13 @@ public class DriveModule extends Module {
 		mRightMaster.burnFlash();
 		mRightFollower.burnFlash();
 
+
+		mYawPid = new PIDController(kYawGains,
+				-kMaxDegreesPerSecond,
+				kMaxDegreesPerSecond,
+				Settings.kControlLoopPeriod);
+		mYawPid.setOutputRange(-1, 1);
+
 	}
 
 	@Override
@@ -171,12 +178,6 @@ public class DriveModule extends Module {
 //		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 //		mTargetAngleLockPid.setSetpoint(0);
 //		mTargetAngleLockPid.reset();
-
-		mYawPid = new PIDController(kYawGains,
-									-kMaxDegreesPerSecond,
-				kMaxDegreesPerSecond,
-									Settings.kControlLoopPeriod);
-		mYawPid.setOutputRange(-1, 1);
 
 		mHoldLeftPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
 		mHoldLeftPositionPid.setOutputRange(-1, 1);
@@ -241,7 +242,7 @@ public class DriveModule extends Module {
 
 			case VELOCITY:
 				mStartHoldingPosition = false;
-				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerSecond);
+//				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
 //				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
 //				DriveMessage d = new DriveMessage().turn(turn).throttle(throttle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());

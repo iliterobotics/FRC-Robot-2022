@@ -2,6 +2,7 @@ package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.robot.Enums;
@@ -13,7 +14,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     private ILog mLog = Logger.createLog(TeleopController.class);
     private static TeleopController INSTANCE;
-    private Enums.FlywheelSpeeds currentState = Enums.FlywheelSpeeds.OFF;
+    private Enums.FlywheelSpeeds currentState = Enums.FlywheelSpeeds.CLOSE;
 
     public static TeleopController getInstance() {
         if(INSTANCE == null) {
@@ -47,23 +48,18 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateFlywheel(double pNow) {
-        if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE))
-        {
+        if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE)) {
             currentState = Enums.FlywheelSpeeds.FAR;
-        }
-        else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE))
-        {
+        }else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
             currentState = Enums.FlywheelSpeeds.CLOSE;
         }
 
-        if(db.operatorinput.isSet(InputMap.OPERATOR.AIM) || db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS))
-        {
+        if(db.operatorinput.isSet(InputMap.OPERATOR.AIM) || db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
             super.setFlywheelClosedLoop(currentState);
-        }
-        else
-        {
+        } else {
             super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
         }
+        SmartDashboard.putString("Flywheel State", currentState.name());
     }
 
 //    public void updateLimelightTargetLock() {
@@ -100,6 +96,9 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //    }
 
     protected void updatePowerCells(double pNow) {
+        if(db.operatorinput.isSet(InputMap.OPERATOR.RESET_INTAKE_COUNT)) {
+            resetSerializerState();
+        }
         // Default to none
         db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
 
