@@ -2,16 +2,11 @@ package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.ELimelightData;
 import us.ilite.robot.Enums;
-import us.ilite.robot.Robot;
 
 import static us.ilite.common.types.EPowerCellData.*;
-import static us.ilite.common.types.EPowerCellData.DESIRED_H_VELOCITY;
 import static us.ilite.robot.Robot.DATA;
 
 public class TeleopController extends BaseManualController { //copied from TestController, needs editing
@@ -120,12 +115,12 @@ public class TeleopController extends BaseManualController { //copied from TestC
             activateSerializer(pNow);
         } else {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
+            db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
         }
 
         if ((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) && isFlywheelUpToSpeed() && isFeederUpToSpeed())) {
-            db.powercell.set(DESIRED_V_VELOCITY, 0.6);
-            db.powercell.set(DESIRED_H_VELOCITY, 0.5);
+            db.powercell.set(SET_V_pct, 0.6);
+            db.powercell.set(SET_H_pct, 0.5);
         }
     }
 

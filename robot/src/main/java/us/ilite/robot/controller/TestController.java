@@ -117,7 +117,6 @@ public class TestController extends BaseManualController {
             db.flywheel.set(HOOD_OPEN_LOOP, 0.0);
         }
 
-
         Enums.FlywheelSpeeds state = Enums.FlywheelSpeeds.OFF;
         if(flywheelinput.isSet(InputMap.FLYWHEEL.FEEDER_SPINUP_TEST)) {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.75);
@@ -139,7 +138,7 @@ public class TestController extends BaseManualController {
         setFlywheelClosedLoop(state);
         if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
-            db.flywheel.set(TARGET_FEEDER_VELOCITY_RPM, state.feeder * 11000.0);
+            db.flywheel.set(SET_FEEDER_rpm, state.feeder * 11000.0);
         } else {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.0);
         }
@@ -210,86 +209,35 @@ public class TestController extends BaseManualController {
     }
 
     protected void updatePowerCells(double pNow) {
+        if(flywheelinput.isSet(ELogitech310.START)) {
+            mNumBalls = 0;
+            mEntryLatch.reset();
+            mSecondaryLatch.reset();
+        }
         // Default to none
         db.powercell.set(INTAKE_STATE, EArmState.NONE);
 
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE) || flywheelinput.isSet(InputMap.FLYWHEEL.BASIC_INTAKE)) {
+            System.out.println("Enabling Intake");
             setIntakeArmEnabled(pNow, true);
-            crossedEntry = activateSerializer(pNow);
-//            if (crossedEntry && !db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER)) {
-//                db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, power);
-//                db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, power);
-//            } else if ( db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER) ) {
-//                crossedEntry = false;
-//            }
-
+            activateSerializer(pNow);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE) || flywheelinput.isSet(InputMap.FLYWHEEL.REVERSE_INTAKE)) {
             db.powercell.set(INTAKE_STATE, EArmState.STOW);
             reverseSerializer(pNow);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW) || flywheelinput.isSet(InputMap.FLYWHEEL.INTAKE_STOW)) {
             setIntakeArmEnabled(pNow, false);
-            crossedEntry = activateSerializer(pNow);
+            activateSerializer(pNow);
         } else {
             // TODO - only enable once we have set the hold gains
 //            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
             db.powercell.set(INTAKE_STATE, EArmState.NONE);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
+            db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
         }
 
         if((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) && isFlywheelUpToSpeed() && isFeederUpToSpeed()) {
-            db.powercell.set(DESIRED_V_VELOCITY, 0.6);
-            db.powercell.set(DESIRED_H_VELOCITY, 0.5);
+            db.powercell.set(SET_V_pct, 0.6);
+            db.powercell.set(SET_H_pct, 0.5);
         }
-
-
-//        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE)) {
-////            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
-////            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
-////            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
-//
-////            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle()); TODO Commented cuz we don't have an arm
-////            if (db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN) != db.powercell.get(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN)){
-//                if (db.powercell.get(EPowerCellData.ALL_BEAMS_BROKEN) == 0.0) {
-//                    db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
-//                    db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
-//                    db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
-//                    db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
-//                } else {
-//                    db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, PowerCellModule.EIntakeState.STOP.getPower());
-//                    db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, PowerCellModule.EIntakeState.STOP.getPower());
-//                    db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY, PowerCellModule.EIntakeState.STOP.getPower());
-//                    db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, PowerCellModule.EIntakeState.STOP.getPower());
-//                }
-////            }
-//
-//        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_INTAKE)) {
-//            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY , PowerCellModule.EIntakeState.REVERSE.getPower());
-//            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY , PowerCellModule.EIntakeState.REVERSE.getPower());
-//            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY , PowerCellModule.EIntakeState.REVERSE.getPower());
-//            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
-////
-////            if (db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN) != db.powercell.get(EPowerCellData.DESIRED_AMOUNT_OF_SENSORS_BROKEN)){
-////                if ( db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN) < mGoalBeamCountBroken) {
-////                    db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
-////                    db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
-////                    db.powercell.se   t(EPowerCellData.DESIRED_INTAKE_VELOCITY, PowerCellModule.EIntakeState.INTAKE.getPower());
-////
-////                } else {
-////                    db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, PowerCellModule.EIntakeState.STOP.getPower());
-////                    db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, PowerCellModule.EIntakeState.STOP.getPower());
-////                    db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY, PowerCellModule.EIntakeState.STOP.getPower());
-////                }
-////            }
-//
-//        } else {
-//            mIntakeState = PowerCellModule.EIntakeState.STOP;
-//            mArmState = PowerCellModule.EArmState.DISENGAGED;
-//            db.powercell.set(EPowerCellData.DESIRED_ARM_ANGLE, mArmState.getAngle());
-//            db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, mIntakeState.getPower());
-//            db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, mIntakeState.getPower());
-//            db.powercell.set(EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S, db.drivetrain.get(LEFT_VEL_IPS) + PowerCellModule.kDeltaIntakeVel);
-//        }
-
     }
 
     void updateDJBooth(double pNow) {
