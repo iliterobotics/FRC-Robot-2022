@@ -23,6 +23,16 @@ public class Field2020 {
         return abs(pAzimuth.degrees()) <= 0.00006 * pow(pDistance.inches(),2) - 0.0241*pDistance.inches() + 18.906;
     }
 
+    public enum Distances{
+        INITIATION_LINE_TO_COLOR_WHEEL(0);
+
+        public double mDistance;
+
+        Distances(double pDist) {
+            mDistance = pDist;
+        }
+    }
+
     /**
      * Any trackable field component for 2020's game.
      */
