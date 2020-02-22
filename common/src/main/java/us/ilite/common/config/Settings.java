@@ -40,20 +40,13 @@ public class Settings {
             public static int kHangerNeoID1 = 15;
             public static int kHangerNeoID2 = 71;
 //            public static int kTalonThreeID = 65; // Change later
-            public static final int kTurretGyroID = 61; // There isn't a gyro on the BunnyBot
             public static final int kDJSpinnerVictorID = 50;
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
-            public static int kPigeonIDForFlywheel=80;
-            public static int kFlywheelNeoAddress = 16;
-
-
-
             public static final int kShooterID = 66; // BunnyBot Shooter
 
             public static int kSRXTurretId = 9;
-            public static int kMAXFeederId = 10;
             public static int kLEDControlCanifierID = 0;
 
 //            public static double kGyroCollisionThreshold = 0.0;

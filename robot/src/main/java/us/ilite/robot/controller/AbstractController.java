@@ -8,10 +8,8 @@ import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.drive.EDriveData;
-import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import static us.ilite.robot.Enums.*;
-import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
 
@@ -58,10 +56,10 @@ public abstract class AbstractController {
                 speed = 0.3;
             }
             db.powercell.set(INTAKE_STATE, EArmState.OUT);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_on);
+            db.powercell.set(SET_INTAKE_VEL_ft_s, kIntakeRollerPower_on);
         } else {
             db.powercell.set(INTAKE_STATE, EArmState.STOW);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_off);
+            db.powercell.set(SET_INTAKE_VEL_ft_s, kIntakeRollerPower_off);
         }
     }
 
@@ -72,19 +70,19 @@ public abstract class AbstractController {
      */
     protected boolean activateSerializer(double pNow) {
         if (db.powercell.isSet(ENTRY_BEAM)) {
-            db.powercell.set(DESIRED_H_VELOCITY, 0.3);
-            db.powercell.set(DESIRED_V_VELOCITY, 0.35);
+            db.powercell.set(SET_H_pct, 0.3);
+            db.powercell.set(SET_V_pct, 0.35);
             return true;
         } else {
-            db.powercell.set(DESIRED_H_VELOCITY, 0.0);
-            db.powercell.set(DESIRED_V_VELOCITY, 0.0);
+            db.powercell.set(SET_H_pct, 0.0);
+            db.powercell.set(SET_V_pct, 0.0);
             return false;
         }
     }
 
     protected void reverseSerializer(double pNow) {
-        db.powercell.set(DESIRED_H_VELOCITY, -1.0);
-        db.powercell.set(DESIRED_V_VELOCITY, -1.0);
+        db.powercell.set(SET_H_pct, -1.0);
+        db.powercell.set(SET_V_pct, -1.0);
     }
 
     protected void stopDrivetrain(double pNow) {
@@ -107,22 +105,22 @@ public abstract class AbstractController {
      * sub systems. These speeds/angles are robot-relative and human-readable.
      * @param pSpeed
      */
-    protected final void setFlywheelClosedLoop(Enums.FlywheelSpeeds pSpeed) {
+    protected final void setFlywheelClosedLoop(FlywheelSpeeds pSpeed) {
         db.flywheel.set(FLYWHEEL_WHEEL_STATE, pSpeed.wheelstate);
-        db.flywheel.set(TARGET_BALL_VELOCITY, pSpeed.speed);
+        db.flywheel.set(BALL_VELOCITY_ft_s, pSpeed.speed);
         db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
         db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
     }
 
 
     protected boolean isFlywheelUpToSpeed() {
-        return db.flywheel.get(TARGET_BALL_VELOCITY) > 0.0 &&
-                db.flywheel.get(CURRENT_BALL_VELOCITY) >= db.flywheel.get(TARGET_BALL_VELOCITY) - 1.0;
+        return db.flywheel.get(SET_BALL_VELOCITY_ft_s) > 0.0 &&
+                db.flywheel.get(SET_BALL_VELOCITY_ft_s) >= db.flywheel.get(BALL_VELOCITY_ft_s) - 1.0;
     }
 
     protected boolean isFeederUpToSpeed() {
-        return db.flywheel.get(TARGET_FEEDER_VELOCITY_RPM) > 0.0 &&
-                db.flywheel.get(CURRENT_FEEDER_VELOCITY_RPM) >= db.flywheel.get(TARGET_FEEDER_VELOCITY_RPM)*0.9;
+        return db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
+                db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.9;
     }
 
     protected abstract void updateImpl(double pNow);

@@ -108,7 +108,6 @@ public class TestController extends BaseManualController {
             db.flywheel.set(HOOD_OPEN_LOOP, 0.0);
         }
 
-
         Enums.FlywheelSpeeds state = Enums.FlywheelSpeeds.OFF;
         if(flywheelinput.isSet(InputMap.FLYWHEEL.FEEDER_SPINUP_TEST)) {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.75);
@@ -130,7 +129,7 @@ public class TestController extends BaseManualController {
         setFlywheelClosedLoop(state);
         if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
-            db.flywheel.set(TARGET_FEEDER_VELOCITY_RPM, state.feeder * 11000.0);
+            db.flywheel.set(SET_FEEDER_rpm, state.feeder * 11000.0);
         } else {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.0);
         }
@@ -203,6 +202,7 @@ public class TestController extends BaseManualController {
         db.powercell.set(INTAKE_STATE, EArmState.NONE);
 
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE) || flywheelinput.isSet(InputMap.FLYWHEEL.BASIC_INTAKE)) {
+            System.out.println("Enabling Intake");
             setIntakeArmEnabled(pNow, true);
             crossedEntry = activateSerializer(pNow);
 //            if (crossedEntry && !db.powercell.isSet(EPowerCellData.SECONDARY_BREAM_BREAKER)) {
@@ -222,12 +222,12 @@ public class TestController extends BaseManualController {
             // TODO - only enable once we have set the hold gains
 //            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
             db.powercell.set(INTAKE_STATE, EArmState.NONE);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
+            db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
         }
 
         if((db.operatorinput.isSet(FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) && isFlywheelUpToSpeed() && isFeederUpToSpeed()) {
-            db.powercell.set(DESIRED_V_VELOCITY, 0.6);
-            db.powercell.set(DESIRED_H_VELOCITY, 0.5);
+            db.powercell.set(SET_V_pct, 0.6);
+            db.powercell.set(SET_H_pct, 0.5);
         }
 
 
