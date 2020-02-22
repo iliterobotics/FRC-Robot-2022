@@ -86,7 +86,7 @@ public class DriveStraight implements ICommand {
             return true;
         } else {
             DriveMessage d = new DriveMessage().throttle(throttle).turn(turn).normalize();
-            Robot.DATA.drivetrain.set(DESIRED_NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
+            Robot.DATA.drivetrain.set(NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
             Robot.DATA.drivetrain.set(DESIRED_THROTTLE_PCT, d.getThrottle());
             Robot.DATA.drivetrain.set(DESIRED_TURN_PCT, d.getTurn());
             mLastTime = pNow;

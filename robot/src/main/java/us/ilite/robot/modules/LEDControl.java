@@ -138,7 +138,7 @@ public class LEDControl extends Module {
     }
 
     private boolean isVisionTracking() {
-        return db.drivetrain.get(EDriveData.DESIRED_STATE, EDriveState.class) == EDriveState.TARGET_ANGLE_LOCK;
+        return db.drivetrain.get(EDriveData.STATE, EDriveState.class) == EDriveState.TARGET_ANGLE_LOCK;
 
     }
 

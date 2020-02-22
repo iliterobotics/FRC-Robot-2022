@@ -30,7 +30,6 @@ public class DJSpinnerModule extends Module {
     private double mSolidStateCounter;
     private double mColorChangeCounter;
     private EColorWheelState eColorWheelState;
-    private boolean mUpdatingFlag;
 
 
     public DJSpinnerModule() {
@@ -46,7 +45,6 @@ public class DJSpinnerModule extends Module {
         mColorChangeCounter = 0;
         mVictor = TalonSRXFactory.createDefaultVictor(Settings.Hardware.CAN.kDJSpinnerVictorID);
         mVictor.setNeutralMode(NeutralMode.Brake);
-        mUpdatingFlag = false;
 
 
         for(EColorMatch cm : EColorMatch.values()) {

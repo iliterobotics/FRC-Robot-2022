@@ -1,116 +1,69 @@
 package us.ilite.robot.commands;
 
 import com.flybotix.hfr.codex.RobotCodex;
-import us.ilite.common.IFieldComponent;
+import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.DriveModule;
-import static us.ilite.robot.Enums.*;
-import us.ilite.robot.modules.IThrottleProvider;
-import us.ilite.robot.modules.targetData.ITargetDataProvider;
+
+import static us.ilite.common.types.ELimelightData.*;
 
 public class TargetLock implements ICommand {
 
     private static final double kTURN_POWER = 0.2;
     private static final int kAlignCount = 10;
     private static final double kTargetAreaScalar = 1.0;
-
-    private DriveModule mDrive;
-    private ITargetDataProvider mCamera;
-    // Different throttle providers give us some control over behavior in autonomous
-    private IThrottleProvider mTargetSearchThrottleProvider, mTargetLockThrottleProvider;
-    private IFieldComponent mTrackingType;
-
-    private double mAllowableError, mPreviousTime, mOutput = 0.0;
+    private static final double kAllowableTargetLockError = 0.1;
 
     private boolean mEndOnAlignment = true;
-    private int mAlignedCount = 0;
-    private boolean mHasAcquiredTarget = false;
-    private boolean mStopWhenTargetLost = true;
+    private int mAlignedCount;
+    private boolean mHasAcquiredTarget;
 
-    public TargetLock(double pAllowableError, IFieldComponent pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider) {
-        this(pAllowableError, pTrackingType, pCamera, pThrottleProvider, true);
-    }
-
-    public TargetLock(double pAllowableError, IFieldComponent pTrackingType, ITargetDataProvider pCamera, IThrottleProvider pThrottleProvider, boolean pEndOnAlignment) {
-        this.mAllowableError = pAllowableError;
-        this.mCamera = pCamera;
-        this.mTargetSearchThrottleProvider = pThrottleProvider;
-        this.mTargetLockThrottleProvider = pThrottleProvider;
-        this.mEndOnAlignment = pEndOnAlignment;
+    public TargetLock() {
     }
 
     @Override
     public void init(double pNow) {
-        System.out.println("++++++++++++++++++++++++++TARGET LOCKING++++++++++++++++++++++++++++++++++++\n\n\n\n");
-
         mHasAcquiredTarget = false;
         mAlignedCount = 0;
 
-        Robot.DATA.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.TARGET_ANGLE_LOCK);
-        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.0);
+        Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TARGET_ANGLE_LOCK);
 
-        this.mPreviousTime = pNow;
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.0);
     }
 
     @Override
     public boolean update(double pNow) {
-        RobotCodex<ELimelightData> currentData = mCamera.getTargetingData();
+        RobotCodex<ELimelightData> currentData = Robot.DATA.goaltracking;
 
-        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, mTargetLockThrottleProvider.getThrottle() * Settings.Input.kSnailModePercentThrottleReduction);
+        Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, Robot.DATA.operatorinput.get(InputMap.DRIVER.THROTTLE_AXIS) * Settings.Input.kSnailModePercentThrottleReduction);
 
-        if(currentData != null && currentData.isSet(ELimelightData.TV) && currentData.isSet(ELimelightData.TX)) {
+        if (currentData.isSet(TV) && currentData.isSet(TX)) {
             mHasAcquiredTarget = true;
-
             mAlignedCount++;
-            if(mEndOnAlignment && Math.abs(currentData.get(ELimelightData.TX)) < mAllowableError && mAlignedCount > kAlignCount) {
-                System.out.println("FINISHED");
-                // Zero drivetrain outputs in shutdown()
+            if (mEndOnAlignment && Math.abs(currentData.get(TX)) < kAllowableTargetLockError && mAlignedCount > kAlignCount) {
                 return true;
             }
 
-        // If we've already seen the target and lose tracking, exit.
-        } else if(mHasAcquiredTarget && !currentData.isSet(ELimelightData.TV)) {
+            // If we've already seen the target and lose tracking, exit.
+        } else if (mHasAcquiredTarget && !currentData.isSet(TV)) {
             return true;
         }
-//        if(!mHasAcquiredTarget){
-//            System.out.println("OPEN LOOP");
-//            mAlignedCount = 0;
-//            //if there is no target in the limelight's pov, continue turning in direction specified by SearchDirection
-//            mDrive.setDriveMessage(
-//                new DriveMessage(
-//                    mTargetSearchThrottleProvider.getThrottle() + (mTrackingType.getTurnScalar() * kTURN_POWER),
-//                    mTargetSearchThrottleProvider.getThrottle() + (mTrackingType.getTurnScalar() * -kTURN_POWER),
-//                    ECommonControlMode.PERCENT_OUTPUT
-//                ).setNeutralMode(ECommonNeutralMode.BRAKE)
-//            );
-//        }
 
-        mPreviousTime = pNow;
-        
-         //command has not completed
-        return false;                                                      
+        //command has not completed
+        return false;
     }
 
     @Override
     public void shutdown(double pNow) {
-        Robot.DATA.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.NORMAL);
+
+        Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.NORMAL);
+
     }
 
-    public TargetLock setTargetLockThrottleProvider(IThrottleProvider pThrottleProvider) {
-        this.mTargetLockThrottleProvider = pThrottleProvider;
-        return this;
+    public void setEndOnAlignment(boolean bool) {
+        mEndOnAlignment = bool;
     }
-
-    public TargetLock setTargetSearchThrottleProvider(IThrottleProvider pThrottleProvider) {
-        this.mTargetSearchThrottleProvider = pThrottleProvider;
-        return this;
-    }
-    public TargetLock setStopWhenTargetLost(boolean pStopWhenTargetLost) {
-        this.mStopWhenTargetLost = pStopWhenTargetLost;
-        return this;
-    }
-
 }
