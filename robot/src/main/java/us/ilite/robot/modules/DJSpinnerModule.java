@@ -65,12 +65,7 @@ public class DJSpinnerModule extends Module {
         db.color.set(EColorData.MEASURED_RED, c.red);
         ColorMatchResult match = mColorMatcher.matchClosestColor(c);
         db.color.set(EColorData.SENSED_COLOR, EColorMatch.from(match));
-        if ( !mUpdatingFlag ) {
-            eCurrentColorState = EColorMatch.from(match);
-        }
-        else {
-            mUpdatingFlag = false;
-        }
+        eCurrentColorState = EColorMatch.from(match);
         db.color.set(EColorData.WHEEL_ROTATION_COUNT, mColorChangeCounter);
         db.color.set(EColorData.CURRENT_MOTOR_POWER , mVictor.getMotorOutputPercent());
     }
@@ -83,13 +78,10 @@ public class DJSpinnerModule extends Module {
             if (eLastColorState.nextColor() == eCurrentColorState) {
                 mColorChangeCounter++;
             }
-            else if ( eCurrentColorState.equals(eLastColorState) ) {
-                mUpdatingFlag = true;
+            else if ( !eCurrentColorState.equals(eLastColorState) ) {
                 eCurrentColorState = eLastColorState;
             }
-            else {
-                eLastColorState = eCurrentColorState;
-            }
+            eLastColorState = eCurrentColorState;
         }
     }
 

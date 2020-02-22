@@ -77,6 +77,7 @@ public class Data {
             powercell,
             hanger,
             limelight,
+            color,
     };
 
     //Stores writers per codex needed for CSV logging

@@ -88,7 +88,7 @@ public abstract class AbstractController {
     }
 
     protected void stopDrivetrain(double pNow) {
-        db.drivetrain.set(EDriveData.STATE, EDriveState.PERCENT_OUTPUT);
+        db.drivetrain.set(DESIRED_STATE, EDriveState.PERCENT_OUTPUT);
         db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
         db.drivetrain.set(DESIRED_TURN_PCT,0.0);
     }

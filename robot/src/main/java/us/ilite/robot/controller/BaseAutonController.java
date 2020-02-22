@@ -61,7 +61,7 @@ public class BaseAutonController extends AbstractController {
         public void resetDistance() {
             mPathStartTime = Robot.CLOCK.getCurrentTime();
             mLastDistance = 0;
-            db.drivetrain.set(EDriveData.STATE, EDriveState.RESET);
+            db.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.RESET);
         }
 
         @Override
@@ -94,7 +94,7 @@ public class BaseAutonController extends AbstractController {
 
         @Override
         public void useOutputs(double left, double right) {
-            db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_HELIX);
+            db.drivetrain.set(EDriveData.DESIRED_STATE, EDriveState.PATH_FOLLOWING_HELIX);
             db.drivetrain.set(EDriveData.L_PATH_FT_s, left);
             db.drivetrain.set(EDriveData.R_PATH_FT_s, right);
             db.drivetrain.set(EDriveData.PATH_ERR_ft, mDistanceController.getError());

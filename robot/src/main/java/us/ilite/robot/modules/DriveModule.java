@@ -76,12 +76,8 @@ public class DriveModule extends Module {
 			.p(1.0).maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
 			.maxAccel(56760d)
 			.slot(POSITION_PID_SLOT)
-<<<<<<< HEAD
 			.velocityConversion(kDriveNEOPositionFactor);
-=======
-			.conversion(kDriveNEOPositionFactor);
 
->>>>>>> feature/led-control
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
 			.p(0.0001)
@@ -90,12 +86,8 @@ public class DriveModule extends Module {
 			// Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
 			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
 			.slot(VELOCITY_PID_SLOT)
-<<<<<<< HEAD
 			.velocityConversion(kDriveNEOVelocityFactor);
-=======
-			.conversion(kDriveNEOVelocityFactor);
 
->>>>>>> feature/led-control
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
 
@@ -234,27 +226,6 @@ public class DriveModule extends Module {
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
-<<<<<<< HEAD
-			case RESET:
-				reset();
-				break;
-//			case HOLD:
-//				if (!mStartHoldingPosition) {
-//					mHoldLeftPositionPid.setSetpoint(db.drivetrain.get(LEFT_POS_INCHES));
-//					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));
-//					mStartHoldingPosition = true;
-//				}
-//				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mHoldLeftPositionPid.getSetpoint()) > .5) {
-//					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
-//					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mHoldRightPositionPid.getSetpoint()) > .5) {
-//					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
-//					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//				break;
-
-=======
 			case HOLD:
 				if (!mStartHoldingPosition) {
 					mLeftHoldSetpoint = mLeftEncoder.getPosition();
@@ -288,7 +259,6 @@ public class DriveModule extends Module {
 
 					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
 				}
->>>>>>> feature/led-control
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);

@@ -75,6 +75,9 @@ public class Settings {
             public static int kMAXIntakeArm = 8;
             public static int kFeederId = 10;
             public static int kTalonPowerCellSerializer = 11;
+            public static int kTalonVerticalID = 12;
+            public static int kFalconMasterId = 13;
+            public static int kFalconFollowerId = 14;
 
             public static int kLEDControlCanifier = 40;
 
