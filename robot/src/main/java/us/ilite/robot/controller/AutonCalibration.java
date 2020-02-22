@@ -4,9 +4,9 @@ import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import us.ilite.common.Distance;
 import us.ilite.robot.auto.paths.*;
+import static us.ilite.robot.Enums.*;
 
 import java.util.Map;
-import static us.ilite.robot.auto.paths.AutonSelection.mAutonConfiguration;
 
 public class AutonCalibration extends BaseAutonController {
 

@@ -23,13 +23,23 @@ public class Field2020 {
         return abs(pAzimuth.degrees()) <= 0.00006 * pow(pDistance.inches(),2) - 0.0241*pDistance.inches() + 18.906;
     }
 
+    public enum Distances{
+        INITIATION_LINE_TO_COLOR_WHEEL(0);
+
+        public double mDistance;
+
+        Distances(double pDist) {
+            mDistance = pDist;
+        }
+    }
+
     /**
      * Any trackable field component for 2020's game.
      */
     public enum FieldElement implements IFieldComponent {
 
         TARGET(12d,1),
-        LINE(0d,5),
+        LINE(0d,5), //TODO detemine why these they have the same pipeline
         OUTER_GOAL(98.25, 0),
         POWER_CELL(0.0, 0),
         TARGET_ZOOM(0d, 2),

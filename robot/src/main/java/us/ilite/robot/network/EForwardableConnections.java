@@ -11,8 +11,11 @@ public enum EForwardableConnections {
     /**
      * The visual feed, used to display what the camera sees
      */
+//    LIMELIGHT_CAMERA_FEED("10.18.85.11", 5800),
+
     LIMELIGHT_CAMERA_FEED("10.18.85.11", 5800),
     /**
+     *
      * The web URL view. Note that the {@link EForwardableConnections#LIMELIGHT_CAMERA_FEED} must be forwarded as well for
      * the camera to show up in this view.
      */

@@ -5,10 +5,9 @@ import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
-import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.BobUtils;
-import us.ilite.robot.modules.EDriveState;
+import static us.ilite.robot.Enums.*;
 
 import java.util.Map;
 
@@ -17,13 +16,12 @@ public class BaseAutonController extends AbstractController {
     protected double mDelayCycleCount;
     protected Path mActivePath = null;
     protected double mPathStartTime = 0d;
-    private HelixFollowerImpl mPathFollower = null;
-    private final String kPathAssociation;
+    protected HelixFollowerImpl mPathFollower = null;
 
     public BaseAutonController(String pPathAssociation) {
         kPathAssociation = pPathAssociation;
-        mDelayCycleCount = AutonSelection.mDelaySeconds;
-        setActivePath(getPathsFromController().get((String) getPathsFromController().keySet().toArray()[AutonSelection.mPathNumber]));
+//        mDelayCycleCount = AutonSelection.mDelaySeconds;
+        //setActivePath(getPathsFromController().get((String) getPathsFromController().keySet().toArray()[AutonSelection.mPathNumber]));
     }
 
     public BaseAutonController() {
@@ -51,19 +49,7 @@ public class BaseAutonController extends AbstractController {
         mPathFollower.initialize();
     }
 
-    public Map<String, Path> getPathsFromController() {
-        Map<String, Path> mAvailablePaths = BobUtils.getAvailablePaths();
-        for (int i = 0; i < mAvailablePaths.entrySet().toArray().length - 1; i++) {
-            Map.Entry<String, Path> entry = (Map.Entry<String, Path>) mAvailablePaths.entrySet().toArray()[i];
-            if (!entry.getKey().toLowerCase().contains(kPathAssociation.toLowerCase())) {
-                mAvailablePaths.remove(entry.getKey());
-                i--;
-            }
-        }
-        return mAvailablePaths;
-    }
-
-    private class HelixFollowerImpl extends IliteHelixFollower {
+    protected class HelixFollowerImpl extends IliteHelixFollower {
         /** Used as a multi-threaded caching buffer */
         private double mLastDistance = 0d;
         private double mLastHeading = 0d;
