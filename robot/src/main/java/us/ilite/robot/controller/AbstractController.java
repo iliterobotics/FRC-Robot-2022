@@ -125,6 +125,10 @@ public abstract class AbstractController {
                 db.flywheel.get(CURRENT_FEEDER_VELOCITY_RPM) >= db.flywheel.get(TARGET_FEEDER_VELOCITY_RPM)*0.9;
     }
 
+    protected boolean finishedFiringStartupSequence() {
+        return isFlywheelUpToSpeed() && isFeederUpToSpeed();
+    }
+
     protected abstract void updateImpl(double pNow);
 
     /**
