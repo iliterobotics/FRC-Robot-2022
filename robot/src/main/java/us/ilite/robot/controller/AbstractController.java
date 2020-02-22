@@ -129,6 +129,8 @@ public abstract class AbstractController {
         return isFlywheelUpToSpeed() && isFeederUpToSpeed();
     }
 
+
+
     protected abstract void updateImpl(double pNow);
 
     /**

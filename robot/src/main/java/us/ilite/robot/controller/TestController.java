@@ -10,10 +10,7 @@ import org.apache.commons.math3.ml.neuralnet.twod.NeuronSquareMesh2D;
 import us.ilite.common.Data;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.types.EColorData;
-import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.EPowerCellData;
+import us.ilite.common.types.*;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
@@ -95,11 +92,25 @@ public class TestController extends BaseManualController {
 
     }
 
-    private void firingSequence() {
-        super.setFlywheelClosedLoop(FlywheelSpeeds.INITIATION_LINE);
+    private void firingSequence(FlywheelSpeeds speed) {
+//
+//        if (db.flywheel.get(FLYWHEEL_WHEEL_STATE) == FlywheelWheelState.VELOCITY.ordinal()) {
+//            super.setFlywheelClosedLoop(FlywheelSpeeds.OVERRIDE);
+//        }
+        if (db.driverinput.isSet(InputMap.OPERATOR.NEAR_FAR_MODE_TOGGLE)) {
+            if (speed == FlywheelSpeeds.FAR_TRENCH)
+            {
+                super.setFlywheelClosedLoop(FlywheelSpeeds.CLOSE);
+            }
+            else
+            {
+                super.setFlywheelClosedLoop(FlywheelSpeeds.FAR_TRENCH);
+            }
+        } else {
+            super.setFlywheelClosedLoop(FlywheelSpeeds.OFF);
+        }
 
         if (isFlywheelUpToSpeed()) {
-            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.75);
             if (isFeederUpToSpeed()) {
                 db.powercell.set(DESIRED_V_VELOCITY, 0.5);
             } else {
@@ -109,11 +120,6 @@ public class TestController extends BaseManualController {
     }
 
     private void updateFlywheel(double pNow) {
-        if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_SPINUP_TEST)) {
-
-        } else {
-            db.flywheel.set(FLYWHEEL_OPEN_LOOP, 0);
-        }
 
         if(db.flywheel.isSet(HOOD_SENSOR_ERROR)) {
             db.flywheel.set(HOOD_STATE, Enums.HoodState.NONE);
@@ -128,32 +134,31 @@ public class TestController extends BaseManualController {
             db.flywheel.set(HOOD_OPEN_LOOP, 0.0);
         }
 
-
-//        Enums.FlywheelSpeeds state = Enums.FlywheelSpeeds.OFF;
-//        if(flywheelinput.isSet(InputMap.FLYWHEEL.FEEDER_SPINUP_TEST) && isFlywheelUpToSpeed()) {
-//                db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.75);
-//        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_SPINUP_TEST) && finishedFiringStartupSequence()) {
-//                db.flywheel.set(FLYWHEEL_WHEEL_STATE, Enums.FlywheelWheelState.OPEN_LOOP);
-//                db.flywheel.set(FLYWHEEL_OPEN_LOOP, 0.2);
-//        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_10_TEST)) {
-//            state = Enums.FlywheelSpeeds.CLOSE;
-//        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_20_TEST)) {
-//            state = Enums.FlywheelSpeeds.INITIATION_LINE;
-//        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_30_TEST)) {
-//            state = Enums.FlywheelSpeeds.FAR;
-//        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_40_TEST)) {
-//            state = Enums.FlywheelSpeeds.FAR_TRENCH;
-//        } else {
-//            state = Enums.FlywheelSpeeds.OFF;
-//        }
-//        db.flywheel.set(FLYWHEEL_SPEED_STATE, state);
-//        setFlywheelClosedLoop(state);
-//        if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
-//            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
-//            db.flywheel.set(TARGET_FEEDER_VELOCITY_RPM, state.feeder * 11000.0);
-//        } else {
-//            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.0);
-//        }
+        Enums.FlywheelSpeeds state = Enums.FlywheelSpeeds.OFF;
+        if(flywheelinput.isSet(InputMap.FLYWHEEL.FEEDER_SPINUP_TEST) && isFlywheelUpToSpeed()) {
+                db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.75);
+        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_SPINUP_TEST) && finishedFiringStartupSequence()) {
+                db.flywheel.set(FLYWHEEL_WHEEL_STATE, Enums.FlywheelWheelState.OPEN_LOOP);
+                db.flywheel.set(FLYWHEEL_OPEN_LOOP, 0.2);
+        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_10_TEST)) {
+            state = Enums.FlywheelSpeeds.CLOSE;
+        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_20_TEST)) {
+            state = Enums.FlywheelSpeeds.INITIATION_LINE;
+        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_30_TEST)) {
+            state = Enums.FlywheelSpeeds.FAR;
+        } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_40_TEST)) {
+            state = Enums.FlywheelSpeeds.FAR_TRENCH;
+        } else {
+            state = Enums.FlywheelSpeeds.OFF;
+        }
+        db.flywheel.set(FLYWHEEL_SPEED_STATE, state);
+        setFlywheelClosedLoop(state);
+        if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
+            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
+            db.flywheel.set(TARGET_FEEDER_VELOCITY_RPM, state.feeder * 11000.0);
+        } else {
+            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.0);
+        }
     }
 
     public void updateLimelightTargetLock() {
