@@ -10,8 +10,8 @@ import us.ilite.common.lib.control.ProfileGains;
  *  - Field element locations & vision target heights
  */
 public class Settings {
-    public static String kGroundLimelightNetworkTable = "limelight-bottom";
-    public static String kFlywheelLimelightNetworkTable = "limelight-top";
+    public static final String kGroundLimelightNetworkTable = "limelight-bottom";
+    public static final String kFlywheelLimelightNetworkTable = "limelight-top";
 
     public static double kControlLoopPeriod = 0.02; // seconds
 
