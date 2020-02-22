@@ -75,7 +75,10 @@ public class DJSpinnerModule extends Module {
         mVictor.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
 
         if( db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE) == EColorWheelState.ROTATION.ordinal() ) {
-            if (eLastColorState.nextColor() == eCurrentColorState) {
+            if ( eLastColorState.nextColor() == EColorMatch.NONE ) {
+                eLastColorState = eCurrentColorState;
+            }
+            else if (eLastColorState.nextColor() == eCurrentColorState) {
                 mColorChangeCounter++;
             }
             else if ( !eCurrentColorState.equals(eLastColorState) ) {
