@@ -11,6 +11,7 @@ import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.common.lib.util.Latch;
 import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import static us.ilite.robot.Enums.*;
 
@@ -145,7 +146,7 @@ public abstract class AbstractController {
 
     protected final void setFeederClosedLoop(Enums.FlywheelSpeeds pFlywheelSpeed) {
         db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, pFlywheelSpeed.feeder);
-        db.flywheel.set(TARGET_FEEDER_VELOCITY_RPM, pFlywheelSpeed.feeder * 11000.0);
+        db.flywheel.set(SET_FEEDER_rpm, pFlywheelSpeed.feeder * 11000.0);
     }
 
     protected boolean isFlywheelUpToSpeed() {

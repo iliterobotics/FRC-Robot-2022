@@ -12,12 +12,12 @@ import us.ilite.robot.Robot;
 
 import static us.ilite.common.types.drive.EDriveData.*;
 
-public class DriveStraightController extends BaseAutonController {
+public class OurTrenchController extends BaseAutonController {
     private Distance mTargetDistance = Distance.fromInches(Field2020.Distances.INITIATION_LINE_TO_COLOR_WHEEL.mDistance);
     private Data db = Robot.DATA;
     private boolean mIsFirstLegDone;
 
-    public DriveStraightController(){
+    public OurTrenchController(){
         db.drivetrain.set(STATE, Enums.EDriveState.PERCENT_OUTPUT);
         mIsFirstLegDone = false;
     }
@@ -52,8 +52,8 @@ public class DriveStraightController extends BaseAutonController {
             if (isFlywheelUpToSpeed()) {
                 setFeederClosedLoop(flywheelState);
                 if (isFeederUpToSpeed()) {
-                    db.powercell.set(EPowerCellData.DESIRED_V_VELOCITY, 0.6);
-                    db.powercell.set(EPowerCellData.DESIRED_H_VELOCITY, 0.5);
+                    db.powercell.set(EPowerCellData.SET_V_pct, 0.6);
+                    db.powercell.set(EPowerCellData.SET_H_pct, 0.5);
                 }
             }
         }

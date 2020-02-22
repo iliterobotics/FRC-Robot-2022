@@ -72,7 +72,7 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-        DATA.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , 90);
+        DATA.powercell.set(EPowerCellData.ARM_ANGLE_deg , 90);
 //        mLedControl = new LEDControl();
 //        mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
