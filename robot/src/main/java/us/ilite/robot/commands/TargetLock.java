@@ -7,7 +7,6 @@ import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.IThrottleProvider;
 
 import static us.ilite.common.types.ELimelightData.*;
 
@@ -36,7 +35,7 @@ public class TargetLock implements ICommand {
 
     @Override
     public boolean update(double pNow) {
-        RobotCodex<ELimelightData> currentData = Robot.DATA.limelight;
+        RobotCodex<ELimelightData> currentData = Robot.DATA.goaltracking;
 
         Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, Robot.DATA.operatorinput.get(InputMap.DRIVER.THROTTLE_AXIS) * Settings.Input.kSnailModePercentThrottleReduction);
 

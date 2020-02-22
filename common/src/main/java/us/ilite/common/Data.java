@@ -39,7 +39,7 @@ public class Data {
     public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
-    public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
+    public final RobotCodex<ELimelightData> goaltracking = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
     public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
     public final RobotCodex<ELimelightData> groundTracking = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
     public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
@@ -59,7 +59,7 @@ public class Data {
             flywheel,
             powercell,
             hanger,
-            limelight,
+            goaltracking,
             color,
     };
 
@@ -74,7 +74,7 @@ public class Data {
             pdp,
             powercell,
             hanger,
-            limelight,
+            goaltracking,
     };
 
     //Stores writers per codex needed for CSV logging

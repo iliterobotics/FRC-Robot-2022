@@ -171,26 +171,26 @@ public class TestController extends BaseManualController {
     }
 
     public void updateTargetTracking(double pNow) {
-        boolean isOffset = !(Robot.DATA.limelight.get(TS) > 0 - mLimelightGoalThreshold || Robot.DATA.limelight.get(TS) < -90 + mLimelightGoalThreshold);
+        boolean isOffset = !(Robot.DATA.goaltracking.get(TS) > 0 - mLimelightGoalThreshold || Robot.DATA.goaltracking.get(TS) < -90 + mLimelightGoalThreshold);
 
         if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_TARGET)) {
-            Robot.DATA.limelight.set(TARGET_ID, (Field2020.FieldElement.TARGET.id()));
+            Robot.DATA.goaltracking.set(TARGET_ID, (Field2020.FieldElement.TARGET.id()));
         } else if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_TARGET_ZOOM)) {
-            if (Robot.DATA.limelight.isSet(TY)) {
-                if (Math.abs(Robot.DATA.limelight.get(TX)) < mLimelightZoomThreshold) {
-                    Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET_ZOOM.id());
+            if (Robot.DATA.goaltracking.isSet(TY)) {
+                if (Math.abs(Robot.DATA.goaltracking.get(TX)) < mLimelightZoomThreshold) {
+                    Robot.DATA.goaltracking.set(TARGET_ID, Field2020.FieldElement.TARGET_ZOOM.id());
                 }
             } else {
-                Robot.DATA.limelight.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
+                Robot.DATA.goaltracking.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
             }
         } else {
-            Robot.DATA.limelight.set(TARGET_ID, Limelight.NONE.id());
+            Robot.DATA.goaltracking.set(TARGET_ID, Limelight.NONE.id());
         }
-        if ((Robot.DATA.limelight.get(TARGET_ID.ordinal()) != (mLastTargetTrackingType))
-                && !(Robot.DATA.limelight.get(TARGET_ID.ordinal()) == Limelight.NONE.id())) {
-            //TargetLock(); something to do with targetlock here, need clarification on command structure
+        if ((Robot.DATA.goaltracking.get(TARGET_ID.ordinal()) != (mLastTargetTrackingType))
+                && !(Robot.DATA.goaltracking.get(TARGET_ID.ordinal()) == Limelight.NONE.id())) {
+            //TODO TargetLock(); something to do with targetlock here, need clarification on command structure
         }
-        mLastTargetTrackingType = Robot.DATA.limelight.get(TARGET_ID.ordinal());
+        mLastTargetTrackingType = Robot.DATA.goaltracking.get(TARGET_ID.ordinal());
     }
 
     public void updateGroundTracking(double pNow) {
@@ -205,9 +205,9 @@ public class TestController extends BaseManualController {
         }
         if ((Robot.DATA.groundTracking.get(TARGET_ID.ordinal()) != (mLastGroundTrackingType))
                 && !(Robot.DATA.groundTracking.get(TARGET_ID.ordinal()) == RawLimelight.NONE.id())) {
-            //TargetLock(); something to do with targetlock here, need clarification on command structure
+            //TODO TargetLock(); something to do with targetlock here, need clarification on command structure
         }
-        mLastGroundTrackingType = Robot.DATA.limelight.get(TARGET_ID.ordinal());
+        mLastGroundTrackingType = Robot.DATA.goaltracking.get(TARGET_ID.ordinal());
     }
 
     protected void updatePowerCells(double pNow) {

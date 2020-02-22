@@ -25,9 +25,9 @@ public class WaitForVisionTarget implements ICommand {
     public boolean update(double pNow) {
 
         // If target is valid
-        if(mData.limelight.isSet(ELimelightData.TV)) {
+        if(mData.goaltracking.isSet(ELimelightData.TV)) {
             // If area above threshold exit command
-            if(mData.limelight.get(ELimelightData.TA) > mTargetAreaThreshold) {
+            if(mData.goaltracking.get(ELimelightData.TA) > mTargetAreaThreshold) {
                 return true;
             }
         }
