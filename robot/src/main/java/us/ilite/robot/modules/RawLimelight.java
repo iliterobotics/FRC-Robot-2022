@@ -53,10 +53,10 @@ public class RawLimelight extends Module{
     private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable(Settings.kGroundLimelightNetworkTable);
 
     protected IFieldComponent mVisionTarget;
-    
+
     public RawLimelight() {
     }
-    
+
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
         Robot.DATA.rawLimelight.set(TARGET_ID, (double) NONE.id());

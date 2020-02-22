@@ -4,9 +4,14 @@ import com.flybotix.hfr.codex.RobotCodex;
 import us.ilite.common.*;
 
 import static us.ilite.common.types.EPowerCellData.*;
+import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
+import static us.ilite.robot.Enums.*;
+import us.ilite.robot.modules.PowerCellModule;
 
 import java.util.List;
 
@@ -16,6 +21,10 @@ public abstract class AbstractController {
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
     protected double dt = 1d;
+
+
+    public static double kIntakeRollerPower_on = 0.5;
+    public static double kIntakeRollerPower_off = 0.0;
 
     public AbstractController(){
 
@@ -45,11 +54,14 @@ public abstract class AbstractController {
     protected void setIntakeArmEnabled(double pNow, boolean pEnabled) {
         if(pEnabled) {
             double speed = Math.max(db.drivetrain.get(L_ACTUAL_VEL_FT_s), db.drivetrain.get(R_ACTUAL_VEL_FT_s));
-            db.powercell.set(DESIRED_ARM_ANGLE, 0d);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, speed);
+            if(speed <= 1.0) {
+                speed = 0.3;
+            }
+            db.powercell.set(INTAKE_STATE, EArmState.OUT);
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_on);
         } else {
-            db.powercell.set(DESIRED_ARM_ANGLE, 90d);
-            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, 0d);
+            db.powercell.set(INTAKE_STATE, EArmState.STOW);
+            db.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_off);
         }
     }
 
@@ -59,10 +71,9 @@ public abstract class AbstractController {
      * @return
      */
     protected boolean activateSerializer(double pNow) {
-        double power =0.3;
         if (db.powercell.isSet(ENTRY_BEAM)) {
-            db.powercell.set(DESIRED_H_VELOCITY, power);
-            db.powercell.set(DESIRED_V_VELOCITY, power);
+            db.powercell.set(DESIRED_H_VELOCITY, 0.3);
+            db.powercell.set(DESIRED_V_VELOCITY, 0.35);
             return true;
         } else {
             db.powercell.set(DESIRED_H_VELOCITY, 0.0);
@@ -76,6 +87,12 @@ public abstract class AbstractController {
         db.powercell.set(DESIRED_V_VELOCITY, -1.0);
     }
 
+    protected void stopDrivetrain(double pNow) {
+        db.drivetrain.set(EDriveData.STATE, EDriveState.PERCENT_OUTPUT);
+        db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
+        db.drivetrain.set(DESIRED_TURN_PCT,0.0);
+    }
+
     /**
      * Enables / Disables this controller.
      * @param pEnabled TRUE if enabled
@@ -83,6 +100,29 @@ public abstract class AbstractController {
     public final void setEnabled(boolean pEnabled) {
         mCycleCount = 0;
         mEnabled = pEnabled;
+    }
+
+    /**
+     * Set the flywheel to closed loop and go to target speeds/angles for all relevant
+     * sub systems. These speeds/angles are robot-relative and human-readable.
+     * @param pSpeed
+     */
+    protected final void setFlywheelClosedLoop(Enums.FlywheelSpeeds pSpeed) {
+        db.flywheel.set(FLYWHEEL_WHEEL_STATE, pSpeed.wheelstate);
+        db.flywheel.set(TARGET_BALL_VELOCITY, pSpeed.speed);
+        db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
+        db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
+    }
+
+
+    protected boolean isFlywheelUpToSpeed() {
+        return db.flywheel.get(TARGET_BALL_VELOCITY) > 0.0 &&
+                db.flywheel.get(CURRENT_BALL_VELOCITY) >= db.flywheel.get(TARGET_BALL_VELOCITY) - 1.0;
+    }
+
+    protected boolean isFeederUpToSpeed() {
+        return db.flywheel.get(TARGET_FEEDER_VELOCITY_RPM) > 0.0 &&
+                db.flywheel.get(CURRENT_FEEDER_VELOCITY_RPM) >= db.flywheel.get(TARGET_FEEDER_VELOCITY_RPM)*0.9;
     }
 
     protected abstract void updateImpl(double pNow);

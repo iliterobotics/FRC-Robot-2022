@@ -3,8 +3,10 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.CANifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
+import us.ilite.common.config.Settings;
+
 import us.ilite.common.types.EColorData;
-import static us.ilite.robot.modules.DJSpinnerModule.*;
+import static us.ilite.robot.Enums.*;
 
 public class LEDControl extends Module {
 
@@ -12,18 +14,6 @@ public class LEDControl extends Module {
     private Timer mBlinkTimer;
     private boolean mLedOn;
     private Message mCurrentMessage;
-//    private DJBoothPositionControl mDjBoothPositionControl;
-//    private DJBoothRotationControl mDjBoothRotationControl;
-    
-//    private final Drive mDrive;
-//    private final Elevator mElevator;
-//    private final PneumaticIntake mPneumaticIntake;
-//    private final CargoSpit mCargoSpit;
-//    private final HatchFlower mHatchFlower;
-//    private final FourBar mFourBar;
-//    private final Limelight mLimelight;
-//    private final Data mData;
-
 
     public static class RGB {
         private int mR;
@@ -31,7 +21,7 @@ public class LEDControl extends Module {
         private int mB;
 
         public RGB(int pR, int pG, int pB) {
-            // Value range for each color is 0-255, we'll enforce this with a modulo divide
+            // Value range for each color is 0-255, we'll enforce this with a module divide
             this.mR = pR % 256;
             this.mG = pG % 256;
             this.mB = pB % 256;
@@ -95,14 +85,6 @@ public class LEDControl extends Module {
 
     // pulse speed in milliseconds, 0 = on solid
     public enum Message {
-//        HAS_HATCH( LEDColor.YELLOW, 0 ),
-//        HAS_CARGO( LEDColor.ORANGE, 0 ),
-//        CURRENT_LIMITING( LEDColor.RED, 300 ),
-//        VISION_TRACKING( LEDColor.GREEN, 0 ),
-//        KICKING_HATCH( LEDColor.BLUE, 0 ),
-//        SPITTING_CARGO( LEDColor.WHITE, 0 ),
-//        NONE( LEDColor.NONE, 0 );
-
         ON_BLUE( LEDColor.BLUE, false ),
         ON_RED( LEDColor.RED, false ),
         ON_GREEN( LEDColor.GREEN, false ),
@@ -111,7 +93,10 @@ public class LEDControl extends Module {
         FINISHED_ON_RED( LEDColor.RED, true ),
         FINISHED_ON_GREEN( LEDColor.GREEN, true ),
         FINISHED_ON_YELLOW( LEDColor.YELLOW, true ),
-        NONE(LEDColor.NONE, false);
+        NONE(LEDColor.NONE, false),
+
+        CURRENT_LIMITING( LEDColor.RED, false),
+        VISION_TRACKING( LEDColor.GREEN, false);
 
         final LEDColor color;
         final int pulse; // milliseconds
@@ -137,6 +122,7 @@ public class LEDControl extends Module {
 
         this.mBlinkTimer = new Timer();
         this.mBlinkTimer.reset();
+        mCanifier = new CANifier(Settings.Hardware.CAN.kLEDControlCanifierID);
     }
 
 
@@ -155,20 +141,9 @@ public class LEDControl extends Module {
     public void update(double pNow) {
         Message lastMsg = this.mCurrentMessage;
         this.mCurrentMessage = Message.NONE;
+
+        //TODO implement CurrentLimiting() in modules
         
-//        if(mCargoSpit.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
-//        if(mElevator.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
-//        if(mDrive.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
-//        if(mFourBar.isCurrentLimiting()) mCurrentMessage = Message.CURRENT_LIMITING;
-//
-//        if(mCargoSpit.hasCargo()) mCurrentMessage = Message.HAS_CARGO;
-//        if(mHatchFlower.hasHatch()) mCurrentMessage = Message.HAS_HATCH;
-//
-//        if(mCargoSpit.isOuttaking()) mCurrentMessage = Message.SPITTING_CARGO;
-//        if(mHatchFlower.shouldBackUp()) mCurrentMessage = Message.KICKING_HATCH;
-//
-//        if(mLimelight.getTracking() != ETrackingType.NONE) mCurrentMessage = Message.VISION_TRACKING;
-//
 
         EColorMatch color = EColorMatch.values()[(int)(double)db.color.get(EColorData.SENSED_COLOR)];
         boolean isDone = (EColorWheelState.valueOf(db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE)) == EColorWheelState.OFF);

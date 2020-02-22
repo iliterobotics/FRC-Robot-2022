@@ -18,14 +18,19 @@ public class CSVLogger {
     private ScheduledFuture<?> scheduledFuture;
     private boolean mIsAcceptingToQueue;
 
-    public CSVLogger( ) {
-        mCSVWriters = new ArrayList<>();
-        for ( RobotCodex c : Robot.DATA.mLoggedCodexes ) {
-//            mCSVWriters.add( new CSVWriter( c ) );
+    public CSVLogger( boolean pIsLogging ) {
+        if ( pIsLogging ) {
+            mCSVWriters = new ArrayList<>();
+            for (RobotCodex c : Robot.DATA.mLoggedCodexes) {
+                mCSVWriters.add(new CSVWriter(c));
+            }
+            mIsAcceptingToQueue = false;
+            logFromCodexToCSVHeader();
+            scheduledFuture = mExService.scheduleAtFixedRate(this::run, Settings.kSecondsToUpdateCSVLogger, Settings.kSecondsToUpdateCSVLogger, TimeUnit.SECONDS);
         }
-        mIsAcceptingToQueue = false;
-        logFromCodexToCSVHeader();
-        scheduledFuture = mExService.scheduleAtFixedRate(this::run, Settings.kSecondsToUpdateCSVLogger, Settings.kSecondsToUpdateCSVLogger, TimeUnit.SECONDS);
+        else {
+            mIsAcceptingToQueue = false;
+        }
     }
 
     private void run() {
@@ -33,13 +38,12 @@ public class CSVLogger {
             try {
                 ArrayList<Log> kTempCSVLogs = new ArrayList<>();
                 kCSVLoggerQueue.drainTo(kTempCSVLogs);
+                //mLogger.error( "Drained queue got: " + kTempCSVLogs.size() );
 
                 for ( Log log : kTempCSVLogs ) {
                     logFromCodexToCSVLog( log );
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) {}
         }
     }
 
@@ -49,12 +53,12 @@ public class CSVLogger {
     
     public void logFromCodexToCSVLog( Log pLog ) {
         for ( CSVWriter c : mCSVWriters ) {
-            if ( c.getMetaDataOfAssociatedCodex().gid().equals(pLog.getmGlobalId()) ) {
+            if ( c.getMetaDataOfAssociatedCodex().gid() == pLog.getmGlobalId() ) {
                 c.log( pLog.getmLogData() );
+                break;
             }
         }
     }
-
 
     /**
      * Opens the queue
@@ -76,11 +80,10 @@ public class CSVLogger {
         }
     }
 
-    /**
-     * Closes all the writers in mNetworkTableWriters
-     */
     public void closeWriters() {
-        mCSVWriters.forEach(c -> c.closeWriter());
+        for ( CSVWriter cw : mCSVWriters ) {
+            cw.close();
+        }
     }
 
 }
