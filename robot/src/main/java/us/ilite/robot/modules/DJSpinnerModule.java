@@ -82,6 +82,7 @@ public class DJSpinnerModule extends Module {
                 eCurrentColorState = eLastColorState;
             }
             eLastColorState = eCurrentColorState;
+            db.color.set( EColorData.UNDERSTOOD_COLOR, eCurrentColorState.ordinal() );
         }
     }
 
