@@ -96,21 +96,22 @@ public class TestController extends BaseManualController {
 
     }
 
+    private void firingSequence() {
+        super.setFlywheelClosedLoop(FlywheelSpeeds.INITIATION_LINE);
+
+        if (isFlywheelUpToSpeed()) {
+            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.75);
+            if (isFeederUpToSpeed()) {
+                db.powercell.set(DESIRED_V_VELOCITY, 0.5);
+            } else {
+                db.powercell.set(DESIRED_V_VELOCITY, 0);
+            }
+        }
+    }
+
     private void updateFlywheel(double pNow) {
         if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_SPINUP_TEST)) {
-            db.flywheel.set(FLYWHEEL_OPEN_LOOP, 0.2);
-            db.flywheel.set(FLYWHEEL_WHEEL_STATE, FlywheelWheelState.OPEN_LOOP);
 
-            if (isFlywheelUpToSpeed()) {
-                db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, FlywheelSpeeds.INITIATION_LINE);
-                if (isFeederUpToSpeed()) {
-                    db.powercell.set(DESIRED_V_VELOCITY, 0.5);
-                } else {
-                    db.powercell.set(DESIRED_V_VELOCITY, 0);
-                }
-            } else {
-                db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0);
-            }
         } else {
             db.flywheel.set(FLYWHEEL_OPEN_LOOP, 0);
         }
