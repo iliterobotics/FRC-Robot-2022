@@ -154,12 +154,6 @@ public abstract class AbstractController {
                 db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8;
     }
 
-    protected boolean finishedFiringStartupSequence() {
-        return isFlywheelUpToSpeed() && isFeederUpToSpeed();
-    }
-
-
-
     protected abstract void updateImpl(double pNow);
 
     /**
