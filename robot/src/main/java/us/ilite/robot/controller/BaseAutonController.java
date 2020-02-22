@@ -1,6 +1,5 @@
 package us.ilite.robot.controller;
 
-import com.team2363.commands.HelixFollower;
 import com.team2363.commands.IliteHelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
@@ -10,11 +9,24 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.BobUtils;
 import static us.ilite.robot.Enums.*;
 
+import java.util.Map;
+
 public class BaseAutonController extends AbstractController {
 
+    protected double mDelayCycleCount;
     protected Path mActivePath = null;
     protected double mPathStartTime = 0d;
     protected HelixFollowerImpl mPathFollower = null;
+
+    public BaseAutonController(String pPathAssociation) {
+        kPathAssociation = pPathAssociation;
+//        mDelayCycleCount = AutonSelection.mDelaySeconds;
+        //setActivePath(getPathsFromController().get((String) getPathsFromController().keySet().toArray()[AutonSelection.mPathNumber]));
+    }
+
+    public BaseAutonController() {
+        this("DEFAULT");
+    }
 
     @Override
     protected void updateImpl(double pNow) {
@@ -29,7 +41,6 @@ public class BaseAutonController extends AbstractController {
         } else {
             mPathFollower.execute(pNow);
         }
-
     }
 
     protected void setActivePath(Path pPath) {
@@ -47,6 +58,7 @@ public class BaseAutonController extends AbstractController {
         private PIDController mHeadingController = new PIDController(
                 0.001, 0.0, 0.0);
         private double mPathStartTime = 0.0;
+
 
         /**
          * This will import the path class based on the name of the path provided

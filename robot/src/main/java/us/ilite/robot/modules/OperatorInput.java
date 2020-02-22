@@ -40,6 +40,7 @@ public class OperatorInput extends Module {
 
     @Override
     public void setOutputs(double pNow) {
+
     }
 
 }

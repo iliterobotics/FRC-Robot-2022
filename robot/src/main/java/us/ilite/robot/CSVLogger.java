@@ -41,7 +41,8 @@ public class CSVLogger {
                 //mLogger.error( "Drained queue got: " + kTempCSVLogs.size() );
 
                 for ( Log log : kTempCSVLogs ) {
-                    logFromCodexToCSVLog( log );
+                    //TODO - fix the excessive exceptions
+//                    logFromCodexToCSVLog( log );
                 }
             } catch (Exception e) {}
         }

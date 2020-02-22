@@ -14,6 +14,7 @@ import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.*;
@@ -55,6 +56,7 @@ public class Robot extends TimedRobot {
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
     private final AbstractController mBaseAutonController = new BaseAutonController();
+//    private final AutonSelection mAutonSelection = new AutonSelection();
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
@@ -70,8 +72,9 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-//        mLEDControl = new LEDControl();
-        mShooter = new FlywheelModule();
+        DATA.powercell.set(EPowerCellData.CURRENT_ARM_ANGLE , 90);
+//        mLedControl = new LEDControl();
+//        mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
 //        mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
