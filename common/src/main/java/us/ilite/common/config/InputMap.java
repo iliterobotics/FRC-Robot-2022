@@ -62,7 +62,8 @@ public class InputMap {
         SERIALIZER_CONVEYORS = ELogitech310.L_BTN,
 
         REVERSE_POWER_CELLS = ELogitech310.R_BTN,
-        NEAR_FAR_MODE_TOGGLE = ELogitech310.Y_BTN,
+        FAR_MODE = ELogitech310.Y_BTN,
+        NEAR_MODE = ELogitech310.A_BTN,
         MANUAL_HOOD_UP = ELogitech310.DPAD_UP,
         MANUAL_HOOD_DOWN = ELogitech310.DPAD_DOWN,
 
