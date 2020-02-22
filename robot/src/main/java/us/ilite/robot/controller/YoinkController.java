@@ -5,6 +5,8 @@ import us.ilite.robot.auto.paths.*;
 
 public class YoinkController extends BaseAutonController {
     private double mStartTime;
+    private Path mYoinkTo = new YoinkTo();
+    private Path mYoinkFrom = new YoinkFrom();
 
     private boolean isFinished(double pNow, Path pPath) {
         return BobUtils.getIndexForCumulativeTime(pPath, pNow, mStartTime) == pPath.getPath().length - 1;
@@ -12,26 +14,15 @@ public class YoinkController extends BaseAutonController {
 
     public YoinkController(double pNow) {
         mStartTime = pNow;
-        setActivePath(new GoToTrenchFromLine());
-        System.out.println("AUTONOMOUS ROUTINE HAS BEEN STARTED");
+        setActivePath(mYoinkTo);
     }
 
     @Override
     public void updateImpl(double pNow) {
-        if (isFinished(pNow, new GoToTrenchFromLine())) {
-            setActivePath(new ReturnToShooting());
+        if (isFinished(pNow, mYoinkTo)) {
+            setActivePath(mYoinkFrom);
             mPathFollower.reverse();
-            System.out.println("ROBOT IS AT TRENCH");
         }
-        if (isFinished(pNow, new ReturnToShooting())) {
-            setActivePath(new PickUpBallsFromGenerator());
-            System.out.println("ROBOT IS BACK TO THE INITIATION LINE");
-        }
-        if (isFinished(pNow, new PickUpBallsFromGenerator())) {
-            setActivePath(new FinalShots());
-            System.out.println("ROBOT IS AT GENERATOR");
-        }
-        System.out.println("AUTONOMOUS ROUTINE HAS BEEN FINISHED");
         super.updateImpl(pNow);
     }
 }
