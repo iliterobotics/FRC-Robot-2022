@@ -78,7 +78,7 @@ public abstract class AbstractController {
         mEntryLatch.update(db.powercell.isSet(ENTRY_BEAM));
         mSecondaryLatch.update(db.powercell.isSet(H_BEAM));
         if(mNumBalls > 3) {
-            if (db.powercell.isSet(ENTRY_BEAM)) {
+            if (db.powercell.isSet(ENTRY_BEAM) && mNumBalls <= 5) {
                 db.powercell.set(SET_H_pct, 0.3);
             } else {
                 db.powercell.set(SET_H_pct, 0.0);
@@ -92,10 +92,10 @@ public abstract class AbstractController {
             if (mSecondaryLatch.get() == XorLatch.State.XOR) {
                 // Ball has entered but not exited
                 db.powercell.set(SET_H_pct, 0.0);
-                db.powercell.set(SET_V_pct, 0.4);
+                db.powercell.set(SET_V_pct, 0.45);
             } else if (mSecondaryLatch.get() == XorLatch.State.NONE) {
                 // Ball has not entered
-                db.powercell.set(SET_H_pct, 0.4);
+                db.powercell.set(SET_H_pct, 0.3);
                 db.powercell.set(SET_V_pct, 0.0);
             } else {
                 // Ball has exited
