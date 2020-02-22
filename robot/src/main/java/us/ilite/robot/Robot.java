@@ -127,7 +127,7 @@ public class Robot extends TimedRobot {
 //        }
 
         MODE=AUTONOMOUS;
-        mActiveController = new DriveStraightController();
+        mActiveController = new OurTrenchController();
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
