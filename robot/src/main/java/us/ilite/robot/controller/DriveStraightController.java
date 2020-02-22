@@ -1,7 +1,11 @@
 package us.ilite.robot.controller;
 
+import us.ilite.common.Angle;
 import us.ilite.common.Data;
 import us.ilite.common.Distance;
+import us.ilite.common.Field2020;
+import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
@@ -13,10 +17,9 @@ public class DriveStraightController extends BaseAutonController {
     private Distance targetDistance;
     private Data db = Robot.DATA;
     private boolean isFirstLegDone;
-    
-    public DriveStraightController(Distance mDistance){
+
+    public DriveStraightController(){
         db.drivetrain.set(STATE, Enums.EDriveState.PERCENT_OUTPUT);
-        this.targetDistance = mDistance;
         isFirstLegDone = false;
     }
 
@@ -30,7 +33,7 @@ public class DriveStraightController extends BaseAutonController {
         }
         activateSerializer(pNow);
         setIntakeArmEnabled(pNow, true);
-        initiateAllModules(isFirstLegDone);
+        initiateAllModules(pNow , isFirstLegDone);
     }
 
     public Distance getDistance() {
@@ -43,10 +46,22 @@ public class DriveStraightController extends BaseAutonController {
         return getDistance().inches() >= targetDistance.inches();
     }
 
-    public void initiateAllModules(boolean isFirstLegDone){
-        if(isFirstLegDone){
-            //TODO implement flywheel module stuff
+    public void initiateAllModules(double pNow , boolean isFirstLegDone){
+        if (isFirstLegDone){
+            if (isFeederUpToSpeed() && isFlywheelUpToSpeed() &&
+                    Field2020.canHitInnerGoal(tempCalcAngleToInnerGoal() , getDistance())){
+                //TODO add in flywheel logic
 
+            }
         }
+    }
+
+    public Angle tempCalcAngleToInnerGoal() {
+        double thetaGoal = db.limelight.get(ELimelightData.CALC_ANGLE_TO_TARGET);
+        double distToGoal = db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET); //TODO: Units??
+        double b = 29.25 + (distToGoal * Math.cos(thetaGoal));
+        double a = distToGoal * Math.sin(thetaGoal);
+        double thetab = Math.tanh(b/a);
+        return Angle.fromDegrees(90 - thetab);
     }
 }

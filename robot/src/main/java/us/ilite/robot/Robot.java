@@ -127,7 +127,7 @@ public class Robot extends TimedRobot {
 //        }
 
         MODE=AUTONOMOUS;
-        mActiveController = new AutonCalibration();
+        mActiveController = new DriveStraightController();
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
@@ -147,7 +147,7 @@ public class Robot extends TimedRobot {
         }
 
         MODE=TELEOPERATED;
-        mActiveController = mTeleopController;
+        mActiveController = mTestController;
         mActiveController.setEnabled(true);
     }
 
