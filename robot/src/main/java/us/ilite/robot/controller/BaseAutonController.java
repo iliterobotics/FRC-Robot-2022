@@ -11,22 +11,22 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.BobUtils;
 import static us.ilite.robot.Enums.*;
 
-import java.util.Map;
-
 public class BaseAutonController extends AbstractController {
 
     protected double mDelayCycleCount;
     protected Path mActivePath = null;
+    private Path mDesiredPath;
     protected double mPathStartTime = 0d;
     private HelixFollowerImpl mPathFollower = null;
-    private final Distance mPathTotalDistance;
-    private final double mMaxAllowedPathTime;
-
+    private Distance mPathTotalDistance;
+    private double mMaxAllowedPathTime;
+    private boolean mInitializedPathFollower = false;
 
     public BaseAutonController(Path pActivePath) {
-        setActivePath(pActivePath);
-        mDelayCycleCount = AutonSelection.mDelaySeconds;
+        mDesiredPath = pActivePath;
+        mDelayCycleCount = AutonSelection.mDelaySeconds / .02;
 
+        setActivePath(mDesiredPath);
         mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1 + (mDelayCycleCount * .02);
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
         e();
@@ -41,7 +41,11 @@ public class BaseAutonController extends AbstractController {
 
     @Override
     protected void updateImpl(double pNow) {
-        if (mDelayCycleCount == 0) {
+        if (mDelayCycleCount <= 0) {
+            if (!mInitializedPathFollower) {
+                mPathFollower.initialize();
+                mInitializedPathFollower = true;
+            }
             if (mPathStartTime == 0) {
                 mPathStartTime = pNow;
             }
@@ -61,7 +65,6 @@ public class BaseAutonController extends AbstractController {
     protected void setActivePath(Path pPath) {
         mActivePath = pPath;
         mPathFollower = new HelixFollowerImpl(mActivePath);
-        mPathFollower.initialize();
     }
 
     private static final void e() {

@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
 //    private final AbstractController mBaseAutonController = new BaseAutonController();
-    public static final AutonSelection mAutonSelection = new AutonSelection();
+    public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
@@ -73,6 +73,7 @@ public class Robot extends TimedRobot {
         initTimer.start();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
+        mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mDrive = new DriveModule();
 //        mLEDControl = new LEDControl();
@@ -132,17 +133,7 @@ public class Robot extends TimedRobot {
 //        }
 
         MODE=AUTONOMOUS;
-        try {
-            mActiveController = mAutonSelection.getSelectedAutonController().getClass().getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException nsme) {
-            nsme.printStackTrace();
-        } catch (InstantiationException ie) {
-            ie.printStackTrace();
-        } catch (IllegalAccessException iae) {
-            iae.printStackTrace();
-        } catch (InvocationTargetException ite) {
-            ite.printStackTrace();
-        }
+        mActiveController = mAutonSelection.getSelectedAutonController();
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);
