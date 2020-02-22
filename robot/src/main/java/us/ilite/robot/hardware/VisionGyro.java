@@ -1,6 +1,5 @@
 package us.ilite.robot.hardware;
 
-import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
@@ -17,7 +16,7 @@ public class VisionGyro extends IMU {
 
     public VisionGyro(Data pData) {
         super(kCollisionGains);
-        mTargetingData = pData.limelight;
+        mTargetingData = pData.goaltracking;
     }
 
     @Override

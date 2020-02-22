@@ -1,74 +1,75 @@
 package us.ilite.robot.modules;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import us.ilite.common.IFieldComponent;
+import com.flybotix.hfr.util.lang.EnumUtils;
 import us.ilite.common.types.ELimelightData;
+
+import static java.lang.Math.abs;
 import static us.ilite.common.types.ERawLimelightData.*;
+
+import us.ilite.common.types.ERawLimelightData;
 import us.ilite.robot.Robot;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class GroundTracking extends Module {
-    private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable("limelight");
-    private IFieldComponent mTrackingType;
-    private Limelight mLimelight;
+    private double mLastXPosition = 0.0;
+    private double mLastYPosition = 0.0;
+    private final double mAcceptableError = 0.1;
+    private final double mAcceptableXError = 10.0;
+    private final double mAcceptableYError = 10.0;
+    private int mSelectedTarget = -1;
+    private boolean mIsTracking = false;
+
     @Override
     public void readInputs(double pNow) {
-
+        sortTrackingData();
     }
 
     @Override
     public void setOutputs(double pNow) {
-        Robot.DATA.rawLimelight.reset();
-        boolean targetValid = mTable.getEntry("tv").getDouble((Double.NaN)) > 0.0;
-        Robot.DATA.rawLimelight.set(tv, targetValid ? 1.0 : null);
-//        Robot.DATA.limelight.get(ETrackingType.values()[Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE).intValue()].ordinal());
-        if (targetValid) {
-            Robot.DATA.rawLimelight.set(tx, mTable.getEntry("tx").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tx0, mTable.getEntry("tx0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tx1, mTable.getEntry("tx1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tx2, mTable.getEntry("tx2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ty, mTable.getEntry("ty").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ty0, mTable.getEntry("ty0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ty1, mTable.getEntry("ty1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ty2, mTable.getEntry("ty2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ta, mTable.getEntry("ta").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ta0, mTable.getEntry("ta0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ta1, mTable.getEntry("ta1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ta2, mTable.getEntry("ta2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ts, mTable.getEntry("ts").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ts0, mTable.getEntry("ts0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ts1, mTable.getEntry("ts1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(ts2, mTable.getEntry("ts2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tl, mTable.getEntry("tl").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tshort, mTable.getEntry("tshort").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tshort0, mTable.getEntry("tshort0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tshort1, mTable.getEntry("tshort1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tshort2, mTable.getEntry("tshort2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tlong, mTable.getEntry("tlong").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tlong0, mTable.getEntry("tlong0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tlong1, mTable.getEntry("tlong1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tlong2, mTable.getEntry("tlong2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(thoriz, mTable.getEntry("thor").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(thoriz0, mTable.getEntry("thor0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(thoriz1, mTable.getEntry("thor1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(thoriz2, mTable.getEntry("thor2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tvert, mTable.getEntry("tvert").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tvert0, mTable.getEntry("tvert0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tvert1, mTable.getEntry("tvert1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(tvert2, mTable.getEntry("tvert2").getDouble(Double.NaN));
-
-            Robot.DATA.rawLimelight.set(calcDistToTarget, Robot.DATA.limelight.get(ELimelightData.CALC_DIST_TO_TARGET));
-            Robot.DATA.rawLimelight.set(calcAngleToTarget, Robot.DATA.limelight.get(ELimelightData.CALC_ANGLE_TO_TARGET));
-
-            if (Robot.DATA.limelight.isSet(ELimelightData.TARGET_ID)) {
-             //   Commented out for now until issue with enums isnt fixed
-            //    Optional<Translation2d> p = Robot.DATA.limelight.get((Robot.DATA.limelight.get(ELimelightData.TRACKING_TYPE));
-          //      if (p.isPresent()) {
-                    // Robot.DATA.rawLimelight.set(calcTargetX, p.get().x());
-                    // Robot.DATA.rawLimelight.set(calcTargetY, p.get().y());
-                }
-            }
-        }
-
     }
 
+    public void sortTrackingData() {
+        Robot.DATA.groundTracking.set(ELimelightData.TV, Robot.DATA.rawLimelight.get(ERawLimelightData.TV));
+        boolean targetValid = Robot.DATA.groundTracking.isSet(ELimelightData.TV);
+        if (targetValid) {
+            if (!mIsTracking) {
+                if (abs(Robot.DATA.rawLimelight.get(ERawLimelightData.TY_0) - Robot.DATA.rawLimelight.get(ERawLimelightData.TY_1)) < mAcceptableError) {
+                    mSelectedTarget = Robot.DATA.rawLimelight.get(ERawLimelightData.TX_0) > Robot.DATA.rawLimelight.get(ERawLimelightData.TX_1) ? 0 : 1;
+                    mIsTracking = true;
+                } else {
+                    mSelectedTarget = 0;
+                }
+            }
+
+            Robot.DATA.groundTracking.set(ELimelightData.TX, Robot.DATA.rawLimelight.get(getEnumFromString("TX_" + mSelectedTarget)) * (Limelight.llFOVHorizontal / 2));
+            Robot.DATA.groundTracking.set(ELimelightData.TY, Robot.DATA.rawLimelight.get(getEnumFromString("TY_" + mSelectedTarget)) * (Limelight.llFOVVertical / 2));
+            Robot.DATA.groundTracking.set(ELimelightData.TA, Robot.DATA.rawLimelight.get(getEnumFromString("TA_" + mSelectedTarget)));
+            Robot.DATA.groundTracking.set(ELimelightData.TS, Robot.DATA.rawLimelight.get(getEnumFromString("TS_" + mSelectedTarget)));
+            Robot.DATA.groundTracking.set(ELimelightData.TL, Robot.DATA.rawLimelight.get(TL));
+            Robot.DATA.groundTracking.set(ELimelightData.TSHORT, Robot.DATA.rawLimelight.get(getEnumFromString("TSHORT_" + mSelectedTarget)));
+            Robot.DATA.groundTracking.set(ELimelightData.TLONG, Robot.DATA.rawLimelight.get(getEnumFromString("TLONG_" + mSelectedTarget)));
+            Robot.DATA.groundTracking.set(ELimelightData.THORIZ, Robot.DATA.rawLimelight.get(getEnumFromString("THORIZ_" + mSelectedTarget)));
+            Robot.DATA.groundTracking.set(ELimelightData.TVERT, Robot.DATA.rawLimelight.get(getEnumFromString("TX_" + mSelectedTarget)));
+            if (abs(mLastXPosition - Robot.DATA.groundTracking.get(ELimelightData.TX)) > mAcceptableXError || abs(mLastYPosition - Robot.DATA.groundTracking.get(ELimelightData.TY)) > mAcceptableYError) {
+                mIsTracking = false;
+            }
+            mLastXPosition = Robot.DATA.groundTracking.get(ELimelightData.TX);
+            mLastYPosition = Robot.DATA.groundTracking.get(ELimelightData.TY);
+        } else {          //set selectedTarget codex straight from limelight codex
+            for (ELimelightData e : EnumUtils.getEnums(ELimelightData.class)) {
+                Robot.DATA.groundTracking.set(e, Robot.DATA.goaltracking.get(e));
+            }
+        }
+    }
+
+    /**
+     * A small helper function to return an ERawLimelightData from the string representation of that enum.
+     * @param pEnum The specified String representation of the desired enum
+     * @return The ERawLimelightData enum desired
+     */
+    private ERawLimelightData getEnumFromString(String pEnum) {
+        return Arrays.stream(values()).filter(e -> e.toString().equals(pEnum)).collect(Collectors.toList()).get(0);
+    }
+}

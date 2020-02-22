@@ -2,11 +2,11 @@ package us.ilite.common.types;
 
 public enum EShooterSystemData {
     HOOD_OPEN_LOOP,
-    CURRENT_BALL_VELOCITY,      //The Current power cell velocity read from the internal encoders (units?)
-    TARGET_BALL_VELOCITY,       //The desired power cell velocity
+    SET_BALL_VELOCITY_ft_s,      //The Current power cell velocity read from the internal encoders (units?)
+    BALL_VELOCITY_ft_s,       //The desired power cell velocity
 
-    CURRENT_FEEDER_VELOCITY_RPM,        //The current feeder velocity read by the internal encoder (units?)
-    TARGET_FEEDER_VELOCITY_RPM,         //The desired feeder velocity
+    FEEDER_rpm,        //The current feeder velocity read by the internal encoder (units?)
+    SET_FEEDER_rpm,         //The desired feeder velocity
 
     CURRENT_TURRET_ANGLE,           //The current angle of the turret (deg)
     DESIRED_TURRET_ANGLE,           //The desired angle of the turret
