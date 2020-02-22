@@ -23,6 +23,7 @@ import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
 import us.ilite.robot.network.EForwardableConnections;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.TimerTask;
 
@@ -131,7 +132,17 @@ public class Robot extends TimedRobot {
 //        }
 
         MODE=AUTONOMOUS;
-        mActiveController = mAutonSelection.getSelectedAutonController();
+        try {
+            mActiveController = mAutonSelection.getSelectedAutonController().getClass().getDeclaredConstructor().newInstance();
+        } catch (NoSuchMethodException nsme) {
+            nsme.printStackTrace();
+        } catch (InstantiationException ie) {
+            ie.printStackTrace();
+        } catch (IllegalAccessException iae) {
+            iae.printStackTrace();
+        } catch (InvocationTargetException ite) {
+            ite.printStackTrace();
+        }
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);
