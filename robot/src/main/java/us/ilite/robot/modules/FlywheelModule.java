@@ -113,8 +113,8 @@ public class FlywheelModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        db.flywheel.set(CURRENT_BALL_VELOCITY, mFlywheelFalconMaster.getSelectedSensorVelocity() / kVelocityConversion);
-        db.flywheel.set(CURRENT_FEEDER_VELOCITY_RPM, mFeederInternalEncoder.getVelocity());
+        db.flywheel.set(SET_BALL_VELOCITY_ft_s, mFlywheelFalconMaster.getSelectedSensorVelocity() / kVelocityConversion);
+        db.flywheel.set(FEEDER_rpm, mFeederInternalEncoder.getVelocity());
         double position = mHoodPot.getPosition();
         db.flywheel.set(POT_RAW_VALUE, position);
         db.flywheel.set(CURRENT_HOOD_ANGLE, convertToHoodAngle(position));
@@ -178,7 +178,7 @@ public class FlywheelModule extends Module {
                 mFlywheelFalconFollower.set(TalonFXControlMode.PercentOutput, l);
                 break;
             case VELOCITY:
-                double flywheelOutput = db.flywheel.get(TARGET_BALL_VELOCITY) * kVelocityConversion;
+                double flywheelOutput = db.flywheel.get(BALL_VELOCITY_ft_s) * kVelocityConversion;
                 SmartDashboard.putNumber("Flywheel Raw Output", flywheelOutput);
                 mFlywheelFalconMaster.set(TalonFXControlMode.Velocity, flywheelOutput);
                 mFlywheelFalconFollower.set(TalonFXControlMode.Velocity, flywheelOutput);
