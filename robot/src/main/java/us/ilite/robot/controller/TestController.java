@@ -93,24 +93,9 @@ public class TestController extends BaseManualController {
     }
 
     private void firingSequence(FlywheelSpeeds speed) {
-//
-//        if (db.flywheel.get(FLYWHEEL_WHEEL_STATE) == FlywheelWheelState.VELOCITY.ordinal()) {
-//            super.setFlywheelClosedLoop(FlywheelSpeeds.OVERRIDE);
-//        }
-        if (db.driverinput.isSet(InputMap.OPERATOR.NEAR_FAR_MODE_TOGGLE)) {
-            if (speed == FlywheelSpeeds.FAR_TRENCH)
-            {
-                super.setFlywheelClosedLoop(FlywheelSpeeds.CLOSE);
-            }
-            else
-            {
-                super.setFlywheelClosedLoop(FlywheelSpeeds.FAR_TRENCH);
-            }
-        } else {
-            super.setFlywheelClosedLoop(FlywheelSpeeds.OFF);
-        }
-
+        db.flywheel.set(TARGET_BALL_VELOCITY, speed.speed);
         if (isFlywheelUpToSpeed()) {
+            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, speed.feeder);
             if (isFeederUpToSpeed()) {
                 db.powercell.set(DESIRED_V_VELOCITY, 0.5);
             } else {
