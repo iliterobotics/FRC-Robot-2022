@@ -222,7 +222,7 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs(double pNow) {
-		EDriveState mode = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
+		EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
 		// Do this to prevent wonkiness while transitioning autonomous to teleop
 		if(mode == null) return;
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);

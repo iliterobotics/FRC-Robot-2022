@@ -40,14 +40,9 @@ public class YoinkController extends BaseAutonController {
                 mIntakingCount--;
             }
             if (BobUtils.isFinished(pNow, mYoinkFrom, mYoinkFromStartTime)) {
+                System.out.println("=========================== TARGETLOCK ENABLED =================================");
                 db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TARGET_ANGLE_LOCK);
             }
         }
-//        if (!mHasReversed && BobUtils.isFinished(pNow, mYoinkTo, mPathStartTime)) {
-//            setNewActivePath(mYoinkFrom, true);
-//            mHasReversed = true;
-//
-//            super.updateImpl(pNow);
-//        }
     }
 }

@@ -25,9 +25,9 @@ public abstract class BaseManualController extends AbstractController {
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
 
         if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_BALL)) {
-            db.drivetrain.set(DESIRED_STATE, EDriveState.TARGET_ANGLE_LOCK);
+            db.drivetrain.set(STATE, EDriveState.TARGET_ANGLE_LOCK);
         } else if(throttle == 0.0 && rotate == 0.0) {
-            db.drivetrain.set(DESIRED_STATE, EDriveState.HOLD);
+            db.drivetrain.set(STATE, EDriveState.HOLD);
             db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
             db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
         }
@@ -46,7 +46,7 @@ public abstract class BaseManualController extends AbstractController {
 
             //TODO - Button here is bound to change once everything is integrated
             if (!db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_BALL)) {
-                db.drivetrain.set(DESIRED_STATE, EDriveState.VELOCITY);
+                db.drivetrain.set(STATE, EDriveState.VELOCITY);
                 db.drivetrain.set(DESIRED_TURN_PCT, rotate);
             }
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
