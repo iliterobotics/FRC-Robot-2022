@@ -2,6 +2,7 @@ package us.ilite.robot.controller;
 
 import com.team2363.commands.IliteHelixFollower;
 import com.team319.trajectory.Path;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Enums;
@@ -11,7 +12,7 @@ public class YoinkController extends BaseAutonController {
     private boolean mHasReversed;
 
     public YoinkController() {
-        super(new YoinkTo(),  false);
+        super(new YoinkTo(), false);
         mHasReversed = false;
     }
 
@@ -34,14 +35,14 @@ public class YoinkController extends BaseAutonController {
         startInhaling(pNow);
         startShooting(pNow);
     }
-    private void startInhaling(double pNow){
-        if(isFinished(pNow, mYoinkTO)){
-            setIntakeArmEnabled(pNow , true);
-            activateSerializer(pNow);
-        }
+
+    private void startInhaling(double pNow) {
+        if (isFinished(pNow, new YoinkTo()))
+            setIntakeArmEnabled(pNow, true);
+        activateSerializer(pNow);
     }
     private void startShooting(double pNow){
-        if(isFinished(pNow , mYoinkFrom)) {
+        if(isFinished(pNow , new YoinkFrom())) {
            setFlywheelClosedLoop(Enums.FlywheelSpeeds.FAR);
            setFeederClosedLoop(Enums.FlywheelSpeeds.FAR);
         }
