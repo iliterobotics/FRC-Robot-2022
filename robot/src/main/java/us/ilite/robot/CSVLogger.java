@@ -42,7 +42,7 @@ public class CSVLogger {
 
                 for ( Log log : kTempCSVLogs ) {
                     //TODO - fix the excessive exceptions
-//                    logFromCodexToCSVLog( log );
+                    logFromCodexToCSVLog( log );
                 }
             } catch (Exception e) {}
         }

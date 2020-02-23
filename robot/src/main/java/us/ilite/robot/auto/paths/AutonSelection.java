@@ -1,6 +1,5 @@
 package us.ilite.robot.auto.paths;
 
-import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,7 +24,7 @@ public class AutonSelection {
             LineAutonController.class,
             ShootIntakeController.class,
             YoinkController.class,
-            OurTrench.class
+            OurTrenchController.class
     };
 
     public AutonSelection() {

@@ -14,19 +14,15 @@ public class YoinkController extends BaseAutonController {
         mHasReversed = false;
     }
 
-    private boolean isFinished(double pNow, Path pPath) {
-        double dt = pNow - mPathStartTime;
-        SmartDashboard.putNumber("Path dt", dt);
-        SmartDashboard.putNumber("Path total time", BobUtils.getPathTotalTime(pPath));
-        return BobUtils.getIndexForCumulativeTime(pPath, pNow, mPathStartTime) == -1;
-    }
-
     @Override
     public void updateImpl(double pNow) {
-        if (!mHasReversed && isFinished(pNow, mActivePath)) {
-//            setNewActivePath(new YoinkFrom(), true);
-            mHasReversed = true;
-        }
         super.updateImpl(pNow);
+        if (!mHasReversed && BobUtils.isFinished(pNow, mActivePath, mPathStartTime)) {
+            setNewActivePath(new YoinkFrom(), true);
+            mHasReversed = true;
+
+            // Update again since path has changed, follows process of BaseAutonController
+            super.updateImpl(pNow);
+        }
     }
 }
