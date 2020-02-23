@@ -9,16 +9,14 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.auto.paths.*;
 
 public class YoinkController extends BaseAutonController {
+    private YoinkTo mYoinkTo = new YoinkTo();
+    private YoinkFrom mYoinkFrom = new YoinkFrom();
+    private double mYoinkFromStartTime;
     private boolean mHasReversed;
 
     public YoinkController() {
         super(new YoinkTo(), false);
         mHasReversed = false;
-    }
-
-    private boolean isFinished(double pNow, Path pPath) {
-        double dt = pNow - mPathStartTime;
-        return BobUtils.getIndexForCumulativeTime(pPath, pNow, mPathStartTime) == -1;
     }
 
     @Override
@@ -27,6 +25,7 @@ public class YoinkController extends BaseAutonController {
         super.updateImpl(pNow);
         if (!mHasReversed && BobUtils.isFinished(pNow, mActivePath, mPathStartTime)) {
             setNewActivePath(new YoinkFrom(), true);
+            mYoinkFromStartTime = pNow;
             mHasReversed = true;
 
             // Update again since path has changed, follows process of BaseAutonController
@@ -37,12 +36,13 @@ public class YoinkController extends BaseAutonController {
     }
 
     private void startInhaling(double pNow) {
-        if (isFinished(pNow, new YoinkTo()))
+        if (BobUtils.isFinished(pNow, mYoinkTo, mPathStartTime))
             setIntakeArmEnabled(pNow, true);
         activateSerializer(pNow);
     }
+
     private void startShooting(double pNow){
-        if(isFinished(pNow , new YoinkFrom())) {
+        if(BobUtils.isFinished(pNow , mYoinkFrom, mYoinkFromStartTime)) {
            setFlywheelClosedLoop(Enums.FlywheelSpeeds.FAR);
            setFeederClosedLoop(Enums.FlywheelSpeeds.FAR);
         }
