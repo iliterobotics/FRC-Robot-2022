@@ -20,6 +20,7 @@ public class BaseAutonController extends AbstractController {
     protected double mPathStartTime = 0d;
     protected HelixFollowerImpl mPathFollower = null;
     private boolean mInitializedPathFollower = false;
+    private boolean hitfirst = false;
 
     private Distance mPathTotalDistance;
     private double mMaxAllowedPathTime;
@@ -52,7 +53,6 @@ public class BaseAutonController extends AbstractController {
                 mInitializedPathFollower = true;
             }
             if (mPathStartTime == 0) {
-                SmartDashboard.putNumber("START OF PATH", pNow);
                 mPathStartTime = pNow;
             }
             if (mPathFollower != null && mPathFollower.isFinished()) {
@@ -151,6 +151,13 @@ public class BaseAutonController extends AbstractController {
 
         protected void moveToNextSegment(double pNow) {
             currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
+
+            if (currentSegment == 0) {
+                hitfirst = true;
+            }
+
+            SmartDashboard.putBoolean("Hit first index?", hitfirst);
+
             if (currentSegment == -1)
             {
                 isFinished = true;
