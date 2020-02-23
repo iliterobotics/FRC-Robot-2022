@@ -1,9 +1,7 @@
 package us.ilite.robot.auto.paths;
 
-import us.ilite.common.types.EPowerCellData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.commands.IAutoCommand;
-
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
