@@ -147,14 +147,12 @@ public abstract class AbstractController {
         db.flywheel.set(BALL_VELOCITY_ft_s, pSpeed.speed);
         db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
         db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
-        db.flywheel.set(FEEDER_rpm, pSpeed.feeder);
     }
 
     protected void firingSequence(FlywheelSpeeds speed) {
-        System.out.println(isFlywheelUpToSpeed());
         setFlywheelClosedLoop(speed);
         if (isFlywheelUpToSpeed()) {
-            db.flywheel.set(FEEDER_rpm, speed.feeder);
+            db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
             if (isFeederUpToSpeed()) {
                 db.powercell.set(SET_V_pct, 0.5);
                 db.powercell.set(SET_H_pct, 0.5);

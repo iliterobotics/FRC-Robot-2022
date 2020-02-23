@@ -55,15 +55,14 @@ public class TeleopController extends BaseManualController { //copied from TestC
             currentState = Enums.FlywheelSpeeds.CLOSE;
         }
 
-        db.flywheel.set(EShooterSystemData.SET_FEEDER_rpm, currentState.feeder);
-
         if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
             super.firingSequence(currentState);
 //            super.setFlywheelClosedLoop(currentState);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.AIM)) {
             super.setFlywheelClosedLoop(currentState);
         } else {
-            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
+            super.firingSequence(Enums.FlywheelSpeeds.OFF);
+//            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
         }
         SmartDashboard.putString("Flywheel State", currentState.name());
     }
@@ -109,10 +108,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
         db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
 
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
-            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
+//            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
                 setIntakeArmEnabled(pNow, true);
                 activateSerializer(pNow);
-            }
+//            }
 
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.STOW);

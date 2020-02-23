@@ -165,7 +165,7 @@ public class FlywheelModule extends Module {
     private void setFeeder() {
         // Cannot set voltage mode if an external sensor is attached
 //        mFeeder.setVoltage(db.flywheel.get(FEEDER_OUTPUT_OPEN_LOOP) / 12.0);
-        mFeeder.set(db.flywheel.get(FEEDER_rpm));
+        mFeeder.set(db.flywheel.get(SET_FEEDER_rpm));
     }
 
     private void setFlywheel() {
