@@ -223,8 +223,9 @@ public class DriveModule extends Module {
 	@Override
 	public void setOutputs(double pNow) {
 		EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
-		// Do this to prevent wonkiness while transitioning autonomous to teleop
+		// Do this to prevent wonkiness while transitioning autonomous to tele op
 		if(mode == null) return;
+		SmartDashboard.putNumber("Drive module state", mode.ordinal());
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
@@ -256,15 +257,16 @@ public class DriveModule extends Module {
 				break;
 			case TARGET_ANGLE_LOCK:
 				RobotCodex<ELimelightData> targetData = Robot.DATA.limelight;
-				double pidOutput;
+				double pidOutput = 0;
 				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
 					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-
+					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
 					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
 					turn = db.drivetrain.get(DESIRED_TURN_PCT);
 				}
+				SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
 			case VELOCITY:
 				mStartHoldingPosition = false;
 				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
