@@ -52,7 +52,6 @@ public class BaseAutonController extends AbstractController {
                 mInitializedPathFollower = true;
             }
             if (mPathStartTime == 0) {
-                SmartDashboard.putNumber("START OF PATH", pNow);
                 mPathStartTime = pNow;
             }
             if (mPathFollower != null && mPathFollower.isFinished()) {
@@ -151,6 +150,9 @@ public class BaseAutonController extends AbstractController {
 
         protected void moveToNextSegment(double pNow) {
             currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
+            if (currentSegment == 0) {
+                SmartDashboard.putBoolean("HIT FIRST", true);
+            }
             if (currentSegment == -1)
             {
                 isFinished = true;
