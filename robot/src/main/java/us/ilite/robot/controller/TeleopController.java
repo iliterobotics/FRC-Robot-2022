@@ -5,6 +5,7 @@ import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EPowerCellData.*;
@@ -53,6 +54,8 @@ public class TeleopController extends BaseManualController { //copied from TestC
         }else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
             currentState = Enums.FlywheelSpeeds.CLOSE;
         }
+
+        db.flywheel.set(EShooterSystemData.SET_FEEDER_rpm, currentState.feeder);
 
         if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
             super.firingSequence(currentState);
