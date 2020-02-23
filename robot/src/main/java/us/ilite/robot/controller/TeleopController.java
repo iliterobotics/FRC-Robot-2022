@@ -29,6 +29,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     @Override
     protected void updateImpl(double pNow) {
+        db.registerAllWithShuffleboard();
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
