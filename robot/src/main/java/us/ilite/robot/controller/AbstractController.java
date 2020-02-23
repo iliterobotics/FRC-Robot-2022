@@ -24,7 +24,7 @@ public abstract class AbstractController {
     protected double dt = 1d;
 
 
-    public static double kIntakeRollerPower_on = 0.5;
+    public static double kIntakeRollerPower_on = 0.6;
     public static double kIntakeRollerPower_off = 0.0;
     protected final XorLatch mSecondaryLatch = new XorLatch();
     protected final XorLatch mEntryLatch = new XorLatch();

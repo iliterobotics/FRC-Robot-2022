@@ -47,8 +47,9 @@ public class DriveModule extends Module {
 	public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
 
 	// This is approx 290 Degrees per second, measured with a Pigeon
-    // Actual measured was 992 Degrees per second, with a resting battery voltage of 12.57V
-	public static double kMaxDegreesPerSecond = Units.radians_to_degrees(5);
+    // Actual measured was 825 Degrees per second, with a resting battery voltage of 12.57V
+	public static double kMaxDegreesPerSecond = Units.radians_to_degrees(10);
+//	public static double kMaxDegreesPerSecond = 0.01; //TODO THIS WAS NOT WORKING
 	// This is with the ADIS16470 IMU
 	public static Rotation2d kDriveMaxOmega_measured = Rotation2d.fromDegrees(19.1);
 

@@ -113,10 +113,10 @@ public class Enums {
     public enum FlywheelSpeeds {
         OFF(                00.0, 62.0, 0.00, HoodState.NONE, FlywheelWheelState.NONE),
         DEFAULT(            20.0, 45.0, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
-        CLOSE(              20.0, 43.6, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
-        INITIATION_LINE(    28.0, 39.5, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
-        FAR(                33.7, 31.5, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
-        FAR_TRENCH(         50.0, 22.0, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
+        CLOSE(              24.0, 62.0, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
+        INITIATION_LINE(    29.0, 39.5, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
+        FAR(                35.0, 31.5, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
+        FAR_TRENCH(         52.0, 22.0, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
         /** Override represents a highly-variable angle / speed state where the controller must directly set everything */
         OVERRIDE(           00.0, 45.0, 0.00, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY);
 
