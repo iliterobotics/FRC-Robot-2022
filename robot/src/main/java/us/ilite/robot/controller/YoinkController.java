@@ -29,22 +29,7 @@ public class YoinkController extends BaseAutonController {
             mHasReversed = true;
 
             // Update again since path has changed, follows process of BaseAutonController
-            super.updateImpl(pNow);
-        }
-        startInhaling(pNow);
-        startShooting(pNow);
-    }
-
-    private void startInhaling(double pNow) {
-        if (BobUtils.isFinished(pNow, mYoinkTo, mPathStartTime))
-            setIntakeArmEnabled(pNow, true);
-        activateSerializer(pNow);
-    }
-
-    private void startShooting(double pNow){
-        if(BobUtils.isFinished(pNow , mYoinkFrom, mYoinkFromStartTime)) {
-           setFlywheelClosedLoop(Enums.FlywheelSpeeds.FAR);
-           setFeederClosedLoop(Enums.FlywheelSpeeds.FAR);
+            super.updateImpl(pNow); 
         }
     }
 }
