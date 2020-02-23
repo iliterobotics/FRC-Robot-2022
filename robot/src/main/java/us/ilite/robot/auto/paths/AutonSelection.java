@@ -25,7 +25,7 @@ public class AutonSelection {
             LineAutonController.class,
             ShootIntakeController.class,
             YoinkController.class,
-            OurTrench.class
+            OurTrenchController.class
     };
 
     public AutonSelection() {
