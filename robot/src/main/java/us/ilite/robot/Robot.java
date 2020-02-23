@@ -16,12 +16,14 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
 import us.ilite.robot.network.EForwardableConnections;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.TimerTask;
 
@@ -55,8 +57,8 @@ public class Robot extends TimedRobot {
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
-    private final AbstractController mBaseAutonController = new BaseAutonController();
-//    private final AutonSelection mAutonSelection = new AutonSelection();
+//    private final AbstractController mBaseAutonController = new BaseAutonController();
+    public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
@@ -70,11 +72,11 @@ public class Robot extends TimedRobot {
         initTimer.start();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
+        mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-        DATA.powercell.set(EPowerCellData.ARM_ANGLE_deg , 90);
-//        mLedControl = new LEDControl();
-//        mShooter = new FlywheelModule();
+//        mLEDControl = new LEDControl();
+        mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
 //        mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
@@ -130,11 +132,12 @@ public class Robot extends TimedRobot {
 //        }
 
         MODE=AUTONOMOUS;
-        mActiveController = new YoinkController(CLOCK.getCurrentTime());
-        mActiveController.setEnabled(true);
 
+        mActiveController = mAutonSelection.getSelectedAutonController();
+        mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mIntake);
         mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 
