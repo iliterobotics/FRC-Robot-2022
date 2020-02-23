@@ -11,7 +11,6 @@ import us.ilite.robot.auto.paths.*;
 public class YoinkController extends BaseAutonController {
     private YoinkTo mYoinkTo = new YoinkTo();
     private YoinkFrom mYoinkFrom = new YoinkFrom();
-    private double mYoinkFromStartTime;
     private boolean mHasReversed;
 
     public YoinkController() {
@@ -23,13 +22,12 @@ public class YoinkController extends BaseAutonController {
     public void updateImpl(double pNow) {
         SmartDashboard.putNumber("INDEX", BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime));
         super.updateImpl(pNow);
-        if (!mHasReversed && BobUtils.isFinished(pNow, mActivePath, mPathStartTime)) {
-            setNewActivePath(new YoinkFrom(), true);
-            mYoinkFromStartTime = pNow;
+        if (!mHasReversed && BobUtils.isFinished(pNow, mYoinkTo, mPathStartTime)) {
+            setNewActivePath(mYoinkFrom, true);
             mHasReversed = true;
 
             // Update again since path has changed, follows process of BaseAutonController
-            super.updateImpl(pNow); 
+            super.updateImpl(pNow);
         }
     }
 }
