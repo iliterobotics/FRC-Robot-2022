@@ -7,6 +7,7 @@ import static com.team319.trajectory.Path.SegmentValue.*;
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import org.reflections.Reflections;
 import us.ilite.common.Distance;
@@ -197,6 +198,13 @@ public class BobUtils {
 
     public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, BobPathValue pBobValue) {
         return getPathValueForCumulativeTime(pPath, pNow, pPathStartTimestamp, 0.0, pBobValue);
+    }
+
+    public static boolean isFinished(double pNow, Path pPath, double pPathStartTime) {
+        double dt = pNow - pPathStartTime;
+        SmartDashboard.putNumber("Path dt", dt);
+        SmartDashboard.putNumber("Path total time", BobUtils.getPathTotalTime(pPath));
+        return getIndexForCumulativeTime(pPath, pNow, pPathStartTime) == -1;
     }
 
     /**

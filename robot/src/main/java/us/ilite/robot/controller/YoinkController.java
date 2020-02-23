@@ -17,15 +17,20 @@ public class YoinkController extends BaseAutonController {
     }
 
     private boolean isFinished(double pNow, Path pPath) {
+        double dt = pNow - mPathStartTime;
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + dt + "\n" +( BobUtils.getPathTotalTime(pPath) )+ "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n ");
         return BobUtils.getIndexForCumulativeTime(pPath, pNow, mPathStartTime) == -1;
     }
 
     @Override
     public void updateImpl(double pNow) {
         super.updateImpl(pNow);
-        if (!mHasReversed && isFinished(pNow, mActivePath)) {
-            setNewActivePath(mYoinkFrom, true);
+        if (!mHasReversed && BobUtils.isFinished(pNow, mActivePath, mPathStartTime)) {
+            setNewActivePath(new YoinkFrom(), true);
             mHasReversed = true;
+
+            // Update again since path has changed, follows process of BaseAutonController
+            super.updateImpl(pNow);
         }
         activateSerializer(pNow);
         setIntakeArmEnabled(pNow , true);
