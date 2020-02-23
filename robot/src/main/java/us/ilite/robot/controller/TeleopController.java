@@ -109,8 +109,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
         db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
 
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
-            setIntakeArmEnabled(pNow, true);
-            activateSerializer(pNow);
+            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
+                setIntakeArmEnabled(pNow, true);
+                activateSerializer(pNow);
+            }
 
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.STOW);

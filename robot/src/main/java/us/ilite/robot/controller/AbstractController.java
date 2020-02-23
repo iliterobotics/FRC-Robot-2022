@@ -151,6 +151,7 @@ public abstract class AbstractController {
     }
 
     protected void firingSequence(FlywheelSpeeds speed) {
+        System.out.println(isFlywheelUpToSpeed());
         setFlywheelClosedLoop(speed);
         if (isFlywheelUpToSpeed()) {
             db.flywheel.set(FEEDER_rpm, speed.feeder);
