@@ -171,23 +171,32 @@ public class BobUtils {
      *
      * @param pNow - The current cycle's time
      * @param pPathStartTimestamp - The timestamp of when the path was started
+     * @param pDelay - delay to take account of
      * @return a 0-based index that determines the index of the input Path. Returns -1 if the time is greater than the path length.
      */
-    public static int getIndexForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp) {
+    public static int getIndexForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, double pDelay) {
         double dt = pNow - pPathStartTimestamp;
         // Check path overrun
         if(
                 pNow < pPathStartTimestamp ||
-                dt > getPathTotalTime(pPath)
+                dt > (getPathTotalTime(pPath) + pDelay)
         ) {
             return -1;
         }
         return (int)(dt / 0.020);
     }
 
-    public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, BobPathValue pBobValue) {
+    public static int getIndexForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp) {
+        return getIndexForCumulativeTime(pPath, pNow, pPathStartTimestamp, 0.0);
+    }
+
+    public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, double pDelay, BobPathValue pBobValue) {
         int pathIndex = getIndexForCumulativeTime(pPath, pNow, pPathStartTimestamp);
         return pPath.getPath()[pathIndex][pBobValue.index];
+    }
+
+    public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, BobPathValue pBobValue) {
+        return getPathValueForCumulativeTime(pPath, pNow, pPathStartTimestamp, 0.0, pBobValue);
     }
 
     /**

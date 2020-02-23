@@ -66,6 +66,11 @@ public class BaseAutonController extends AbstractController {
         }
     }
 
+    protected void setNewActivePath(Path pPath, boolean pReverse) {
+        setActivePath(pPath, pReverse);
+        mInitializedPathFollower = false;
+    }
+
     protected void setActivePath(Path pPath, boolean pReverse) {
         mActivePath = pPath;
         mPathFollower = new HelixFollowerImpl(mActivePath);

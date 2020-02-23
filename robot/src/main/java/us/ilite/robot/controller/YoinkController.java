@@ -5,22 +5,25 @@ import com.team319.trajectory.Path;
 import us.ilite.robot.auto.paths.*;
 
 public class YoinkController extends BaseAutonController {
-    private double mStartTime;
     private Path mYoinkTo = new YoinkTo();
-    private Path mYoinkFrom = new YoinkFrom();
+    private boolean mHasReversed;
 
     public YoinkController() {
         super(new YoinkTo(), false);
+        mHasReversed = false;
     }
 
     private boolean isFinished(double pNow, Path pPath) {
-        return BobUtils.getIndexForCumulativeTime(pPath, pNow, mStartTime) == pPath.getPath().length - 1;
+        double dt = pNow - mPathStartTime;
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + dt + "\n" +( BobUtils.getPathTotalTime(pPath) )+ "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n ");
+        return BobUtils.getIndexForCumulativeTime(pPath, pNow, mPathStartTime) == -1;
     }
 
     @Override
     public void updateImpl(double pNow) {
-        if (isFinished(pNow, mYoinkTo)) {
-            setActivePath(mYoinkFrom, true);
+        if (!mHasReversed && isFinished(pNow, mActivePath)) {
+            setNewActivePath(new YoinkFrom(), true);
+            mHasReversed = true;
         }
         super.updateImpl(pNow);
     }

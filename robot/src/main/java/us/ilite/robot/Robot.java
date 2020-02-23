@@ -127,9 +127,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-//        if ( Settings.kIsLogging ) {
-//            mCSVLogger.start();
-//        }
+        if ( Settings.kIsLogging ) {
+            mCSVLogger.start();
+        }
 
         MODE=AUTONOMOUS;
         mActiveController = mAutonSelection.getSelectedAutonController();
