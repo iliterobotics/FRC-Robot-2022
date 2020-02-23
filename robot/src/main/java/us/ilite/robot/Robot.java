@@ -65,7 +65,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         // Init the actual robot
         initTimer.reset();
@@ -133,6 +132,7 @@ public class Robot extends TimedRobot {
 
         MODE=AUTONOMOUS;
         mActiveController = mAutonSelection.getSelectedAutonController();
+        SmartDashboard.putNumber("AUTON INIT", CLOCK.getCurrentTime());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);

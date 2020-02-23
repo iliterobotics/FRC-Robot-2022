@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.robot.auto.paths.*;
 
 public class YoinkController extends BaseAutonController {
-    private Path mYoinkTo = new YoinkTo();
     private boolean mHasReversed;
 
     public YoinkController() {
@@ -16,6 +15,7 @@ public class YoinkController extends BaseAutonController {
 
     @Override
     public void updateImpl(double pNow) {
+        SmartDashboard.putNumber("INDEX", BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime));
         super.updateImpl(pNow);
         if (!mHasReversed && BobUtils.isFinished(pNow, mActivePath, mPathStartTime)) {
             setNewActivePath(new YoinkFrom(), true);

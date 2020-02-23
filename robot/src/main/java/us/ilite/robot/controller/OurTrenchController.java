@@ -59,6 +59,7 @@ public class OurTrenchController extends BaseAutonController {
         }
     }
 
+    // TODO - figure out if this is the correct way we'll be targeting
     private Angle tempCalcAngleToInnerGoal() {
         double thetaGoal = db.limelight.get(ELimelightData.CALC_ANGLE_TO_TARGET);
         double distToGoal = db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET); //TODO: Units??

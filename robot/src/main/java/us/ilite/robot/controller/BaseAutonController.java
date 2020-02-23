@@ -3,6 +3,7 @@ package us.ilite.robot.controller;
 import com.team2363.commands.IliteHelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
@@ -51,6 +52,7 @@ public class BaseAutonController extends AbstractController {
                 mInitializedPathFollower = true;
             }
             if (mPathStartTime == 0) {
+                SmartDashboard.putNumber("START OF PATH", pNow);
                 mPathStartTime = pNow;
             }
             if (mPathFollower != null && mPathFollower.isFinished()) {
