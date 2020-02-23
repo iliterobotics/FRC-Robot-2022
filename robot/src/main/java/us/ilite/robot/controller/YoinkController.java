@@ -9,7 +9,7 @@ public class YoinkController extends BaseAutonController {
     private boolean mHasReversed;
 
     public YoinkController() {
-        super(new YoinkFrom(), false);
+        super(new YoinkTo(), false);
         mHasReversed = false;
     }
 
@@ -18,7 +18,7 @@ public class YoinkController extends BaseAutonController {
         SmartDashboard.putNumber("INDEX", BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime));
         super.updateImpl(pNow);
         if (!mHasReversed && BobUtils.isFinished(pNow, mActivePath, mPathStartTime)) {
-            setNewActivePath(new YoinkTo(), true);
+            setNewActivePath(new YoinkFrom(), true);
             mHasReversed = true;
 
             // Update again since path has changed, follows process of BaseAutonController
