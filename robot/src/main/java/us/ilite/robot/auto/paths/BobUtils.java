@@ -172,40 +172,30 @@ public class BobUtils {
      *
      * @param pNow - The current cycle's time
      * @param pPathStartTimestamp - The timestamp of when the path was started
-     * @param pDelay - delay to take account of
      * @return a 0-based index that determines the index of the input Path. Returns -1 if the time is greater than the path length.
      */
-    public static int getIndexForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, double pDelay) {
+    public static int getIndexForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp) {
         double dt = pNow - pPathStartTimestamp;
         // Check path overrun
         if(
                 pNow < pPathStartTimestamp ||
-                dt > (getPathTotalTime(pPath) + pDelay)
+                dt > (getPathTotalTime(pPath) + AutonSelection.mDelaySeconds)
         ) {
             return -1;
         }
         return (int)(dt / 0.020);
     }
 
-    public static int getIndexForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp) {
-        return getIndexForCumulativeTime(pPath, pNow, pPathStartTimestamp, 0.0);
-    }
 
-    public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, double pDelay, BobPathValue pBobValue) {
+    public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, BobPathValue pBobValue) {
         int pathIndex = getIndexForCumulativeTime(pPath, pNow, pPathStartTimestamp);
         return pPath.getPath()[pathIndex][pBobValue.index];
     }
 
-    public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, BobPathValue pBobValue) {
-        return getPathValueForCumulativeTime(pPath, pNow, pPathStartTimestamp, 0.0, pBobValue);
-    }
-
     public static boolean isFinished(double pNow, Path pPath, double pPathStartTime) {
-        double dt = pNow - pPathStartTime;
-        SmartDashboard.putNumber("Path dt", dt);
-        SmartDashboard.putNumber("Path total time", BobUtils.getPathTotalTime(pPath));
         return getIndexForCumulativeTime(pPath, pNow, pPathStartTime) == -1;
     }
+
 
     /**
      * Return the max speed of the path in feet/sec
