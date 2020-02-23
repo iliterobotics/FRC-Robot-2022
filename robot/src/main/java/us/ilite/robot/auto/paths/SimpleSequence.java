@@ -9,8 +9,7 @@ import us.ilite.robot.modules.PowerCellModule;
 
 import javax.swing.*;
 
-import static us.ilite.common.types.EPowerCellData.DESIRED_INTAKE_VELOCITY_FT_S;
-import static us.ilite.common.types.EPowerCellData.INTAKE_STATE;
+import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 import static us.ilite.robot.controller.AbstractController.kIntakeRollerPower_off;
@@ -81,7 +80,7 @@ public class SimpleSequence implements ISequence {
                     speed = 0.3;
                 }
 //                Robot.DATA.powercell.set(INTAKE_STATE, PowerCellModule.EArm.OUT);
-                Robot.DATA.powercell.set(DESIRED_INTAKE_VELOCITY_FT_S, kIntakeRollerPower_on);
+                Robot.DATA.powercell.set(SET_INTAKE_VEL_ft_s, kIntakeRollerPower_on);
 
                 return checkBeams();
             }

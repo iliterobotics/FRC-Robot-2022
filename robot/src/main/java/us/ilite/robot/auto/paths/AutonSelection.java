@@ -23,10 +23,11 @@ public class AutonSelection {
 
     public AutonSelection() {
        mDelaySeconds = ((Double) (mAutonConfiguration.add("Path Delay Seconds", 0)
-                .withPosition(2, 0)
-                .getEntry()
-                .getDouble(0.0)))
-                .intValue();
+               .withPosition(2, 0)
+               .withSize(2, 1)
+               .getEntry()
+               .getDouble(0.0)))
+               .intValue();
 
         mSendableAutonControllers.setDefaultOption("Default - Auton Calibration", AutonCalibration.class);
         for (Class<?> c : mAutonControllers) {
