@@ -10,7 +10,6 @@ public class ShootIntakeController extends BaseAutonController {
 
     public ShootIntakeController() {
         setActivePath(new SimplePath());
-//        setActivePath(new StealsBallsAndRun());
     }
     @Override
     protected void updateImpl(double pNow) {

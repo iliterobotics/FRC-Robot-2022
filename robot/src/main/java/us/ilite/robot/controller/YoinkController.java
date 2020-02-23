@@ -8,13 +8,12 @@ public class YoinkController extends BaseAutonController {
     private Path mYoinkTo = new YoinkTo();
     private Path mYoinkFrom = new YoinkFrom();
 
-    private boolean isFinished(double pNow, Path pPath) {
-        return BobUtils.getIndexForCumulativeTime(pPath, pNow, mStartTime) == pPath.getPath().length - 1;
+    public YoinkController() {
+        super(new YoinkTo());
     }
 
-    public YoinkController(double pNow) {
-        mStartTime = pNow;
-        setActivePath(mYoinkTo);
+    private boolean isFinished(double pNow, Path pPath) {
+        return BobUtils.getIndexForCumulativeTime(pPath, pNow, mStartTime) == pPath.getPath().length - 1;
     }
 
     @Override

@@ -24,6 +24,8 @@ public class AutonSelection {
     private Class<?>[] mAutonControllers = {
             LineAutonController.class,
             ShootIntakeController.class,
+            YoinkController.class,
+            OurTrench.class
     };
 
     public AutonSelection() {

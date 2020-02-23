@@ -132,7 +132,6 @@ public class Robot extends TimedRobot {
 //        }
 
         MODE=AUTONOMOUS;
-
         mActiveController = mAutonSelection.getSelectedAutonController();
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();

@@ -18,13 +18,13 @@ public class OurTrenchController extends BaseAutonController {
     private boolean mIsFirstLegDone;
 
     public OurTrenchController(){
+        super();
         db.drivetrain.set(STATE, Enums.EDriveState.PERCENT_OUTPUT);
         mIsFirstLegDone = false;
     }
 
     @Override
     protected void updateImpl(double pNow) {
-        super.updateImpl(pNow);
         db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.5);
         if (isAtDistance(mTargetDistance)){
             stopDrivetrain(pNow);

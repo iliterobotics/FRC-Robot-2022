@@ -7,20 +7,24 @@ import us.ilite.common.Distance;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Robot;
+import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.auto.paths.BobUtils;
 import static us.ilite.robot.Enums.*;
 
 public class BaseAutonController extends AbstractController {
 
-    protected double mDelayCycleCount;
     protected Path mActivePath = null;
     private Path mDesiredPath;
+    protected double mDelayCycleCount;
     protected double mPathStartTime = 0d;
+    protected HelixFollowerImpl mPathFollower = null;
+    private boolean mInitializedPathFollower = false;
 
-    private HelixFollowerImpl mPathFollower = null;
     private Distance mPathTotalDistance;
     private double mMaxAllowedPathTime;
-    private boolean mInitializedPathFollower = false;
+
+    public BaseAutonController() {
+    }
 
     public BaseAutonController(Path pActivePath) {
         mDesiredPath = pActivePath;
