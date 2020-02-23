@@ -9,7 +9,7 @@ public class ShootIntakeController extends BaseAutonController {
     private SimplePath simplePath;
 
     public ShootIntakeController() {
-        setActivePath(new SimplePath());
+        setActivePath(new SimplePath(), false);
     }
     @Override
     protected void updateImpl(double pNow) {

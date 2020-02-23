@@ -41,7 +41,6 @@ public class PowerCellModule extends Module {
     private CANSparkMax mIntakeRoller;
     private CANPIDController mIntakePivotCtrl;
     private DutyCycleEncoder mIntakePivotEncoder;
-    private DutyCycleEncoder mIntakePivotAbsoluteEncoder;
     private CANEncoder mIntakeRollerEncoder;
 
 //    Beam Breakers
@@ -121,7 +120,6 @@ public class PowerCellModule extends Module {
 //        mIntakePivotEncoder.reset();
 
         mIntakeRollerEncoder = mIntakeRoller.getEncoder();
-        mIntakePivotAbsoluteEncoder = new DutyCycleEncoder(0);
 
         mIntakePivotCtrl = mIntakePivot.getPIDController();
         HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotDownGains);
@@ -152,7 +150,6 @@ public class PowerCellModule extends Module {
         db.powercell.set(SERIALIZER_CURRENT, mConveyorMotorHorizontal.getStatorCurrent());
         db.powercell.set(VERTICAL_CURRENT, mConveyorMotorVertical.getStatorCurrent());
         db.powercell.set(INTAKE_PIVOT_CURRENT, mIntakePivot.getOutputCurrent());
-        db.powercell.set(PIVOT_ABSOLUTE_ENCODER_RAW, mIntakePivotAbsoluteEncoder.getDistance());
 
         if(db.powercell.get(DESIRED_AMOUNT_OF_SENSORS_BROKEN) >= 3.0){
             db.powercell.set(DESIRED_AMOUNT_OF_SENSORS_BROKEN , (db.powercell.get(CURRENT_AMOUNT_OF_SENSORS_BROKEN )) + 1)  ;

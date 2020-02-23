@@ -1,5 +1,6 @@
 package us.ilite.robot.controller;
 
+import com.team2363.commands.IliteHelixFollower;
 import com.team319.trajectory.Path;
 import us.ilite.robot.auto.paths.*;
 
@@ -9,7 +10,7 @@ public class YoinkController extends BaseAutonController {
     private Path mYoinkFrom = new YoinkFrom();
 
     public YoinkController() {
-        super(new YoinkTo());
+        super(new YoinkTo(), false);
     }
 
     private boolean isFinished(double pNow, Path pPath) {
@@ -19,8 +20,7 @@ public class YoinkController extends BaseAutonController {
     @Override
     public void updateImpl(double pNow) {
         if (isFinished(pNow, mYoinkTo)) {
-            setActivePath(mYoinkFrom);
-            mPathFollower.reverse();
+            setActivePath(mYoinkFrom, true);
         }
         super.updateImpl(pNow);
     }

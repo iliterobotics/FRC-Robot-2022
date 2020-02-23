@@ -26,11 +26,11 @@ public class BaseAutonController extends AbstractController {
     public BaseAutonController() {
     }
 
-    public BaseAutonController(Path pActivePath) {
+    public BaseAutonController(Path pActivePath, boolean pReverse) {
         mDesiredPath = pActivePath;
         mDelayCycleCount = AutonSelection.mDelaySeconds / .02;
 
-        setActivePath(mDesiredPath);
+        setActivePath(mDesiredPath, pReverse);
         mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1 + (mDelayCycleCount * .02);
         mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
         e();
@@ -45,7 +45,6 @@ public class BaseAutonController extends AbstractController {
 
     @Override
     protected void updateImpl(double pNow) {
-        System.out.println("|||||||||||||||||||||||||||| DESIRED TIME PAUSED" + AutonSelection.mDelaySeconds);
         if (mDelayCycleCount <= 0) {
             if (!mInitializedPathFollower) {
                 mPathFollower.initialize();
@@ -67,9 +66,12 @@ public class BaseAutonController extends AbstractController {
         }
     }
 
-    protected void setActivePath(Path pPath) {
+    protected void setActivePath(Path pPath, boolean pReverse) {
         mActivePath = pPath;
         mPathFollower = new HelixFollowerImpl(mActivePath);
+        if (pReverse) {
+            mPathFollower.reverse();
+        }
     }
 
 
