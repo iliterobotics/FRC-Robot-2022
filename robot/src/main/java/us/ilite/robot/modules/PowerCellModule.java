@@ -107,7 +107,7 @@ public class PowerCellModule extends Module {
 
         mIntakePivot = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeArm, CANSparkMaxLowLevel.MotorType.kBrushless);
         mIntakePivot.setIdleMode(CANSparkMax.IdleMode.kCoast);
-        mIntakePivot.setSecondaryCurrentLimit(50);
+        mIntakePivot.setSmartCurrentLimit(40);
 
         double debounceTime_s = 0.1;
         mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel, debounceTime_s);
@@ -202,8 +202,6 @@ public class PowerCellModule extends Module {
             EArmState state = db.powercell.get(INTAKE_STATE, EArmState.class);
             switch(state) {
                 case OUT:
-                    mIntakePivotCtrl.setReference(state.angle / kPivotConversion, ControlType.kSmartMotion, INTAKE_PIVOT_DOWN_SLOT, 0.01);
-                    break;
                 case STOW:
                     mIntakePivotCtrl.setReference(state.angle / kPivotConversion, ControlType.kSmartMotion, INTAKE_PIVOT_DOWN_SLOT, 0.01);
                     break;

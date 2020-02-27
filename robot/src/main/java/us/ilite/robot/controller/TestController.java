@@ -111,17 +111,7 @@ public class TestController extends BaseManualController {
 
     }
 
-    private void firingSequence(FlywheelSpeeds speed) {
-        db.flywheel.set(BALL_VELOCITY_ft_s, speed.speed);
-        if (isFlywheelUpToSpeed()) {
-            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, speed.feeder);
-            if (isFeederUpToSpeed()) {
-                db.powercell.set(SET_V_pct, 0.5);
-            } else {
-                db.powercell.set(SET_V_pct, 0);
-            }
-        }
-    }
+
 
     private void updateFlywheel(double pNow) {
 
@@ -240,10 +230,8 @@ public class TestController extends BaseManualController {
     }
 
     protected void updatePowerCells(double pNow) {
-        if(flywheelinput.isSet(ELogitech310.START)) {
-            mNumBalls = 0;
-            mEntryLatch.reset();
-            mSecondaryLatch.reset();
+        if(flywheelinput.isSet(InputMap.FLYWHEEL.RESET_INTAKE_COUNT)) {
+            resetSerializerState();
         }
         // Default to none
         db.powercell.set(INTAKE_STATE, EArmState.NONE);

@@ -6,7 +6,6 @@ import us.ilite.robot.modules.DriveMessage;
 import static us.ilite.robot.Enums.*;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
-import static us.ilite.common.config.InputMap.DRIVER.SUB_WARP_AXIS;
 import static us.ilite.common.types.drive.EDriveData.*;
 import static us.ilite.common.types.drive.EDriveData.DESIRED_TURN_PCT;
 
@@ -36,7 +35,7 @@ public abstract class BaseManualController extends AbstractController {
             var d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
             throttle = d.getThrottle();
             rotate = d.getTurn();
-            if (db.driverinput.isSet(SUB_WARP_AXIS) && db.driverinput.get(SUB_WARP_AXIS) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
+            if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
                 throttle *= Settings.Input.kSnailModePercentThrottleReduction;
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
             }

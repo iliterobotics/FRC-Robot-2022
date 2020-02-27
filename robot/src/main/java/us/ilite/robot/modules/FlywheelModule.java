@@ -81,12 +81,12 @@ public class FlywheelModule extends Module {
         SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
         SmartDashboard.putNumber("kVelocityConversion",kVelocityConversion);
         mFlywheelFalconMaster = new TalonFX(Settings.Hardware.CAN.kFalconMasterId);
+        mFlywheelFalconMaster.setInverted(true);
         mFlywheelFalconMaster.setNeutralMode(NeutralMode.Coast);
         mFlywheelFalconMaster.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
         mFlywheelFalconFollower = new TalonFX(Settings.Hardware.CAN.kFalconFollowerId);
         mFlywheelFalconFollower.setNeutralMode(NeutralMode.Coast);
-        mFlywheelFalconFollower.setInverted(true);
         mFlywheelFalconFollower.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
         mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -165,7 +165,7 @@ public class FlywheelModule extends Module {
     private void setFeeder() {
         // Cannot set voltage mode if an external sensor is attached
 //        mFeeder.setVoltage(db.flywheel.get(FEEDER_OUTPUT_OPEN_LOOP) / 12.0);
-        mFeeder.set(db.flywheel.get(FEEDER_OUTPUT_OPEN_LOOP));
+        mFeeder.set(db.flywheel.get(SET_FEEDER_rpm));
     }
 
     private void setFlywheel() {

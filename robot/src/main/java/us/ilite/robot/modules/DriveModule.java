@@ -47,7 +47,9 @@ public class DriveModule extends Module {
 	public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
 
 	// This is approx 290 Degrees per second, measured with a Pigeon
-	public static double kMaxDegreesPerSecond = Units.radians_to_degrees(5);
+    // Actual measured was 825 Degrees per second, with a resting battery voltage of 12.57V
+	public static double kMaxDegreesPerSecond = Units.radians_to_degrees(10);
+//	public static double kMaxDegreesPerSecond = 0.01; //TODO THIS WAS NOT WORKING
 	// This is with the ADIS16470 IMU
 	public static Rotation2d kDriveMaxOmega_measured = Rotation2d.fromDegrees(19.1);
 
@@ -163,6 +165,13 @@ public class DriveModule extends Module {
 		mRightMaster.burnFlash();
 		mRightFollower.burnFlash();
 
+
+		mYawPid = new PIDController(kYawGains,
+				-kMaxDegreesPerSecond,
+				kMaxDegreesPerSecond,
+				Settings.kControlLoopPeriod);
+		mYawPid.setOutputRange(-1, 1);
+
 	}
 
 	@Override
@@ -171,12 +180,6 @@ public class DriveModule extends Module {
 //		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 //		mTargetAngleLockPid.setSetpoint(0);
 //		mTargetAngleLockPid.reset();
-
-		mYawPid = new PIDController(kYawGains,
-									-kMaxDegreesPerSecond,
-				kMaxDegreesPerSecond,
-									Settings.kControlLoopPeriod);
-		mYawPid.setOutputRange(-1, 1);
 
 		mHoldLeftPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
 		mHoldLeftPositionPid.setOutputRange(-1, 1);
@@ -241,7 +244,7 @@ public class DriveModule extends Module {
 
 			case VELOCITY:
 				mStartHoldingPosition = false;
-				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerSecond);
+//				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
 //				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
 //				DriveMessage d = new DriveMessage().turn(turn).throttle(throttle).normalize();
 				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
