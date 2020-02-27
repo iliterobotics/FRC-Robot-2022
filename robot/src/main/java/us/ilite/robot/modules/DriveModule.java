@@ -1,5 +1,6 @@
 package us.ilite.robot.modules;
 
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
@@ -10,11 +11,16 @@ import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.lib.util.Conversions;
 import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 
+import static us.ilite.common.types.ERawLimelightData.TV;
+import static us.ilite.common.types.ERawLimelightData.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
+import us.ilite.common.types.ERawLimelightData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -47,9 +53,7 @@ public class DriveModule extends Module {
 	public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
 
 	// This is approx 290 Degrees per second, measured with a Pigeon
-    // Actual measured was 825 Degrees per second, with a resting battery voltage of 12.57V
-	public static double kMaxDegreesPerSecond = Units.radians_to_degrees(10);
-//	public static double kMaxDegreesPerSecond = 0.01; //TODO THIS WAS NOT WORKING
+	public static double kMaxDegreesPerCycle = Units.radians_to_degrees(5);
 	// This is with the ADIS16470 IMU
 	public static Rotation2d kDriveMaxOmega_measured = Rotation2d.fromDegrees(19.1);
 
@@ -74,6 +78,7 @@ public class DriveModule extends Module {
 			.maxAccel(56760d)
 			.slot(POSITION_PID_SLOT)
 			.velocityConversion(kDriveNEOPositionFactor);
+
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
 			.p(0.0001)
@@ -112,9 +117,14 @@ public class DriveModule extends Module {
 	private Rotation2d mGyroOffset = new Rotation2d();
 	private PIDController mTargetAngleLockPid;
 	private PIDController mYawPid;
-	private PIDController mHoldLeftPositionPid;
-	private PIDController mHoldRightPositionPid;
+//	private PIDController mHoldLeftPositionPid;
+//	private PIDController mHoldRightPositionPid;
 	private boolean mStartHoldingPosition;
+
+	private double mLeftHoldSetpoint;
+	private double mRightHoldSetpoint;
+	private double mPreviousHeading = 0.0;
+	private double mPreviousTime = 0;
 
 	private final CANSparkMax mLeftMaster;
 	private final CANSparkMax mLeftFollower;
@@ -149,7 +159,6 @@ public class DriveModule extends Module {
 
 //		mGyro = new ADIS16470();
 
-
 		HardwareUtils.setGains(mLeftCtrl, vPID);
 		HardwareUtils.setGains(mRightCtrl, vPID);
 		HardwareUtils.setGains(mLeftCtrl, dPID);
@@ -167,8 +176,8 @@ public class DriveModule extends Module {
 
 
 		mYawPid = new PIDController(kYawGains,
-				-kMaxDegreesPerSecond,
-				kMaxDegreesPerSecond,
+				-kMaxDegreesPerCycle,
+				kMaxDegreesPerCycle,
 				Settings.kControlLoopPeriod);
 		mYawPid.setOutputRange(-1, 1);
 
@@ -176,18 +185,20 @@ public class DriveModule extends Module {
 
 	@Override
 	public void modeInit(EMatchMode pMode, double pNow) {
-//		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
-//		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
-//		mTargetAngleLockPid.setSetpoint(0);
-//		mTargetAngleLockPid.reset();
+		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
+		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
+		mTargetAngleLockPid.setSetpoint(0);
+		mTargetAngleLockPid.reset();
 
-		mHoldLeftPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-		mHoldLeftPositionPid.setOutputRange(-1, 1);
-		mHoldLeftPositionPid.setSetpoint(0.0);
-		mHoldRightPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-		mHoldRightPositionPid.setOutputRange(-1, 1);
-		mHoldRightPositionPid.setSetpoint(0.0);
+		mYawPid = new PIDController(kYawGains,
+									-kMaxDegreesPerCycle,
+									kMaxDegreesPerCycle,
+									Settings.kControlLoopPeriod);
+		mYawPid.setOutputRange(-1, 1);
+		mYawPid.reset();
 		mStartHoldingPosition = false;
+		mLeftHoldSetpoint = 0.0;
+		mRightHoldSetpoint = 0.0;
 
 		reset();
 		HardwareUtils.setGains(mLeftCtrl, vPID);
@@ -217,42 +228,54 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs(double pNow) {
-		EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
+		EDriveState mode = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
 		// Do this to prevent wonkiness while transitioning autonomous to teleop
 		if(mode == null) return;
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
-			case RESET:
-				reset();
-				break;
-//			case HOLD:
-//				if (!mStartHoldingPosition) {
-//					mHoldLeftPositionPid.setSetpoint(db.drivetrain.get(LEFT_POS_INCHES));
-//					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));
-//					mStartHoldingPosition = true;
-//				}
-//				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mHoldLeftPositionPid.getSetpoint()) > .5) {
-//					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
-//					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mHoldRightPositionPid.getSetpoint()) > .5) {
-//					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
-//					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//				break;
+			case HOLD:
+				if (!mStartHoldingPosition) {
+					mLeftHoldSetpoint = mLeftEncoder.getPosition();
+					mRightHoldSetpoint = mRightEncoder.getPosition();
+					mStartHoldingPosition = true;
+				}
 
+				if (mLeftEncoder.getVelocity() < 100) {
+					if (Math.abs(mLeftEncoder.getPosition() - mLeftHoldSetpoint) > .15) {
+						mLeftCtrl.setReference(mLeftHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
+					}
+				} else {
+					mLeftCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				}
+
+				if (mRightEncoder.getVelocity() < 100) {
+					if (Math.abs(mRightEncoder.getPosition() - mRightHoldSetpoint) > .15) {
+						mRightCtrl.setReference(mRightHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
+					}
+				} else {
+					mRightCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				}
+				break;
+			case TARGET_ANGLE_LOCK:
+				RobotCodex<ERawLimelightData> targetData = Robot.DATA.rawLimelight;
+				double pidOutput;
+				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
+					//if there is a target in the limelight's fov, lock onto target using feedback loop
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
+					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
+
+					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
+					turn = db.drivetrain.get(DESIRED_TURN_PCT);
+				}
 			case VELOCITY:
 				mStartHoldingPosition = false;
-//				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
-//				double turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-//				DriveMessage d = new DriveMessage().turn(turn).throttle(throttle).normalize();
-				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
-				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-//				mLeftCtrl.setReference(d.getLeftOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				mRightCtrl.setReference(d.getRightOutput() * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
-				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
+//				turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
+//				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
+//				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
+				mLeftCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				mRightCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				break;
 			case PATH_FOLLOWING_BASIC:
 			case PATH_FOLLOWING_HELIX:
@@ -269,38 +292,6 @@ public class DriveModule extends Module {
 	private void reset() {
 		mLeftEncoder.setPosition(0.0);
 		mRightEncoder.setPosition(0.0);
-	}
-
-	public void loop(double pNow) {
-//		mUpdateTimer.start();
-//		mDriveState = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
-//		switch(mDriveState) {
-//			case PATH_FOLLOWING:
-//				mDriveHardware.configureMode(ECommonControlMode.VELOCITY);
-//			case TARGET_ANGLE_LOCK:
-//				mDriveHardware.configureMode(ECommonControlMode.PERCENT_OUTPUT);
-//				mDriveHardware.set(DriveMessage.kNeutral);
-//				RobotCodex<ELimelightData> targetData = Robot.DATA.limelight;
-//				double pidOutput;
-//				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
-//
-//					//if there is a target in the limelight's fov, lock onto target using feedback loop
-//					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
-//					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-//
-//					double mTargetTrackingThrottle = db.drivetrain.get(TARGET_TRACKING_THROTTLE);
-//					mDriveMessage = new DriveMessage().throttle(mTargetTrackingThrottle).turn(pidOutput).calculateCurvature();
-//					// If we've already seen the target and lose tracking, exit.
-//				}
-//				break;
-//			case NORMAL:
-//				break;
-//			default:
-//				mLogger.warn("Got drivetrain state: " + mDriveState+" which is unhandled");
-//				break;
-//		}
-//		mPreviousTime = pNow;
-//		mUpdateTimer.stop();
 	}
 
 }

@@ -203,7 +203,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
-        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
 //        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
