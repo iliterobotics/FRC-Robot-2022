@@ -13,7 +13,7 @@ public class YoinkController extends BaseAutonController {
     private YoinkTo mYoinkTo = new YoinkTo();
     private YoinkFrom mYoinkFrom = new YoinkFrom();
     private boolean mHasReversed;
-    private double mIntakingCount = 2 / .02;
+    private double mIntakingCount = 1 / .02;
     private double mYoinkFromStartTime;
 
     public YoinkController() {
@@ -25,8 +25,8 @@ public class YoinkController extends BaseAutonController {
     public void updateImpl(double pNow) {
         SmartDashboard.putNumber("INDEX", BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime));
         super.updateImpl(pNow);
-        setIntakeArmEnabled(pNow, true);
-        activateSerializer(pNow);
+//        setIntakeArmEnabled(pNow, true);
+//        activateSerializer(pNow);
 
         if (BobUtils.isFinished(pNow, mYoinkTo, mPathStartTime)) {
             if (mIntakingCount <= 0 && !mHasReversed) {

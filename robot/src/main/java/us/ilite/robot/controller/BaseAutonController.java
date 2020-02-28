@@ -163,8 +163,6 @@ public class BaseAutonController extends AbstractController {
                 mHitFirst = true;
             }
 
-            SmartDashboard.putBoolean("Hit first index?", mHitFirst);
-
             if (currentSegment == -1)
             {
                 isFinished = true;
