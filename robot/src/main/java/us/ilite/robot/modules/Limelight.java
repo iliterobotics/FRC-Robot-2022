@@ -53,7 +53,7 @@ public class Limelight extends Module implements ITargetDataProvider {
     public static double kRightBCoeff = -4.53956454545558;
     public static double kRightCCoeff = -0.0437470770400814;
 
-    private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable(Settings.kFlywheelLimelightNetworkTable);
+    private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable("limelight");//Settings.kFlywheelLimelightNetworkTable);
 
 
     public Limelight() {

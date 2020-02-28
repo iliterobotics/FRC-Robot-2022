@@ -61,10 +61,10 @@ public class Settings {
             public static int kPDP = 20;
             public static int kPigeon = 21;
             // ===== 2020 Drive =====
-            public static int kDriveRightMaster = 1;
-            public static int kDriveRightFollower = 2;
-            public static int kDriveLeftMaster = 3;
-            public static int kDriveLeftFollower = 4;
+//            public static int kDriveRightMaster = 1;
+//            public static int kDriveRightFollower = 2;
+//            public static int kDriveLeftMaster = 3;
+//            public static int kDriveLeftFollower = 4;
 
             public static int kMAXIntakeRollerId = 7;
             public static int kMAXIntakeArm = 8;
@@ -75,10 +75,10 @@ public class Settings {
             public static int kFalconFollowerId = 14;
 
             // ===== 2019 Drive =====
-//            public static  int kDriveLeftMaster = 1;
-//            public static int kDriveLeftFollower = 3;
-//            public static  int kDriveRightMaster = 2;
-//            public static int kDriveRightFollower = 4;
+            public static  int kDriveLeftMaster = 1;
+            public static int kDriveLeftFollower = 3;
+            public static  int kDriveRightMaster = 2;
+            public static int kDriveRightFollower = 4;
 
         }
 
