@@ -10,6 +10,14 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.DriverStation;
 
+import com.flybotix.hfr.util.log.ILog;
+import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.apache.commons.math3.ml.neuralnet.twod.NeuronSquareMesh2D;
+import us.ilite.common.Data;
+import us.ilite.common.Field2020;
+import us.ilite.common.config.InputMap;
+import us.ilite.common.types.*;
 import us.ilite.common.Data;
 import us.ilite.common.Field2020;
 import us.ilite.common.types.EHangerModuleData;
@@ -107,7 +115,22 @@ public class TestController extends BaseManualController {
 
     }
 
+
+
     private void updateFlywheel(double pNow) {
+
+        if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_10_TEST)) {
+            firingSequence(FlywheelSpeeds.CLOSE);
+        } else if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_20_TEST)) {
+            firingSequence(FlywheelSpeeds.INITIATION_LINE);
+        } else if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_30_TEST)) {
+            firingSequence(FlywheelSpeeds.FAR);
+        } else if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_40_TEST)) {
+            firingSequence(FlywheelSpeeds.FAR_TRENCH);
+        } else {
+            firingSequence(FlywheelSpeeds.OFF);
+        }
+
         if(db.flywheel.isSet(HOOD_SENSOR_ERROR)) {
             db.flywheel.set(HOOD_STATE, Enums.HoodState.NONE);
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.HOOD)) {
@@ -158,17 +181,15 @@ public class TestController extends BaseManualController {
 //                db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 1000);
 //            }
 //        } else {
-//            db.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
+//            state = Enums.FlywheelSpeeds.OFF;
 //        }
-//
-//        if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
-//            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 1.0);
-//
-//        } else if (db.operatorinput.isSet(ELogitech310.Y_BTN)){
-//            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 0);
-//        }
-//        else {
-//            db.flywheel.set(EShooterSystemData.TARGET_HOOD_ANGLE, 0.5);
+//        db.flywheel.set(FLYWHEEL_SPEED_STATE, state);
+//        setFlywheelClosedLoop(state);
+//        if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
+//            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
+//            db.flywheel.set(TARGET_FEEDER_VELOCITY_RPM, state.feeder * 11000.0);
+//        } else {
+//            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.0);
 //        }
     }
 
@@ -214,10 +235,8 @@ public class TestController extends BaseManualController {
 
 
     protected void updatePowerCells(double pNow) {
-        if(flywheelinput.isSet(ELogitech310.START)) {
-            mNumBalls = 0;
-            mEntryLatch.reset();
-            mSecondaryLatch.reset();
+        if(flywheelinput.isSet(InputMap.FLYWHEEL.RESET_INTAKE_COUNT)) {
+            resetSerializerState();
         }
         // Default to none
         db.powercell.set(INTAKE_STATE, EArmState.NONE);

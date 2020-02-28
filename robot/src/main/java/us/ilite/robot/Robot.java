@@ -146,6 +146,11 @@ public class Robot extends TimedRobot {
             mCSVLogger.start();
         }
 
+        mRunningModules.clearModules();
+        mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mShooter);
+        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mIntake);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);

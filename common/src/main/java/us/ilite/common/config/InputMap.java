@@ -3,6 +3,8 @@ package us.ilite.common.config;
 
 import us.ilite.common.types.input.ELogitech310;
 
+import java.lang.annotation.ElementType;
+
 public class InputMap {
 
     /**
@@ -40,7 +42,6 @@ public class InputMap {
         GROUND_TRACK = ELogitech310.A_BTN,
         FIRE_POWER_CELLS = ELogitech310.LEFT_TRIGGER_AXIS,
 
-        SUB_WARP_AXIS = ELogitech310.LEFT_TRIGGER_AXIS,
         //NUDGE_SEEK_LEFT = ELogitech310.L_BTN,
         //NUDGE_SEEK_RIGHT = ELogitech310.R_BTN,
         //BEGIN_HANG = ELogitech310.Y_BTN,
@@ -59,9 +60,7 @@ public class InputMap {
         public static  final ELogitech310
         INTAKE_BULLDOZE = ELogitech310.X_BTN,
         AIM = ELogitech310.B_BTN,
-        SERIALIZER_CONVEYORS = ELogitech310.L_BTN,
 
-        REVERSE_POWER_CELLS = ELogitech310.R_BTN,
         FAR_MODE = ELogitech310.Y_BTN,
         NEAR_MODE = ELogitech310.A_BTN,
         MANUAL_HOOD_UP = ELogitech310.DPAD_UP,
@@ -71,6 +70,7 @@ public class InputMap {
         INTAKE_ACTIVATE = ELogitech310.LEFT_TRIGGER_AXIS,
         INTAKE_REVERSE = ELogitech310.R_BTN,
         INTAKE_STOW = ELogitech310.RIGHT_TRIGGER_AXIS,
+        RESET_INTAKE_COUNT = ELogitech310.BACK,
 
         // PUT TEST ITEMS BELOW
         BEGIN_HANG = ELogitech310.LEFT_X_AXIS,
@@ -79,7 +79,6 @@ public class InputMap {
         //FLYWHEEL_AXIS = ELogitech310.START,
         COLOR_ROTATION = ELogitech310.DPAD_LEFT,
         //SHOOT_FLYWHEEL = ELogitech310.A_BTN,
-        //LOWER_ARM = ELogitech310.START,
         LIMELIGHT_SEARCH = ELogitech310.RIGHT_X_AXIS
         ;
 
@@ -100,6 +99,7 @@ public class InputMap {
                 FLYWHEEL_VELOCITY_30_TEST = ELogitech310.DPAD_DOWN,
                 FLYWHEEL_VELOCITY_40_TEST = ELogitech310.DPAD_LEFT,
                 FEEDER_SPINUP_TEST = ELogitech310.Y_BTN,
+                RESET_INTAKE_COUNT = ELogitech310.BACK,
                 FLYWHEEL_SPINUP_AXIS = ELogitech310.RIGHT_TRIGGER_AXIS
         ;
     }

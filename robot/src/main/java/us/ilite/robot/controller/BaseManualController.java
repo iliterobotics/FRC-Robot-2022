@@ -6,7 +6,6 @@ import us.ilite.robot.modules.DriveMessage;
 import static us.ilite.robot.Enums.*;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
-import static us.ilite.common.config.InputMap.DRIVER.SUB_WARP_AXIS;
 import static us.ilite.common.types.drive.EDriveData.*;
 import static us.ilite.common.types.drive.EDriveData.DESIRED_TURN_PCT;
 
@@ -19,7 +18,7 @@ public abstract class BaseManualController extends AbstractController {
 
     void updateDrivetrain(double pNow) {
         double throttle = db.driverinput.get(THROTTLE_AXIS);
-        double rotate = db.driverinput.get(TURN_AXIS);
+        double rotate = db.driverinput.get(TURN_AXIS) * 0.75;
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
@@ -33,10 +32,10 @@ public abstract class BaseManualController extends AbstractController {
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.01;
             }
-            var d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
+            DriveMessage  d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
             throttle = d.getThrottle();
             rotate = d.getTurn();
-            if (db.driverinput.isSet(SUB_WARP_AXIS) && db.driverinput.get(SUB_WARP_AXIS) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
+            if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
                 throttle *= Settings.Input.kSnailModePercentThrottleReduction;
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
             }
