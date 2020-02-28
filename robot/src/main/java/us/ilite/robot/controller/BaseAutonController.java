@@ -5,6 +5,7 @@ import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
@@ -88,6 +89,16 @@ public class BaseAutonController extends AbstractController {
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TARGET_ANGLE_LOCK);
     }
 
+    protected void startShootingLogic(FlywheelSpeeds mFlywheelSpeeds) {
+        setFlywheelClosedLoop(mFlywheelSpeeds);
+        if (isFlywheelUpToSpeed()) {
+            setFeederClosedLoop(mFlywheelSpeeds);
+            if (isFeederUpToSpeed()) {
+                db.powercell.set(EPowerCellData.SET_V_pct, 0.6);
+                db.powercell.set(EPowerCellData.SET_H_pct, 0.5);
+            }
+        }
+    }
 
     private static final void e() {
         System.out.println("================================================");
