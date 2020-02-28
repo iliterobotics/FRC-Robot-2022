@@ -31,7 +31,7 @@ public class TurnToDegree implements ICommand {
   private Rotation2d mInitialYaw, mTurnAngle, mTargetYaw;
   private PIDController pid;
   public Data mData;
-  
+
   public TurnToDegree(Rotation2d pTurnAngle, double pAllowableError, Data pData ) {
     this.mTurnAngle = pTurnAngle;
     this.mAllowableError = pAllowableError;
@@ -60,9 +60,9 @@ public class TurnToDegree implements ICommand {
 
     // Keep track of time on target
     if ( ( Math.abs( pid.getError() ) <= Math.abs( mAllowableError ) ) ) {
-     mAlignedCount++;
+      mAlignedCount++;
     } else {
-     mAlignedCount = 0;
+      mAlignedCount = 0;
     }
 
     // End if on target for 25 counts
@@ -84,10 +84,10 @@ public class TurnToDegree implements ICommand {
     // TODO - was this inverted?
     return Rotation2d.fromDegrees( mData.imu.get( EGyro.HEADING_DEGREES ) );
   }
-  
+
   @Override
   public void shutdown( double pNow ) {
-    
+
   }
- 
+
 }

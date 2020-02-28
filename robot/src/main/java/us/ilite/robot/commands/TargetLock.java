@@ -30,6 +30,7 @@ public class TargetLock implements ICommand {
         mAlignedCount = 0;
 
         Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TARGET_ANGLE_LOCK);
+
         Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.0);
     }
 
@@ -57,7 +58,9 @@ public class TargetLock implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
+
         Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.NORMAL);
+
     }
 
     public void setEndOnAlignment(boolean bool) {

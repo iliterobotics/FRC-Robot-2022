@@ -37,7 +37,7 @@ public class DriveTrainUnitTest extends BaseTest {
             ctrl.update(0.0);
             assertNormalizedInputs(
                     "THROTTLE-" + nf.format(db.driverinput.get(DRIVER.THROTTLE_AXIS)) +
-                    "\tTURN-" + nf.format(db.driverinput.get(DRIVER.TURN_AXIS))
+                            "\tTURN-" + nf.format(db.driverinput.get(DRIVER.TURN_AXIS))
             );
         }
 
@@ -54,10 +54,10 @@ public class DriveTrainUnitTest extends BaseTest {
 
     private void assertNormalizedInputs(String pMessage) {
         Assert.assertTrue(
-        "Normalized Driver Inputs not <= 1.0, values are THROTTLE= " +
-                abs(db.drivetrain.get(DESIRED_THROTTLE_PCT))+
-                ", TURN=" + abs(db.drivetrain.get(DESIRED_TURN_PCT)) + " " +
-                pMessage,
+                "Normalized Driver Inputs not <= 1.0, values are THROTTLE= " +
+                        abs(db.drivetrain.get(DESIRED_THROTTLE_PCT))+
+                        ", TURN=" + abs(db.drivetrain.get(DESIRED_TURN_PCT)) + " " +
+                        pMessage,
                 abs(db.drivetrain.get(DESIRED_THROTTLE_PCT)) + abs(db.drivetrain.get(DESIRED_TURN_PCT)) <= 1.0
         );
     }

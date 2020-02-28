@@ -43,7 +43,7 @@ public class DriveModule extends Module {
 	// Actual measured was 5514 with a resting battery voltage of 12.75V
 	public static double kDriveTrainMaxVelocityRPM = 5500.0;
 	public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveNEOVelocityFactor);
-//	public static Distance kDriveMaxAccel_measured = Distance.fromFeet()
+	//	public static Distance kDriveMaxAccel_measured = Distance.fromFeet()
 	public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
 
 	// This is approx 290 Degrees per second, measured with a Pigeon
