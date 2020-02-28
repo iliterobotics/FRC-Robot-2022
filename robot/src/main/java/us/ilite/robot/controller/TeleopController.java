@@ -79,7 +79,6 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //            if (DATA.selectedTarget.isSet(ELimelightData.TY)) {
 //                if (Math.abs(DATA.selectedTarget.get(ELimelightData.TX)) < mLimelightZoomThreshold) {
 //                    DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET_ZOOM.id());
-//                    System.out.println("ZOOMING");
 //                } else {
 //                    DATA.limelight.set(ELimelightData.TARGET_ID, (double) Field2020.FieldElement.TARGET.id());
 //                }
