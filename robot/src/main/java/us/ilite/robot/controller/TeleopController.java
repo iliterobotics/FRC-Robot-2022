@@ -2,8 +2,10 @@ package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EPowerCellData.*;
@@ -13,7 +15,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     private ILog mLog = Logger.createLog(TeleopController.class);
     private static TeleopController INSTANCE;
-    private Enums.FlywheelSpeeds currentState = Enums.FlywheelSpeeds.OFF;
+    private Enums.FlywheelSpeeds currentState = Enums.FlywheelSpeeds.CLOSE;
 
     public static TeleopController getInstance() {
         if(INSTANCE == null) {
@@ -27,6 +29,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     @Override
     protected void updateImpl(double pNow) {
+        db.registerAllWithShuffleboard();
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
@@ -47,23 +50,22 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateFlywheel(double pNow) {
-        if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE))
-        {
+        if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE)) {
             currentState = Enums.FlywheelSpeeds.FAR;
-        }
-        else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE))
-        {
+        }else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
             currentState = Enums.FlywheelSpeeds.CLOSE;
         }
 
-        if(db.operatorinput.isSet(InputMap.OPERATOR.AIM) || db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS))
-        {
+        if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
+            super.firingSequence(currentState);
+//            super.setFlywheelClosedLoop(currentState);
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.AIM)) {
             super.setFlywheelClosedLoop(currentState);
+        } else {
+            super.firingSequence(Enums.FlywheelSpeeds.OFF);
+//            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
         }
-        else
-        {
-            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
-        }
+        SmartDashboard.putString("Flywheel State", currentState.name());
     }
 
 //    public void updateLimelightTargetLock() {
@@ -100,12 +102,17 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //    }
 
     protected void updatePowerCells(double pNow) {
+        if(db.operatorinput.isSet(InputMap.OPERATOR.RESET_INTAKE_COUNT)) {
+            resetSerializerState();
+        }
         // Default to none
         db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
 
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
-            setIntakeArmEnabled(pNow, true);
-            activateSerializer(pNow);
+//            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
+                setIntakeArmEnabled(pNow, true);
+                activateSerializer(pNow);
+//            }
 
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.STOW);
@@ -117,11 +124,11 @@ public class TeleopController extends BaseManualController { //copied from TestC
             db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
             db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
         }
-
-        if ((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) && isFlywheelUpToSpeed() && isFeederUpToSpeed())) {
-            db.powercell.set(SET_V_pct, 0.6);
-            db.powercell.set(SET_H_pct, 0.5);
-        }
+//
+//        if ((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) && isFlywheelUpToSpeed() && isFeederUpToSpeed())) {
+//            db.powercell.set(SET_V_pct, 0.6);
+//            db.powercell.set(SET_H_pct, 0.5);
+//        }
     }
 
 //    void updateDJBooth(double pNow) {

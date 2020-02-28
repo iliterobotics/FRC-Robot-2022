@@ -25,7 +25,7 @@ public abstract class AbstractController {
     protected double dt = 1d;
 
 
-    public static double kIntakeRollerPower_on = 0.5;
+    public static double kIntakeRollerPower_on = 0.6;
     public static double kIntakeRollerPower_off = 0.0;
     protected final XorLatch mSecondaryLatch = new XorLatch();
     protected final XorLatch mEntryLatch = new XorLatch();
@@ -68,6 +68,12 @@ public abstract class AbstractController {
             db.powercell.set(INTAKE_STATE, EArmState.STOW);
             db.powercell.set(SET_INTAKE_VEL_ft_s, kIntakeRollerPower_off);
         }
+    }
+
+    protected final void resetSerializerState() {
+        mEntryLatch.reset();
+        mSecondaryLatch.reset();
+        mNumBalls = 0;
     }
 
 
@@ -147,6 +153,20 @@ public abstract class AbstractController {
     protected final void setFeederClosedLoop(Enums.FlywheelSpeeds pFlywheelSpeed) {
         db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, pFlywheelSpeed.feeder);
         db.flywheel.set(SET_FEEDER_rpm, pFlywheelSpeed.feeder * 11000.0);
+    }
+
+    protected void firingSequence(FlywheelSpeeds speed) {
+        setFlywheelClosedLoop(speed);
+        if (isFlywheelUpToSpeed()) {
+            db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
+            if (isFeederUpToSpeed()) {
+                db.powercell.set(SET_V_pct, 0.5);
+                db.powercell.set(SET_H_pct, 0.5);
+            } else {
+                db.powercell.set(SET_V_pct, 0);
+                db.powercell.set(SET_H_pct, 0);
+            }
+        }
     }
 
     protected boolean isFlywheelUpToSpeed() {

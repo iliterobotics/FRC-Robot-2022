@@ -6,6 +6,7 @@ import us.ilite.common.types.ELimelightData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.Limelight;
 
+@Deprecated
 public class LimelightTargetLock extends TargetLock {
 
     private ILog mLog = Logger.createLog(LimelightTargetLock.class);

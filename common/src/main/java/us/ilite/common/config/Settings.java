@@ -61,10 +61,10 @@ public class Settings {
             public static int kPDP = 20;
             public static int kPigeon = 21;
             // ===== 2020 Drive =====
-//            public static int kDriveRightMaster = 1;
-//            public static int kDriveRightFollower = 2;
-//            public static int kDriveLeftMaster = 3;
-//            public static int kDriveLeftFollower = 4;
+//            public static int kDriveRightMaster = 4;
+//            public static int kDriveRightFollower = 3;
+//            public static int kDriveLeftMaster = 2;
+//            public static int kDriveLeftFollower = 1;
 
             public static int kMAXIntakeRollerId = 7;
             public static int kMAXIntakeArm = 8;
@@ -111,7 +111,7 @@ public class Settings {
         // These are applied AFTER the normal throttle reduction
         public static double kSnailModePercentThrottleReduction = 0.5;
         public static double kSnailModePercentRotateReduction = 0.4;
-        public static double kMaxAllowedVelocityMultiplier = 1.0; //set back to lower value for safety before merging
+        public static double kMaxAllowedVelocityMultiplier = 0.5;
 
         // Applied after any scaling
         public static double kDriverInputTurnMaxMagnitude = 0.5;

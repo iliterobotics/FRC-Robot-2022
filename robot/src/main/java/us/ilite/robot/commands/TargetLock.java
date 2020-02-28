@@ -10,6 +10,7 @@ import us.ilite.robot.Robot;
 
 import static us.ilite.common.types.ELimelightData.*;
 
+@Deprecated
 public class TargetLock implements ICommand {
 
     private static final double kTURN_POWER = 0.2;
