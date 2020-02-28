@@ -8,19 +8,17 @@ import static com.revrobotics.ControlType.*;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
+import us.ilite.common.Field2020;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.lib.util.Conversions;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 
-import static us.ilite.common.types.ERawLimelightData.TV;
-import static us.ilite.common.types.ERawLimelightData.TX;
+import static us.ilite.common.types.ELimelightData.TARGET_ID;
 import static us.ilite.common.types.drive.EDriveData.*;
 
-import us.ilite.common.types.ERawLimelightData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -258,11 +256,12 @@ public class DriveModule extends Module {
 				}
 				break;
 			case TARGET_ANGLE_LOCK:
-				RobotCodex<ERawLimelightData> targetData = Robot.DATA.rawLimelight;
+				RobotCodex<ELimelightData> targetData = Robot.DATA.goaltracking;
+				targetData.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id());
 				double pidOutput;
-				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
+				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(ELimelightData.TV) && targetData.isSet(ELimelightData.TX)) {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mPreviousTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 
 					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
