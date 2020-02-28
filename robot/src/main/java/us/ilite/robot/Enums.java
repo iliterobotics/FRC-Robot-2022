@@ -169,7 +169,7 @@ public class Enums {
 
     public enum EArmState {
         NONE(0.0, 0),
-        OUT(95.0, 1),
+        OUT(90.0, 1),
         // TODO - fix to UP slot
         STOW(0.0, 1),
         HOLD(0.0, 1);

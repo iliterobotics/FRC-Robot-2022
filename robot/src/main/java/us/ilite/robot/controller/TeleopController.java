@@ -25,6 +25,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private TeleopController() {
+        db.registerAllWithShuffleboard();
     }
 
     @Override
