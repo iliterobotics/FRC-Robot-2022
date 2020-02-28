@@ -47,7 +47,7 @@ public class OurTrenchController extends BaseAutonController {
 
     private void initiateAllModules(){
         Enums.FlywheelSpeeds flywheelState = Enums.FlywheelSpeeds.FAR;
-        if (Field2020.canHitInnerGoal(tempCalcAngleToInnerGoal() , getDistance())){
+        if (Field2020.canHitInnerGoal(tempCalcAngleToInnerGoal() , Distance.fromFeet(db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET)))){ //TODO - Units??
             setFlywheelClosedLoop(flywheelState);
             if (isFlywheelUpToSpeed()) {
                 setFeederClosedLoop(flywheelState);
