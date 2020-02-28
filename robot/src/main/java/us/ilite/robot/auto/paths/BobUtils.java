@@ -177,6 +177,8 @@ public class BobUtils {
     public static int getIndexForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp) {
         double dt = pNow - pPathStartTimestamp;
         // Check path overrun
+        SmartDashboard.putBoolean ("DT > PATHTIME", dt > (getPathTotalTime(pPath) + AutonSelection.mDelaySeconds));
+        SmartDashboard.putBoolean ("Pnow < pathstart", (pNow < pPathStartTimestamp));
         if(
                 pNow < pPathStartTimestamp ||
                 dt > (getPathTotalTime(pPath) + AutonSelection.mDelaySeconds)

@@ -137,6 +137,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mDrive);
         mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mLimelight);
         mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 

@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
+import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.auto.paths.BobUtils;
@@ -20,7 +21,8 @@ public class BaseAutonController extends AbstractController {
     protected double mPathStartTime = 0d;
     protected HelixFollowerImpl mPathFollower = null;
     private boolean mInitializedPathFollower = false;
-    private boolean hitfirst = false;
+    private boolean mHitFirst = false;
+    private boolean mIsTargetTracking = false;
 
     private Distance mPathTotalDistance;
     private double mMaxAllowedPathTime;
@@ -79,6 +81,11 @@ public class BaseAutonController extends AbstractController {
         if (pReverse) {
             mPathFollower.reverse();
         }
+    }
+
+    protected void setTargetTracking(boolean pTargetTracking) {
+        mIsTargetTracking = pTargetTracking;
+        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TARGET_ANGLE_LOCK);
     }
 
 
@@ -153,10 +160,8 @@ public class BaseAutonController extends AbstractController {
             currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
 
             if (currentSegment == 0) {
-                hitfirst = true;
+                mHitFirst = true;
             }
-
-            SmartDashboard.putBoolean("Hit first index?", hitfirst);
 
             if (currentSegment == -1)
             {
@@ -167,7 +172,9 @@ public class BaseAutonController extends AbstractController {
         public void execute(double pNow) {
             super.execute();
             moveToNextSegment(pNow);
-            super.calculateOutputs();
+            if (!mIsTargetTracking) {
+                super.calculateOutputs();
+            }
             if(isFinished()) {
                 stopDrivetrain(0.0);
             }

@@ -229,9 +229,13 @@ public class DriveModule extends Module {
 		EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
 		// Do this to prevent wonkiness while transitioning autonomous to teleop
 		if(mode == null) return;
+		SmartDashboard.putNumber("Drive module state", mode.ordinal());
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
+			case RESET:
+				reset();
+				break;
 			case HOLD:
 				if (!mStartHoldingPosition) {
 					mLeftHoldSetpoint = mLeftEncoder.getPosition();
@@ -263,7 +267,7 @@ public class DriveModule extends Module {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
 					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mPreviousTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-
+					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
 					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
 					turn = db.drivetrain.get(DESIRED_TURN_PCT);
 				}
