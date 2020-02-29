@@ -1,9 +1,12 @@
 package us.ilite.common;
 
 import com.flybotix.hfr.codex.RobotCodex;
+import com.flybotix.hfr.util.lang.EnumUtils;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
@@ -15,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,12 +33,13 @@ public class Data {
 
     //Add new codexes here as we need more
 
-    public static final double NULL_CODEX_VALUE = Double.NaN;
+    public static final double NULL_CODEX_VALUE = 0.0;
+    private boolean mHasRegisteredWithShuffleboard = false;
     public final RobotCodex<EGyro> imu = new RobotCodex(Double.NaN, EGyro.class);
     public final RobotCodex<ELogitech310> driverinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
-    public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
+    public final RobotCodex<ELimelightData> goaltracking = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
     public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
     public final RobotCodex<ELimelightData> groundTracking = new RobotCodex(NULL_CODEX_VALUE, ELimelightData.class);
     public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
@@ -42,6 +47,8 @@ public class Data {
     public final RobotCodex<EPowerCellData> powercell = new RobotCodex(NULL_CODEX_VALUE, EPowerCellData.class);
     public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(NULL_CODEX_VALUE, EShooterSystemData.class);
     public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
+    public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
+
 
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
             imu,
@@ -49,9 +56,12 @@ public class Data {
             driverinput,
             operatorinput,
             pdp,
+            rawLimelight,
+            groundTracking,
+            flywheel,
             powercell,
             hanger,
-            limelight,
+            goaltracking,
             color,
     };
 
@@ -62,10 +72,12 @@ public class Data {
             drivetrain,
             driverinput,
             operatorinput,
+            flywheel,
             pdp,
             powercell,
             hanger,
-            limelight,
+            color,
+            goaltracking,
     };
 
     //Stores writers per codex needed for CSV logging
@@ -78,7 +90,7 @@ public class Data {
      */
     public Data(boolean pLogging) {
         int i = 0;
-        for (RobotCodex rc : mAllCodexes) {
+        for (RobotCodex rc : mLoggedCodexes) {
             mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
             rc.meta().setGlobalId(i);
             i++;
@@ -87,6 +99,26 @@ public class Data {
 
     public Data() {
         this(true);
+    }
+
+    public void registerAllWithShuffleboard() {
+        if(mHasRegisteredWithShuffleboard) { return ; }
+        for (String key : mMappedCodex.keySet()) {
+            ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
+            List<Enum<?>> enums = EnumUtils.getEnums(mMappedCodex.get(key).meta().getEnum(), true);
+            enums.stream().forEach(
+                    e -> {
+                        tab.addNumber(e.name(), () -> {
+                            if (mMappedCodex.get(key).isSet(e)) {
+                                return mMappedCodex.get(key).get(e);
+                            } else {
+                                return 0d;
+                            }
+                        });
+                    }
+            );
+        }
+        mHasRegisteredWithShuffleboard = true;
     }
 
     /**
@@ -118,6 +150,17 @@ public class Data {
         } else {
             return '\u1000';
         }
+    }
 
+    //USE TO TEST LOGGING
+    public void randomizeCodex( RobotCodex c ) {
+        for ( RobotCodex rb : mLoggedCodexes ) {
+            List<Enum<?>> enums = EnumUtils.getEnums(c.meta().getEnum(), true);
+            if ( rb.equals( c ) ) {
+                for ( Enum e : enums ) {
+                    rb.set( e, Math.random()*10 );
+                }
+            }
+        }
     }
 }

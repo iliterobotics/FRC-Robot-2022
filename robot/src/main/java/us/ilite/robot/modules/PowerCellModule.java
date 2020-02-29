@@ -4,10 +4,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.*;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
@@ -15,8 +13,9 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EPowerCellData;
 import static us.ilite.common.types.EPowerCellData.*;
-import us.ilite.common.types.sensor.EPowerDistPanel;
+
 import us.ilite.robot.Robot;
+import static us.ilite.robot.Enums.*;
 import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
@@ -41,7 +40,9 @@ public class PowerCellModule extends Module {
     private CANSparkMax mIntakeRoller;
     private CANPIDController mIntakePivotCtrl;
     private CANEncoder mIntakePivotEncoder;
+    private DutyCycleEncoder mIntakePivotAbsoluteEncoder;
     private CANEncoder mIntakeRollerEncoder;
+    private CANPIDController mIntakeRollerCtrl;
 
 //    Beam Breakers
     private DigitalBeamSensor mEntryBeam;
@@ -53,120 +54,102 @@ public class PowerCellModule extends Module {
     private int mSecondaryBeamNotBrokenCycles = 0;
     private int mExitBeamNotBrokenCycles = 0;
 
-
-
     //Constants
-
     public static double kIntakeTalonPower = 1d;
     public static double kForStopTalon = 0d;
     public static double kIntakePower = 1.0;
     public static double kForStop = 1.0;
-    public static double kPowerCellP;
-    public static double kPowerCellI;
-    public static double kPowerCellD;
-    public static double kPowerCellF;
-    public static double kWarnCurrentLimitThreshold = 30; //Tune this later
-    public static double kArmPowerEngaged = 1.0;
-    public static double kArmPowerDisengaged = 0.0;
+    public static int kWarnCurrentLimitThreshold = 20;
 
-    private static final int INTAKE_PIVOT_SLOT = 1;
-    private static final ProfileGains mIntakePivotGains = new ProfileGains()
-            .slot(INTAKE_PIVOT_SLOT)
-            .p(0.0005)
-            .f(0.0000391419);
+    private static final int INTAKE_PIVOT_DOWN_SLOT = 1;
+    private static final int INTAKE_PIVOT_UP_SLOT = 2;
+    private static final int INTAKE_ROLLER_SLOT = 1;
 
-    //Intake state
-    private EIntakeState mIntakeState;
-    private EIndexingState mIndexingState;
+    private static final double kIntakeRollerRatio = 12.0 / 30.0 * 22.0 / 36.0;
+    private static final double kIntakeRollerDiameterFeet = 1.5 / 12.0;
+    private static final double kIntakeRollerSpeedConversion = kIntakeRollerRatio * kIntakeRollerDiameterFeet * Math.PI / 60.0;
+    // 100:1 AM Sport with 16:36 sprocket reduction
+    // We may change this ratio to speed up the arm, so leave the math separated out like this
+    private static final double kPivotGearRatio = 1.0/100.0 * 16.0 / 36.0;
+    // 36T Driving sprocket on the pivot, 16T driven sprocket on the cross-axle
+    private static final double kAbsoluteEncoderRatio = kPivotGearRatio * 36.0 / 16.0;
+    // Rotations in degrees
+    private static final double kPivotConversion = kPivotGearRatio * 360.0;
+    // RPM to degrees / second
+    private static final double kPivotVelocityConversion = kPivotConversion / 60.0;
+    private static final double kMaxIntakePivotVelocityDeg_s = 10.0;
+    private static final ProfileGains mIntakePivotDownGains = new ProfileGains()
+            .slot(INTAKE_PIVOT_DOWN_SLOT)
+            .p(0.00025)
+            .maxAccel(9000d)
+            .maxVelocity(6000d)
+            ;
+    private static final ProfileGains mIntakeRollerGains = new ProfileGains()
+            .slot(INTAKE_ROLLER_SLOT)
+            .f(0.00015)
+//            .p(0.0001)
+            .maxAccel(9000d)
+            .maxVelocity(11000d)
+            ;
 
-    //Arm State
-    private EArmState mArmState;
-    
+    // These are PRODUCTION BOT values
+    // TODO - calbirate
+    private static final double kPivotAbsoluteMin = -0.32;
+    private static final double kPivotAbsoluteMax = 0.25;
+    private static final ProfileGains mIntakePivotUpGains = mIntakePivotDownGains;
+
     //For indexing
     private int mGoalBeamCountBroken = 0;
     private int mBeamCountBroken = 0;
     //Array of beam-breakers (Used when indexing PowerCells)
     private DigitalBeamSensor[] mDigitalBeamSensors;
 
-
     private ILog mLog = Logger.createLog(this.getClass());
 
-
-    public enum EIntakeState {
-        //TODO find velocities
-        INTAKE (0.1),
-        STOP (0.0),
-        REVERSE (-0.1);
-
-        double pPower;
-
-        EIntakeState (double pPower) {
-            this.pPower = pPower;
-        }
-
-        public double getPower() {
-            return pPower;
-        }
-    }
-
-    public enum EArmState {
-        //TODO find angles
-        ENGAGED (1.0),
-        DISENGAGED (0.0);
-
-        double angle;
-
-        EArmState (double angle) {
-            this.angle = angle;
-        }
-
-        public double getAngle() {
-            return angle;
-        }
-    }
-
-    public enum EIndexingState {
-        BROKEN (true),
-        NOT_BROKEN(false);
-
-        boolean broken;
-
-        EIndexingState(boolean broken) {
-            this.broken = broken;
-        }
-
-        public boolean getState(){
-            return this.broken;
-        }
-    }
-
     public PowerCellModule() {
-        mIntakeState = EIntakeState.STOP;
-        mArmState = EArmState.DISENGAGED;
-        mIndexingState = EIndexingState.NOT_BROKEN;
-
         mIntakeRoller = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeRollerId, CANSparkMaxLowLevel.MotorType.kBrushless );
+        mIntakeRoller.setInverted(true);
+        mIntakeRoller.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        mIntakeRoller.setSmartCurrentLimit(40);
+        mIntakeRollerEncoder = mIntakeRoller.getEncoder();
+        mIntakeRollerCtrl = mIntakeRoller.getPIDController();
+
         mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonPowerCellSerializer);
         mConveyorMotorVertical = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonVerticalID );
         mConveyorMotorVertical.setInverted(true);
 
         mIntakePivot = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeArm, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mIntakePivot.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        mIntakePivot.setSmartCurrentLimit(40);
 
-        mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel);
-        mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel);
-        mExitBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kExitBeamChannel);
+        double debounceTime_s = 0.1;
+        mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel, debounceTime_s);
+        mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel, debounceTime_s);
+        mExitBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kExitBeamChannel, debounceTime_s);
         mDigitalBeamSensors = new DigitalBeamSensor[]{mEntryBeam, mSecondaryBeam, mExitBeam};
 
-        mIntakePivotEncoder = mIntakePivot.getEncoder();
-        mIntakeRollerEncoder = mIntakeRoller.getEncoder();
-
+        mIntakePivotEncoder = new CANEncoder(mIntakePivot);
+        mIntakePivotAbsoluteEncoder = new DutyCycleEncoder(0);
         mIntakePivotCtrl = mIntakePivot.getPIDController();
-        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotGains);
+
+        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotDownGains);
+        HardwareUtils.setGains(mIntakeRollerCtrl, mIntakeRollerGains);
+        mIntakeRoller.burnFlash();
+        mIntakePivot.burnFlash();
     }
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotGains);
+        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotUpGains);
+//        HardwareUtils.setGains(mIntakePivotEncoder, mIntakePivotUpGains);
+//        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotDownGains);
+//        HardwareUtils.setGains(mIntakePivotEncoder, mIntakePivotDownGains);
+        HardwareUtils.setGains(mIntakeRollerCtrl, mIntakeRollerGains);
+        mIntakePivotEncoder.setPosition(0.0);
+        mIntakePivotCtrl.setOutputRange(0.0, 95.0);
+        SmartDashboard.putNumber("Rotation Conversion (deg)", mIntakePivotDownGains.POSITION_CONVERSION_FACTOR);
+        SmartDashboard.putNumber("Max Rotation Speed (deg/s)", kMaxIntakePivotVelocityDeg_s * kPivotVelocityConversion);
+        mIntakeRollerEncoder.setPosition(0.0);
     }
 
     @Override
@@ -176,59 +159,46 @@ public class PowerCellModule extends Module {
 
         db.powercell.set(CURRENT_AMOUNT_OF_SENSORS_BROKEN, List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count());
         db.powercell.set(INTAKE_ROLLER_CURRENT, mIntakeRoller.getOutputCurrent());
-        db.powercell.set(CURRENT_INTAKE_VELOCITY_FT_S, mIntakeRollerEncoder.getVelocity());
-        db.powercell.set(CURRENT_ARM_ANGLE , mIntakePivotEncoder.getPosition());
+        db.powercell.set(INTAKE_VEL_ft_s, mIntakeRollerEncoder.getVelocity() * kIntakeRollerSpeedConversion);
+        db.powercell.set(ARM_ANGLE_deg, mIntakePivotEncoder.getPosition() * kPivotConversion);
         db.powercell.set(SERIALIZER_CURRENT, mConveyorMotorHorizontal.getStatorCurrent());
         db.powercell.set(VERTICAL_CURRENT, mConveyorMotorVertical.getStatorCurrent());
         db.powercell.set(INTAKE_PIVOT_CURRENT, mIntakePivot.getOutputCurrent());
+        db.powercell.set(PIVOT_ABSOLUTE_ENCODER_RAW, mIntakePivotAbsoluteEncoder.getDistance());
 
-        if(db.powercell.get(DESIRED_AMOUNT_OF_SENSORS_BROKEN) >= 3.0){
-            db.powercell.set(DESIRED_AMOUNT_OF_SENSORS_BROKEN , (db.powercell.get(CURRENT_AMOUNT_OF_SENSORS_BROKEN )) + 1)  ;
-        }
-        else{
-            db.powercell.set(DESIRED_AMOUNT_OF_SENSORS_BROKEN , 3)  ;
-        }
-
-//        double currentSensorsBroken = db.powercell.get(EPowerCellData.CURRENT_AMOUNT_OF_SENSORS_BROKEN);
-//        if (currentSensorsBroken < 3) {
-//            mEntryBeamNotBrokenCycles++;
-//        } else {
-//            mEntryBeamNotBrokenCycles = 0;
-//    }
-//        db.powercell.set(EPowerCellData.ALL_BEAMS_BROKEN, mEntryBeamNotBrokenCycles < 15);
-
-        if((boolean)brokenArray[0]) {
-            mEntryBeamNotBrokenCycles++;
-        } else {
-            mEntryBeamNotBrokenCycles = 0;
-        }
-
-        if((boolean)brokenArray[1]) {
-            mSecondaryBeamNotBrokenCycles++;
-        } else {
-            mSecondaryBeamNotBrokenCycles = 0;
-        }
-
-        if((boolean)brokenArray[2]) {
-            mExitBeamNotBrokenCycles++;
-        } else {
-            mExitBeamNotBrokenCycles = 0;
-        }
-
-        db.powercell.set(ENTRY_BEAM, mEntryBeamNotBrokenCycles > 15);//mEntryBeamNotBrokenCycles > 15);
-        db.powercell.set(SECONDARY_BREAM, mSecondaryBeamNotBrokenCycles > 15);
-        db.powercell.set(EXIT_BEAM, mExitBeamNotBrokenCycles > 15);
-
+        db.powercell.set(ENTRY_BEAM, mEntryBeam.isBroken());
+        db.powercell.set(H_BEAM, mSecondaryBeam.isBroken());
+        db.powercell.set(EXIT_BEAM, mExitBeam.isBroken());
         //TODO Determine Indexer State
     }
 
     @Override
     public void setOutputs(double pNow) {
-        mIntakeRoller.set(db.powercell.get(DESIRED_INTAKE_VELOCITY_FT_S));
-        mConveyorMotorHorizontal.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_H_VELOCITY));
-        mConveyorMotorVertical.set(ControlMode.PercentOutput, db.powercell.get(DESIRED_V_VELOCITY));
-//        mIntakePivotEncoder.setPosition(db.powercell.get(EPowerCellData.DESIRED_ARM_ANGLE));
-        mIntakePivot.set(db.powercell.get(UNUSED));
+        mConveyorMotorHorizontal.set(ControlMode.PercentOutput, db.powercell.get(SET_H_pct));
+        mConveyorMotorVertical.set(ControlMode.PercentOutput, db.powercell.get(SET_V_pct));
+        setPivotArm();
+    }
+
+    private void setPivotArm() {
+//        kPivotAbsoluteMin
+        if(db.powercell.isSet(INTAKE_STATE)) {
+//            mIntakeRoller.set(db.powercell.get(SET_INTAKE_VEL_ft_s) / 18.0); // 18ft/s theoretical max
+            double rpm = db.powercell.get(SET_INTAKE_VEL_ft_s) / kIntakeRollerSpeedConversion;
+            SmartDashboard.putNumber("Target Intake Roller RPM", rpm);
+            mIntakeRollerCtrl.setReference(rpm, ControlType.kSmartVelocity, INTAKE_ROLLER_SLOT);
+//            mIntakeRoller.set(0.6);
+            EArmState state = db.powercell.get(INTAKE_STATE, EArmState.class);
+            switch(state) {
+                case OUT:
+                case STOW:
+                    mIntakePivotCtrl.setReference(state.angle / kPivotConversion, ControlType.kSmartMotion, INTAKE_PIVOT_DOWN_SLOT, 0.01);
+                    break;
+                default:
+                    mIntakePivot.set(0.0);
+            }
+        } else {
+            mIntakePivot.set(0.0);
+        }
     }
 
     @Override
@@ -236,10 +206,6 @@ public class PowerCellModule extends Module {
 //        mIntakeState = EIntakeState.STOP;
 //        mArmState = EArmState.DISENGAGED;
 //        mIndexingState = EIndexingState.NOT_INDEXING;
-    }
-
-    public boolean isCurrentLimiting(){
-        return db.pdp.get(EPowerDistPanel.CURRENT5) > kWarnCurrentLimitThreshold;
     }
 
     public void startIndexing() {
@@ -254,16 +220,11 @@ public class PowerCellModule extends Module {
 //            if (mDigitalBeamSensor.isBroken()) mBeamCountBroken++;
 //        }
         if ( mBeamCountBroken < mGoalBeamCountBroken) {
-            mConveyorMotorHorizontal.set( ControlMode.PercentOutput, db.powercell.get(EPowerCellData.DESIRED_H_VELOCITY) );
+            mConveyorMotorHorizontal.set( ControlMode.PercentOutput, db.powercell.get(EPowerCellData.SET_H_pct) );
         } else {
             mConveyorMotorHorizontal.set( ControlMode.PercentOutput, 0.0 );
         }
 
         mGoalBeamCountBroken = mBeamCountBroken + 1;
-    }
-
-
-    public void setIntakeState(EIntakeState pIntakeState){
-        mIntakeState = pIntakeState;
     }
 }

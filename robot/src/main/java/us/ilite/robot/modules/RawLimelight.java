@@ -1,12 +1,10 @@
 package us.ilite.robot.modules;
 
-import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import us.ilite.common.Field2020;
 import us.ilite.common.IFieldComponent;
 import us.ilite.common.config.Settings;
-import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Robot;
 
@@ -146,7 +144,7 @@ public class RawLimelight extends Module{
     }
 
     public String toString() {
-        return Robot.DATA.limelight.toCSV();
+        return Robot.DATA.goaltracking.toCSV();
     }
 
 }

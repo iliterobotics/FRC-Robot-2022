@@ -6,10 +6,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,10 +15,13 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
+import us.ilite.robot.network.EForwardableConnections;
 
+import java.util.Arrays;
 import java.util.TimerTask;
 
 import static us.ilite.common.types.EMatchMode.*;
@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     private HangerModule mHanger;
-    private CSVLogger mCSVLogger = new CSVLogger();
+    private CSVLogger mCSVLogger = new CSVLogger(true);
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
@@ -44,10 +44,11 @@ public class Robot extends TimedRobot {
     private PowerCellModule mIntake;
     private RawLimelight mRawLimelight;
     private DJSpinnerModule mDJSpinnerModule;
+    private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
 
-    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
+//    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -60,20 +61,21 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+
+        Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         // Init the actual robot
-        initTimer.reset();
-        initTimer.start();
+//        initTimer.reset();
+//        initTimer.start();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-//        mLedControl = new LEDControl();
         mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
-        mLimelight = new Limelight();
-        mRawLimelight = new RawLimelight();
+//        mLimelight = new Limelight();
+//        mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
-        mHanger = new HangerModule();
+        mLEDControl = new LEDControl();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -98,20 +100,15 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
 
-        try {
-        } catch (Exception e) {
-            mLogger.exception(e);
-        }
-
         LiveWindow.disableAllTelemetry();
-
-        TimerTask shuffleupdate = new TimerTask(){
-            public void run(){Shuffleboard.update();}
-        };
-        new java.util.Timer().scheduleAtFixedRate(shuffleupdate, 15000, 1000);
 
         initTimer.stop();
         mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
+
+        if ( !Settings.kIsLogging ) {
+            mLogger.warn("------------Not Logging to CSV------------");
+        }
+
     }
 
     /**
@@ -125,13 +122,16 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-//        mCSVLogger.start();
+//        if ( Settings.kIsLogging ) {
+//            mCSVLogger.start();
+//        }
+
         MODE=AUTONOMOUS;
         mActiveController = new AutonCalibration();
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
-        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 
@@ -142,7 +142,15 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-//        mCSVLogger.start();
+        if ( Settings.kIsLogging ){
+            mCSVLogger.start();
+        }
+
+        mRunningModules.clearModules();
+        mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mShooter);
+        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mIntake);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -159,6 +167,7 @@ public class Robot extends TimedRobot {
         mLogger.info("Disabled Initialization");
 
         mRunningModules.shutdown(CLOCK.getCurrentTime());
+
 //        mCSVLogger.stop();
 
         if(mActiveController != null) {
@@ -169,12 +178,20 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.readInputs(0d);
+        mDrive.readInputs(0d);
+        mShooter.readInputs(0d);
+        mIntake.readInputs(0d);
+        Shuffleboard.update();
     }
 
     @Override
     public void testInit() {
+        if ( Settings.kIsLogging ){
+            mCSVLogger.start();
+        }
+
         if(mTestController == null) {
-             mTestController = TestController.getInstance();
+            mTestController = TestController.getInstance();
         }
         MODE = TEST;
         mActiveController = mTestController;
@@ -198,18 +215,27 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
+        //Used to Test logging
+//        for (RobotCodex c : DATA.mLoggedCodexes ) {
+//            if (c.equals(DATA.drivetrain)) {
+//                DATA.randomizeCodex(c);
+//            }
+//        }
         commonPeriodic();
     }
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        for (RobotCodex c : DATA.mLoggedCodexes ) {
-//            mCSVLogger.addToQueue( new Log( c.toCSV(), c.meta().gid()) );
+        if ( Settings.kIsLogging ) {
+            for ( RobotCodex c : DATA.mLoggedCodexes ) {
+                if ( c.hasChanged() ) {
+                    mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
+                }
+            }
         }
         for ( RobotCodex c : DATA.mAllCodexes ) {
             c.reset();
         }
-
 //        EPowerDistPanel.map(mData.pdp, pdp);
 
         mRunningModules.readInputs(CLOCK.getCurrentTime());
@@ -224,9 +250,7 @@ public class Robot extends TimedRobot {
             mMatchMeta = new MatchMetadata();
             int gid = mMatchMeta.hash;
             for (RobotCodex c : DATA.mAllCodexes) {
-                if ( !c.meta().getEnum().getSimpleName().equals("ELogitech310")) {
-                    c.meta().setGlobalId(gid);
-                }
+                c.meta().setGlobalId(gid);
             }
         }
     }
@@ -250,7 +274,6 @@ public class Robot extends TimedRobot {
         if (this.isTest()) {
             mRobotEnabledDisabled = "Test";
         }
-
         if (this.isEnabled()) {
             mRobotEnabledDisabled = "Enabled";
         }

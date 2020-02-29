@@ -23,12 +23,11 @@ public class GroundTracking extends Module {
 
     @Override
     public void readInputs(double pNow) {
-
+        sortTrackingData();
     }
 
     @Override
     public void setOutputs(double pNow) {
-        sortTrackingData();
     }
 
     public void sortTrackingData() {
@@ -60,7 +59,7 @@ public class GroundTracking extends Module {
             mLastYPosition = Robot.DATA.groundTracking.get(ELimelightData.TY);
         } else {          //set selectedTarget codex straight from limelight codex
             for (ELimelightData e : EnumUtils.getEnums(ELimelightData.class)) {
-                Robot.DATA.groundTracking.set(e, Robot.DATA.limelight.get(e));
+                Robot.DATA.groundTracking.set(e, Robot.DATA.goaltracking.get(e));
             }
         }
     }

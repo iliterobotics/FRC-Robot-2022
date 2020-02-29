@@ -13,8 +13,12 @@ public enum EDriveData implements CodexOf<Double> {
 
     // Outputs from a generated path
     L_PATH_FT_s, R_PATH_FT_s,
+    PATH_ERR_ft,
 
     DESIRED_TURN_PCT, DESIRED_THROTTLE_PCT,
+
+    DELTA_HEADING,
+    GYRO_RATE,
 
     NEUTRAL_MODE,
     STATE,

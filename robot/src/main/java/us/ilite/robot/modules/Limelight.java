@@ -61,31 +61,31 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        Robot.DATA.limelight.set(TARGET_ID, (double) NONE.id());
+        Robot.DATA.goaltracking.set(TARGET_ID, (double) NONE.id());
     }
 
     @Override
     public void readInputs(double pNow) {
         boolean targetValid = mTable.getEntry("tv").getDouble(Double.NaN) > 0.0;
-        Robot.DATA.limelight.set(TV, targetValid ? 1.0d : 0d);
+        Robot.DATA.goaltracking.set(TV, targetValid ? 1.0d : 0d);
 
         if(targetValid) {
-            Robot.DATA.limelight.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(TA,mTable.getEntry("ta").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(TSHORT,mTable.getEntry("tshort").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
-            Robot.DATA.limelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
-            if(Robot.DATA.limelight.get(TARGET_ID) != -1) {
-                Robot.DATA.limelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)].height()));
-                Robot.DATA.limelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
-                Optional<Translation2d> p = calcTargetLocation(Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)]);
+            Robot.DATA.goaltracking.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
+            Robot.DATA.goaltracking.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
+            Robot.DATA.goaltracking.set(TA,mTable.getEntry("ta").getDouble(Double.NaN));
+            Robot.DATA.goaltracking.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
+            Robot.DATA.goaltracking.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
+            Robot.DATA.goaltracking.set(TSHORT,mTable.getEntry("tshort").getDouble(Double.NaN));
+            Robot.DATA.goaltracking.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
+            Robot.DATA.goaltracking.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
+            Robot.DATA.goaltracking.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
+            if(Robot.DATA.goaltracking.get(TARGET_ID) != -1) {
+                Robot.DATA.goaltracking.set(CALC_DIST_TO_TARGET, calcTargetDistance(Field2020.FieldElement.values()[(int) Robot.DATA.goaltracking.get(TARGET_ID)].height()));
+                Robot.DATA.goaltracking.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
+                Optional<Translation2d> p = calcTargetLocation(Field2020.FieldElement.values()[(int) Robot.DATA.goaltracking.get(TARGET_ID)]);
                 if(p.isPresent()) {
-                    Robot.DATA.limelight.set(CALC_TARGET_X, p.get().getX());
-                    Robot.DATA.limelight.set(CALC_TARGET_Y, p.get().getY());
+                    Robot.DATA.goaltracking.set(CALC_TARGET_X, p.get().getX());
+                    Robot.DATA.goaltracking.set(CALC_TARGET_Y, p.get().getY());
                 }
             }
         }
@@ -98,7 +98,7 @@ public class Limelight extends Module implements ITargetDataProvider {
         setStreamMode();
         setSnapshotMode();
         setPipeline();
-        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, kAngleDeg);
+        Robot.DATA.goaltracking.set(ANGLE_FROM_HORIZON, kAngleDeg);
 //        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, Robot.DATA.flywheel.get(ANGLE_FROM_HORIZON)); //TODO Add angle functionality to flywheel module
     }
 
@@ -108,37 +108,37 @@ public class Limelight extends Module implements ITargetDataProvider {
     }
 
     private void setPipeline() {
-        int mPipeline = (Robot.DATA.limelight.get(TARGET_ID) == -1) ?
-                NONE.pipeline() :
-                Field2020.FieldElement.values()[(int) Robot.DATA.limelight.get(TARGET_ID)].pipeline();
+        int mPipeline = (Robot.DATA.goaltracking.get(TARGET_ID) == -1) ?
+                        NONE.pipeline() :
+                        Field2020.FieldElement.values()[(int) Robot.DATA.goaltracking.get(TARGET_ID)].pipeline();
 
-        Robot.DATA.limelight.set(PIPELINE, mPipeline);
-        mTable.getEntry("pipeline").setNumber(Robot.DATA.limelight.get(PIPELINE));
+        Robot.DATA.goaltracking.set(PIPELINE, mPipeline);
+        mTable.getEntry("pipeline").setNumber(Robot.DATA.goaltracking.get(PIPELINE));
     }
 
     private void setLedMode() {
-        mTable.getEntry("ledMode").setNumber(Robot.DATA.limelight.get(LED_MODE));
+        mTable.getEntry("ledMode").setNumber(Robot.DATA.goaltracking.get(LED_MODE));
     }
 
     private void setCamMode() {
-        mTable.getEntry("camMode").setNumber(Robot.DATA.limelight.get(CAM_MODE));
+        mTable.getEntry("camMode").setNumber(Robot.DATA.goaltracking.get(CAM_MODE));
     }
 
     private void setStreamMode() {
-        mTable.getEntry("stream").setNumber(Robot.DATA.limelight.get(STREAM_MODE));
+        mTable.getEntry("stream").setNumber(Robot.DATA.goaltracking.get(STREAM_MODE));
     }
 
     private void setSnapshotMode() {
-        mTable.getEntry("snapshot").setNumber(Robot.DATA.limelight.get(SNAPSHOT_MODE));
+        mTable.getEntry("snapshot").setNumber(Robot.DATA.goaltracking.get(SNAPSHOT_MODE));
     }
 
     public String toString() {
-        return Robot.DATA.limelight.toCSV();
+        return Robot.DATA.goaltracking.toCSV();
     }
 
     @Override
     public RobotCodex<ELimelightData> getTargetingData() {
-        return Robot.DATA.limelight;
+        return Robot.DATA.goaltracking;
     }
 
     @Override

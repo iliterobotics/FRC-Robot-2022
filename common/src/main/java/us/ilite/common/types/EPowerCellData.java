@@ -3,23 +3,19 @@ package us.ilite.common.types;
 import com.flybotix.hfr.codex.CodexOf;
 
 public enum EPowerCellData implements CodexOf<Double> {
-    UNUSED,
     ENTRY_BEAM,
-    SECONDARY_BREAM,
+    H_BEAM,
     EXIT_BEAM,
 
-    // etc - 1 per beam break sensor
+    SET_H_pct,
+    SET_V_pct,
 
-    DESIRED_H_VELOCITY,
-    DESIRED_V_VELOCITY,
+    INTAKE_STATE,
+    ARM_ANGLE_deg,
+    PIVOT_ABSOLUTE_ENCODER_RAW,
 
-    CURRENT_ARM_ANGLE,
-    DESIRED_ARM_ANGLE,
-
-    CURRENT_INTAKE_VELOCITY_FT_S,
-    DESIRED_INTAKE_VELOCITY_FT_S,
-
-    CURRENT_INDEXING_STATE,
+    INTAKE_VEL_ft_s,
+    SET_INTAKE_VEL_ft_s,
 
     CURRENT_AMOUNT_OF_SENSORS_BROKEN,
     DESIRED_AMOUNT_OF_SENSORS_BROKEN,

@@ -3,6 +3,7 @@ package us.ilite.robot.hardware;
 import java.util.List;
 import java.util.Collections;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -28,12 +29,15 @@ public class Pigeon extends IMU{
 	private static List<Double>kCollisionGains = Collections.singletonList(Double.valueOf(1.0));
 	
 	public Pigeon(int pPigeonCANId){
+//	    mPigeon.
 		super(kCollisionGains);
 		ypr = new double[3];
 		xyz = new short[3];
 		this.mPigeon = new PigeonIMU(pPigeonCANId);
-		mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, (int)(1.0 / kUpdateRate * 1000.0), Settings.Hardware.CAN.kLongTimeoutMs);
+		ErrorCode ec = mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, (int)(1.0 / kUpdateRate * 1000.0), Settings.Hardware.CAN.kLongTimeoutMs);
+		System.err.println("===== PIGEON ERROR CODE: " + ec);
 		mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_6_SensorFusion, (int)(1.0 / kUpdateRate * 1000.0), Settings.Hardware.CAN.kLongTimeoutMs);
+
 		setCollisionThreshold_DeltaG(kCollisionThreshold);
 		//mAccelerationX = new FilteredAverage(kCollisionGains);
 		//mAccelerationY = new FilteredAverage(kCollisionGains);
