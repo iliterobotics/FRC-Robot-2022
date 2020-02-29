@@ -18,7 +18,7 @@ public abstract class BaseManualController extends AbstractController {
 
     void updateDrivetrain(double pNow) {
         double throttle = db.driverinput.get(THROTTLE_AXIS);
-        double rotate = -db.driverinput.get(TURN_AXIS);
+        double rotate = db.driverinput.get(TURN_AXIS) * 0.75;
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
@@ -29,13 +29,12 @@ public abstract class BaseManualController extends AbstractController {
             db.drivetrain.set(STATE, EDriveState.HOLD);
             db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
             db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
-        }
-        
-        if (throttle != 0.0 || rotate != 0.0) {
+        } else {
+            db.drivetrain.set(STATE, EDriveState.VELOCITY);
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.01;
             }
-            var d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
+            DriveMessage  d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
             throttle = d.getThrottle();
             rotate = d.getTurn();
             if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
@@ -49,7 +48,7 @@ public abstract class BaseManualController extends AbstractController {
                 db.drivetrain.set(DESIRED_TURN_PCT, rotate);
             }
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
-
+            db.drivetrain.set(DESIRED_TURN_PCT, rotate);
         }
 
     }

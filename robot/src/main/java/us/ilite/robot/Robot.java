@@ -46,8 +46,8 @@ public class Robot extends TimedRobot {
     private Limelight mLimelight;
     private PowerCellModule mIntake;
 //    private RawLimelight mRawLimelight;
-//    private DJSpinnerModule mDJSpinnerModule;
-//    private LEDControl mLEDControl;
+    private DJSpinnerModule mDJSpinnerModule;
+    private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
 
@@ -67,19 +67,19 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         // Init the actual robot
-        initTimer.reset();
-        initTimer.start();
+//        initTimer.reset();
+//        initTimer.start();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-//        mLEDControl = new LEDControl();
         mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
         mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
-//        mDJSpinnerModule = new DJSpinnerModule();
+        mDJSpinnerModule = new DJSpinnerModule();
+        mLEDControl = new LEDControl();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -210,8 +210,8 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
-//        mRunningModules.addModule(mDJSpinnerModule);
-//        mRunningModules.addModule(mLEDControl);
+        mRunningModules.addModule(mLEDControl);
+        mRunningModules.addModule(mDJSpinnerModule);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }

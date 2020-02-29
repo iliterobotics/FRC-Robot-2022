@@ -44,11 +44,13 @@ public class Settings {
             public static int kHangerNeoID1 = 15;
             public static int kHangerNeoID2 = 71;
 //            public static int kTalonThreeID = 65; // Change later
-            public static final int kDJSpinnerVictorID = 50;
+
+            public static final int kDJSpinnerVictorID = 12; //ID of intake on Aria
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
             public static final int kShooterID = 66; // BunnyBot Shooter
+
 
             public static int kSRXTurretId = 9;
             public static int kLEDControlCanifierID = 0;
@@ -61,10 +63,10 @@ public class Settings {
             public static int kPDP = 20;
             public static int kPigeon = 21;
             // ===== 2020 Drive =====
-//            public static int kDriveRightMaster = 4;
-//            public static int kDriveRightFollower = 3;
-//            public static int kDriveLeftMaster = 2;
-//            public static int kDriveLeftFollower = 1;
+//            public static int kDriveRightMaster = 1;
+//            public static int kDriveRightFollower = 2;
+//            public static int kDriveLeftMaster = 3;
+//            public static int kDriveLeftFollower = 4;
 
             public static int kMAXIntakeRollerId = 7;
             public static int kMAXIntakeArm = 8;
@@ -74,11 +76,14 @@ public class Settings {
             public static int kFalconMasterId = 13;
             public static int kFalconFollowerId = 14;
 
+            public static int kLEDControlCanifier = 40;
+
+
             // ===== 2019 Drive =====
-            public static  int kDriveLeftMaster = 1;
-            public static int kDriveLeftFollower = 3;
-            public static  int kDriveRightMaster = 2;
-            public static int kDriveRightFollower = 4;
+//            public static  int kDriveLeftMaster = 1;
+//            public static int kDriveLeftFollower = 3;
+//            public static  int kDriveRightMaster = 2;
+//            public static int kDriveRightFollower = 4;
 
         }
 

@@ -59,14 +59,15 @@ public abstract class AbstractController {
     protected void setIntakeArmEnabled(double pNow, boolean pEnabled) {
         if(pEnabled) {
             double speed = Math.max(db.drivetrain.get(L_ACTUAL_VEL_FT_s), db.drivetrain.get(R_ACTUAL_VEL_FT_s));
-            if(speed <= 1.0) {
-                speed = 0.3;
-            }
+//            if(speed <= 1.0) {
+//                speed = 3.0;
+//            }
+            speed += 3.0;
             db.powercell.set(INTAKE_STATE, EArmState.OUT);
-            db.powercell.set(SET_INTAKE_VEL_ft_s, kIntakeRollerPower_on);
+            db.powercell.set(SET_INTAKE_VEL_ft_s, speed);
         } else {
             db.powercell.set(INTAKE_STATE, EArmState.STOW);
-            db.powercell.set(SET_INTAKE_VEL_ft_s, kIntakeRollerPower_off);
+            db.powercell.set(SET_INTAKE_VEL_ft_s, 0.0);
         }
     }
 

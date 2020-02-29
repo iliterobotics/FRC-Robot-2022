@@ -48,6 +48,7 @@ public class Data {
     public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(NULL_CODEX_VALUE, EShooterSystemData.class);
     public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
     public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE , ELimelightData.class);
+    public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
             imu,
             drivetrain,
@@ -74,6 +75,7 @@ public class Data {
             pdp,
             powercell,
             hanger,
+            color,
             goaltracking,
     };
 

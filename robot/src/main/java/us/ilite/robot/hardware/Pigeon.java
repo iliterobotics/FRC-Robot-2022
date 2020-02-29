@@ -29,6 +29,7 @@ public class Pigeon extends IMU{
 	private static List<Double>kCollisionGains = Collections.singletonList(Double.valueOf(1.0));
 	
 	public Pigeon(int pPigeonCANId){
+//	    mPigeon.
 		super(kCollisionGains);
 		ypr = new double[3];
 		xyz = new short[3];

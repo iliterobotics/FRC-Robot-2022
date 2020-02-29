@@ -16,7 +16,6 @@ import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 
-import static us.ilite.common.types.ELimelightData.TARGET_ID;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.sensor.EGyro;
@@ -47,11 +46,12 @@ public class DriveModule extends Module {
 	// Actual measured was 5514 with a resting battery voltage of 12.75V
 	public static double kDriveTrainMaxVelocityRPM = 5500.0;
 	public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveNEOVelocityFactor);
-//	public static Distance kDriveMaxAccel_measured = Distance.fromFeet()
+	//	public static Distance kDriveMaxAccel_measured = Distance.fromFeet()
 	public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
 
 	// This is approx 290 Degrees per second, measured with a Pigeon
-	public static double kMaxDegreesPerCycle = Units.radians_to_degrees(5);
+    // Actual measured was 825 Degrees per second, with a resting battery voltage of 12.57V
+	public static double kMaxDegreesPerSecond = 300;
 	// This is with the ADIS16470 IMU
 	public static Rotation2d kDriveMaxOmega_measured = Rotation2d.fromDegrees(19.1);
 
@@ -76,14 +76,13 @@ public class DriveModule extends Module {
 			.maxAccel(56760d)
 			.slot(POSITION_PID_SLOT)
 			.velocityConversion(kDriveNEOPositionFactor);
-
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
 			.p(0.0001)
 			// Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
 			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
 			// Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
-			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
+//			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
 			.slot(VELOCITY_PID_SLOT)
 			.velocityConversion(kDriveNEOVelocityFactor);
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
@@ -93,8 +92,11 @@ public class DriveModule extends Module {
 	// Heading Gains
 	// =============================================================================
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
-	public static ProfileGains kYawGains = new ProfileGains().f(.15);
+	public static ProfileGains kYawGains = new ProfileGains().p(0.1);
 	public IMU mGyro;
+	private double mLastHeading = 0;
+	private double mDeltaTime = 0;
+	private double mLastTime = 0;
 
 	// =============================================================================
 	// Hold Gains
@@ -114,15 +116,10 @@ public class DriveModule extends Module {
 
 	private Rotation2d mGyroOffset = new Rotation2d();
 	private PIDController mTargetAngleLockPid;
-	private PIDController mYawPid;
-//	private PIDController mHoldLeftPositionPid;
-//	private PIDController mHoldRightPositionPid;
-	private boolean mStartHoldingPosition;
-
+	private edu.wpi.first.wpilibj.controller.PIDController mYawPid;
 	private double mLeftHoldSetpoint;
 	private double mRightHoldSetpoint;
-	private double mPreviousHeading = 0.0;
-	private double mPreviousTime = 0;
+	private boolean mStartHoldingPosition;
 
 	private final CANSparkMax mLeftMaster;
 	private final CANSparkMax mLeftFollower;
@@ -154,8 +151,15 @@ public class DriveModule extends Module {
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
 		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
+		double ramprate = 0.01;
+        mLeftMaster.setClosedLoopRampRate(ramprate);
+        mLeftFollower.setClosedLoopRampRate(ramprate);
+        mRightMaster.setClosedLoopRampRate(ramprate);
+        mRightFollower.setClosedLoopRampRate(ramprate);
+
 
 //		mGyro = new ADIS16470();
+
 
 		HardwareUtils.setGains(mLeftCtrl, vPID);
 		HardwareUtils.setGains(mRightCtrl, vPID);
@@ -173,11 +177,13 @@ public class DriveModule extends Module {
 		mRightFollower.burnFlash();
 
 
-		mYawPid = new PIDController(kYawGains,
-				-kMaxDegreesPerCycle,
-				kMaxDegreesPerCycle,
+		mYawPid = new edu.wpi.first.wpilibj.controller.PIDController(kYawGains.P,
+				kYawGains.I,
+				kYawGains.D,
+//				-kMaxDegreesPerSecond,
+//				kMaxDegreesPerSecond,
 				Settings.kControlLoopPeriod);
-		mYawPid.setOutputRange(-1, 1);
+//		mYawPid.setOutputRange(-1, 1);
 
 	}
 
@@ -187,16 +193,7 @@ public class DriveModule extends Module {
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 		mTargetAngleLockPid.setSetpoint(0);
 		mTargetAngleLockPid.reset();
-
-		mYawPid = new PIDController(kYawGains,
-									-kMaxDegreesPerCycle,
-									kMaxDegreesPerCycle,
-									Settings.kControlLoopPeriod);
-		mYawPid.setOutputRange(-1, 1);
-		mYawPid.reset();
 		mStartHoldingPosition = false;
-		mLeftHoldSetpoint = 0.0;
-		mRightHoldSetpoint = 0.0;
 
 		reset();
 		HardwareUtils.setGains(mLeftCtrl, vPID);
@@ -209,7 +206,10 @@ public class DriveModule extends Module {
 
 	@Override
 	public void readInputs(double pNow) {
-		mGyro.update(pNow);
+	    mDeltaTime = pNow - mLastTime;
+	    mGyro.update(pNow);
+	    db.drivetrain.set(DELTA_HEADING, mGyro.getHeading().getDegrees() - mLastHeading);
+	    db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
 		db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
 		db.drivetrain.set(L_ACTUAL_VEL_FT_s, mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor);
 		db.drivetrain.set(R_ACTUAL_POS_FT, mRightEncoder.getPosition() * kDriveNEOPositionFactor);
@@ -226,6 +226,8 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs(double pNow) {
+	    mLastHeading = mGyro.getHeading().getDegrees();
+	    mLastTime = pNow;
 		EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
 		// Do this to prevent wonkiness while transitioning autonomous to teleop
 		if(mode == null) return;
@@ -265,7 +267,7 @@ public class DriveModule extends Module {
 				double pidOutput;
 				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(ELimelightData.TV) && targetData.isSet(ELimelightData.TX)) {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mPreviousTime);
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mLastTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
 					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
@@ -273,12 +275,12 @@ public class DriveModule extends Module {
 				}
 			case VELOCITY:
 				mStartHoldingPosition = false;
-				mYawPid.setSetpoint(db.drivetrain.get(DESIRED_TURN_PCT) * kMaxDegreesPerCycle);
-//				turn = mYawPid.calculate(Robot.DATA.imu.get(EGyro.YAW_DEGREES), pNow);
-//				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
-//				SmartDashboard.putNumber("ACTUAL YAW", (Robot.DATA.imu.get(EGyro.YAW_DEGREES)));
-				mLeftCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
-				mRightCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+//				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
+//				turn = mYawPid.calculate(mGyro.getYaw().getDegrees(), turn * kMaxDegreesPerSecond);
+				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
+				SmartDashboard.putNumber("ACTUAL YAW", (db.drivetrain.get(GYRO_RATE)));
+				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
+				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
 				break;
 			case PATH_FOLLOWING_BASIC:
 			case PATH_FOLLOWING_HELIX:
