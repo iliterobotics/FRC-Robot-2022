@@ -9,9 +9,14 @@ import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.lib.util.Latch;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.lib.util.XorLatch;
+import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
+import us.ilite.robot.modules.FlywheelModule;
+
 import static us.ilite.robot.Enums.*;
 
 import java.util.List;
@@ -148,18 +153,21 @@ public abstract class AbstractController {
         db.flywheel.set(BALL_VELOCITY_ft_s, pSpeed.speed);
         db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
         db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
+        db.flywheel.set(DESIRED_TURRET_ANGLE, db.goaltracking.get(ELimelightData.CALC_ANGLE_TO_TARGET));
     }
 
     protected void firingSequence(FlywheelSpeeds speed) {
-        setFlywheelClosedLoop(speed);
-        if (isFlywheelUpToSpeed()) {
-            db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
-            if (isFeederUpToSpeed()) {
-                db.powercell.set(SET_V_pct, 0.5);
-                db.powercell.set(SET_H_pct, 0.5);
-            } else {
-                db.powercell.set(SET_V_pct, 0);
-                db.powercell.set(SET_H_pct, 0);
+        if (isHoodAtCorrectAngle() && isTurretAtCorrectAngle(db.flywheel.get(TARGET_LOCKING) == 0.0)) {
+            setFlywheelClosedLoop(speed);
+            if (isFlywheelUpToSpeed()) {
+                db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
+                if (isFeederUpToSpeed()) {
+                    db.powercell.set(SET_V_pct, 0.5);
+                    db.powercell.set(SET_H_pct, 0.5);
+                } else {
+                    db.powercell.set(SET_V_pct, 0);
+                    db.powercell.set(SET_H_pct, 0);
+                }
             }
         }
     }
@@ -176,6 +184,15 @@ public abstract class AbstractController {
 
     protected boolean isHoodAtCorrectAngle() {
         return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) -  db.flywheel.get(TARGET_HOOD_ANGLE)) <= 5.0; //TODO - Tune tolerance
+    }
+
+    protected boolean isTurretAtCorrectAngle(boolean mIsManual) {
+        if (!mIsManual) {
+            double turretAngle = db.flywheel.get(CURRENT_TURRET_ANGLE);
+            double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
+            return Math.abs(turretAngle - target) <= 5.0;
+        }
+        return true;
     }
 
     protected abstract void updateImpl(double pNow);

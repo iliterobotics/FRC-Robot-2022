@@ -50,7 +50,7 @@ public class FlywheelModule extends Module {
 
     // Constants
     private static final double kHoodGearRatio = 32.0 / 20.0 * 14.0 / 360.0;//First stage was 32/20 in code but 36/20 in integration
-    private static final double kTurretGearRatio = 9.0 / 72.0 * 18.0 / 160.0;
+    public static final double kTurretGearRatio = 9.0 / 72.0 * 18.0 / 160.0;
     private static final double kFlyWheelGearRatio = 36.0 / 24.0;
     private static final double kFlywheelDiameterInches = 4.0;
     private static double kFlywheelRadiusFeet = kFlywheelDiameterInches / 2.0 / 12.0;
@@ -146,6 +146,7 @@ public class FlywheelModule extends Module {
 //        db.flywheel.set(POT_RAW_VALUE, mHoodPID.getValue());
         db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
         db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
+        db.flywheel.set(CURRENT_TURRET_ANGLE, Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio));
 //        mPotentiometerReadings.addNumber(mHoodAI.getValue());
 //
 //        double cur = mHoodAI.getValue();
@@ -188,11 +189,10 @@ public class FlywheelModule extends Module {
     }
 
     private void setTurret() {
-        if (db.flywheel.get(TARGET_LOCKING) == 1.0) {
+        if (true) {//db.flywheel.get(TARGET_LOCKING) == 1.0) {
             double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
             if (db.goaltracking.isSet(ELimelightData.TX) && (target >= -kMaximumTurretAngle && target <= kMaximumTurretAngle)) {
                 mTurretPID.setReference(Units.degrees_to_rotations(target, kTurretGearRatio), ControlType.kSmartMotion);
-                mIsTurretLocked = Math.abs(Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio) - target) <= kTurretErrorTolerance;
             }
         } else {
             mTurretPID.setReference(0.0, ControlType.kSmartMotion);
