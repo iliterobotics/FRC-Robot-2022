@@ -119,7 +119,7 @@ public class FlywheelModule extends Module {
             Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, 2000);
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, 0);
         }
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_POSITION, mTurretEncoder.getVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_POSITION, mTurretEncoder.getPosition());
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_POTENTIOMETER_TURNS, mHoodPot.get());
     }
 
