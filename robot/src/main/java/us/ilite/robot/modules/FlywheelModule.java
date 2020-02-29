@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import static us.ilite.robot.Enums.*;
@@ -66,6 +67,7 @@ public class FlywheelModule extends Module {
     private static final double kHoodAngleRange = kMaxShotDegrees - kMinShotDegrees;
     private static final double kHoodConversionFactor = kHoodReadingRange / kHoodAngleRange;
     private final FilteredAverage mPotentiometerReadings = FilteredAverage.filteredAverageForTime(0.1);
+    private static final double kMaximumTurretAngle = 45.0;
 
 
     private static double kRadiansPerSecToTalonTicksPer100ms = (2 * Math.PI) / 2048.0 / 0.1;
@@ -82,6 +84,10 @@ public class FlywheelModule extends Module {
 //            .kA(0.00165)
 //            .kV(0.018)
             ;
+    private static ProfileGains kTurretGains = new ProfileGains()
+            .p(1.0/2)
+            .maxVelocity(1000d)
+            .maxAccel(1000d);
     private PIDController mHoodPID = new PIDController(5, 0, 0);
     private CANEncoder mFeederInternalEncoder;
 
@@ -100,10 +106,7 @@ public class FlywheelModule extends Module {
 
         mTurretEncoder = mTurret.getEncoder();
         mTurretPID = mTurret.getPIDController();
-
-        mTurretPID.setP(0.05);
-        mTurretPID.setI(0);
-        mTurretPID.setD(0);
+        HardwareUtils.setGains(mTurretPID, kTurretGains);
 
 //        mHoodPot = new AnalogPotentiometer(0);
         SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
@@ -126,11 +129,13 @@ public class FlywheelModule extends Module {
 //        mHoodPot = new AnalogPotentiometer(mHoodAI);
     }
 
-
     private void setTurret() {
-        double current = mTurretEncoder.getPosition();
-        double target = current * Robot.DATA.rawLimelight.get(ERawLimelightData.TX);
-        mTurretPID.setReference(target, ControlType.kPosition);
+        double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
+        if (db.goaltracking.isSet(ELimelightData.TX) && (target >= -kMaximumTurretAngle && target <= kMaximumTurretAngle)) {
+            mTurretPID.setReference(Units.degrees_to_rotations(target, kTurretGearRatio), ControlType.kSmartMotion);
+        }
+
+        SmartDashboard.putNumber("TURRET POSITION", Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio));
     }
 
     @Override

@@ -123,7 +123,7 @@ public class TestController extends BaseManualController {
 
     private void updateFlywheel(double pNow) {
         if (db.groundTracking.isSet(TX)) {
-            db.flywheel.set(DESIRED_TURRET_ANGLE, -0.1 * db.groundTracking.get(TX));
+            db.flywheel.set(DESIRED_TURRET_ANGLE, db.goaltracking.get(CALC_ANGLE_TO_TARGET));
         } else {
             db.flywheel.set(DESIRED_TURRET_ANGLE, 0);
         }
