@@ -70,10 +70,20 @@ public class DriveModule extends Module {
 	// =============================================================================
 	private static final int VELOCITY_PID_SLOT = 1;
 	private static final int POSITION_PID_SLOT = 2;
+	private static final int SMART_MOTION_PID_SLOT = 3;
 	public static ProfileGains dPID = new ProfileGains()
-			.p(1.0).maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
-			.maxAccel(56760d)
+//			.p(5.0e-4)
+			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
+			.f(0.00015)
+			.maxAccel(5676d)
 			.slot(POSITION_PID_SLOT)
+			.velocityConversion(kDriveNEOPositionFactor);
+	public static ProfileGains smartMotionPID = new ProfileGains()
+			.p(.00025)
+			.f(0.00015)
+			.maxVelocity(kDriveTrainMaxVelocityRPM)
+			.maxAccel(1000d)
+			.slot(SMART_MOTION_PID_SLOT)
 			.velocityConversion(kDriveNEOPositionFactor);
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
@@ -164,6 +174,8 @@ public class DriveModule extends Module {
 		HardwareUtils.setGains(mRightCtrl, vPID);
 		HardwareUtils.setGains(mLeftCtrl, dPID);
 		HardwareUtils.setGains(mRightCtrl, dPID);
+		HardwareUtils.setGains(mLeftCtrl, smartMotionPID);
+		HardwareUtils.setGains(mRightCtrl, smartMotionPID);
 
 		//TODO - we want to do use our conversion factor calculated above, but that requires re-turning of F & P
 		mLeftEncoder.setPositionConversionFactor(1d);
