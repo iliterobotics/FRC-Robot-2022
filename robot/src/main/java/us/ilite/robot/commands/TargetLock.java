@@ -7,12 +7,6 @@ import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
-<<<<<<< HEAD
-import us.ilite.robot.modules.DriveModule;
-import us.ilite.robot.modules.EDriveState;
-import us.ilite.robot.modules.IThrottleProvider;
-=======
->>>>>>> master
 
 import static us.ilite.common.types.ELimelightData.*;
 
@@ -42,11 +36,7 @@ public class TargetLock implements ICommand {
 
     @Override
     public boolean update(double pNow) {
-<<<<<<< HEAD
-        RobotCodex<ELimelightData> currentData = Robot.DATA.limelight;
-=======
         RobotCodex<ELimelightData> currentData = Robot.DATA.goaltracking;
->>>>>>> master
 
         Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, Robot.DATA.operatorinput.get(InputMap.DRIVER.THROTTLE_AXIS) * Settings.Input.kSnailModePercentThrottleReduction);
 
@@ -68,14 +58,9 @@ public class TargetLock implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-
-<<<<<<< HEAD
-=======
         Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.NORMAL);
-
     }
 
->>>>>>> master
     public void setEndOnAlignment(boolean bool) {
         mEndOnAlignment = bool;
     }

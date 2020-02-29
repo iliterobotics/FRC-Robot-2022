@@ -1,23 +1,14 @@
 package us.ilite.robot.controller;
 
-<<<<<<< HEAD
-import com.flybotix.hfr.util.lang.EnumUtils;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
-=======
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
->>>>>>> master
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-<<<<<<< HEAD
 import us.ilite.common.Field2020;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EShooterSystemData;
-=======
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.util.Color;
@@ -34,32 +25,17 @@ import us.ilite.common.types.*;
 import us.ilite.common.Data;
 import us.ilite.common.Field2020;
 import us.ilite.common.types.EHangerModuleData;
->>>>>>> master
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
-<<<<<<< HEAD
-=======
 import us.ilite.robot.modules.*;
-
 import static us.ilite.common.types.ELimelightData.*;
->>>>>>> master
 import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
-
 import static us.ilite.robot.Enums.*;
-
-<<<<<<< HEAD
-import static us.ilite.common.types.EPowerCellData.UNUSED;
-import us.ilite.robot.modules.*;
-
-import static us.ilite.common.types.ELimelightData.*;
-=======
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.EShooterSystemData.*;
-
->>>>>>> master
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 import static us.ilite.robot.modules.DriveModule.kDriveNEOVelocityFactor;
@@ -73,14 +49,11 @@ public class TestController extends BaseManualController {
 
     private double mLimelightZoomThreshold = 7.0;
     private double mLimelightGoalThreshold = 5.0;
-<<<<<<< HEAD
-=======
     private Double mLastTrackingType = 0d;
     private Joystick mFlywheelJoystick;
     private Joystick mLimelightJoystick;
     public final RobotCodex<ELogitech310> flywheelinput = new RobotCodex(Data.NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<ELogitech310> limelightinput = new RobotCodex(Data.NULL_CODEX_VALUE, ELogitech310.class);
->>>>>>> master
 
     private double mStartTime;
 
@@ -116,21 +89,12 @@ public class TestController extends BaseManualController {
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-<<<<<<< HEAD
-        Robot.CLOCK.report("updateLimelightTargetLock", t-> updateTargetTracking(pNow));
-        Robot.CLOCK.report("updateDrivetrain", t->updateDrivetrain(pNow));
-        Robot.CLOCK.report("updateFlywheel", t->updateFlywheel());
-        Robot.CLOCK.report("updateIntake", t-> updatePowerCells(pNow));
-        Robot.CLOCK.report("updateHanger", t->updateHanger(pNow));
-        Robot.CLOCK.report("updateDJBooth", t->updateDJBooth(pNow));
-=======
         Robot.CLOCK.report("updateLimelightTargetLock", t -> updateTargetTracking(pNow));
         Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
         Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
         Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
         Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
->>>>>>> master
 //        updateArm(pNow);
 
         double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
@@ -150,21 +114,19 @@ public class TestController extends BaseManualController {
         }
     }
 
-<<<<<<< HEAD
     private void updateFlywheel() {
-        if (db.limelight.isSet(TX)) {
-            db.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, -0.1 * db.limelight.get(TX));
-        } else {
-            db.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, 0);
-        }
+
 
     }
 
-=======
 
 
     private void updateFlywheel(double pNow) {
-
+        if (db.groundTracking.isSet(TX)) {
+            db.flywheel.set(DESIRED_TURRET_ANGLE, -0.1 * db.groundTracking.get(TX));
+        } else {
+            db.flywheel.set(DESIRED_TURRET_ANGLE, 0);
+        }
         if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_10_TEST)) {
             firingSequence(FlywheelSpeeds.CLOSE);
         } else if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_20_TEST)) {
@@ -239,7 +201,6 @@ public class TestController extends BaseManualController {
 //        }
     }
 
->>>>>>> master
     public void updateTargetTracking(double pNow) {
         boolean isOffset = !(Robot.DATA.goaltracking.get(TS) > 0 - mLimelightGoalThreshold || Robot.DATA.goaltracking.get(TS) < -90 + mLimelightGoalThreshold);
 
@@ -280,10 +241,6 @@ public class TestController extends BaseManualController {
         mLastGroundTrackingType = Robot.DATA.goaltracking.get(TARGET_ID.ordinal());
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
     protected void updatePowerCells(double pNow) {
         if(flywheelinput.isSet(InputMap.FLYWHEEL.RESET_INTAKE_COUNT)) {
             resetSerializerState();
