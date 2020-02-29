@@ -39,8 +39,8 @@ public class Settings {
 
         public static class CAN {
             public static int kDJBoothTalonId = 72;
-            public static int kHangerNeoID1 = 15;
-            public static int kHangerNeoID2 = 71;
+            public static int kHangerNeoID1 = 13;
+            public static int kHangerNeoID2 = 2;
 //            public static int kTalonThreeID = 65; // Change later
 
             public static final int kDJSpinnerVictorID = 12; //ID of intake on Aria
