@@ -174,6 +174,10 @@ public abstract class AbstractController {
                 db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8;
     }
 
+    protected boolean isHoodAtCorrectAngle() {
+        return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) -  db.flywheel.get(TARGET_HOOD_ANGLE)) <= 5.0; //TODO - Tune tolerance
+    }
+
     protected abstract void updateImpl(double pNow);
 
     /**

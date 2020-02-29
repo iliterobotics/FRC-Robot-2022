@@ -68,7 +68,8 @@ public class FlywheelModule extends Module {
     private static final double kHoodConversionFactor = kHoodReadingRange / kHoodAngleRange;
     private final FilteredAverage mPotentiometerReadings = FilteredAverage.filteredAverageForTime(0.1);
     private static final double kMaximumTurretAngle = 45.0;
-
+    private final double kTurretErrorTolerance = 5.0; //TODO - tune tolerance
+    private boolean mIsTurretLocked = false;
 
     private static double kRadiansPerSecToTalonTicksPer100ms = (2 * Math.PI) / 2048.0 / 0.1;
     // https://docs.google.com/spreadsheets/d/1Po6exzGvfr0rMWMWVSyqxf49ZMSfGoYn/edit#gid=1858991275
@@ -85,7 +86,7 @@ public class FlywheelModule extends Module {
 //            .kV(0.018)
             ;
     private static ProfileGains kTurretGains = new ProfileGains()
-            .p(1.0/2)
+            .p(.001)
             .maxVelocity(1000d)
             .maxAccel(1000d);
     private PIDController mHoodPID = new PIDController(5, 0, 0);
@@ -95,8 +96,6 @@ public class FlywheelModule extends Module {
 
     private CANEncoder mTurretEncoder;
 
-    private double target;
-    private double current;
 
     private double mIntegral = 0;
     private final int kFlywheelFalconPIDSlot = 0;
@@ -127,15 +126,6 @@ public class FlywheelModule extends Module {
         mHoodPot = mFeeder.getAnalog(CANAnalog.AnalogMode.kAbsolute);
 //        mHoodAI = new AnalogInput(Settings.Hardware.Analog.kHoodPot);
 //        mHoodPot = new AnalogPotentiometer(mHoodAI);
-    }
-
-    private void setTurret() {
-        double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
-        if (db.goaltracking.isSet(ELimelightData.TX) && (target >= -kMaximumTurretAngle && target <= kMaximumTurretAngle)) {
-            mTurretPID.setReference(Units.degrees_to_rotations(target, kTurretGearRatio), ControlType.kSmartMotion);
-        }
-
-        SmartDashboard.putNumber("TURRET POSITION", Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio));
     }
 
     @Override
@@ -183,9 +173,9 @@ public class FlywheelModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
+        setTurret();
         setFlywheel();
         setFeeder();
-        setTurret();
         setHood(pNow);
     }
 
@@ -195,6 +185,20 @@ public class FlywheelModule extends Module {
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, 0);
+    }
+
+    private void setTurret() {
+        if (db.flywheel.get(TARGET_LOCKING) == 1.0) {
+            double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
+            if (db.goaltracking.isSet(ELimelightData.TX) && (target >= -kMaximumTurretAngle && target <= kMaximumTurretAngle)) {
+                mTurretPID.setReference(Units.degrees_to_rotations(target, kTurretGearRatio), ControlType.kSmartMotion);
+                mIsTurretLocked = Math.abs(Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio) - target) <= kTurretErrorTolerance;
+            }
+        } else {
+            mTurretPID.setReference(0.0, ControlType.kSmartMotion);
+        }
+
+        SmartDashboard.putNumber("TURRET POSITION", Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio));
     }
 
     private void setFeeder() {

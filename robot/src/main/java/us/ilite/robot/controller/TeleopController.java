@@ -51,12 +51,13 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateFlywheel(double pNow) {
-        if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE)) {
-            currentState = Enums.FlywheelSpeeds.FAR;
-        }else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
-            currentState = Enums.FlywheelSpeeds.CLOSE;
-        }
-
+//        if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE)) {
+//            currentState = Enums.FlywheelSpeeds.FAR;
+//        }else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
+//            currentState = Enums.FlywheelSpeeds.CLOSE;
+//        }
+        db.flywheel.set(EShooterSystemData.TARGET_LOCKING, db.operatorinput.get(InputMap.OPERATOR.NEAR_MODE));
+        
         if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
             super.firingSequence(currentState);
 //            super.setFlywheelClosedLoop(currentState);
