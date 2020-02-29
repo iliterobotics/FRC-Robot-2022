@@ -14,7 +14,7 @@ public class SitAndShootController extends BaseAutonController
     }
 
     @Override
-    public void updateImpl(double pNow)
+    protected void updateImpl(double pNow)
     {
         shoot();
     }
