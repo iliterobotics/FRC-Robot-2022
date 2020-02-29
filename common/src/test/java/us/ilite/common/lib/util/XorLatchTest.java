@@ -57,7 +57,7 @@ public class XorLatchTest {
     }
 
     @Test
-    public void testThis() {
+    public void test_XORLatch_Update() {
 
         aLatch.mEntry.update(initEntryValue);
         aLatch.mExit.update(initExitValue);
