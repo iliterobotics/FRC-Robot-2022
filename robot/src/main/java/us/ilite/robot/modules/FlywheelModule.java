@@ -1,8 +1,6 @@
 package us.ilite.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
@@ -17,7 +15,6 @@ import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.SparkMaxFactory;
-import us.ilite.robot.hardware.TalonSRXFactory;
 
 public class FlywheelModule extends Module {
     // Hood Servo Gear Ratio
@@ -95,7 +92,7 @@ public class FlywheelModule extends Module {
 
     private double turretTurn() {
         double target = Robot.DATA.limelight.get(ELimelightData.TX);
-        double current = Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_TURRET_VELOCITY);
+        double current = Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_TURRET_POSITION);
 
         return -target;
     }
@@ -106,7 +103,7 @@ public class FlywheelModule extends Module {
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, 0);
     }
 
     @Override
@@ -122,15 +119,15 @@ public class FlywheelModule extends Module {
             Robot.DATA.flywheel.set(EShooterSystemData.FLYWHEEL_DISTANCE_BASED_SPEED, 2000);
             Robot.DATA.flywheel.set(EShooterSystemData.SERVO_DISTANCE_BASED_ANGLE, 0);
         }
-        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_VELOCITY, mTurretEncoder.getVelocity());
+        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_POSITION, mTurretEncoder.getVelocity());
         Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_POTENTIOMETER_TURNS, mHoodPot.get());
     }
 
     @Override
     public void setOutputs(double pNow) {
-        double current = Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_TURRET_VELOCITY);
-        double target = Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_VELOCITY);
-        SmartDashboard.putNumber("Turret Current Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_TURRET_VELOCITY));
+        double current = Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_TURRET_POSITION);
+        double target = Robot.DATA.flywheel.get(EShooterSystemData.TARGET_TURRET_POSITION);
+        SmartDashboard.putNumber("Turret Current Velocity", Robot.DATA.flywheel.get(EShooterSystemData.CURRENT_TURRET_POSITION));
         mTurret.set(target);
     }
 
@@ -139,6 +136,6 @@ public class FlywheelModule extends Module {
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
         Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
-        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
+        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, 0);
     }
 }

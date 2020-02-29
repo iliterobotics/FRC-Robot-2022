@@ -10,10 +10,7 @@ import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.Field2020;
-import us.ilite.common.config.InputMap;
-import us.ilite.common.types.EColorData;
 import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
@@ -26,9 +23,8 @@ import java.util.List;
 
 import static us.ilite.common.types.EPowerCellData.UNUSED;
 import us.ilite.robot.modules.*;
-import us.ilite.common.types.EHangerModuleData;
+
 import static us.ilite.common.types.ELimelightData.*;
-import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 import static us.ilite.robot.modules.DriveModule.kDriveNEOVelocityFactor;
@@ -111,9 +107,9 @@ public class TestController extends BaseManualController {
 
     private void updateFlywheel() {
         if (db.limelight.isSet(TX)) {
-            db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, -0.1 * db.limelight.get(TX));
+            db.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, -0.1 * db.limelight.get(TX));
         } else {
-            db.flywheel.set(EShooterSystemData.TARGET_TURRET_VELOCITY, 0);
+            db.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, 0);
         }
 
     }
