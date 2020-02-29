@@ -11,15 +11,13 @@ import us.ilite.robot.hardware.SparkMaxFactory;
 
 public class HangerModule extends Module {
 
-    private CANSparkMax mHangerNeoOne;
-    //TODO create sparkmax to follow to first
-//    private CANSparkMax mHangerNeoTwo;
+    private CANSparkMax mHangerNeoMaster;
+    private CANSparkMax mHangerNeoFollower;
 
     private EHangerState mHangerState;
     private CANPIDController mHangerPID;
 
     private CANEncoder mHangerEncoderOne;
-//    private CANEncoder mHangerEncoderTwo; O
 
     //PID Constants, to be used if needed
     private static final int UP_PID_SLOT_ID = 1;
@@ -36,32 +34,29 @@ public class HangerModule extends Module {
 
     public HangerModule(){
 
-        mHangerNeoOne = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID1 ,
+        mHangerNeoMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID1 ,
                 CANSparkMaxLowLevel.MotorType.kBrushless);
-        mHangerNeoOne.setInverted(true);
-//        mHangerNeoTwo = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kHangerNeoID2 , mHangerNeoOne,
-//                CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        mHangerPID = new CANPIDController(mHangerNeoOne);
+        mHangerNeoFollower = SparkMaxFactory.createFollowerSparkMax(Settings.Hardware.CAN.kHangerNeoID2 ,
+                mHangerNeoMaster, CANSparkMaxLowLevel.MotorType.kBrushless);
+
+        mHangerNeoMaster.setInverted(true);
+
+        mHangerPID = new CANPIDController(mHangerNeoMaster);
         mHangerPID.setP(P, UP_PID_SLOT_ID);
         mHangerPID.setI(I, UP_PID_SLOT_ID);
         mHangerPID.setD(D, UP_PID_SLOT_ID);
         mHangerPID.setSmartMotionMaxAccel(kMaxElevatorUpAcceleration, UP_PID_SLOT_ID);
         mHangerPID.setSmartMotionMaxVelocity(kMaxElevatorVelocity, UP_PID_SLOT_ID);
 
-//        mHangerNeoTwo.follow(mHangerNeoOne , true);
+        mHangerNeoMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
-        
+        mHangerNeoMaster.burnFlash();
+        mHangerNeoFollower.burnFlash();
 
-        mHangerNeoOne.setIdleMode(CANSparkMax.IdleMode.kCoast);
-
-        mHangerNeoOne.burnFlash();
-//        mHangerNeoTwo.burnFlash();
-
-        mHangerEncoderOne = mHangerNeoOne.getEncoder();
+        mHangerEncoderOne = mHangerNeoMaster.getEncoder();
 
         zeroTheEncoders();
-
     }
     public enum EHangerState {
         HANGING(1.0),
@@ -80,12 +75,9 @@ public class HangerModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-//        Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER1 , (double) returnHangerState().ordinal() );
-//        Robot.DATA.hanger.set(EHangerModuleData.DESIRED_HANGER_POWER2 , (double) returnHangerState().ordinal() );
-
         db.hanger.set(EHangerModuleData.CURRENT_HANGER_VELOCITY , mHangerEncoderOne.getVelocity());
         db.hanger.set(EHangerModuleData.CURRENT_POSITION, mHangerEncoderOne.getPosition());
-        db.hanger.set(EHangerModuleData.OUTPUT_CURRENT, mHangerNeoOne.getOutputCurrent());
+        db.hanger.set(EHangerModuleData.OUTPUT_CURRENT, mHangerNeoMaster.getOutputCurrent());
     }
 
     @Override
@@ -96,8 +88,7 @@ public class HangerModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-//        mHangerPID.setReference(db.hanger.get(EHangerModuleData.DESIRED_POSITION), ControlType.kSmartMotion, UP_PID_SLOT_ID);
-        mHangerNeoOne.set(db.hanger.get(EHangerModuleData.DESIRED_HANGER_VELOCITY));
+        mHangerPID.setReference(db.hanger.get(EHangerModuleData.DESIRED_POSITION), ControlType.kSmartMotion, UP_PID_SLOT_ID);
     }
 
 
@@ -109,7 +100,7 @@ public class HangerModule extends Module {
         mHangerState = desiredState;
     }
     public boolean isCurrentLimiting(){
-        return mHangerNeoOne.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold;
+        return mHangerNeoMaster.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold;
     }
 
     public void zeroTheEncoders(){
