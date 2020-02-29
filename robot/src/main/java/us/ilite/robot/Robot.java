@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     public static final CSVLogger mCSVLogger = new CSVLogger( Settings.kIsLogging );
-//    private HangerModule mHanger = new HangerModule();
+    private HangerModule mHanger;
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
@@ -76,6 +76,7 @@ public class Robot extends TimedRobot {
 //        mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
         mLEDControl = new LEDControl();
+        mHanger = new HangerModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -151,6 +152,8 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
         mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mHanger);
+
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);

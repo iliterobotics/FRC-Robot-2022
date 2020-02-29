@@ -96,9 +96,8 @@ public class HangerModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        mHangerPID.setReference(db.hanger.get(EHangerModuleData.DESIRED_POSITION), ControlType.kSmartMotion, UP_PID_SLOT_ID);
-//        mHangerNeoOne.set(Robot.DATA.hanger.get(EHangerModuleData.CURRENT_HANGER_VELOCITY));
-
+//        mHangerPID.setReference(db.hanger.get(EHangerModuleData.DESIRED_POSITION), ControlType.kSmartMotion, UP_PID_SLOT_ID);
+        mHangerNeoOne.set(db.hanger.get(EHangerModuleData.DESIRED_HANGER_VELOCITY));
     }
 
 
