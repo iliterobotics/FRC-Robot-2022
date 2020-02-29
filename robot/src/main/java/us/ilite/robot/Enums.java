@@ -17,7 +17,8 @@ public class Enums {
         TARGET_ANGLE_LOCK,
         HOLD,
         VELOCITY,
-        PERCENT_OUTPUT
+        PERCENT_OUTPUT,
+        SMART_MOTION
     }
 
     // =============================================================================
