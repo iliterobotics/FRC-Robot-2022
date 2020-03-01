@@ -166,8 +166,8 @@ public abstract class AbstractController {
         if (isHoodAtCorrectAngle(speed)) {
             db.goaltracking.set(ELimelightData.TARGET_ID, trackedElement.id());
             db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
+            setFlywheelClosedLoop(speed);
             if (isTurretAtCorrectAngle()) {
-                setFlywheelClosedLoop(speed);
                 if (isFlywheelUpToSpeed()) {
                     db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
                     if (isFeederUpToSpeed()) {

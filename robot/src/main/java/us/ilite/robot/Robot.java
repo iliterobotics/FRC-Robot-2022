@@ -160,7 +160,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mDrive);
         mRunningModules.addModule(mIntake);
         MODE=TELEOPERATED;
-        mActiveController = mTestController;
+        mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
     }
 
