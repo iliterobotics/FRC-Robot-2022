@@ -122,8 +122,9 @@ public class TestController extends BaseManualController {
 
 
     private void updateFlywheel(double pNow) {
+        db.flywheel.set(TURRET_CONTROL, TurretControlType.MANUAL);
         double turretDirection = db.operatorinput.get(InputMap.OPERATOR_REFACTOR.MANUAL_TURRET);
-        turretDirection = Math.abs(turretDirection) > 0.1 ? turretDirection : 0.0; //Handling Deadband
+        turretDirection = Math.abs(turretDirection) > 0.02 ? turretDirection : 0.0; //Handling Deadband
         db.flywheel.set(MANUAL_TURRET_DIRECTION, turretDirection);
 
 //        if (db.groundTracking.isSet(TX)) {

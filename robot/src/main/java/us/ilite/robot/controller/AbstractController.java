@@ -154,7 +154,7 @@ public abstract class AbstractController {
         db.flywheel.set(BALL_VELOCITY_ft_s, pSpeed.speed);
         db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
         db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
-        db.flywheel.set(DESIRED_TURRET_ANGLE, db.goaltracking.get(ELimelightData.CALC_ANGLE_TO_TARGET));
+        db.flywheel.set(DESIRED_TURRET_ANGLE, db.goaltracking.get(ELimelightData.TX));
     }
 
     protected final void setFeederClosedLoop(Enums.FlywheelSpeeds pFlywheelSpeed) {
@@ -163,7 +163,7 @@ public abstract class AbstractController {
     }
 
     protected void firingSequence(FlywheelSpeeds speed) {
-        if (isTurretAtCorrectAngle(db.flywheel.get(TARGET_LOCKING) == 0.0)) {
+        if (isTurretAtCorrectAngle(db.flywheel.get(TURRET_CONTROL, TurretControlType.class) == TurretControlType.MANUAL)) {
             setFlywheelClosedLoop(speed);
             if (isHoodAtCorrectAngle(speed)) {
                 if (isFlywheelUpToSpeed()) {
@@ -192,9 +192,12 @@ public abstract class AbstractController {
 
     protected boolean isTurretAtCorrectAngle(boolean mIsManual){
         if (!mIsManual) {
-            double turretAngle = db.flywheel.get(CURRENT_TURRET_ANGLE);
-            double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
-            return Math.abs(turretAngle - target) <= 5.0;
+            TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
+            if (turretControlType != TurretControlType.MANUAL) {
+                double turretAngle = db.flywheel.get(CURRENT_TURRET_ANGLE);
+                double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
+                return Math.abs(turretAngle - target) <= 2.0;
+            }
         }
         return true;
     }
