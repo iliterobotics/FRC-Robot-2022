@@ -197,10 +197,9 @@ public class FlywheelModule extends Module {
 
     private void setTurret() {
         double mTurretDirection = db.flywheel.get(MANUAL_TURRET_DIRECTION);
-        System.out.println("||||||||||||||||||||||||||||||||||||||||||||| " + (getTurretAngle()));
+        SmartDashboard.putNumber("TURRET ANGLE", getTurretAngle());
         if (db.flywheel.isSet(MANUAL_TURRET_DIRECTION)) {
-            SmartDashboard.putNumber("TURRET PO", .25 * (mTurretDirection));
-            mTurret.set(.8 * mTurretDirection);
+            mTurret.set(.25 * mTurretDirection);
         } else {
             mTurret.set(0.0);
 //            if (true) {//db.flywheel.get(TARGET_LOCKING) == 1.0) {
