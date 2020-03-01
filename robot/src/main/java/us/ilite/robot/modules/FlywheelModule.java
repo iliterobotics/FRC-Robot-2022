@@ -200,12 +200,12 @@ public class FlywheelModule extends Module {
     private void setTurret(double pNow) {
         if (db.flywheel.isSet(TURRET_CONTROL)) {
             TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
+
             switch (turretControlType) {
                 case MANUAL:
                     double mTurretDirection = db.flywheel.get(MANUAL_TURRET_DIRECTION);
                     if (db.flywheel.isSet(MANUAL_TURRET_DIRECTION)) {
-                        SmartDashboard.putNumber("TURRET PO", .8 * (mTurretDirection));
-                        mTurret.set(.8 * mTurretDirection);
+                        mTurret.set(.25 * mTurretDirection);
                     } else {
                         mTurret.set(0.0);
                     }
@@ -217,9 +217,8 @@ public class FlywheelModule extends Module {
                     }
 
             }
+            SmartDashboard.putNumber("TURRET ANGLE", getTurretAngle());
         }
-
-        SmartDashboard.putNumber("TURRET POSITION", Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio));
     }
 
     private double getTurretAngle() {
