@@ -32,4 +32,20 @@ public class Units {
     public static double radians_to_degrees(double radians) {
         return Math.toDegrees(radians);
     }
+
+    public static double degrees_to_rotations(double degrees) {
+        return degrees / 360.0;
+    }
+
+    public static double rotations_to_degrees(double rotations) {
+        return rotations * 360.0;
+    }
+
+    public static double degrees_to_rotations(double degrees, double smallToBigGearRatio) {
+        return degrees_to_rotations(degrees) / smallToBigGearRatio;
+    }
+
+    public static double rotations_to_degrees(double rotations, double smallToBigGearRatio) {
+        return rotations_to_degrees(rotations) * smallToBigGearRatio;
+    }
 }

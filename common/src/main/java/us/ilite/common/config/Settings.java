@@ -13,6 +13,7 @@ public class Settings {
     public static final String kGroundLimelightNetworkTable = "limelight-bottom";
     public static final String kFlywheelLimelightNetworkTable = "limelight-top";
 
+
     public static double kControlLoopPeriod = 0.02; // seconds
 
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
