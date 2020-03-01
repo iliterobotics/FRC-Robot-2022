@@ -92,7 +92,7 @@ public class FlywheelModule extends Module {
     private PIDController mHoodPID = new PIDController(5, 0, 0);
     private CANEncoder mFeederInternalEncoder;
 
-    private CANPIDController mTurretPID;
+    private us.ilite.common.lib.control.PIDController mTurretPID = new us.ilite.common.lib.control.PIDController(kTurretGains, -45, 45, Settings.kControlLoopPeriod);
 
     private CANEncoder mTurretEncoder;
 
@@ -105,12 +105,13 @@ public class FlywheelModule extends Module {
 
         mTurretEncoder = mTurret.getEncoder();
         mTurretEncoder.setPositionConversionFactor(360 * kTurretGearRatio);
-        mTurretPID = mTurret.getPIDController();
+//        mTurretPID = mTurret.getPIDController();
+        mTurretPID.setOutputRange(-.5, .5);
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
         mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  45);
         mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -45);
-        HardwareUtils.setGains(mTurretPID, kTurretGains);
+//        HardwareUtils.setGains(mTurretPID, kTurretGains);
 
 //        mHoodPot = new AnalogPotentiometer(0);
         SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
@@ -181,7 +182,7 @@ public class FlywheelModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        setTurret();
+        setTurret(pNow);
         setFlywheel();
         setFeeder();
         setHood(pNow);
@@ -195,22 +196,26 @@ public class FlywheelModule extends Module {
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, 0);
     }
 
-    private void setTurret() {
-        double mTurretDirection = db.flywheel.get(MANUAL_TURRET_DIRECTION);
+    private void setTurret(double pNow) {
         System.out.println("||||||||||||||||||||||||||||||||||||||||||||| " + (getTurretAngle()));
-        if (db.flywheel.isSet(MANUAL_TURRET_DIRECTION)) {
-            SmartDashboard.putNumber("TURRET PO", .25 * (mTurretDirection));
-            mTurret.set(.8 * mTurretDirection);
-        } else {
-            mTurret.set(0.0);
-//            if (true) {//db.flywheel.get(TARGET_LOCKING) == 1.0) {
-//                double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
-//                if (db.goaltracking.isSet(ELimelightData.TX) && (target >= -kMaximumTurretAngle && target <= kMaximumTurretAngle)) {
-//                    mTurretPID.setReference(target), ControlType.kSmartMotion);
-//                }
-//            } else {
-//                mTurretPID.setReference(0.0, ControlType.kSmartMotion);
-//            }
+
+        TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
+        switch (turretControlType) {
+            case MANUAL:
+                double mTurretDirection = db.flywheel.get(MANUAL_TURRET_DIRECTION);
+                if (db.flywheel.isSet(MANUAL_TURRET_DIRECTION)) {
+                    SmartDashboard.putNumber("TURRET PO", .8 * (mTurretDirection));
+                    mTurret.set(.8 * mTurretDirection);
+                } else {
+                    mTurret.set(0.0);
+                }
+            case TARGET_LOCKING:
+                double target = db.goaltracking.get(ELimelightData.TX);
+                mTurretPID.setSetpoint(target);
+                double output = mTurretPID.calculate(getTurretAngle(), pNow);
+                if (db.goaltracking.isSet(ELimelightData.TX) && Math.abs(target) <= kMaximumTurretAngle) {
+                    mTurret.set(output);
+                }
 
         }
 

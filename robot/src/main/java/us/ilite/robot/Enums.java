@@ -107,6 +107,10 @@ public class Enums {
         OPEN_LOOP,
         VELOCITY
     }
+    public enum TurretControlType {
+        MANUAL,
+        TARGET_LOCKING
+    }
 
     /**
      * Closed-loop velocity settings for various target speeds
