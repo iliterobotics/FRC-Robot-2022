@@ -158,14 +158,16 @@ public abstract class AbstractController {
 
     protected void firingSequence(FlywheelSpeeds speed) {
         setFlywheelClosedLoop(speed);
-        if (isFlywheelUpToSpeed()) {
-            db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
-            if (isFeederUpToSpeed()) {
-                db.powercell.set(SET_V_pct, 0.5);
-                db.powercell.set(SET_H_pct, 0.5);
-            } else {
-                db.powercell.set(SET_V_pct, 0);
-                db.powercell.set(SET_H_pct, 0);
+        if (isHoodAtCorrectAngle(speed)) {
+            if (isFlywheelUpToSpeed()) {
+                db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
+                if (isFeederUpToSpeed()) {
+                    db.powercell.set(SET_V_pct, 0.5);
+                    db.powercell.set(SET_H_pct, 0.5);
+                } else {
+                    db.powercell.set(SET_V_pct, 0);
+                    db.powercell.set(SET_H_pct, 0);
+                }
             }
         }
     }
@@ -178,6 +180,10 @@ public abstract class AbstractController {
     protected boolean isFeederUpToSpeed() {
         return db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
                 db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8;
+    }
+
+    protected boolean isHoodAtCorrectAngle(FlywheelSpeeds pSpeed) {
+        return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 5.0;
     }
 
     protected abstract void updateImpl(double pNow);
