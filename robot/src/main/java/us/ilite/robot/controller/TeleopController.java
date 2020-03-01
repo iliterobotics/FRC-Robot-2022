@@ -44,10 +44,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateHanger(double pNow) {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)) {
-            db.hanger.set(EHangerModuleData.DESIRED_POSITION, 17.0);
+        if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
+            db.hanger.set(EHangerModuleData.DESIRED_PCT, 0.05);
         } else {
-            db.hanger.set(EHangerModuleData.DESIRED_POSITION, 0.0);
+            db.hanger.set(EHangerModuleData.DESIRED_PCT, 0.0);
         }
     }
 

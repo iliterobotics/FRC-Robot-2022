@@ -6,6 +6,7 @@ public enum EHangerModuleData {
     CURRENT_HANGER_VELOCITY,
     CURRENT_POSITION,
     DESIRED_POSITION,
-    OUTPUT_CURRENT
+    OUTPUT_CURRENT,
+    DESIRED_PCT
 
     }
