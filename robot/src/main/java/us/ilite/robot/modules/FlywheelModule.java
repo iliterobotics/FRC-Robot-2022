@@ -210,10 +210,9 @@ public class FlywheelModule extends Module {
                         mTurret.set(0.0);
                     }
                 case TARGET_LOCKING:
-                    double target = db.goaltracking.get(ELimelightData.TX);
-                    mTurretPID.setSetpoint(0.0);
-                    double output = mTurretPID.calculate(target, pNow);
                     if (db.goaltracking.isSet(ELimelightData.TX)) {
+                        mTurretPID.setSetpoint(0.0);
+                        double output = mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), pNow);
                         mTurret.set(output);
                     }
 

@@ -197,7 +197,7 @@ public abstract class AbstractController {
         if (turretControlType != TurretControlType.MANUAL) {
             double turretAngle = db.flywheel.get(CURRENT_TURRET_ANGLE);
             double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
-            return Math.abs(turretAngle - target) <= 5.0;
+            return Math.abs(turretAngle - target) <= 2.0;
         }
         return true;
     }
