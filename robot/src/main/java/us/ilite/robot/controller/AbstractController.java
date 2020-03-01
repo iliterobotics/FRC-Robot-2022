@@ -163,16 +163,18 @@ public abstract class AbstractController {
     }
 
     protected void firingSequence(FlywheelSpeeds speed) {
-        if (isHoodAtCorrectAngle() && isTurretAtCorrectAngle(db.flywheel.get(TARGET_LOCKING) == 0.0)) {
+        if (isTurretAtCorrectAngle(db.flywheel.get(TARGET_LOCKING) == 0.0)) {
             setFlywheelClosedLoop(speed);
-            if (isFlywheelUpToSpeed()) {
-                db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
-                if (isFeederUpToSpeed()) {
-                    db.powercell.set(SET_V_pct, 0.5);
-                    db.powercell.set(SET_H_pct, 0.5);
-                } else {
-                    db.powercell.set(SET_V_pct, 0);
-                    db.powercell.set(SET_H_pct, 0);
+            if (isHoodAtCorrectAngle(speed)) {
+                if (isFlywheelUpToSpeed()) {
+                    db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
+                    if (isFeederUpToSpeed()) {
+                        db.powercell.set(SET_V_pct, 0.5);
+                        db.powercell.set(SET_H_pct, 0.5);
+                    } else {
+                        db.powercell.set(SET_V_pct, 0);
+                        db.powercell.set(SET_H_pct, 0);
+                    }
                 }
             }
         }
@@ -188,17 +190,16 @@ public abstract class AbstractController {
                 db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8;
     }
 
-    protected boolean isHoodAtCorrectAngle() {
-        return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) -  db.flywheel.get(TARGET_HOOD_ANGLE)) <= 5.0; //TODO - Tune tolerance
-    }
-
-    protected boolean isTurretAtCorrectAngle(boolean mIsManual) {
+    protected boolean isTurretAtCorrectAngle(boolean mIsManual){
         if (!mIsManual) {
             double turretAngle = db.flywheel.get(CURRENT_TURRET_ANGLE);
             double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
             return Math.abs(turretAngle - target) <= 5.0;
         }
         return true;
+    }
+    protected boolean isHoodAtCorrectAngle(FlywheelSpeeds pSpeed) {
+        return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 1.0;
     }
 
     protected abstract void updateImpl(double pNow);

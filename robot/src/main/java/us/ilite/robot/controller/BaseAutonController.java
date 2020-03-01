@@ -89,17 +89,6 @@ public class BaseAutonController extends AbstractController {
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TARGET_ANGLE_LOCK);
     }
 
-    protected void startShootingLogic(FlywheelSpeeds mFlywheelSpeeds) {
-        setFlywheelClosedLoop(mFlywheelSpeeds);
-        if (isFlywheelUpToSpeed()) {
-            setFeederClosedLoop(mFlywheelSpeeds);
-            if (isFeederUpToSpeed()) {
-                db.powercell.set(EPowerCellData.SET_V_pct, 0.6);
-                db.powercell.set(EPowerCellData.SET_H_pct, 0.5);
-            }
-        }
-    }
-
     private static final void e() {
         System.out.println("================================================");
     }
