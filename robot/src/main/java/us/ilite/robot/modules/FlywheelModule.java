@@ -189,16 +189,28 @@ public class FlywheelModule extends Module {
     }
 
     private void setTurret() {
-        if (true) {//db.flywheel.get(TARGET_LOCKING) == 1.0) {
-            double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
-            if (db.goaltracking.isSet(ELimelightData.TX) && (target >= -kMaximumTurretAngle && target <= kMaximumTurretAngle)) {
-                mTurretPID.setReference(Units.degrees_to_rotations(target, kTurretGearRatio), ControlType.kSmartMotion);
+        double mTurretDirection = db.flywheel.get(MANUAL_TURRET_DIRECTION);
+        if (db.flywheel.isSet(MANUAL_TURRET_DIRECTION)) {
+            if (Math.abs(getTurretAngle()) <= kMaximumTurretAngle) {
+                mTurret.set(.1 * Math.signum(mTurretDirection));
             }
         } else {
-            mTurretPID.setReference(0.0, ControlType.kSmartMotion);
+            if (true) {//db.flywheel.get(TARGET_LOCKING) == 1.0) {
+                double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
+                if (db.goaltracking.isSet(ELimelightData.TX) && (target >= -kMaximumTurretAngle && target <= kMaximumTurretAngle)) {
+                    mTurretPID.setReference(Units.degrees_to_rotations(target, kTurretGearRatio), ControlType.kSmartMotion);
+                }
+            } else {
+                mTurretPID.setReference(0.0, ControlType.kSmartMotion);
+            }
+
         }
 
         SmartDashboard.putNumber("TURRET POSITION", Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio));
+    }
+
+    private double getTurretAngle() {
+        return Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio);
     }
 
     private void setFeeder() {

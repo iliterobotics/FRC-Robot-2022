@@ -72,7 +72,7 @@ public class Robot extends TimedRobot {
         mDrive = new DriveModule();
         mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
-//        mLimelight = new Limelight();
+        mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
         mLEDControl = new LEDControl();
