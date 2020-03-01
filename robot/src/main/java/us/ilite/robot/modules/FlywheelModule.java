@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.Field2020;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
@@ -198,7 +199,6 @@ public class FlywheelModule extends Module {
 
     private void setTurret(double pNow) {
         System.out.println("||||||||||||||||||||||||||||||||||||||||||||| " + (getTurretAngle()));
-
         TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
         switch (turretControlType) {
             case MANUAL:

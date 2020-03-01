@@ -1,6 +1,8 @@
 package us.ilite.robot.controller;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.Field2020;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.drive.EDriveData;
@@ -24,6 +26,7 @@ public class SitAndShootController extends BaseAutonController
     @Override
     protected void updateImpl(double pNow)
     {
+        db.goaltracking.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id());
         db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
 //        firingSequence( Enums.FlywheelSpeeds.CLOSE );
 //        SmartDashboard.putBoolean("EXIT BEAM IS BROKEN", db.powercell.get(EPowerCellData.EXIT_BEAM) == 1.0);
