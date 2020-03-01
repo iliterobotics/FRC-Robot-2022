@@ -1,34 +1,22 @@
 package us.ilite.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.revrobotics.*;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.Field2020;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
-import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import static us.ilite.robot.Enums.*;
 
-import us.ilite.common.types.ERawLimelightData;
-import us.ilite.common.types.EShooterSystemData;
-import us.ilite.robot.Robot;
-import us.ilite.robot.controller.AbstractController;
 import us.ilite.robot.hardware.ContinuousRotationServo;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
-import us.ilite.robot.hardware.TalonSRXFactory;
 
 import static us.ilite.common.types.EShooterSystemData.*;
 
@@ -166,7 +154,9 @@ public class FlywheelModule extends Module {
 //        db.flywheel.set(POT_RAW_VALUE, mHoodPID.getValue());
         db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
         db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
-        db.flywheel.set(CURRENT_TURRET_ANGLE, Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio));
+        db.flywheel.set(CURRENT_TURRET_ANGLE, mTurretEncoder.getPosition());
+        db.flywheel.set(IS_TARGET_LOCKED, Math.abs(mTurretPID.getError()) <= 2.0);
+
 //        mPotentiometerReadings.addNumber(mHoodAI.getValue());
 //
 //        double cur = mHoodAI.getValue();
@@ -220,6 +210,7 @@ public class FlywheelModule extends Module {
                     } else {
                         mTurret.set(0.0);
                     }
+                    break;
                 case TARGET_LOCKING:
                     if (db.goaltracking.isSet(ELimelightData.TX)) {
                         mTurretPID.setSetpoint(0.0);
@@ -230,6 +221,7 @@ public class FlywheelModule extends Module {
 //                        mTurretPID.setReference(0.0, ControlType.kPosition, 0, 0);
                         mTurret.set(0.0);
                     }
+                    break;
 
             }
             SmartDashboard.putNumber("TURRET ANGLE", getTurretAngle());

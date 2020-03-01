@@ -24,12 +24,8 @@ public class SitAndShootController extends BaseAutonController
     }
 
     @Override
-    protected void updateImpl(double pNow)
-    {
-        db.goaltracking.set(ELimelightData.TARGET_ID, Field2020.FieldElement.OUTER_GOAL.id());
-        db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
-        firingSequence(Enums.FlywheelSpeeds.INITIATION_LINE);
-        SmartDashboard.putBoolean("EXIT BEAM IS BROKEN", db.powercell.get(EPowerCellData.EXIT_BEAM) == 1.0);
+    protected void updateImpl(double pNow) {
+        firingSequence(Enums.FlywheelSpeeds.INITIATION_LINE, Field2020.FieldElement.OUTER_GOAL);
         mIsBroken = db.powercell.get(EPowerCellData.EXIT_BEAM) == 1.0;
 
         if (mPreviouslyBroken && !mIsBroken) {

@@ -8,15 +8,11 @@ import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
-import us.ilite.common.lib.util.Latch;
-import us.ilite.common.lib.util.Units;
 import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EShooterSystemData;
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.FlywheelModule;
 
 import static us.ilite.robot.Enums.*;
 
@@ -154,7 +150,10 @@ public abstract class AbstractController {
         db.flywheel.set(BALL_VELOCITY_ft_s, pSpeed.speed);
         db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
         db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
-        db.flywheel.set(DESIRED_TURRET_ANGLE, db.goaltracking.get(ELimelightData.TX));
+    }
+
+    protected final void setHood(FlywheelSpeeds pSpeed) {
+        db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
     }
 
     protected final void setFeederClosedLoop(Enums.FlywheelSpeeds pFlywheelSpeed) {
@@ -162,10 +161,13 @@ public abstract class AbstractController {
         db.flywheel.set(SET_FEEDER_rpm, pFlywheelSpeed.feeder * 11000.0);
     }
 
-    protected void firingSequence(FlywheelSpeeds speed) {
-        if (isTurretAtCorrectAngle(db.flywheel.get(TURRET_CONTROL, TurretControlType.class) == TurretControlType.MANUAL)) {
-            setFlywheelClosedLoop(speed);
-            if (isHoodAtCorrectAngle(speed)) {
+    protected void firingSequence(FlywheelSpeeds speed, Field2020.FieldElement trackedElement) {
+        setHood(speed);
+        if (isHoodAtCorrectAngle(speed)) {
+            db.goaltracking.set(ELimelightData.TARGET_ID, trackedElement.id());
+            db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
+            if (isTurretAtCorrectAngle()) {
+                setFlywheelClosedLoop(speed);
                 if (isFlywheelUpToSpeed()) {
                     db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
                     if (isFeederUpToSpeed()) {
@@ -175,6 +177,22 @@ public abstract class AbstractController {
                         db.powercell.set(SET_V_pct, 0);
                         db.powercell.set(SET_H_pct, 0);
                     }
+                }
+            }
+        }
+    }
+
+    protected void firingSequence(FlywheelSpeeds speed) {
+        setFlywheelClosedLoop(speed);
+        if (isHoodAtCorrectAngle(speed)) {
+            if (isFlywheelUpToSpeed()) {
+                db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
+                if (isFeederUpToSpeed()) {
+                    db.powercell.set(SET_V_pct, 0.5);
+                    db.powercell.set(SET_H_pct, 0.5);
+                } else {
+                    db.powercell.set(SET_V_pct, 0);
+                    db.powercell.set(SET_H_pct, 0);
                 }
             }
         }
@@ -190,16 +208,12 @@ public abstract class AbstractController {
                 db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8;
     }
 
-    protected boolean isTurretAtCorrectAngle(boolean mIsManual){
-        if (!mIsManual) {
-            TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
-            if (turretControlType != TurretControlType.MANUAL) {
-                double turretAngle = db.flywheel.get(CURRENT_TURRET_ANGLE);
-                double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
-                return Math.abs(turretAngle - target) <= 2.0;
-            }
-        }
-        return true;
+    protected boolean isTurretAtCorrectAngle(){
+//        TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
+//        if (turretControlType != TurretControlType.MANUAL) {
+            return db.flywheel.get(IS_TARGET_LOCKED) == 1.0;
+//        }
+//        return true;
     }
     protected boolean isHoodAtCorrectAngle(FlywheelSpeeds pSpeed) {
         return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 1.0;
