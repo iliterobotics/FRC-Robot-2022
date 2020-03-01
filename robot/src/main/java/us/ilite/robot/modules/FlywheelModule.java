@@ -104,7 +104,12 @@ public class FlywheelModule extends Module {
         mTurret = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kSRXTurretId, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         mTurretEncoder = mTurret.getEncoder();
+        mTurretEncoder.setPositionConversionFactor(360 * kTurretGearRatio);
         mTurretPID = mTurret.getPIDController();
+        mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
+        mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  45);
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -45);
         HardwareUtils.setGains(mTurretPID, kTurretGains);
 
 //        mHoodPot = new AnalogPotentiometer(0);
@@ -133,6 +138,8 @@ public class FlywheelModule extends Module {
         //Set PID gains & zero encoders here
         HardwareUtils.setGains(mFlywheelFalconMaster, kFlywheelGains);
         HardwareUtils.setGains(mFlywheelFalconFollower, kFlywheelGains);
+
+        mTurretEncoder.setPosition(0.0);
     }
 
     @Override
@@ -190,22 +197,20 @@ public class FlywheelModule extends Module {
 
     private void setTurret() {
         double mTurretDirection = db.flywheel.get(MANUAL_TURRET_DIRECTION);
-        System.out.println("||||||||||||||||||||||||||||||||||||||||||||| " + Math.abs(getTurretAngle()));
+        System.out.println("||||||||||||||||||||||||||||||||||||||||||||| " + (getTurretAngle()));
         if (db.flywheel.isSet(MANUAL_TURRET_DIRECTION)) {
-            if (Math.abs(getTurretAngle()) <= kMaximumTurretAngle) {
-                System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-                SmartDashboard.putNumber("TURRET PO", .5 * Math.signum(mTurretDirection));
-                mTurret.set(.5 * mTurretDirection);
-            }
+            SmartDashboard.putNumber("TURRET PO", .25 * (mTurretDirection));
+            mTurret.set(.8 * mTurretDirection);
         } else {
-            if (true) {//db.flywheel.get(TARGET_LOCKING) == 1.0) {
-                double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
-                if (db.goaltracking.isSet(ELimelightData.TX) && (target >= -kMaximumTurretAngle && target <= kMaximumTurretAngle)) {
-                    mTurretPID.setReference(Units.degrees_to_rotations(target, kTurretGearRatio), ControlType.kSmartMotion);
-                }
-            } else {
-                mTurretPID.setReference(0.0, ControlType.kSmartMotion);
-            }
+            mTurret.set(0.0);
+//            if (true) {//db.flywheel.get(TARGET_LOCKING) == 1.0) {
+//                double target = db.flywheel.get(DESIRED_TURRET_ANGLE);
+//                if (db.goaltracking.isSet(ELimelightData.TX) && (target >= -kMaximumTurretAngle && target <= kMaximumTurretAngle)) {
+//                    mTurretPID.setReference(target), ControlType.kSmartMotion);
+//                }
+//            } else {
+//                mTurretPID.setReference(0.0, ControlType.kSmartMotion);
+//            }
 
         }
 
@@ -213,7 +218,7 @@ public class FlywheelModule extends Module {
     }
 
     private double getTurretAngle() {
-        return Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio);
+        return mTurretEncoder.getPosition();
     }
 
     private void setFeeder() {
