@@ -20,7 +20,8 @@ public class HangerModule extends Module {
     private CANEncoder mHangerEncoderOne;
     private CANEncoder mHangerEncoderTwo;
 
-    //PID Constants, to be used if needed
+    //PID Constants, to be used if needed, these are in RPM and
+    // ripped directly from the 2019 robot.
 //    private static final int UP_PID_SLOT_ID = 1;
 //    public static double P = 5.0e-4;
 //    public static double I = 0.0;
@@ -78,10 +79,7 @@ public class HangerModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-//        db.hanger.set(EHangerModuleData.CURRENT_HANGER_VELOCITY , mHangerEncoderOne.getVelocity());
-//        db.hanger.set(EHangerModuleData.CURRENT_HANGER_VELOCITY , mHangerEncoderTwo.getVelocity());
-//        db.hanger.set(EHangerModuleData.CURRENT_POSITION, mHangerEncoderOne.getPosition());
-//        db.hanger.set(EHangerModuleData.CURRENT_POSITION, mHangerEncoderTwo.getPosition());
+        db.hanger.set(EHangerModuleData.CURRENT_PCT , mHangerNeoMaster.getOutputCurrent());
     }
 
     @Override
@@ -103,16 +101,13 @@ public class HangerModule extends Module {
         mHangerState = desiredState;
     }
     public boolean isCurrentLimiting(){
-        return mHangerNeoMaster.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold;
+        return mHangerNeoMaster.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold ||
+                mHangerNeoFollower.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold;
     }
 
     public void zeroTheEncoders(){
         mHangerEncoderOne.setPosition(0);
         mHangerEncoderTwo.setPosition(0);
     }
-
-//    public boolean isAtPosition() {
-//        return mCurrentState == EElevatorState.SET_POSITION && (Math.abs(pPosition.getEncoderRotations() - mData.elevator.get(EElevator.CURRENT_ENCODER_TICKS)) <= SystemSettings.kElevatorAllowableError);
-//    }
 
 }

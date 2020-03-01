@@ -74,6 +74,7 @@ public class InputMap {
 
         // PUT TEST ITEMS BELOW
         BEGIN_HANG = ELogitech310.LEFT_X_AXIS,
+        REVERSE_HANG = ELogitech310.LEFT_Y_AXIS,
         //RELEASE_HANG = ELogitech310.START,
         COLOR_POSITION = ELogitech310.DPAD_RIGHT,
         //FLYWHEEL_AXIS = ELogitech310.START,
