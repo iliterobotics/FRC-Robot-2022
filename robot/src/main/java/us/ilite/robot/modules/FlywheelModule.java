@@ -101,7 +101,7 @@ public class FlywheelModule extends Module {
     private final int kFlywheelFalconPIDSlot = 0;
 
     public FlywheelModule() {
-        mTurret = SparkMaxFactory.createDefaultSparkMax(16, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mTurret = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kSRXTurretId, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         mTurretEncoder = mTurret.getEncoder();
         mTurretPID = mTurret.getPIDController();
