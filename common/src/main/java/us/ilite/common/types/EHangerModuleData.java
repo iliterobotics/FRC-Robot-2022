@@ -7,6 +7,7 @@ public enum EHangerModuleData {
     CURRENT_POSITION,
     DESIRED_POSITION,
     OUTPUT_CURRENT,
-    DESIRED_PCT
+    DESIRED_PCT,
+    CURRENT_PCT;
 
     }

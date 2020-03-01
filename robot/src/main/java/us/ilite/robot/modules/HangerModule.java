@@ -80,12 +80,8 @@ public class HangerModule extends Module {
     public void readInputs(double pNow) {
 //        db.hanger.set(EHangerModuleData.CURRENT_HANGER_VELOCITY , mHangerEncoderOne.getVelocity());
 //        db.hanger.set(EHangerModuleData.CURRENT_HANGER_VELOCITY , mHangerEncoderTwo.getVelocity());
-
 //        db.hanger.set(EHangerModuleData.CURRENT_POSITION, mHangerEncoderOne.getPosition());
 //        db.hanger.set(EHangerModuleData.CURRENT_POSITION, mHangerEncoderTwo.getPosition());
-
-        db.hanger.set(EHangerModuleData.OUTPUT_CURRENT, mHangerNeoMaster.getOutputCurrent());
-        db.hanger.set(EHangerModuleData.OUTPUT_CURRENT, mHangerNeoFollower.getOutputCurrent());
     }
 
     @Override
@@ -112,6 +108,7 @@ public class HangerModule extends Module {
 
     public void zeroTheEncoders(){
         mHangerEncoderOne.setPosition(0);
+        mHangerEncoderTwo.setPosition(0);
     }
 
 //    public boolean isAtPosition() {
