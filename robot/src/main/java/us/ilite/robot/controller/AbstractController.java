@@ -183,7 +183,7 @@ public abstract class AbstractController {
     }
 
     protected boolean isHoodAtCorrectAngle(FlywheelSpeeds pSpeed) {
-        return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 5.0;
+        return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 1.0;
     }
 
     protected abstract void updateImpl(double pNow);

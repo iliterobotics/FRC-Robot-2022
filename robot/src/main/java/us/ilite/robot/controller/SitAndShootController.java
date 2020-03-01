@@ -24,7 +24,7 @@ public class SitAndShootController extends BaseAutonController
     @Override
     protected void updateImpl(double pNow)
     {
-        firingSequence( Enums.FlywheelSpeeds.CLOSE );
+        firingSequence( Enums.FlywheelSpeeds.INITIATION_LINE );
         SmartDashboard.putBoolean("EXIT BEAM IS BROKEN", db.powercell.get(EPowerCellData.EXIT_BEAM) == 1.0);
         mIsBroken = db.powercell.get(EPowerCellData.EXIT_BEAM) == 1.0;
 
