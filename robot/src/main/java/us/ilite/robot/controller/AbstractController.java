@@ -153,6 +153,7 @@ public abstract class AbstractController {
     }
 
     protected final void setHood(FlywheelSpeeds pSpeed) {
+        db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
         db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
     }
 

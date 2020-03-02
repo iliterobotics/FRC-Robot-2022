@@ -184,10 +184,10 @@ public class FlywheelModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
+        setHood(pNow);
         setTurret(pNow);
         setFlywheel();
         setFeeder();
-        setHood(pNow);
     }
 
     @Override
@@ -274,6 +274,7 @@ public class FlywheelModule extends Module {
     private void setHood(double pNow) {
         HoodState state = db.flywheel.get(HOOD_STATE, HoodState.class);
         if (state == null) state = HoodState.NONE;
+        System.out.println("00000000000000000000000000000000000000000000 " + state.name());
 
         switch (state) {
             case MANUAL:
@@ -281,6 +282,7 @@ public class FlywheelModule extends Module {
                 break;
             case TARGET_ANGLE:
                 double target = convertFromHoodAngle(db.flywheel.get(TARGET_HOOD_ANGLE));
+                System.out.println("||||||||||||||||||||||||||||||||||||| " + target);
                 double current = convertFromHoodAngle(db.flywheel.get(CURRENT_HOOD_ANGLE));
 
                 double output = mHoodPID.calculate(current, target);
