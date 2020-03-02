@@ -149,8 +149,7 @@ public abstract class AbstractController {
         db.flywheel.set(FLYWHEEL_WHEEL_STATE, pSpeed.wheelstate);
         db.flywheel.set(BALL_VELOCITY_ft_s, pSpeed.speed);
         if (pSetHoodState) {
-            db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
-            db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
+            setHood(pSpeed);
         }
     }
 
