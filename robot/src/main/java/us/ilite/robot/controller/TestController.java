@@ -175,7 +175,7 @@ public class TestController extends BaseManualController {
             state = Enums.FlywheelSpeeds.OFF;
         }
         db.flywheel.set(FLYWHEEL_SPEED_STATE, state);
-        setFlywheelClosedLoop(state);
+        setFlywheelClosedLoop(state, true);
         if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
             db.flywheel.set(SET_FEEDER_rpm, state.feeder * 11000.0);

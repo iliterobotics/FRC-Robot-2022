@@ -145,11 +145,13 @@ public abstract class AbstractController {
      * sub systems. These speeds/angles are robot-relative and human-readable.
      * @param pSpeed
      */
-    protected final void setFlywheelClosedLoop(FlywheelSpeeds pSpeed) {
+    protected final void setFlywheelClosedLoop(FlywheelSpeeds pSpeed, boolean pSetHoodState) {
         db.flywheel.set(FLYWHEEL_WHEEL_STATE, pSpeed.wheelstate);
         db.flywheel.set(BALL_VELOCITY_ft_s, pSpeed.speed);
-        db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
-        db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
+        if (pSetHoodState) {
+            db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
+            db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
+        }
     }
 
     protected final void setHood(FlywheelSpeeds pSpeed) {
@@ -164,7 +166,7 @@ public abstract class AbstractController {
 
     protected void firingSequence(FlywheelSpeeds speed, Field2020.FieldElement trackedElement) {
         setHood(speed);
-        setFlywheelClosedLoop(speed);
+        setFlywheelClosedLoop(speed, false);
         if (isHoodAtCorrectAngle(speed)) {
             db.goaltracking.set(ELimelightData.TARGET_ID, trackedElement.id());
             db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
@@ -184,7 +186,7 @@ public abstract class AbstractController {
     }
 
     protected void firingSequence(FlywheelSpeeds speed) {
-        setFlywheelClosedLoop(speed);
+        setFlywheelClosedLoop(speed, true);
         if (isHoodAtCorrectAngle(speed)) {
             if (isFlywheelUpToSpeed()) {
                 db.flywheel.set(SET_FEEDER_rpm, speed.feeder);

@@ -61,7 +61,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             super.firingSequence(currentState);
 //            super.setFlywheelClosedLoop(currentState);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.AIM)) {
-            super.setFlywheelClosedLoop(currentState);
+            super.setFlywheelClosedLoop(currentState, true);
         } else {
             super.firingSequence(Enums.FlywheelSpeeds.OFF);
 //            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);

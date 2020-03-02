@@ -53,7 +53,7 @@ public class OurTrenchController extends BaseAutonController {
         Enums.FlywheelSpeeds flywheelState = Enums.FlywheelSpeeds.FAR;
         if (canHitInnerGoal()){
             setTargetTracking(true);
-            setFlywheelClosedLoop(flywheelState);
+            setFlywheelClosedLoop(flywheelState, true);
             if (isFlywheelUpToSpeed()) {
                 setFeederClosedLoop(flywheelState);
                 if (isFeederUpToSpeed()) {
