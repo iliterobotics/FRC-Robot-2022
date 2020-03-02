@@ -164,10 +164,10 @@ public abstract class AbstractController {
 
     protected void firingSequence(FlywheelSpeeds speed, Field2020.FieldElement trackedElement) {
         setHood(speed);
+        setFlywheelClosedLoop(speed);
         if (isHoodAtCorrectAngle(speed)) {
             db.goaltracking.set(ELimelightData.TARGET_ID, trackedElement.id());
             db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
-            setFlywheelClosedLoop(speed);
             if (isTurretAtCorrectAngle()) {
                 if (isFlywheelUpToSpeed()) {
                     db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
