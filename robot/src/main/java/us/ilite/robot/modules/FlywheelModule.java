@@ -75,24 +75,24 @@ public class FlywheelModule extends Module {
 //            .kV(0.018)
             ;
     // Smart motion turret gains
-    private static ProfileGains kTurretGains = new ProfileGains()
-            .p(.0002)
-            .maxVelocity(1000d)
-            .maxAccel(1000d)
-            .slot(0);
-    // Percent output turret gains
 //    private static ProfileGains kTurretGains = new ProfileGains()
-//            .p(.02)
+//            .p(.0002)
 //            .maxVelocity(1000d)
 //            .maxAccel(1000d)
 //            .slot(0);
+    // Percent output turret gains
+    private static ProfileGains kTurretGains = new ProfileGains()
+            .p(.02)
+            .maxVelocity(1000d)
+            .maxAccel(1000d)
+            .slot(0);
 
     private PIDController mHoodPID = new PIDController(5, 0, 0);
 
     private CANEncoder mFeederInternalEncoder;
 
-    private CANPIDController mTurretPID;
-//    private us.ilite.common.lib.control.PIDController mTurretPID = new us.ilite.common.lib.control.PIDController(kTurretGains, -90, 90, Settings.kControlLoopPeriod);
+//    private CANPIDController mTurretPID;
+    private us.ilite.common.lib.control.PIDController mTurretPID = new us.ilite.common.lib.control.PIDController(kTurretGains, -90, 90, Settings.kControlLoopPeriod);
 
     private CANEncoder mTurretEncoder;
 
@@ -105,13 +105,13 @@ public class FlywheelModule extends Module {
 
         mTurretEncoder = mTurret.getEncoder();
         mTurretEncoder.setPositionConversionFactor(360 * kTurretGearRatio);
-//        mTurretPID.setOutputRange(-.8, .8);
-        mTurretPID = mTurret.getPIDController();
+        mTurretPID.setOutputRange(-.8, .8);
+//        mTurretPID = mTurret.getPIDController();
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
         mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  45);
         mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -45);
-        HardwareUtils.setGains(mTurretPID, kTurretGains);
+//        HardwareUtils.setGains(mTurretPID, kTurretGains);
 
 //        mHoodPot = new AnalogPotentiometer(0);
         SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
@@ -213,10 +213,10 @@ public class FlywheelModule extends Module {
                     break;
                 case TARGET_LOCKING:
                     if (db.goaltracking.isSet(ELimelightData.TX)) {
-//                        mTurretPID.setSetpoint(0.0);
-//                        double output = -mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), pNow);
-//                        mTurret.set(output);
-                        mTurretPID.setReference(mTurretEncoder.getPosition() + db.goaltracking.get(ELimelightData.TX), ControlType.kSmartMotion, 0, 0);
+                        mTurretPID.setSetpoint(0.0);
+                        double output = -mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), pNow);
+                        mTurret.set(output);
+//                        mTurretPID.setReference(mTurretEncoder.getPosition() + db.goaltracking.get(ELimelightData.TX), ControlType.kSmartMotion, 0, 0);
                     } else {
 //                        mTurretPID.setReference(0.0, ControlType.kPosition, 0, 0);
                         mTurret.set(0.0);
