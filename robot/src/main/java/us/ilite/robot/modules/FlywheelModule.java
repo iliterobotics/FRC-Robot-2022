@@ -91,6 +91,7 @@ public class FlywheelModule extends Module {
 
         mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
         mFeederInternalEncoder = new CANEncoder(mFeeder);
+        mFeeder.setIdleMode(CANSparkMax.IdleMode.kBrake);
         mFeeder.setSmartCurrentLimit(30);
 
 

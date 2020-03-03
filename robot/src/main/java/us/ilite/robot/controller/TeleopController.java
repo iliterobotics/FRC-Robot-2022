@@ -4,6 +4,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.InputMap;
+import us.ilite.common.config.Settings;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Enums;
@@ -54,7 +55,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
         if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE)) {
             currentState = Enums.FlywheelSpeeds.FAR;
         }else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
-            currentState = Enums.FlywheelSpeeds.CLOSE;
+            currentState = Enums.FlywheelSpeeds.INITIATION_LINE;
         }
 
         if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
@@ -108,6 +109,9 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // Default to none
         db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
 
+        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_BULLDOZE)) {
+
+        }
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
 //            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
                 setIntakeArmEnabled(pNow, true);
@@ -119,7 +123,9 @@ public class TeleopController extends BaseManualController { //copied from TestC
             reverseSerializer(pNow);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW)) {
             setIntakeArmEnabled(pNow, false);
-            activateSerializer(pNow);
+            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
+                activateSerializer(pNow);
+            }
         } else {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
             db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
