@@ -212,7 +212,7 @@ public abstract class AbstractController {
     protected boolean isTurretAtCorrectAngle(){
 //        TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
 //        if (turretControlType != TurretControlType.MANUAL) {
-            return db.flywheel.get(IS_TARGET_LOCKED) == 1.0;
+            return db.flywheel.isSet(IS_TARGET_LOCKED);
 //        }
 //        return true;
     }
