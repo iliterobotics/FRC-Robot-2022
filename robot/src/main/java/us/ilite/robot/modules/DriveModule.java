@@ -272,18 +272,6 @@ public class DriveModule extends Module {
 					mRightCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
 				}
 				break;
-			case TARGET_ANGLE_LOCK:
-				RobotCodex<ELimelightData> targetData = Robot.DATA.goaltracking;
-				targetData.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id());
-				double pidOutput;
-				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(ELimelightData.TV) && targetData.isSet(ELimelightData.TX)) {
-					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mLastTime);
-					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
-					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
-					turn = db.drivetrain.get(DESIRED_TURN_PCT);
-				}
 			case VELOCITY:
 				mStartHoldingPosition = false;
 //				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);

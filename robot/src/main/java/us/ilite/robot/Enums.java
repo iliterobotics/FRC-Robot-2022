@@ -14,7 +14,6 @@ public class Enums {
         PATH_FOLLOWING_BASIC,
         PATH_FOLLOWING_HELIX,
         PATH_FOLLOWING_RAMSETE,
-        TARGET_ANGLE_LOCK,
         HOLD,
         VELOCITY,
         PERCENT_OUTPUT,
