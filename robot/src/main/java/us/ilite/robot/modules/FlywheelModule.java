@@ -110,8 +110,10 @@ public class FlywheelModule extends Module {
 //        mTurretPID = mTurret.getPIDController();
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  kMaximumTurretAngle);
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -kMaximumTurretAngle);
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  (float) kMaximumTurretAngle);
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) -kMaximumTurretAngle);
+        mTurretEncoder.setPosition(0.0);
+
 //        HardwareUtils.setGains(mTurretPID, kTurretGains);
 
 //        mHoodPot = new AnalogPotentiometer(0);
@@ -140,8 +142,6 @@ public class FlywheelModule extends Module {
         //Set PID gains & zero encoders here
         HardwareUtils.setGains(mFlywheelFalconMaster, kFlywheelGains);
         HardwareUtils.setGains(mFlywheelFalconFollower, kFlywheelGains);
-
-        mTurretEncoder.setPosition(0.0);
     }
 
     @Override
