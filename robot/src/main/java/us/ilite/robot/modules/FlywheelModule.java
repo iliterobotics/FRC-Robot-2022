@@ -58,7 +58,6 @@ public class FlywheelModule extends Module {
     private final FilteredAverage mPotentiometerReadings = FilteredAverage.filteredAverageForTime(0.1);
     private static final double kMaximumTurretAngle = 45.0;
     private final double kTurretErrorTolerance = 5.0; //TODO - tune tolerance
-    private boolean mIsTurretLocked = false;
 
     private static double kRadiansPerSecToTalonTicksPer100ms = (2 * Math.PI) / 2048.0 / 0.1;
     // https://docs.google.com/spreadsheets/d/1Po6exzGvfr0rMWMWVSyqxf49ZMSfGoYn/edit#gid=1858991275
@@ -155,7 +154,7 @@ public class FlywheelModule extends Module {
         db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
         db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
         db.flywheel.set(CURRENT_TURRET_ANGLE, mTurretEncoder.getPosition());
-        db.flywheel.set(IS_TARGET_LOCKED, Math.abs(mTurretPID.getError()) <= 2.0);
+        db.flywheel.set(IS_TARGET_LOCKED, Math.abs(mTurretPID.getError()) <= kTurretErrorTolerance);
 
 //        mPotentiometerReadings.addNumber(mHoodAI.getValue());
 //
