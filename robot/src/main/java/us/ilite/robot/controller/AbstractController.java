@@ -186,8 +186,7 @@ public abstract class AbstractController {
 
     protected void firingSequence(FlywheelSpeeds speed) {
         setFlywheelClosedLoop(speed, true);
-        if (isHoodAtCorrectAngle(speed)) {
-            if (isFlywheelUpToSpeed()) {
+        if (isHoodAtCorrectAngle(speed) && isFlywheelUpToSpeed()) {
                 db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
                 if (isFeederUpToSpeed()) {
                     db.powercell.set(SET_V_pct, 0.5);
