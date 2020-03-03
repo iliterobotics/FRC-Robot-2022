@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import static us.ilite.robot.Enums.*;
@@ -104,7 +105,6 @@ public class FlywheelModule extends Module {
         mTurret = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kSRXTurretId, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         mTurretEncoder = mTurret.getEncoder();
-        mTurretEncoder.setPositionConversionFactor(360 * kTurretGearRatio);
         mTurretPID.setOutputRange(-.8, .8);
 //        mTurretPID = mTurret.getPIDController();
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
@@ -154,7 +154,7 @@ public class FlywheelModule extends Module {
 //        db.flywheel.set(POT_RAW_VALUE, mHoodPID.getValue());
         db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
         db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
-        db.flywheel.set(CURRENT_TURRET_ANGLE, mTurretEncoder.getPosition());
+        db.flywheel.set(CURRENT_TURRET_ANGLE, getCurrentTurretAngle());
         db.flywheel.set(IS_TARGET_LOCKED, Math.abs(mTurretPID.getError()) <= kTurretErrorTolerance);
 
 //        mPotentiometerReadings.addNumber(mHoodAI.getValue());
@@ -216,7 +216,7 @@ public class FlywheelModule extends Module {
                         mTurretPID.setSetpoint(0.0);
                         double output = -mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), pNow);
                         mTurret.set(output);
-//                        mTurretPID.setReference(mTurretEncoder.getPosition() + db.goaltracking.get(ELimelightData.TX), ControlType.kSmartMotion, TURRET_SLOT, 0);
+//                        mTurretPID.setReference(Units.degrees_to_rotations(getCurrentTurretAngle() + db.goaltracking.get(ELimelightData.TX), kTurretGearRatio), ControlType.kSmartMotion, TURRET_SLOT, 0);
                     } else {
 //                        mTurretPID.setReference(0.0, ControlType.kPosition, 0, 0);
                         mTurret.set(0.0);
@@ -253,8 +253,12 @@ public class FlywheelModule extends Module {
                 mFlywheelFalconMaster.set(TalonFXControlMode.PercentOutput, 0.0);
                 mFlywheelFalconFollower.set(TalonFXControlMode.PercentOutput, 0.0);
         }
-//        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_POSITION, mTurretEncoder.getPosition());
+//        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_TURRET_POSITION, getCurrentTurretAngle());
 //        Robot.DATA.flywheel.set(EShooterSystemData.CURRENT_POTENTIOMETER_TURNS, mHoodPot.get());
+    }
+
+    private double getCurrentTurretAngle() {
+        return Units.rotations_to_degrees(mTurretEncoder.getPosition(), kTurretGearRatio);
     }
 
     private double convertToHoodAngle(double pPotentiometerReading) {
