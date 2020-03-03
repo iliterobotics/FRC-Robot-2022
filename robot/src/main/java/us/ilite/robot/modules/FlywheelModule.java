@@ -57,6 +57,7 @@ public class FlywheelModule extends Module {
     private static final double kHoodAngleRange = kMaxShotDegrees - kMinShotDegrees;
     private static final double kHoodConversionFactor = kHoodReadingRange / kHoodAngleRange;
     private final FilteredAverage mPotentiometerReadings = FilteredAverage.filteredAverageForTime(0.1);
+    private static final double kMaxTurretPercentOutput = 0.8;
     private static final double kMaximumTurretAngle = 45.0;
     private final double kTurretErrorTolerance = 5.0; //TODO - tune tolerance
 
@@ -105,12 +106,12 @@ public class FlywheelModule extends Module {
         mTurret = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kSRXTurretId, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         mTurretEncoder = mTurret.getEncoder();
-        mTurretPID.setOutputRange(-.8, .8);
+        mTurretPID.setOutputRange(-kMaxTurretPercentOutput, kMaxTurretPercentOutput);
 //        mTurretPID = mTurret.getPIDController();
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  45);
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -45);
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  kMaximumTurretAngle);
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -kMaximumTurretAngle);
 //        HardwareUtils.setGains(mTurretPID, kTurretGains);
 
 //        mHoodPot = new AnalogPotentiometer(0);
