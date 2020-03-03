@@ -66,6 +66,7 @@ public class FlywheelModule extends Module {
     private static double kVelocityConversion = kMOISlipFactor * (2048.0 / 600.0) / (kFlyWheelGearRatio * kFlywheelDiameterInches * Math.PI / 12.0 / 60.0) * 2.0;
 
     private static final int FLYWHEEL_SLOT = 0;
+    private static final int TURRET_SLOT = 0;
     private static ProfileGains kFlywheelGains = new ProfileGains()
             .slot(FLYWHEEL_SLOT)
             .p(0.05)
@@ -78,13 +79,13 @@ public class FlywheelModule extends Module {
 //            .p(.0002)
 //            .maxVelocity(1000d)
 //            .maxAccel(1000d)
-//            .slot(0);
+//            .slot(TURRET_SLOT);
     // Percent output turret gains
     private static ProfileGains kTurretGains = new ProfileGains()
             .p(.02)
             .maxVelocity(1000d)
             .maxAccel(1000d)
-            .slot(0);
+            .slot(TURRET_SLOT);
 
     private PIDController mHoodPID = new PIDController(5, 0, 0);
 
@@ -215,7 +216,7 @@ public class FlywheelModule extends Module {
                         mTurretPID.setSetpoint(0.0);
                         double output = -mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), pNow);
                         mTurret.set(output);
-//                        mTurretPID.setReference(mTurretEncoder.getPosition() + db.goaltracking.get(ELimelightData.TX), ControlType.kSmartMotion, 0, 0);
+//                        mTurretPID.setReference(mTurretEncoder.getPosition() + db.goaltracking.get(ELimelightData.TX), ControlType.kSmartMotion, TURRET_SLOT, 0);
                     } else {
 //                        mTurretPID.setReference(0.0, ControlType.kPosition, 0, 0);
                         mTurret.set(0.0);
