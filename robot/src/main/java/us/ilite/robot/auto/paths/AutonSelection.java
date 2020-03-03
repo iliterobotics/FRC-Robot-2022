@@ -17,7 +17,6 @@ public class AutonSelection {
      */
     private Class<?>[] mAutonControllers = {
             LineAutonController.class,
-            ShootIntakeController.class,
             YoinkController.class,
             OurTrenchController.class,
             SitAndShootController.class
