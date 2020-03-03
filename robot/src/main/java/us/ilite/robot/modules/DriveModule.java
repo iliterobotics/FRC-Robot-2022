@@ -280,8 +280,7 @@ public class DriveModule extends Module {
 					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mLastTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
-					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
-					turn = db.drivetrain.get(DESIRED_TURN_PCT);
+					turn = pidOutput;
 				}
 			case VELOCITY:
 				mStartHoldingPosition = false;
