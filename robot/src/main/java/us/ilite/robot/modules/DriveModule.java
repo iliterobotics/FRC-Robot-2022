@@ -81,7 +81,7 @@ public class DriveModule extends Module {
 	public static ProfileGains smartMotionPID = new ProfileGains()
 			.p(.00025)
 			.f(0.00015)
-			.maxVelocity(kDriveTrainMaxVelocityRPM)
+			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
 			.maxAccel(1000d)
 			.slot(SMART_MOTION_PID_SLOT)
 			.velocityConversion(kDriveNEOPositionFactor);
