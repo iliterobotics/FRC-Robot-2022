@@ -163,6 +163,15 @@ public abstract class AbstractController {
         db.flywheel.set(SET_FEEDER_rpm, pFlywheelSpeed.feeder * 11000.0);
     }
 
+    protected final void setTurretHandling(TurretControlType pTurretControlType) {
+        setTurretHandling(pTurretControlType, Field2020.FieldElement.OUTER_GOAL);
+    }
+
+    protected final void setTurretHandling(TurretControlType pTurretControlType, Field2020.FieldElement trackedElement) {
+        db.goaltracking.set(ELimelightData.TARGET_ID, trackedElement.id());
+        db.flywheel.set(EShooterSystemData.TURRET_CONTROL, pTurretControlType);
+    }
+
     protected void firingSequence(FlywheelSpeeds speed, Field2020.FieldElement trackedElement) {
         setHood(speed);
         setFlywheelClosedLoop(speed, false);
@@ -215,8 +224,8 @@ public abstract class AbstractController {
         SmartDashboard.putBoolean("Turret at correct angle", db.flywheel.isSet(IS_TARGET_LOCKED));
 //        TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
 //        if (turretControlType != TurretControlType.MANUAL) {
-//            return db.flywheel.isSet(IS_TARGET_LOCKED);
-        return true;
+            return db.flywheel.isSet(IS_TARGET_LOCKED);
+//        return true;
 //        }
 //        return true;
     }
