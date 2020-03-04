@@ -40,7 +40,6 @@ public class SitAndShootController extends BaseAutonController
         } else {
             mCyclesNotShooting++;
         }
-        SmartDashboard.putNumber("EXIT BEAM BROKEN N TIMES", mExitBeamBrokenCount);
         mPreviouslyBroken = mIsBroken;
         mFinished = getDriveDistance() >= 9;
     }

@@ -169,16 +169,14 @@ public abstract class AbstractController {
         if (isHoodAtCorrectAngle(speed)) {
             db.goaltracking.set(ELimelightData.TARGET_ID, trackedElement.id());
             db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
-            if (isTurretAtCorrectAngle()) {
-                if (isFlywheelUpToSpeed()) {
-                    db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
-                    if (isFeederUpToSpeed()) {
-                        db.powercell.set(SET_V_pct, 0.5);
-                        db.powercell.set(SET_H_pct, 0.5);
-                    } else {
-                        db.powercell.set(SET_V_pct, 0);
-                        db.powercell.set(SET_H_pct, 0);
-                    }
+            if (isTurretAtCorrectAngle() && isFlywheelUpToSpeed()) {
+                setFeederClosedLoop(speed);
+                if (isFeederUpToSpeed()) {
+                    db.powercell.set(SET_V_pct, 0.5);
+                    db.powercell.set(SET_H_pct, 0.5);
+                } else {
+                    db.powercell.set(SET_V_pct, 0);
+                    db.powercell.set(SET_H_pct, 0);
                 }
             }
         }
@@ -200,19 +198,25 @@ public abstract class AbstractController {
     }
 
     protected boolean isFlywheelUpToSpeed() {
+        SmartDashboard.putBoolean("Flywheel up to speed", db.flywheel.get(SET_BALL_VELOCITY_ft_s) > 0.0 &&
+                db.flywheel.get(SET_BALL_VELOCITY_ft_s) >= db.flywheel.get(BALL_VELOCITY_ft_s) - 2.0);
         return db.flywheel.get(SET_BALL_VELOCITY_ft_s) > 0.0 &&
                 db.flywheel.get(SET_BALL_VELOCITY_ft_s) >= db.flywheel.get(BALL_VELOCITY_ft_s) - 2.0;
     }
 
     protected boolean isFeederUpToSpeed() {
+        SmartDashboard.putBoolean("Feeder up to speed", db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
+                db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8);
         return db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
                 db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8;
     }
 
     protected boolean isTurretAtCorrectAngle(){
+        SmartDashboard.putBoolean("Turret at correct angle", db.flywheel.isSet(IS_TARGET_LOCKED));
 //        TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
 //        if (turretControlType != TurretControlType.MANUAL) {
-            return db.flywheel.isSet(IS_TARGET_LOCKED);
+//            return db.flywheel.isSet(IS_TARGET_LOCKED);
+        return true;
 //        }
 //        return true;
     }
