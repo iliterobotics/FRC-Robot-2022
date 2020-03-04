@@ -65,7 +65,7 @@ public abstract class AbstractController {
 //            }
             speed += 3.0;
             db.powercell.set(INTAKE_STATE, EArmState.OUT);
-            db.powercell.set(SET_INTAKE_VEL_ft_s, speed);
+            db.powercell.set(SET_INTAKE_VEL_ft_s, speed + 1);
         } else {
             db.powercell.set(INTAKE_STATE, EArmState.STOW);
             db.powercell.set(SET_INTAKE_VEL_ft_s, 0.0);
