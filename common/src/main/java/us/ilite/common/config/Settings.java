@@ -13,6 +13,7 @@ public class Settings {
     public static final String kGroundLimelightNetworkTable = "limelight-bottom";
     public static final String kFlywheelLimelightNetworkTable = "limelight-top";
 
+
     public static double kControlLoopPeriod = 0.02; // seconds
 
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
@@ -27,6 +28,8 @@ public class Settings {
     public static int sCODEX_COMMS_PORT = 5805;
 
     public static final String AUTO_PATH_PACKAGE = "us.ilite.robot.auto.paths";
+
+    public static final String CONTROLLER_PATH_PACKAGE = "us.ilite.robot.controller";
 
     // ================================
     // System ID's
@@ -114,8 +117,7 @@ public class Settings {
         // These are applied AFTER the normal throttle reduction
         public static double kSnailModePercentThrottleReduction = 0.5;
         public static double kSnailModePercentRotateReduction = 0.4;
-        public static double kMaxAllowedVelocityMultiplier = 0.85; //set back to lower value for safety before merging
-
+        public static double kMaxAllowedVelocityMultiplier = 0.5;
 
         // Applied after any scaling
         public static double kDriverInputTurnMaxMagnitude = 0.5;

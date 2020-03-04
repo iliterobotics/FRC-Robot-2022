@@ -1,5 +1,6 @@
 package us.ilite.robot.modules;
 
+import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
@@ -7,10 +8,11 @@ import static com.revrobotics.ControlType.*;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
+import us.ilite.common.Field2020;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 
 import static us.ilite.common.types.drive.EDriveData.*;
@@ -68,10 +70,20 @@ public class DriveModule extends Module {
 	// =============================================================================
 	private static final int VELOCITY_PID_SLOT = 1;
 	private static final int POSITION_PID_SLOT = 2;
+	private static final int SMART_MOTION_PID_SLOT = 3;
 	public static ProfileGains dPID = new ProfileGains()
-			.p(1.0).maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
-			.maxAccel(56760d)
+//			.p(5.0e-4)
+			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
+			.f(0.00015)
+			.maxAccel(5676d)
 			.slot(POSITION_PID_SLOT)
+			.velocityConversion(kDriveNEOPositionFactor);
+	public static ProfileGains smartMotionPID = new ProfileGains()
+			.p(.00025)
+			.f(0.00015)
+			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
+			.maxAccel(1000d)
+			.slot(SMART_MOTION_PID_SLOT)
 			.velocityConversion(kDriveNEOPositionFactor);
 	public static ProfileGains vPID = new ProfileGains()
 			.f(0.00015)
@@ -114,8 +126,8 @@ public class DriveModule extends Module {
 	private Rotation2d mGyroOffset = new Rotation2d();
 	private PIDController mTargetAngleLockPid;
 	private edu.wpi.first.wpilibj.controller.PIDController mYawPid;
-	private PIDController mHoldLeftPositionPid;
-	private PIDController mHoldRightPositionPid;
+	private double mLeftHoldSetpoint;
+	private double mRightHoldSetpoint;
 	private boolean mStartHoldingPosition;
 
 	private final CANSparkMax mLeftMaster;
@@ -162,6 +174,8 @@ public class DriveModule extends Module {
 		HardwareUtils.setGains(mRightCtrl, vPID);
 		HardwareUtils.setGains(mLeftCtrl, dPID);
 		HardwareUtils.setGains(mRightCtrl, dPID);
+		HardwareUtils.setGains(mLeftCtrl, smartMotionPID);
+		HardwareUtils.setGains(mRightCtrl, smartMotionPID);
 
 		//TODO - we want to do use our conversion factor calculated above, but that requires re-turning of F & P
 		mLeftEncoder.setPositionConversionFactor(1d);
@@ -186,17 +200,10 @@ public class DriveModule extends Module {
 
 	@Override
 	public void modeInit(EMatchMode pMode, double pNow) {
-//		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
-//		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
-//		mTargetAngleLockPid.setSetpoint(0);
-//		mTargetAngleLockPid.reset();
-
-		mHoldLeftPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-		mHoldLeftPositionPid.setOutputRange(-1, 1);
-		mHoldLeftPositionPid.setSetpoint(0.0);
-		mHoldRightPositionPid = new PIDController(kHoldPositionGains,-99999, 99999, Settings.kControlLoopPeriod);
-		mHoldRightPositionPid.setOutputRange(-1, 1);
-		mHoldRightPositionPid.setSetpoint(0.0);
+		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
+		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
+		mTargetAngleLockPid.setSetpoint(0);
+		mTargetAngleLockPid.reset();
 		mStartHoldingPosition = false;
 
 		reset();
@@ -241,22 +248,40 @@ public class DriveModule extends Module {
 			case RESET:
 				reset();
 				break;
-//			case HOLD:
-//				if (!mStartHoldingPosition) {
-//					mHoldLeftPositionPid.setSetpoint(db.drivetrain.get(LEFT_POS_INCHES));
-//					mHoldRightPositionPid.setSetpoint(db.drivetrain.get(RIGHT_POS_INCHES));
-//					mStartHoldingPosition = true;
-//				}
-//				if (Math.abs(db.drivetrain.get(LEFT_POS_INCHES) - mHoldLeftPositionPid.getSetpoint()) > .5) {
-//					double leftOutput = mHoldLeftPositionPid.calculate(db.drivetrain.get(LEFT_POS_INCHES), pNow);
-//					mLeftCtrl.setReference(leftOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//				if (Math.abs(db.drivetrain.get(RIGHT_POS_INCHES) - mHoldRightPositionPid.getSetpoint()) > .5) {
-//					double rightOutput = mHoldRightPositionPid.calculate(db.drivetrain.get( RIGHT_POS_INCHES), pNow);
-//					mRightCtrl.setReference(rightOutput * kDriveTrainMaxVelocity, kVelocity, VELOCITY_PID_SLOT, 0);
-//				}
-//				break;
+			case HOLD:
+				if (!mStartHoldingPosition) {
+					mLeftHoldSetpoint = mLeftEncoder.getPosition();
+					mRightHoldSetpoint = mRightEncoder.getPosition();
+					mStartHoldingPosition = true;
+				}
 
+				if (mLeftEncoder.getVelocity() < 100) {
+					if (Math.abs(mLeftEncoder.getPosition() - mLeftHoldSetpoint) > .15) {
+						mLeftCtrl.setReference(mLeftHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
+					}
+				} else {
+					mLeftCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				}
+
+				if (mRightEncoder.getVelocity() < 100) {
+					if (Math.abs(mRightEncoder.getPosition() - mRightHoldSetpoint) > .15) {
+						mRightCtrl.setReference(mRightHoldSetpoint, kPosition, POSITION_PID_SLOT, 0);
+					}
+				} else {
+					mRightCtrl.setReference(0.0, kSmartVelocity, VELOCITY_PID_SLOT, 0);
+				}
+				break;
+			case TARGET_ANGLE_LOCK:
+				RobotCodex<ELimelightData> targetData = Robot.DATA.goaltracking;
+				targetData.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id());
+				double pidOutput;
+				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(ELimelightData.TV) && targetData.isSet(ELimelightData.TX)) {
+					//if there is a target in the limelight's fov, lock onto target using feedback loop
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mLastTime);
+					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
+					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
+					turn = pidOutput;
+				}
 			case VELOCITY:
 				mStartHoldingPosition = false;
 //				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
@@ -275,44 +300,16 @@ public class DriveModule extends Module {
 				mLeftMaster.set(throttle+turn);
 				mRightMaster.set(throttle-turn);
 				break;
+			case SMART_MOTION:
+				mLeftCtrl.setReference( db.drivetrain.get(L_DESIRED_POS) / kDriveNEOPositionFactor, kSmartMotion, POSITION_PID_SLOT, 0 );
+				mRightCtrl.setReference( db.drivetrain.get(R_DESIRED_POS) / kDriveNEOPositionFactor, kSmartMotion, POSITION_PID_SLOT, 0 );
+				break;
 		}
 	}
 
 	private void reset() {
 		mLeftEncoder.setPosition(0.0);
 		mRightEncoder.setPosition(0.0);
-	}
-
-	public void loop(double pNow) {
-//		mUpdateTimer.start();
-//		mDriveState = db.drivetrain.get(DESIRED_STATE, EDriveState.class);
-//		switch(mDriveState) {
-//			case PATH_FOLLOWING:
-//				mDriveHardware.configureMode(ECommonControlMode.VELOCITY);
-//			case TARGET_ANGLE_LOCK:
-//				mDriveHardware.configureMode(ECommonControlMode.PERCENT_OUTPUT);
-//				mDriveHardware.set(DriveMessage.kNeutral);
-//				RobotCodex<ELimelightData> targetData = Robot.DATA.limelight;
-//				double pidOutput;
-//				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(TV) && targetData.isSet(TX)) {
-//
-//					//if there is a target in the limelight's fov, lock onto target using feedback loop
-//					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(TX), pNow - mPreviousTime);
-//					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-//
-//					double mTargetTrackingThrottle = db.drivetrain.get(TARGET_TRACKING_THROTTLE);
-//					mDriveMessage = new DriveMessage().throttle(mTargetTrackingThrottle).turn(pidOutput).calculateCurvature();
-//					// If we've already seen the target and lose tracking, exit.
-//				}
-//				break;
-//			case NORMAL:
-//				break;
-//			default:
-//				mLogger.warn("Got drivetrain state: " + mDriveState+" which is unhandled");
-//				break;
-//		}
-//		mPreviousTime = pNow;
-//		mUpdateTimer.stop();
 	}
 
 }

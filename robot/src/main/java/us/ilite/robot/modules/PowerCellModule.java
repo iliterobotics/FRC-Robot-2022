@@ -2,6 +2,7 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
@@ -77,6 +78,7 @@ public class PowerCellModule extends Module {
     private static final double kPivotConversion = kPivotGearRatio * 360.0;
     // RPM to degrees / second
     private static final double kPivotVelocityConversion = kPivotConversion / 60.0;
+    private static final double kPivotAngleConversionFactor = 0.0;
     private static final double kMaxIntakePivotVelocityDeg_s = 10.0;
     private static final ProfileGains mIntakePivotDownGains = new ProfileGains()
             .slot(INTAKE_PIVOT_DOWN_SLOT)
@@ -164,7 +166,6 @@ public class PowerCellModule extends Module {
         db.powercell.set(SERIALIZER_CURRENT, mConveyorMotorHorizontal.getStatorCurrent());
         db.powercell.set(VERTICAL_CURRENT, mConveyorMotorVertical.getStatorCurrent());
         db.powercell.set(INTAKE_PIVOT_CURRENT, mIntakePivot.getOutputCurrent());
-        db.powercell.set(PIVOT_ABSOLUTE_ENCODER_RAW, mIntakePivotAbsoluteEncoder.getDistance());
 
         db.powercell.set(ENTRY_BEAM, mEntryBeam.isBroken());
         db.powercell.set(H_BEAM, mSecondaryBeam.isBroken());

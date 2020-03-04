@@ -23,8 +23,10 @@ public abstract class BaseManualController extends AbstractController {
         rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
 
-        if(throttle == 0.0 && rotate == 0.0) {
-            db.drivetrain.set(STATE, EDriveState.VELOCITY);//HOLD);
+        if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
+            db.drivetrain.set(STATE, EDriveState.TARGET_ANGLE_LOCK);
+        } else if(throttle == 0.0 && rotate == 0.0) {
+            db.drivetrain.set(STATE, EDriveState.HOLD);
             db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
             db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
         } else {
@@ -38,6 +40,12 @@ public abstract class BaseManualController extends AbstractController {
             if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
                 throttle *= Settings.Input.kSnailModePercentThrottleReduction;
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;
+            }
+
+            //TODO - Button here is bound to change once everything is integrated
+            if (!db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
+                db.drivetrain.set(STATE, EDriveState.VELOCITY);
+                db.drivetrain.set(DESIRED_TURN_PCT, rotate);
             }
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
             db.drivetrain.set(DESIRED_TURN_PCT, rotate);

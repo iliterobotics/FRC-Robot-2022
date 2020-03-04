@@ -4,10 +4,10 @@ import com.team2363.commands.HelixFollower;
 
 import static com.team319.trajectory.Path.SegmentValue.*;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
 import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import org.reflections.Reflections;
 import us.ilite.common.Distance;
@@ -161,14 +161,27 @@ public class BobUtils {
     public static int getIndexForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp) {
         double dt = pNow - pPathStartTimestamp;
         // Check path overrun
+        SmartDashboard.putBoolean ("DT > PATHTIME", dt > (getPathTotalTime(pPath) + AutonSelection.mDelaySeconds));
+        SmartDashboard.putBoolean ("Pnow < pathstart", (pNow < pPathStartTimestamp));
         if(
                 pNow < pPathStartTimestamp ||
-                dt > getPathTotalTime(pPath)
+                dt > (getPathTotalTime(pPath) + AutonSelection.mDelaySeconds)
         ) {
             return -1;
         }
         return (int)(dt / 0.020);
     }
+
+
+    public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, Path.SegmentValue pBobValue) {
+        int pathIndex = getIndexForCumulativeTime(pPath, pNow, pPathStartTimestamp);
+        return pPath.getPath()[pathIndex][pBobValue.ordinal()];
+    }
+
+    public static boolean isFinished(double pNow, Path pPath, double pPathStartTime) {
+        return getIndexForCumulativeTime(pPath, pNow, pPathStartTime) == -1;
+    }
+
 
     /**
      * Return the max speed of the path in feet/sec

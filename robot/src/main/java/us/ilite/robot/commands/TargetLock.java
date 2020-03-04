@@ -10,6 +10,7 @@ import us.ilite.robot.Robot;
 
 import static us.ilite.common.types.ELimelightData.*;
 
+@Deprecated
 public class TargetLock implements ICommand {
 
     private static final double kTURN_POWER = 0.2;
@@ -30,7 +31,6 @@ public class TargetLock implements ICommand {
         mAlignedCount = 0;
 
         Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TARGET_ANGLE_LOCK);
-
         Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.0);
     }
 
@@ -58,9 +58,7 @@ public class TargetLock implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-
         Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.NORMAL);
-
     }
 
     public void setEndOnAlignment(boolean bool) {
