@@ -29,22 +29,6 @@ public class BobUtils {
     private static final Map<String, Double> mMaxTimeCache = new HashMap<>();
     private HelixFollower hf;
 
-    public enum BobPathValue {
-        dt(0),
-        x(1), y(2),
-        left_pos(3), left_vel(4), left_acc(5), left_jerk(6),
-        center_pos(7), center_vel(8), center_acc(9), center_jerk(10),
-        right_pos(11), right_vel(12), right_acc(13), right_jerk(14),
-        heading(15);
-
-        public int index;
-
-        BobPathValue(int pIndex) {
-            this.index = pIndex;
-        }
-
-    }
-
     public static double getMeters(Path pPath, Path.SegmentValue pKey, int i) {
         return Distance.fromFeet(pPath.getValue(i, pKey)).meters();
     }
@@ -189,9 +173,9 @@ public class BobUtils {
     }
 
 
-    public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, BobPathValue pBobValue) {
+    public static double getPathValueForCumulativeTime(Path pPath, double pNow, double pPathStartTimestamp, Path.SegmentValue pBobValue) {
         int pathIndex = getIndexForCumulativeTime(pPath, pNow, pPathStartTimestamp);
-        return pPath.getPath()[pathIndex][pBobValue.index];
+        return pPath.getPath()[pathIndex][pBobValue.ordinal()];
     }
 
     public static boolean isFinished(double pNow, Path pPath, double pPathStartTime) {

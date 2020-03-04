@@ -81,7 +81,7 @@ public class DriveModule extends Module {
 	public static ProfileGains smartMotionPID = new ProfileGains()
 			.p(.00025)
 			.f(0.00015)
-			.maxVelocity(kDriveTrainMaxVelocityRPM)
+			.maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
 			.maxAccel(1000d)
 			.slot(SMART_MOTION_PID_SLOT)
 			.velocityConversion(kDriveNEOPositionFactor);
@@ -242,7 +242,6 @@ public class DriveModule extends Module {
 		EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
 		// Do this to prevent wonkiness while transitioning autonomous to teleop
 		if(mode == null) return;
-		SmartDashboard.putNumber("Drive module state", mode.ordinal());
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		switch (mode) {
@@ -281,8 +280,7 @@ public class DriveModule extends Module {
 					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mLastTime);
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
-					db.drivetrain.set(DESIRED_TURN_PCT, pidOutput);
-					turn = db.drivetrain.get(DESIRED_TURN_PCT);
+					turn = pidOutput;
 				}
 			case VELOCITY:
 				mStartHoldingPosition = false;

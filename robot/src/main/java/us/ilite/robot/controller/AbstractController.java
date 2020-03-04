@@ -59,7 +59,7 @@ public abstract class AbstractController {
      */
     protected void setIntakeArmEnabled(double pNow, boolean pEnabled) {
         if(pEnabled) {
-            double speed = Math.max(db.drivetrain.get(L_ACTUAL_VEL_FT_s), db.drivetrain.get(R_ACTUAL_VEL_FT_s));
+            double speed = Math.max(Math.abs(db.drivetrain.get(L_ACTUAL_VEL_FT_s)), Math.abs(db.drivetrain.get(R_ACTUAL_VEL_FT_s)));
 //            if(speed <= 1.0) {
 //                speed = 3.0;
 //            }
@@ -186,17 +186,16 @@ public abstract class AbstractController {
 
     protected void firingSequence(FlywheelSpeeds speed) {
         setFlywheelClosedLoop(speed, true);
-        if (isHoodAtCorrectAngle(speed)) {
-            if (isFlywheelUpToSpeed()) {
-                db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
-                if (isFeederUpToSpeed()) {
-                    db.powercell.set(SET_V_pct, 0.5);
-                    db.powercell.set(SET_H_pct, 0.5);
-                } else {
-                    db.powercell.set(SET_V_pct, 0);
-                    db.powercell.set(SET_H_pct, 0);
-                }
+        if (isHoodAtCorrectAngle(speed) && isFlywheelUpToSpeed()) {
+            db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
+            if (isFeederUpToSpeed()) {
+                db.powercell.set(SET_V_pct, 0.5);
+                db.powercell.set(SET_H_pct, 0.5);
+            } else {
+                db.powercell.set(SET_V_pct, 0);
+                db.powercell.set(SET_H_pct, 0);
             }
+
         }
     }
 
@@ -213,7 +212,7 @@ public abstract class AbstractController {
     protected boolean isTurretAtCorrectAngle(){
 //        TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
 //        if (turretControlType != TurretControlType.MANUAL) {
-            return db.flywheel.get(IS_TARGET_LOCKED) == 1.0;
+            return db.flywheel.isSet(IS_TARGET_LOCKED);
 //        }
 //        return true;
     }

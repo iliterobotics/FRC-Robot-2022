@@ -7,6 +7,7 @@ import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 import static us.ilite.robot.controller.AbstractController.kIntakeRollerPower_on;
 
+@Deprecated
 public class SimpleSequence implements ISequence {
     private static int beamCounter = 0;
     private static boolean mLastSecondaryBeamBroken = false;

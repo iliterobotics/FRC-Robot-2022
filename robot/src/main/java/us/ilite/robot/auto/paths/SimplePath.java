@@ -2,6 +2,7 @@ package us.ilite.robot.auto.paths;
 
 import com.team319.trajectory.Path;
 
+@Deprecated
 public class SimplePath extends Path {
    // dt,x,y,left.pos,left.vel,left.acc,left.jerk,center.pos,center.vel,center.acc,center.jerk,right.pos,right.vel,right.acc,right.jerk,heading
 	private static final double[][] points = {
