@@ -61,7 +61,7 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     @Override
     public void modeInit(EMatchMode pMode, double pNow) {
-        Robot.DATA.goaltracking.set(TARGET_ID, (double) NONE.id());
+        Robot.DATA.goaltracking.set(TARGET_ID, NONE.id());
     }
 
     @Override
@@ -103,7 +103,7 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     @Override
     public void shutdown(double pNow) {
-
+        db.goaltracking.set(ELimelightData.PIPELINE, Limelight.NONE.id());
     }
 
     private void setPipeline() {

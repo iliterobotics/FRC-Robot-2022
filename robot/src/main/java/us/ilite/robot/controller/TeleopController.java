@@ -70,7 +70,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
             super.setFlywheelClosedLoop(currentState, true);
         } else {
-            db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.MANUAL);;
+            db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.HOME);
             super.firingSequence(Enums.FlywheelSpeeds.OFF);
 //            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
         }
