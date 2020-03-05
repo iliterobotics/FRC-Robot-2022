@@ -13,6 +13,7 @@ import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
+import us.ilite.robot.modules.Limelight;
 
 import static us.ilite.robot.Enums.*;
 
@@ -164,20 +165,20 @@ public abstract class AbstractController {
     }
 
     protected final void setTurretHandling(TurretControlType pTurretControlType) {
-        setTurretHandling(pTurretControlType, Field2020.FieldElement.OUTER_GOAL);
+        setTurretHandling(pTurretControlType, Limelight.NONE.id());
     }
 
-    protected final void setTurretHandling(TurretControlType pTurretControlType, Field2020.FieldElement trackedElement) {
-        db.goaltracking.set(ELimelightData.TARGET_ID, trackedElement.id());
+    protected final void setTurretHandling(TurretControlType pTurretControlType, int pTrackingId) {
+        db.goaltracking.set(ELimelightData.TARGET_ID, pTrackingId);
         db.flywheel.set(EShooterSystemData.TURRET_CONTROL, pTurretControlType);
     }
 
-    protected void firingSequence(FlywheelSpeeds speed, Field2020.FieldElement trackedElement) {
+    protected void
+    firingSequence(FlywheelSpeeds speed, Field2020.FieldElement trackedElement) {
         setHood(speed);
         setFlywheelClosedLoop(speed, false);
         if (isHoodAtCorrectAngle(speed)) {
-            db.goaltracking.set(ELimelightData.TARGET_ID, trackedElement.id());
-            db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
+            setTurretHandling(TurretControlType.TARGET_LOCKING, trackedElement.id());
             if (isTurretAtCorrectAngle() && isFlywheelUpToSpeed()) {
                 setFeederClosedLoop(speed);
                 if (isFeederUpToSpeed()) {

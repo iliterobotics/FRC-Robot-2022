@@ -61,16 +61,14 @@ public class TeleopController extends BaseManualController { //copied from TestC
         }
 
         if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
-            db.goaltracking.set(ELimelightData.TARGET_ID, Field2020.FieldElement.OUTER_GOAL.id());
-            db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
+            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());
             super.firingSequence(currentState);
 //            super.setFlywheelClosedLoop(currentState);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.AIM)) {
-            db.goaltracking.set(ELimelightData.TARGET_ID, Field2020.FieldElement.OUTER_GOAL.id());
-            db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.TARGET_LOCKING);
+            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());
             super.setFlywheelClosedLoop(currentState, true);
         } else {
-            db.flywheel.set(EShooterSystemData.TURRET_CONTROL, Enums.TurretControlType.HOME);
+            super.setTurretHandling(Enums.TurretControlType.HOME);
             super.firingSequence(Enums.FlywheelSpeeds.OFF);
 //            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
         }

@@ -222,7 +222,6 @@ public class FlywheelModule extends Module {
                     }
                     break;
                 case HOME:
-                    db.goaltracking.set(ELimelightData.PIPELINE, Limelight.NONE.id());
                     mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
                     break;
 
