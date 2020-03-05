@@ -3,6 +3,7 @@ package us.ilite.robot.modules;
 import com.revrobotics.*;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
+import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.sensor.EPowerDistPanel;
@@ -13,24 +14,20 @@ public class HangerModule extends Module {
 
     private CANSparkMax mHangerNeoMaster;
     private CANSparkMax mHangerNeoFollower;
-
-    private EHangerState mHangerState;
-//    private CANPIDController mHangerPID;
+    protected EHangerState mHangerState;
+    private CANPIDController mHangerPIDMaster;
+    private CANPIDController mHangerPIDFollower;
 
     private CANEncoder mHangerEncoderOne;
     private CANEncoder mHangerEncoderTwo;
 
-    //PID Constants, to be used if needed, these are in RPM and
-    // ripped directly from the 2019 robot.
-//    private static final int UP_PID_SLOT_ID = 1;
-//    public static double P = 5.0e-4;
-//    public static double I = 0.0;
-//    public static double D = 0.0;
-//    public static double F = 0.000391419;
-//    public static double kMaxElevatorVelocity = 3700;
-//    public static double kMinElevatorVelocity = 0;
-//    public static double kMaxElevatorUpAcceleration = 4000 * 1.5;
-//    public static double kMaxElevatorDownAcceleration = 4000 * 1.5;
+    private static final int UP_PID_SLOT_ID = 1;
+    private static final ProfileGains mIntakePivotDownGains = new ProfileGains()
+            .slot(UP_PID_SLOT_ID)
+            .p(0.00025)
+            .maxAccel(9000d)
+            .maxVelocity(6000d)
+            ;
 
     private  double kHangerWarnCurrentLimitThreshold = 30;
 
@@ -42,12 +39,9 @@ public class HangerModule extends Module {
         mHangerNeoFollower = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID2 , CANSparkMaxLowLevel.MotorType.kBrushless);
 
 
-//        mHangerPID = new CANPIDController(mHangerNeoMaster);
-//        mHangerPID.setP(P, UP_PID_SLOT_ID);
-//        mHangerPID.setI(I, UP_PID_SLOT_ID);
-//        mHangerPID.setD(D, UP_PID_SLOT_ID);
-//        mHangerPID.setSmartMotionMaxAccel(kMaxElevatorUpAcceleration, UP_PID_SLOT_ID);
-//        mHangerPID.setSmartMotionMaxVelocity(kMaxElevatorVelocity, UP_PID_SLOT_ID);
+        mHangerPIDMaster = new CANPIDController(mHangerNeoMaster);
+        mHangerPIDFollower = new CANPIDController(mHangerNeoFollower);
+
 
         mHangerNeoMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
         mHangerNeoFollower.setInverted(false);
@@ -79,7 +73,7 @@ public class HangerModule extends Module {
 
     @Override
     public void readInputs(double pNow) {
-        db.hanger.set(EHangerModuleData.CURRENT_PCT , mHangerNeoMaster.getOutputCurrent());
+        db.hanger.set(EHangerModuleData.OUTPUT_CURRENT , mHangerNeoMaster.getOutputCurrent());
     }
 
     @Override

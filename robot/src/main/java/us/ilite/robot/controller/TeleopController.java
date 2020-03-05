@@ -7,6 +7,7 @@ import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EShooterSystemData;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 
@@ -46,9 +47,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     private void updateHanger(double pNow) {
         if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
-            db.hanger.set(EHangerModuleData.DESIRED_PCT, 0.05);
-        } else if (db.operatorinput.get(InputMap.OPERATOR.REVERSE_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
-            db.hanger.set(EHangerModuleData.DESIRED_PCT, -0.05);
+            db.hanger.set(EHangerModuleData.DESIRED_PCT, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS) / 5.0));
         }else{
             db.hanger.set(EHangerModuleData.DESIRED_PCT, 0.0);
         }
