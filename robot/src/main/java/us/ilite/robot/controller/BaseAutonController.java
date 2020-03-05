@@ -1,41 +1,96 @@
 package us.ilite.robot.controller;
 
-import com.team2363.commands.HelixFollower;
 import com.team2363.commands.IliteHelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.Distance;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
+import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
+import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.robot.auto.paths.BobUtils;
 import static us.ilite.robot.Enums.*;
 
 public class BaseAutonController extends AbstractController {
 
     protected Path mActivePath = null;
+    private Path mDesiredPath;
+    protected double mDelayCycleCount;
     protected double mPathStartTime = 0d;
-    private HelixFollowerImpl mPathFollower = null;
+    protected HelixFollowerImpl mPathFollower = null;
+    private boolean mInitializedPathFollower = false;
+    private boolean mHitFirst = false;
+    private boolean mIsTargetTracking = false;
+
+    private Distance mPathTotalDistance;
+    private double mMaxAllowedPathTime;
+
+    public BaseAutonController() {
+    }
+
+    public BaseAutonController(Path pActivePath, boolean pReverse) {
+        mDesiredPath = pActivePath;
+        mDelayCycleCount = AutonSelection.mDelaySeconds / .02;
+
+        setActivePath(mDesiredPath, pReverse);
+        mMaxAllowedPathTime = BobUtils.getPathTotalTime(mActivePath) + 0.1 + (mDelayCycleCount * .02);
+        mPathTotalDistance = BobUtils.getPathTotalDistance(mActivePath);
+        e();
+        System.out.println("==== RUNNING AUTONOMOUS PATH ====");
+        System.out.println("Path: " + mActivePath.getClass().getSimpleName());
+        System.out.println("Time (s): " + mMaxAllowedPathTime);
+        System.out.println("Dist (ft): " + mPathTotalDistance);
+        e();
+
+        db.registerAllWithShuffleboard();
+    }
 
     @Override
     protected void updateImpl(double pNow) {
-        if(mPathStartTime == 0) {
-            mPathStartTime = pNow;
-        }
-        if (mPathFollower != null && mPathFollower.isFinished()) {
-            mPathFollower = null;
-        }
-        if(mPathFollower == null) {
-            stopDrivetrain(pNow);
+        if (mDelayCycleCount <= 0) {
+            if (!mInitializedPathFollower) {
+                mPathFollower.initialize();
+                mInitializedPathFollower = true;
+            }
+            if (mPathStartTime == 0) {
+                mPathStartTime = pNow;
+            }
+            if (mPathFollower != null && mPathFollower.isFinished()) {
+                mPathFollower = null;
+            }
+            if (mPathFollower == null) {
+                stopDrivetrain(pNow);
+            } else {
+                mPathFollower.execute(pNow);
+            }
         } else {
-            mPathFollower.execute(pNow);
+            mDelayCycleCount--;
         }
-
     }
 
-    protected void setActivePath(Path pPath) {
+    protected void setNewActivePath(Path pPath, boolean pReverse) {
+        setActivePath(pPath, pReverse);
+        mInitializedPathFollower = false;
+    }
+
+    protected void setActivePath(Path pPath, boolean pReverse) {
         mActivePath = pPath;
         mPathFollower = new HelixFollowerImpl(mActivePath);
-        mPathFollower.initialize();
+        if (pReverse) {
+            mPathFollower.reverse();
+        }
+    }
+
+    protected void setTargetTracking(boolean pTargetTracking) {
+        mIsTargetTracking = pTargetTracking;
+        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TARGET_ANGLE_LOCK);
+    }
+
+    private static final void e() {
+        System.out.println("================================================");
     }
 
     private class HelixFollowerImpl extends IliteHelixFollower {
@@ -47,6 +102,7 @@ public class BaseAutonController extends AbstractController {
         private PIDController mHeadingController = new PIDController(
                 0.001, 0.0, 0.0);
         private double mPathStartTime = 0.0;
+
 
         /**
          * This will import the path class based on the name of the path provided
@@ -102,6 +158,11 @@ public class BaseAutonController extends AbstractController {
 
         protected void moveToNextSegment(double pNow) {
             currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
+
+            if (currentSegment == 0) {
+                mHitFirst = true;
+            }
+
             if (currentSegment == -1)
             {
                 isFinished = true;
@@ -111,7 +172,9 @@ public class BaseAutonController extends AbstractController {
         public void execute(double pNow) {
             super.execute();
             moveToNextSegment(pNow);
-            super.calculateOutputs();
+            if (!mIsTargetTracking) {
+                super.calculateOutputs();
+            }
             if(isFinished()) {
                 stopDrivetrain(0.0);
             }

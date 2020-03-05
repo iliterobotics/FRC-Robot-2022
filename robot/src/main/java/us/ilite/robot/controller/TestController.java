@@ -1,10 +1,14 @@
 package us.ilite.robot.controller;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import us.ilite.common.Field2020;
+import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.EShooterSystemData;
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.util.Color;
@@ -26,17 +30,13 @@ import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.*;
-
 import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.EHangerModuleData.*;
 import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
-
 import static us.ilite.robot.Enums.*;
-
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.common.types.EShooterSystemData.*;
-
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 import static us.ilite.robot.modules.DriveModule.kDriveNEOVelocityFactor;
@@ -106,12 +106,17 @@ public class TestController extends BaseManualController {
         SmartDashboard.putNumber("Max Robot Omega (deg/s)", mMaxYaw);
     }
 
-
-
-
-
     private void updateFlywheel(double pNow) {
+//        db.flywheel.set(TURRET_CONTROL, TurretControlType.MANUAL);
+//        double turretDirection = db.operatorinput.get(InputMap.OPERATOR_REFACTOR.MANUAL_TURRET);
+//        turretDirection = Math.abs(turretDirection) > 0.02 ? turretDirection : 0.0; //Handling Deadband
+//        db.flywheel.set(MANUAL_TURRET_DIRECTION, turretDirection);
 
+        if (db.groundTracking.isSet(TX)) {
+            db.flywheel.set(DESIRED_TURRET_ANGLE, db.goaltracking.get(CALC_ANGLE_TO_TARGET));
+        } else {
+            db.flywheel.set(DESIRED_TURRET_ANGLE, 0);
+        }
         if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_10_TEST)) {
             firingSequence(FlywheelSpeeds.CLOSE);
         } else if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_20_TEST)) {
@@ -155,7 +160,7 @@ public class TestController extends BaseManualController {
             state = Enums.FlywheelSpeeds.OFF;
         }
         db.flywheel.set(FLYWHEEL_SPEED_STATE, state);
-        setFlywheelClosedLoop(state);
+        setFlywheelClosedLoop(state, true);
         if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
             db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
             db.flywheel.set(SET_FEEDER_rpm, state.feeder * 11000.0);
@@ -226,7 +231,6 @@ public class TestController extends BaseManualController {
         mLastGroundTrackingType = Robot.DATA.goaltracking.get(TARGET_ID.ordinal());
     }
 
-
     protected void updatePowerCells(double pNow) {
         if(flywheelinput.isSet(InputMap.FLYWHEEL.RESET_INTAKE_COUNT)) {
             resetSerializerState();
@@ -254,7 +258,6 @@ public class TestController extends BaseManualController {
             db.powercell.set(SET_V_pct, 0.6);
             db.powercell.set(SET_H_pct, 0.5);
         }
-
     }
 
     void updateDJBooth(double pNow) {

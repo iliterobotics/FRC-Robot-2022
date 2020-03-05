@@ -17,7 +17,8 @@ public class Enums {
         TARGET_ANGLE_LOCK,
         HOLD,
         VELOCITY,
-        PERCENT_OUTPUT
+        PERCENT_OUTPUT,
+        SMART_MOTION
     }
 
     // =============================================================================
@@ -105,6 +106,10 @@ public class Enums {
         NONE,
         OPEN_LOOP,
         VELOCITY
+    }
+    public enum TurretControlType {
+        MANUAL,
+        TARGET_LOCKING
     }
 
     /**

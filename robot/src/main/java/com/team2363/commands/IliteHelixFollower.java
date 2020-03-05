@@ -8,10 +8,6 @@ import static com.team319.trajectory.Path.SegmentValue.RIGHT_VELOCITY;
 import com.team2363.controller.PIDController;
 import com.team2363.logger.HelixEvents;
 import com.team319.trajectory.Path;
-import com.team319.trajectory.Path.SegmentValue;
-
-import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public abstract class IliteHelixFollower {

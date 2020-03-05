@@ -68,7 +68,6 @@ public class Limelight extends Module implements ITargetDataProvider {
     public void readInputs(double pNow) {
         boolean targetValid = mTable.getEntry("tv").getDouble(Double.NaN) > 0.0;
         Robot.DATA.goaltracking.set(TV, targetValid ? 1.0d : 0d);
-
         if(targetValid) {
             Robot.DATA.goaltracking.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
             Robot.DATA.goaltracking.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));

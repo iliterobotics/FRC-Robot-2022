@@ -114,4 +114,11 @@ public class InputMap {
                 LIMELIGHT_LOCK_BALL_DUAL = ELogitech310.START
                         ;
     }
+
+    public static class OPERATOR_REFACTOR {
+        public static final ELogitech310
+                MANUAL_TURRET = ELogitech310.RIGHT_X_AXIS
+
+                ;
+    }
 }

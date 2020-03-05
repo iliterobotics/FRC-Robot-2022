@@ -6,6 +6,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -14,13 +15,16 @@ import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.robot.auto.paths.AutonSelection;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
 import us.ilite.robot.network.EForwardableConnections;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.TimerTask;
 
@@ -40,9 +44,9 @@ public class Robot extends TimedRobot {
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
-//    private Limelight mLimelight;
+    private Limelight mLimelight;
     private PowerCellModule mIntake;
-//    private RawLimelight mRawLimelight;
+    private RawLimelight mRawLimelight;
     private DJSpinnerModule mDJSpinnerModule;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
@@ -54,25 +58,26 @@ public class Robot extends TimedRobot {
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
-    private final AbstractController mBaseAutonController = new BaseAutonController();
+//    private final AbstractController mBaseAutonController = new BaseAutonController();
+    public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
 
     @Override
     public void robotInit() {
-
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         // Init the actual robot
 //        initTimer.reset();
 //        initTimer.start();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
+        mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mDrive = new DriveModule();
         mShooter = new FlywheelModule();
         mIntake = new PowerCellModule();
-//        mLimelight = new Limelight();
+        mLimelight = new Limelight();
 //        mRawLimelight = new RawLimelight();
         mDJSpinnerModule = new DJSpinnerModule();
         mLEDControl = new LEDControl();
@@ -123,16 +128,19 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-//        if ( Settings.kIsLogging ) {
-//            mCSVLogger.start();
-//        }
+        if ( Settings.kIsLogging ) {
+            mCSVLogger.start();
+        }
 
         MODE=AUTONOMOUS;
-        mActiveController = new AutonCalibration();
+        mActiveController = mAutonSelection.getSelectedAutonController();
+        SmartDashboard.putNumber("AUTON INIT", CLOCK.getCurrentTime());
         mActiveController.setEnabled(true);
-
         mRunningModules.clearModules();
-//        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mLimelight);
+        mRunningModules.addModule(mShooter);
+        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
     }
 
@@ -202,13 +210,13 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-//        mRunningModules.addModule(mLimelight);
+        mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
-//        mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mLEDControl);
-        mRunningModules.addModule(mDJSpinnerModule);
+        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mDJSpinnerModule);
+//        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }
