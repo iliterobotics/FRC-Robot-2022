@@ -9,7 +9,9 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EShooterSystemData;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
+import us.ilite.robot.Robot;
 
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.robot.Robot.DATA;
@@ -41,15 +43,15 @@ public class TeleopController extends BaseManualController { //copied from TestC
         updateFlywheel(pNow);
         super.updateDrivetrain(pNow);
         updatePowerCells(pNow);
-        //updateHanger(pNow); //not integrated yet
+        updateHanger(pNow); //not integrated yet
         //updateDJBooth(pNow); //not integrated yet
     }
 
     private void updateHanger(double pNow) {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)) {
-            DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 17.0);
-        } else {
-            DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 0.0);
+        if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
+            db.hanger.set(EHangerModuleData.DESIRED_PCT, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS) / 5.0));
+        }else{
+            db.hanger.set(EHangerModuleData.DESIRED_PCT, 0.0);
         }
     }
 

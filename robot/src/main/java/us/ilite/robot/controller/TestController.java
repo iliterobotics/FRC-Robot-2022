@@ -31,6 +31,7 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.*;
 import static us.ilite.common.types.ELimelightData.*;
+import static us.ilite.common.types.EHangerModuleData.*;
 import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
 import static us.ilite.robot.Enums.*;
@@ -93,7 +94,6 @@ public class TestController extends BaseManualController {
         Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
         Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
         Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
-        Robot.CLOCK.report("updateHanger", t -> updateHanger(pNow));
         Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
 //        updateArm(pNow);
 
@@ -105,21 +105,6 @@ public class TestController extends BaseManualController {
         mMaxYaw = Math.max(mMaxYaw, db.imu.get(EGyro.YAW_OMEGA_DEGREES));
         SmartDashboard.putNumber("Max Robot Omega (deg/s)", mMaxYaw);
     }
-
-    private void updateHanger(double pNow) {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.BEGIN_HANG)) {
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 17.0);
-        } else {
-            Robot.DATA.hanger.set(EHangerModuleData.DESIRED_POSITION, 0.0);
-        }
-    }
-
-    private void updateFlywheel() {
-
-
-    }
-
-
 
     private void updateFlywheel(double pNow) {
 //        db.flywheel.set(TURRET_CONTROL, TurretControlType.MANUAL);

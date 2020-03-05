@@ -2,10 +2,9 @@ package us.ilite.common.types;
 
 public enum EHangerModuleData {
 
-    DESIRED_HANGER_VELOCITY,
-    CURRENT_HANGER_VELOCITY,
-    CURRENT_POSITION,
-    DESIRED_POSITION,
-    OUTPUT_CURRENT
+    SET_HANGER_VELOCITY,
+    HANGER_VELOCITY,
+    OUTPUT_CURRENT,
+    DESIRED_PCT,
 
     }
