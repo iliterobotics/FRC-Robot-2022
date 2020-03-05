@@ -29,7 +29,7 @@ public class HangerModule extends Module {
             .maxVelocity(6000d)
             ;
 
-    private  double kHangerWarnCurrentLimitThreshold = 30;
+    private int kHangerWarnCurrentLimitThreshold = 60;
 
     public HangerModule(){
 
@@ -53,6 +53,9 @@ public class HangerModule extends Module {
 
         mHangerEncoderOne = mHangerNeoMaster.getEncoder();
         mHangerEncoderTwo = mHangerNeoFollower.getEncoder();
+
+        mHangerNeoMaster.setSmartCurrentLimit(kHangerWarnCurrentLimitThreshold);
+        mHangerNeoFollower.setSmartCurrentLimit(kHangerWarnCurrentLimitThreshold);
 
         zeroTheEncoders();
     }
