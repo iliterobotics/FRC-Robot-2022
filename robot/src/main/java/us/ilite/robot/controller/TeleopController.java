@@ -3,9 +3,11 @@ package us.ilite.robot.controller;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
@@ -61,11 +63,14 @@ public class TeleopController extends BaseManualController { //copied from TestC
         }
 
         if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
+            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());
             super.firingSequence(currentState);
 //            super.setFlywheelClosedLoop(currentState);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.AIM)) {
+            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());
             super.setFlywheelClosedLoop(currentState, true);
         } else {
+            super.setTurretHandling(Enums.TurretControlType.HOME);
             super.firingSequence(Enums.FlywheelSpeeds.OFF);
 //            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
         }

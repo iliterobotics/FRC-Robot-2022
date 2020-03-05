@@ -20,8 +20,8 @@ public abstract class BaseManualController extends AbstractController {
         double throttle = db.driverinput.get(THROTTLE_AXIS);
         double rotate = db.driverinput.get(TURN_AXIS) * 0.75;
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
-        rotate = Math.abs(rotate) > 0.01 ? rotate : 0.0; //Handling Deadband
-        throttle = Math.abs(throttle) > 0.01 ? throttle : 0.0; //Handling Deadband
+        rotate = Math.abs(rotate) > 0.02 ? rotate : 0.0; //Handling Deadband
+        throttle = Math.abs(throttle) > 0.02 ? throttle : 0.0; //Handling Deadband
 
         if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
             db.drivetrain.set(STATE, EDriveState.TARGET_ANGLE_LOCK);
