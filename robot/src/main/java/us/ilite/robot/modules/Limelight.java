@@ -22,7 +22,7 @@ public class Limelight extends Module implements ITargetDataProvider {
     public static final IFieldComponent NONE = new IFieldComponent() {
         public int id() {return -1;}
         public double height() {return 0;}
-        public int pipeline() {return 1;}
+        public int pipeline() {return 0;}
         public String toString() { return "NONE"; }
     };
 
