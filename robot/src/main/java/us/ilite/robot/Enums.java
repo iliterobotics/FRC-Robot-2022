@@ -109,7 +109,8 @@ public class Enums {
     }
     public enum TurretControlType {
         MANUAL,
-        TARGET_LOCKING
+        TARGET_LOCKING,
+        HOME
     }
 
     /**

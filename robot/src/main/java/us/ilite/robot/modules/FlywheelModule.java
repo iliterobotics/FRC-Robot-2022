@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.*;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.Field2020;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
@@ -77,23 +78,20 @@ public class FlywheelModule extends Module {
 //            .kV(0.018)
             ;
     // Smart motion turret gains
-//    private static ProfileGains kTurretGains = new ProfileGains()
-//            .p(.0002)
-//            .maxVelocity(1000d)
-//            .maxAccel(1000d)
-//            .slot(TURRET_SLOT);
-    // Percent output turret gains
-    private static ProfileGains kTurretGains = new ProfileGains()
-            .p(.02)
+    private static ProfileGains kTurretCtrlGains = new ProfileGains()
+            .p(.0002)
             .maxVelocity(1000d)
             .maxAccel(1000d)
             .slot(TURRET_SLOT);
+//     Percent output turret gains
+    private static ProfileGains kTurretGains = new ProfileGains()
+            .p(.02);
 
     private PIDController mHoodPID = new PIDController(5, 0, 0);
 
     private CANEncoder mFeederInternalEncoder;
 
-//    private CANPIDController mTurretPID;
+    private CANPIDController mTurretCtrlPID;
     private us.ilite.common.lib.control.PIDController mTurretPID = new us.ilite.common.lib.control.PIDController(kTurretGains, -90, 90, Settings.kControlLoopPeriod);
 
     private CANEncoder mTurretEncoder;
@@ -107,14 +105,13 @@ public class FlywheelModule extends Module {
 
         mTurretEncoder = mTurret.getEncoder();
         mTurretPID.setOutputRange(-kMaxTurretPercentOutput, kMaxTurretPercentOutput);
-//        mTurretPID = mTurret.getPIDController();
+        mTurretCtrlPID = mTurret.getPIDController();
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  (float) kMaximumTurretAngle);
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) -kMaximumTurretAngle);
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  (float) Units.degrees_to_rotations(kMaximumTurretAngle, kTurretGearRatio));
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) -Units.degrees_to_rotations(kMaximumTurretAngle, kTurretGearRatio));
         mTurretEncoder.setPosition(0.0);
-
-//        HardwareUtils.setGains(mTurretPID, kTurretGains);
+        HardwareUtils.setGains(mTurretCtrlPID, kTurretCtrlGains);
 
 //        mHoodPot = new AnalogPotentiometer(0);
         SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
@@ -208,9 +205,10 @@ public class FlywheelModule extends Module {
                 case MANUAL:
                     double mTurretDirection = db.flywheel.get(MANUAL_TURRET_DIRECTION);
                     if (db.flywheel.isSet(MANUAL_TURRET_DIRECTION)) {
-                        mTurret.set(.25 * mTurretDirection);
+//                        mTurret.set(.25 * mTurretDirection);
+                        mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
                     } else {
-                        mTurret.set(0.0);
+                        mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
                     }
                     break;
                 case TARGET_LOCKING:
@@ -220,9 +218,15 @@ public class FlywheelModule extends Module {
                         mTurret.set(output);
 //                        mTurretPID.setReference(Units.degrees_to_rotations(getCurrentTurretAngle() + db.goaltracking.get(ELimelightData.TX), kTurretGearRatio), ControlType.kSmartMotion, TURRET_SLOT, 0);
                     } else {
-//                        mTurretPID.setReference(0.0, ControlType.kPosition, 0, 0);
-                        mTurret.set(0.0);
+                        mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
                     }
+                    break;
+                case HOME:
+                    db.goaltracking.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
+//                    mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
+                    mTurretPID.setSetpoint(0.0);
+                    double output = mTurretPID.calculate(getCurrentTurretAngle(), pNow);
+                    mTurret.set(output);
                     break;
 
             }
