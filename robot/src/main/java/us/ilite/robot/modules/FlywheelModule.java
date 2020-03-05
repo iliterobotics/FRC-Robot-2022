@@ -225,7 +225,7 @@ public class FlywheelModule extends Module {
                     db.goaltracking.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
 //                    mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
                     mTurretPID.setSetpoint(0.0);
-                    double output = -mTurretPID.calculate(getCurrentTurretAngle(), pNow);
+                    double output = mTurretPID.calculate(getCurrentTurretAngle(), pNow);
                     mTurret.set(output);
                     break;
 
