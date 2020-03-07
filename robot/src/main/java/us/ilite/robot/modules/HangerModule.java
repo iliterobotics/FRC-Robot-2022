@@ -22,14 +22,14 @@ public class HangerModule extends Module {
     private CANEncoder mHangerEncoderOne;
     private CANEncoder mHangerEncoderTwo;
 
-    public static double kMaxRPM = 5500.0;
-    public static double kMaxRPMMultiplier = 0.5;
+    public static double kMaxRPM = 1000.0;
     private static final int VELOCITY_PID_SLOT = 0;
     public static ProfileGains kHangerVelocityGains = new ProfileGains()
             .f(0.00015)
             .p(0.0001)
             // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
-            .maxVelocity(kMaxRPM * kMaxRPMMultiplier)
+            .maxVelocity(kMaxRPM)
+            .maxAccel(kMaxRPM*1.5)
             .slot(VELOCITY_PID_SLOT);
 
     private int kHangerWarnCurrentLimitThreshold = 60;
@@ -94,9 +94,9 @@ public class HangerModule extends Module {
 //        mHangerNeoFollower.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
 //        mHangerNeoMaster.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
 
-        double desiredPct = db.hanger.get(EHangerModuleData.DESIRED_PCT);
-        mHangerPIDMaster.setReference(desiredPct, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-        mHangerPIDFollower.setReference(desiredPct, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+        double desiredPct = db.hanger.safeGet(EHangerModuleData.DESIRED_PCT, 0.0);
+        mHangerPIDMaster.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+        mHangerPIDFollower.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
     }
 
     public EHangerState returnHangerState() {
