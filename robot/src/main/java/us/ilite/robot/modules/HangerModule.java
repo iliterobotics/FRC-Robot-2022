@@ -8,6 +8,7 @@ import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Robot;
+import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
 public class HangerModule extends Module {
@@ -21,13 +22,15 @@ public class HangerModule extends Module {
     private CANEncoder mHangerEncoderOne;
     private CANEncoder mHangerEncoderTwo;
 
-    private static final int UP_PID_SLOT_ID = 1;
-    private static final ProfileGains mIntakePivotDownGains = new ProfileGains()
-            .slot(UP_PID_SLOT_ID)
-            .p(0.00025)
-            .maxAccel(9000d)
-            .maxVelocity(6000d)
-            ;
+    public static double kMaxRPM = 5500.0;
+    public static double kMaxRPMMultiplier = 0.5;
+    private static final int VELOCITY_PID_SLOT = 0;
+    public static ProfileGains kHangerVelocityGains = new ProfileGains()
+            .f(0.00015)
+            .p(0.0001)
+            // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
+            .maxVelocity(kMaxRPM * kMaxRPMMultiplier)
+            .slot(VELOCITY_PID_SLOT);
 
     private int kHangerWarnCurrentLimitThreshold = 60;
 
@@ -41,7 +44,8 @@ public class HangerModule extends Module {
 
         mHangerPIDMaster = new CANPIDController(mHangerNeoMaster);
         mHangerPIDFollower = new CANPIDController(mHangerNeoFollower);
-
+        HardwareUtils.setGains(mHangerPIDMaster, kHangerVelocityGains);
+        HardwareUtils.setGains(mHangerPIDFollower, kHangerVelocityGains);
 
         mHangerNeoMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
         mHangerNeoFollower.setInverted(false);
@@ -87,8 +91,12 @@ public class HangerModule extends Module {
 
     @Override
     public void setOutputs(double pNow) {
-        mHangerNeoFollower.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
-        mHangerNeoMaster.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
+//        mHangerNeoFollower.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
+//        mHangerNeoMaster.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
+
+        double desiredPct = db.hanger.get(EHangerModuleData.DESIRED_PCT);
+        mHangerPIDMaster.setReference(desiredPct, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+        mHangerPIDFollower.setReference(desiredPct, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
     }
 
     public EHangerState returnHangerState() {

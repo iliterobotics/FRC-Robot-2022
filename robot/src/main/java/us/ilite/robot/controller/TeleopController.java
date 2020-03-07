@@ -12,6 +12,7 @@ import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
+import us.ilite.robot.modules.Limelight;
 
 import static us.ilite.common.types.EPowerCellData.*;
 import static us.ilite.robot.Robot.DATA;
@@ -70,6 +71,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());
             super.setFlywheelClosedLoop(currentState, true);
         } else {
+            db.goaltracking.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
             super.setTurretHandling(Enums.TurretControlType.HOME);
             super.firingSequence(Enums.FlywheelSpeeds.OFF);
 //            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
