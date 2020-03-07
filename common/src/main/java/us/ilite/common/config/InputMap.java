@@ -63,6 +63,7 @@ public class InputMap {
 
         FAR_MODE = ELogitech310.Y_BTN,
         NEAR_MODE = ELogitech310.A_BTN,
+        CLOSE_MODE = ELogitech310.L_BTN,
         MANUAL_HOOD_UP = ELogitech310.DPAD_UP,
         MANUAL_HOOD_DOWN = ELogitech310.DPAD_DOWN,
 

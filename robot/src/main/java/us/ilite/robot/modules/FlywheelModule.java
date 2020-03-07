@@ -229,15 +229,15 @@ public class FlywheelModule extends Module {
                 case HOME:
                     db.goaltracking.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
 //                    mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
+                    boolean reversed = db.flywheel.isSet(HOME_REVERSED);
                     double turretHome = kTurretFront;
-                    if (db.flywheel.get(FLYWHEEL_SPEED_STATE, FlywheelSpeeds.class) == FlywheelSpeeds.CLOSE) {
+                    if (reversed) {
                         turretHome = kTurretBack;
                     }
                     mTurretPID.setSetpoint(turretHome);
                     double output = mTurretPID.calculate(getCurrentTurretAngle(), pNow);
                     mTurret.set(output);
                     break;
-
             }
         }
     }
