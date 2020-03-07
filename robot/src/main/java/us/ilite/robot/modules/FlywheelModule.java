@@ -70,7 +70,7 @@ public class FlywheelModule extends Module {
     private static double kRadiansPerSecToTalonTicksPer100ms = (2 * Math.PI) / 2048.0 / 0.1;
     // https://docs.google.com/spreadsheets/d/1Po6exzGvfr0rMWMWVSyqxf49ZMSfGoYn/edit#gid=1858991275
     // Converts from desired BALL (not wheel) velocity to Falcon ticks per 100ms
-    private static double kMOISlipFactor = 1.25;
+    private static double kMOISlipFactor = 1.35;
     private static double kVelocityConversion = kMOISlipFactor * (2048.0 / 600.0) / (kFlyWheelGearRatio * kFlywheelDiameterInches * Math.PI / 12.0 / 60.0) * 2.0;
 
     private static final int FLYWHEEL_SLOT = 0;
