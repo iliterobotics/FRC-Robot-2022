@@ -77,9 +77,10 @@ public class FlywheelModule extends Module {
 //            .kA(0.00165)
 //            .kV(0.018)
             ;
+    private static final double kTurretPReduction = 0.8;
     // Smart motion turret gains
     private static ProfileGains kTurretCtrlGains = new ProfileGains()
-            .p(.0002)
+            .p(.0002 * kTurretPReduction)
             .maxVelocity(1000d)
             .maxAccel(1000d)
             .slot(TURRET_SLOT);
