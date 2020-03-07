@@ -195,14 +195,14 @@ public class TestController extends BaseManualController {
         boolean isOffset = !(Robot.DATA.goaltracking.get(TS) > 0 - mLimelightGoalThreshold || Robot.DATA.goaltracking.get(TS) < -90 + mLimelightGoalThreshold);
 
         if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_TARGET)) {
-            Robot.DATA.goaltracking.set(TARGET_ID, (Field2020.FieldElement.TARGET.id()));
+//            Robot.DATA.goaltracking.set(TARGET_ID, (Field2020.FieldElement.TARGET.id()));
         } else if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_TARGET_ZOOM)) {
             if (Robot.DATA.goaltracking.isSet(TY)) {
                 if (Math.abs(Robot.DATA.goaltracking.get(TX)) < mLimelightZoomThreshold) {
                     Robot.DATA.goaltracking.set(TARGET_ID, Field2020.FieldElement.TARGET_ZOOM.id());
                 }
             } else {
-                Robot.DATA.goaltracking.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
+//                Robot.DATA.goaltracking.set(TARGET_ID, Field2020.FieldElement.TARGET.id());
             }
         } else {
             Robot.DATA.goaltracking.set(TARGET_ID, Limelight.NONE.id());
