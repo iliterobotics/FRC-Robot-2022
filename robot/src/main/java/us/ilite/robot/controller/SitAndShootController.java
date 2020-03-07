@@ -37,6 +37,7 @@ public class SitAndShootController extends BaseAutonController
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.SMART_MOTION);
             Robot.DATA.drivetrain.set(EDriveData.L_DESIRED_POS, 10);
             Robot.DATA.drivetrain.set(EDriveData.R_DESIRED_POS, 10);
+            setHood(Enums.FlywheelSpeeds.HOME);
         } else {
             mCyclesNotShooting++;
         }
