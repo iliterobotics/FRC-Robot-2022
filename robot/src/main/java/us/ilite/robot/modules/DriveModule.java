@@ -273,7 +273,7 @@ public class DriveModule extends Module {
 				break;
 			case TARGET_ANGLE_LOCK:
 				RobotCodex<ELimelightData> targetData = Robot.DATA.goaltracking;
-				targetData.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id());
+//				targetData.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
 				double pidOutput;
 				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(ELimelightData.TV) && targetData.isSet(ELimelightData.TX)) {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
