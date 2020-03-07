@@ -16,6 +16,7 @@ import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import static us.ilite.robot.Enums.*;
 
+import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.hardware.ContinuousRotationServo;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
@@ -60,7 +61,11 @@ public class FlywheelModule extends Module {
     private final FilteredAverage mPotentiometerReadings = FilteredAverage.filteredAverageForTime(0.1);
     private static final double kMaxTurretPercentOutput = 0.8;
     private static final double kMaximumTurretAngle = 45.0;
+    private static final double kMaxTurretAngleLeft = 45.0;
+    private static final double kMaxTurretAngleRight = 190.0;
     private final double kTurretErrorTolerance = 5.0; //TODO - tune tolerance
+    private final double kTurretFront = 0.0;
+    private final double kTurretBack = 180.0;
 
     private static double kRadiansPerSecToTalonTicksPer100ms = (2 * Math.PI) / 2048.0 / 0.1;
     // https://docs.google.com/spreadsheets/d/1Po6exzGvfr0rMWMWVSyqxf49ZMSfGoYn/edit#gid=1858991275
@@ -224,7 +229,11 @@ public class FlywheelModule extends Module {
                 case HOME:
                     db.goaltracking.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
 //                    mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
-                    mTurretPID.setSetpoint(0.0);
+                    double turretHome = kTurretFront;
+                    if (db.flywheel.get(FLYWHEEL_SPEED_STATE, FlywheelSpeeds.class) == FlywheelSpeeds.CLOSE) {
+                        turretHome = kTurretBack;
+                    }
+                    mTurretPID.setSetpoint(turretHome);
                     double output = mTurretPID.calculate(getCurrentTurretAngle(), pNow);
                     mTurret.set(output);
                     break;
