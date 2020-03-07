@@ -61,7 +61,7 @@ public class FlywheelModule extends Module {
     private final FilteredAverage mPotentiometerReadings = FilteredAverage.filteredAverageForTime(0.1);
     private static final double kMaxTurretPercentOutput = 0.8;
     private static final double kMaximumTurretAngle = 45.0;
-    private static final double kMaxTurretAngleLeft = 45.0;
+    private static final double kMaxTurretAngleLeft = -45.0;
     private static final double kMaxTurretAngleRight = 190.0;
     private final double kTurretErrorTolerance = 5.0; //TODO - tune tolerance
     private final double kTurretFront = 0.0;
@@ -113,8 +113,8 @@ public class FlywheelModule extends Module {
         mTurretCtrlPID = mTurret.getPIDController();
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  (float) Units.degrees_to_rotations(kMaximumTurretAngle, kTurretGearRatio));
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) -Units.degrees_to_rotations(kMaximumTurretAngle, kTurretGearRatio));
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  (float) Units.degrees_to_rotations(kMaxTurretAngleRight, kTurretGearRatio));
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Units.degrees_to_rotations(kMaxTurretAngleLeft, kTurretGearRatio));
         mTurretEncoder.setPosition(0.0);
         HardwareUtils.setGains(mTurretCtrlPID, kTurretCtrlGains);
 
