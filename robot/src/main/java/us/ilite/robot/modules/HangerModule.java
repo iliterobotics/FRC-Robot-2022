@@ -95,8 +95,8 @@ public class HangerModule extends Module {
 //        mHangerNeoMaster.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
 
         double desiredPct = db.hanger.get(EHangerModuleData.DESIRED_PCT);
-        mHangerPIDMaster.setReference(desiredPct, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-        mHangerPIDFollower.setReference(desiredPct, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+        mHangerPIDMaster.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+        mHangerPIDFollower.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
     }
 
     public EHangerState returnHangerState() {
