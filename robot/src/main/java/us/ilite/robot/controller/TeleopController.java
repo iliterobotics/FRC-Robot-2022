@@ -5,23 +5,21 @@ import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
+import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
-import us.ilite.robot.Robot;
 import us.ilite.robot.modules.Limelight;
 
 import static us.ilite.common.types.EPowerCellData.*;
-import static us.ilite.robot.Robot.DATA;
 
 public class TeleopController extends BaseManualController { //copied from TestController, needs editing
 
     private ILog mLog = Logger.createLog(TeleopController.class);
     private static TeleopController INSTANCE;
     private Enums.FlywheelSpeeds currentState = Enums.FlywheelSpeeds.CLOSE;
+    private XorLatch mTurretReverseHome = new XorLatch();
 
     public static TeleopController getInstance() {
         if(INSTANCE == null) {
@@ -57,11 +55,21 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateFlywheel(double pNow) {
+
+        mTurretReverseHome.update(db.operatorinput.isSet(InputMap.OPERATOR.CLOSE_MODE));
+        if(mTurretReverseHome.mExit.get()) {
+            reverseTurretHome();
+            mTurretReverseHome.reset();
+        }
+
         if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE)) {
             currentState = Enums.FlywheelSpeeds.FAR;
-        }else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
             currentState = Enums.FlywheelSpeeds.INITIATION_LINE;
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.CLOSE_MODE)) {
+            currentState = Enums.FlywheelSpeeds.CLOSE;
         }
+
 
         if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
             super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());

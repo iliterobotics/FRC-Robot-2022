@@ -173,6 +173,12 @@ public abstract class AbstractController {
         db.flywheel.set(EShooterSystemData.TURRET_CONTROL, pTurretControlType);
     }
 
+    private boolean mIsTurretReversed = false;
+    protected final void reverseTurretHome() {
+        mIsTurretReversed = !mIsTurretReversed;
+        db.flywheel.set(HOME_REVERSED, mIsTurretReversed);
+    }
+
     protected void
     firingSequence(FlywheelSpeeds speed, Field2020.FieldElement trackedElement) {
         setHood(speed);
