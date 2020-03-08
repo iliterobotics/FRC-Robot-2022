@@ -35,8 +35,8 @@ public class SitAndShootController extends BaseAutonController
 
         if(mExitBeamBrokenCount == 3 || mCyclesNotShooting >= 10 / .02) {
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.SMART_MOTION);
-            Robot.DATA.drivetrain.set(EDriveData.L_DESIRED_POS, 10);
-            Robot.DATA.drivetrain.set(EDriveData.R_DESIRED_POS, 10);
+            Robot.DATA.drivetrain.set(EDriveData.L_DESIRED_POS, 3);
+            Robot.DATA.drivetrain.set(EDriveData.R_DESIRED_POS, 3);
             setHood(Enums.FlywheelSpeeds.HOME);
         } else {
             mCyclesNotShooting++;
