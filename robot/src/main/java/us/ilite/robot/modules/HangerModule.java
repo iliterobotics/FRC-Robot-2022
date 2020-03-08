@@ -22,7 +22,7 @@ public class HangerModule extends Module {
     private CANEncoder mHangerEncoderOne;
     private CANEncoder mHangerEncoderTwo;
 
-    public static double kMaxRPM = 1000.0;
+    public static double kMaxRPM = 2000.0;
     private static final int VELOCITY_PID_SLOT = 0;
     public static ProfileGains kHangerVelocityGains = new ProfileGains()
             .f(0.00015)
