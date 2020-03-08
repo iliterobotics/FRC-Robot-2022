@@ -160,7 +160,7 @@ public class FlywheelModule extends Module {
         db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
         db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
         db.flywheel.set(CURRENT_TURRET_ANGLE, getCurrentTurretAngle());
-        db.flywheel.set(IS_TARGET_LOCKED, Math.abs(mTurretPID.getError()) <= kTurretErrorTolerance);
+        db.flywheel.set(IS_TARGET_LOCKED, true);//Math.abs(mTurretPID.getError()) <= kTurretErrorTolerance);
 
 //        mPotentiometerReadings.addNumber(mHoodAI.getValue());
 //
