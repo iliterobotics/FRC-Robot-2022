@@ -34,13 +34,6 @@ public class HangerModule extends Module {
             .maxAccel(kMaxRPM*1.5)
             .slot(VELOCITY_PID_SLOT);
 
-    public static ProfileGains kHangerPositionGains = new ProfileGains()
-//			.p(5.0e-4)
-            .maxVelocity(kMaxRPM)
-            .f(0.00015)
-            .maxAccel(kMaxRPM * 1.5)
-            .slot(POSITION_PID_SLOT);
-
     private int kHangerWarnCurrentLimitThreshold = 100;
 
     public HangerModule(){
@@ -55,8 +48,6 @@ public class HangerModule extends Module {
         mHangerPIDFollower = new CANPIDController(mHangerNeoFollower);
         HardwareUtils.setGains(mHangerPIDMaster, kHangerVelocityGains);
         HardwareUtils.setGains(mHangerPIDFollower, kHangerVelocityGains);
-        HardwareUtils.setGains(mHangerPIDMaster, kHangerPositionGains);
-        HardwareUtils.setGains(mHangerPIDFollower, kHangerPositionGains);
 
         mHangerNeoMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
         mHangerNeoFollower.setInverted(false);
