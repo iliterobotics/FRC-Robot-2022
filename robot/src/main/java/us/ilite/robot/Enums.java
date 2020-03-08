@@ -118,7 +118,7 @@ public class Enums {
      */
     public enum FlywheelSpeeds {
         OFF(                00.0, 62.0, 0.00, HoodState.NONE, FlywheelWheelState.NONE),
-        HOME(               0.0, 45.0, 0.00, HoodState.TARGET_ANGLE, FlywheelWheelState.NONE),
+        HOME(               0.0, 30.0, 0.00, HoodState.TARGET_ANGLE, FlywheelWheelState.NONE),
         DEFAULT(            20.0, 45.0, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
         CLOSE(              24.0, 62.0, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
         INITIATION_LINE(    29.0, 39.5, 0.75, HoodState.TARGET_ANGLE, FlywheelWheelState.VELOCITY),
