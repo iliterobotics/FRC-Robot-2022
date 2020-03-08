@@ -160,7 +160,7 @@ public class DriveModule extends Module {
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
 		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
-		double ramprate = 0.01;
+		double ramprate = 0.20;
         mLeftMaster.setClosedLoopRampRate(ramprate);
         mLeftFollower.setClosedLoopRampRate(ramprate);
         mRightMaster.setClosedLoopRampRate(ramprate);
