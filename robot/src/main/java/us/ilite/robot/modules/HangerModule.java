@@ -106,22 +106,9 @@ public class HangerModule extends Module {
     public void setOutputs(double pNow) {
 //        mHangerNeoFollower.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
 //        mHangerNeoMaster.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
-        Enums.EHangerControlState state = db.hanger.safeGet(EHangerModuleData.STATE, Enums.EHangerControlState.HOLD, Enums.EHangerControlState.class);
-
-        switch (state) {
-            case MOVE:
-                double desiredPct = db.hanger.safeGet(EHangerModuleData.DESIRED_PCT, 0.0);
-                mHangerPIDMaster.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-                mHangerPIDFollower.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-            case HOLD:
-                if (!mSetSetpoint) {
-                    mStartingPosOne = mHangerEncoderOne.getPosition();
-                    mStartingPosTwo = mHangerEncoderTwo.getPosition();
-                    mSetSetpoint = true;
-                }
-                mHangerPIDMaster.setReference(1, ControlType.kPosition, POSITION_PID_SLOT, 0);
-                mHangerPIDFollower.setReference(1, ControlType.kPosition, POSITION_PID_SLOT, 0);
-        }
+        double desiredPct = db.hanger.safeGet(EHangerModuleData.DESIRED_PCT, 0.0);
+        mHangerPIDMaster.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+        mHangerPIDFollower.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
     }
 
     public EHangerState returnHangerState() {

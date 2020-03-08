@@ -47,7 +47,6 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateHanger(double pNow) {
-        db.hanger.set(EHangerModuleData.STATE, Enums.EHangerControlState.HOLD);
         if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
             db.hanger.set(EHangerModuleData.STATE, Enums.EHangerControlState.MOVE);
             db.hanger.set(EHangerModuleData.DESIRED_PCT, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS)));
