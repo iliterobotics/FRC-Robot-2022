@@ -13,19 +13,14 @@ public class HangerModule extends Module {
 
     private CANSparkMax mHangerNeoMaster;
     private CANSparkMax mHangerNeoFollower;
-    protected EHangerState mHangerState;
     private CANPIDController mHangerPIDMaster;
     private CANPIDController mHangerPIDFollower;
-    private double mStartingPosOne;
-    private double mStartingPosTwo;
-    private boolean mSetSetpoint = false;
 
     private CANEncoder mHangerEncoderOne;
     private CANEncoder mHangerEncoderTwo;
 
     public static double kMaxRPM = 2000.0;
     private static final int VELOCITY_PID_SLOT = 0;
-    private static final int POSITION_PID_SLOT = 1;
     public static ProfileGains kHangerVelocityGains = new ProfileGains()
             .f(0.0002)
             .p(0.00015)
@@ -65,26 +60,10 @@ public class HangerModule extends Module {
 
         zeroTheEncoders();
     }
-    public enum EHangerState {
-        HANGING(1.0),
-        BRAKE (0.0),
-        REVERSE(-1.0);
-
-        private double position;
-        EHangerState(double position){
-            this.position = position;
-        }
-        private double getPower(){
-            return this.position;
-        }
-
-    }
 
     @Override
     public void readInputs(double pNow) {
         db.hanger.set(EHangerModuleData.OUTPUT_CURRENT , mHangerNeoMaster.getOutputCurrent());
-        db.hanger.set(EHangerModuleData.POS_ONE_ROT, mHangerEncoderOne.getPosition());
-        db.hanger.set(EHangerModuleData.POS_TWO_ROT , mHangerEncoderTwo.getPosition());
     }
 
     @Override
@@ -102,12 +81,6 @@ public class HangerModule extends Module {
         mHangerPIDFollower.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
     }
 
-    public EHangerState returnHangerState() {
-        return this.mHangerState;
-    }
-    public void putDesiredHangerState(EHangerState desiredState){
-        mHangerState = desiredState;
-    }
     public boolean isCurrentLimiting(){
         return mHangerNeoMaster.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold ||
                 mHangerNeoFollower.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold;
