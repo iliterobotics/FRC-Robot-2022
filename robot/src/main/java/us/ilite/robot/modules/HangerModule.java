@@ -1,14 +1,11 @@
 package us.ilite.robot.modules;
 
 import com.revrobotics.*;
-import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Enums;
-import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
@@ -19,6 +16,9 @@ public class HangerModule extends Module {
     protected EHangerState mHangerState;
     private CANPIDController mHangerPIDMaster;
     private CANPIDController mHangerPIDFollower;
+    private double mStartingPosOne;
+    private double mStartingPosTwo;
+    private boolean mSetSetpoint = false;
 
     private CANEncoder mHangerEncoderOne;
     private CANEncoder mHangerEncoderTwo;
@@ -92,6 +92,8 @@ public class HangerModule extends Module {
     @Override
     public void readInputs(double pNow) {
         db.hanger.set(EHangerModuleData.OUTPUT_CURRENT , mHangerNeoMaster.getOutputCurrent());
+        db.hanger.set(EHangerModuleData.POS_ONE_ROT, mHangerEncoderOne.getPosition());
+        db.hanger.set(EHangerModuleData.POS_TWO_ROT , mHangerEncoderTwo.getPosition());
     }
 
     @Override
@@ -112,8 +114,13 @@ public class HangerModule extends Module {
                 mHangerPIDMaster.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
                 mHangerPIDFollower.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
             case HOLD:
-                mHangerPIDMaster.setReference(mHangerEncoderOne.getPosition(), ControlType.kPosition, POSITION_PID_SLOT, 0);
-                mHangerPIDFollower.setReference(mHangerEncoderTwo.getPosition(), ControlType.kPosition, POSITION_PID_SLOT, 0);
+                if (!mSetSetpoint) {
+                    mStartingPosOne = mHangerEncoderOne.getPosition();
+                    mStartingPosTwo = mHangerEncoderTwo.getPosition();
+                    mSetSetpoint = true;
+                }
+                mHangerPIDMaster.setReference(1, ControlType.kPosition, POSITION_PID_SLOT, 0);
+                mHangerPIDFollower.setReference(1, ControlType.kPosition, POSITION_PID_SLOT, 0);
         }
     }
 
