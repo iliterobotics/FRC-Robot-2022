@@ -203,4 +203,12 @@ public class Enums {
             return this.broken;
         }
     }
+
+    // =============================================================================
+    // Power Cell Module States
+    // =============================================================================
+    public enum EHangerControlState {
+        HOLD,
+        MOVE
+    }
 }

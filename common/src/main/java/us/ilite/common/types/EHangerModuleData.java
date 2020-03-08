@@ -6,5 +6,5 @@ public enum EHangerModuleData {
     HANGER_VELOCITY,
     OUTPUT_CURRENT,
     DESIRED_PCT,
-
+    STATE
     }
