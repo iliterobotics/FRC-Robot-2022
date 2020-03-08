@@ -25,14 +25,14 @@ public class HangerModule extends Module {
     public static double kMaxRPM = 2000.0;
     private static final int VELOCITY_PID_SLOT = 0;
     public static ProfileGains kHangerVelocityGains = new ProfileGains()
-            .f(0.00015)
-            .p(0.0001)
+            .f(0.0002)
+            .p(0.00015)
             // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
             .maxVelocity(kMaxRPM)
             .maxAccel(kMaxRPM*1.5)
             .slot(VELOCITY_PID_SLOT);
 
-    private int kHangerWarnCurrentLimitThreshold = 60;
+    private int kHangerWarnCurrentLimitThreshold = 100;
 
     public HangerModule(){
 
