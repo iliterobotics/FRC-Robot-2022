@@ -35,7 +35,7 @@ public class SimpleSequence implements ISequence {
     public boolean finishedWithStep() {
         if (!isFinished()) {
             (mSteps[mCurrentCommandIndex]).updateDistance(mCurrentDistance);
-            return mSteps[mCurrentCommandIndex].update(Robot.CLOCK.getCurrentTime());
+            return mSteps[mCurrentCommandIndex].update(Robot.CLOCK.time());
         }
         return false;
     }

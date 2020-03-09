@@ -3,9 +3,7 @@ package us.ilite.robot.controller;
 import com.team2363.commands.IliteHelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
-import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
@@ -115,7 +113,7 @@ public class BaseAutonController extends AbstractController {
 
         @Override
         public void resetDistance() {
-            mPathStartTime = Robot.CLOCK.getCurrentTime();
+            mPathStartTime = Robot.CLOCK.time();
             mLastDistance = 0;
             db.drivetrain.set(EDriveData.STATE, EDriveState.RESET);
         }

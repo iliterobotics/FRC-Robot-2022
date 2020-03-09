@@ -5,11 +5,8 @@ import com.flybotix.hfr.util.log.Logger;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.IFieldComponent;
-import us.ilite.robot.Robot;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * @author Stephen Welch
@@ -32,7 +29,7 @@ public class Clock {
      *
      * @return A cycle-consistent time, in seconds.
      */
-    public double getCurrentTime() {
+    public double time() {
         if(hasTimeUpdatedThisCycle == false) {
             mCurrentTime = (mIsSimulated) ? getJavaTime() : getRobotTime();
             mCurrentTime -= mStartTime;
@@ -47,7 +44,7 @@ public class Clock {
      * @return A cycle-consistent time, in milliseconds.
      */
     public double getCurrentTimeInMillis() {
-        return getCurrentTime() * 1000;
+        return time() * 1000;
     }
 
     /**
@@ -55,7 +52,7 @@ public class Clock {
      * @return A cycle-consistent time, in microseconds.
      */
     public double getCurrentTimeInMicros() {
-        return getCurrentTime() * 1000000;
+        return time() * 1000000;
     }
 
     /**
@@ -63,7 +60,7 @@ public class Clock {
      * @return A cycle-consistent time, in nanoseconds.
      */
     public double getCurrentTimeInNanos() {
-        return getCurrentTime() * 1000000000;
+        return time() * 1000000000;
     }
 
     /**
