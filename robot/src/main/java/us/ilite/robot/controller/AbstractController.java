@@ -54,18 +54,20 @@ public abstract class AbstractController {
     }
 
     /**
-     * TODO - adjust arm angles
      * @param pEnabled if TRUE, the arm is put down and rollers activated; if FALSE, it is stowed
      */
     protected void setIntakeArmEnabled(boolean pEnabled) {
         if(pEnabled) {
-            double speed = Math.max(Math.abs(db.drivetrain.get(L_ACTUAL_VEL_FT_s)), Math.abs(db.drivetrain.get(R_ACTUAL_VEL_FT_s)));
-//            if(speed <= 1.0) {
-//                speed = 3.0;
-//            }
+            // Divide the drive train adder in half
+            double speed = Math.max(Math.abs(db.drivetrain.get(L_ACTUAL_VEL_FT_s)), Math.abs(db.drivetrain.get(R_ACTUAL_VEL_FT_s))) / 2.0;
+
+            // Add a static speed, in case we're human loading
             speed += 3.0;
+
+            // Cap the speed to ensure the intake doesn't over-vibrate loose. This is close to the max drivetrain speed.
+            speed = Math.min(speed, 10.5);
             db.powercell.set(INTAKE_STATE, EArmState.OUT);
-            db.powercell.set(SET_INTAKE_VEL_ft_s , (speed + 1.0)/2.0);
+            db.powercell.set(SET_INTAKE_VEL_ft_s , speed);
         } else {
             db.powercell.set(INTAKE_STATE, EArmState.STOW);
             db.powercell.set(SET_INTAKE_VEL_ft_s, 0.0);
