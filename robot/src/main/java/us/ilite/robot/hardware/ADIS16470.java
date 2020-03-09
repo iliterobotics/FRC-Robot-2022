@@ -15,12 +15,12 @@ public class ADIS16470 extends IMU {
         rawAccelY = 0d;
 
 
-    public ADIS16470() {
-        super(new double[]{1.0});
+    public ADIS16470(Clock pClock) {
+        super(pClock,DEFAULT_GAINS);
     }
 
     @Override
-    protected void updateSensorCache(double pTimestampNow) {
+    protected void updateSensorCache() {
         yaw = Rotation2d.fromDegrees(imu.getAngle());
         rate = Rotation2d.fromDegrees(imu.getRate());
         rawAccelX = imu.getAccelInstantX();

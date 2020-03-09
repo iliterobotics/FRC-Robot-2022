@@ -13,6 +13,7 @@ import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
+import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.Limelight;
 
 import static us.ilite.robot.Enums.*;
@@ -21,6 +22,7 @@ import java.util.List;
 
 public abstract class AbstractController {
     protected final Data db = Robot.DATA;
+    protected final Clock clock = Robot.CLOCK;
     private boolean mEnabled = false;
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
@@ -39,26 +41,23 @@ public abstract class AbstractController {
     }
 
     /**
-     * @param pNow the amount of time since the robot started
      */
-    public void update(double pNow){
-        dt = pNow - mLastTime;
+    public void update(){
         if(mEnabled) {
             // split this out so we can put additional common elements here
-            updateImpl(pNow);
+            updateImpl();
 
             // Every 10s or so
             mCycleCount++;
         }
-        mLastTime = pNow;
+        mLastTime = clock.time();
     }
 
     /**
      * TODO - adjust arm angles
-     * @param pNow - Current Timestamp
      * @param pEnabled if TRUE, the arm is put down and rollers activated; if FALSE, it is stowed
      */
-    protected void setIntakeArmEnabled(double pNow, boolean pEnabled) {
+    protected void setIntakeArmEnabled(boolean pEnabled) {
         if(pEnabled) {
             double speed = Math.max(Math.abs(db.drivetrain.get(L_ACTUAL_VEL_FT_s)), Math.abs(db.drivetrain.get(R_ACTUAL_VEL_FT_s)));
 //            if(speed <= 1.0) {
@@ -82,9 +81,8 @@ public abstract class AbstractController {
 
     /**
      * Activates the serializer based upon the beam breaker states
-     * @param pNow - current timestamp
      */
-    protected void activateSerializer(double pNow) {
+    protected void activateSerializer() {
         mEntryLatch.update(db.powercell.isSet(ENTRY_BEAM));
         mSecondaryLatch.update(db.powercell.isSet(H_BEAM));
         if(mNumBalls >= 3) {
@@ -120,13 +118,13 @@ public abstract class AbstractController {
         SmartDashboard.putNumber("# Balls", mNumBalls);
     }
 
-    protected void reverseSerializer(double pNow) {
+    protected void reverseSerializer() {
         db.powercell.set(SET_H_pct, -1.0);
         db.powercell.set(SET_V_pct, -0.5);
         db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP,-0.75);
     }
 
-    protected void stopDrivetrain(double pNow) {
+    protected void stopDrivetrain() {
         db.drivetrain.set(STATE, EDriveState.PERCENT_OUTPUT);
         db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
         db.drivetrain.set(DESIRED_TURN_PCT,0.0);
@@ -240,7 +238,7 @@ public abstract class AbstractController {
         return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 1.0;
     }
 
-    protected abstract void updateImpl(double pNow);
+    protected abstract void updateImpl();
 
     /**
      * Provides a way to report on what is used in our codex vs not used. This should help reduce the

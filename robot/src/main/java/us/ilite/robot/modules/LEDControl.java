@@ -47,7 +47,7 @@ public class LEDControl extends Module {
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
         Robot.DATA.ledcontrol.set(ELEDControlData.LED_STATE , 1.0);
 
         this.mBlinkTimer.stop();
@@ -55,12 +55,12 @@ public class LEDControl extends Module {
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         db.ledcontrol.set(ELEDControlData.LED_STATE , mLEDState.isOn() );
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         EColorMatch color = EColorMatch.values()[(int) db.color.get(EColorData.SENSED_COLOR)];
         boolean isDone = (db.color.get(EColorData.DESIRED_MOTOR_POWER) == EColorWheelState.OFF.power);
 

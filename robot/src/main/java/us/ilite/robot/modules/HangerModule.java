@@ -62,18 +62,18 @@ public class HangerModule extends Module {
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         db.hanger.set(EHangerModuleData.OUTPUT_CURRENT , mHangerNeoMaster.getOutputCurrent());
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow){
+    public void modeInit(EMatchMode pMode){
 
 
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
 //        mHangerNeoFollower.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
 //        mHangerNeoMaster.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
         double desiredPct = db.hanger.safeGet(EHangerModuleData.DESIRED_PCT, 0.0);

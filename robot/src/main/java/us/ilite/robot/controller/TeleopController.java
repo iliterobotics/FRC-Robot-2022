@@ -33,20 +33,20 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     @Override
-    protected void updateImpl(double pNow) {
+    protected void updateImpl() {
         db.registerAllWithShuffleboard();
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
         //updateLimelightTargetLock(); //waiting for merge to master
-        updateFlywheel(pNow);
-        super.updateDrivetrain(pNow);
-        updatePowerCells(pNow);
-        updateHanger(pNow); //not integrated yet
+        updateFlywheel();
+        super.updateDrivetrain();
+        updatePowerCells();
+        updateHanger(); //not integrated yet
         //updateDJBooth(pNow); //not integrated yet
     }
 
-    private void updateHanger(double pNow) {
+    private void updateHanger() {
         if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
             db.hanger.set(EHangerModuleData.DESIRED_PCT, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS)));
         }else{
@@ -55,7 +55,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     }
 
-    private void updateFlywheel(double pNow) {
+    private void updateFlywheel() {
 
         mTurretReverseHome.update(db.operatorinput.isSet(InputMap.OPERATOR.CLOSE_MODE));
         if(mTurretReverseHome.mExit.get()) {
@@ -120,7 +120,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //        mLastTrackingType = DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
 //    }
 
-    protected void updatePowerCells(double pNow) {
+    protected void updatePowerCells() {
         if(db.operatorinput.isSet(InputMap.OPERATOR.RESET_INTAKE_COUNT)) {
             resetSerializerState();
         }
@@ -132,17 +132,17 @@ public class TeleopController extends BaseManualController { //copied from TestC
         }
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
 //            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
-                setIntakeArmEnabled(pNow, true);
-                activateSerializer(pNow);
+                setIntakeArmEnabled(true);
+                activateSerializer();
 //            }
 
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.STOW);
-            reverseSerializer(pNow);
+            reverseSerializer();
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW)) {
-            setIntakeArmEnabled(pNow, false);
+            setIntakeArmEnabled(false);
             if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
-                activateSerializer(pNow);
+                activateSerializer();
             }
         } else {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);

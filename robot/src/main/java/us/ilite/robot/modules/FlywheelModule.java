@@ -142,14 +142,14 @@ public class FlywheelModule extends Module {
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
         //Set PID gains & zero encoders here
         HardwareUtils.setGains(mFlywheelFalconMaster, kFlywheelGains);
         HardwareUtils.setGains(mFlywheelFalconFollower, kFlywheelGains);
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         db.flywheel.set(SET_BALL_VELOCITY_ft_s, mFlywheelFalconMaster.getSelectedSensorVelocity() / kVelocityConversion);
         db.flywheel.set(FEEDER_rpm, mFeederInternalEncoder.getVelocity());
         double position = mHoodPot.getPosition();
@@ -188,22 +188,22 @@ public class FlywheelModule extends Module {
     }
 
     @Override
-    public void setOutputs(double pNow) {
-        setHood(pNow);
-        setTurret(pNow);
+    public void setOutputs() {
+        setHood();
+        setTurret();
         setFlywheel();
         setFeeder();
     }
 
     @Override
-    public void shutdown(double pNow) {
+    public void shutdown() {
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, 0);
     }
 
-    private void setTurret(double pNow) {
+    private void setTurret() {
         if (db.flywheel.isSet(TURRET_CONTROL)) {
             TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
 
@@ -220,7 +220,7 @@ public class FlywheelModule extends Module {
                 case TARGET_LOCKING:
                     if (db.goaltracking.isSet(ELimelightData.TX)) {
                         mTurretPID.setSetpoint(0.0);
-                        double output = -mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), pNow);
+                        double output = -mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), clock.time());
                         mTurret.set(output);
 //                        mTurretPID.setReference(Units.degrees_to_rotations(getCurrentTurretAngle() + db.goaltracking.get(ELimelightData.TX), kTurretGearRatio), ControlType.kSmartMotion, TURRET_SLOT, 0);
                     } else {
@@ -236,7 +236,7 @@ public class FlywheelModule extends Module {
                         turretHome = kTurretBack;
                     }
                     mTurretPID.setSetpoint(turretHome);
-                    double output = mTurretPID.calculate(getCurrentTurretAngle(), pNow);
+                    double output = mTurretPID.calculate(getCurrentTurretAngle(), clock.time());
                     mTurret.set(output);
                     break;
             }
@@ -286,7 +286,7 @@ public class FlywheelModule extends Module {
         return (90.0 - pHoodAngle - kMinShotDegrees) * kHoodConversionFactor;
     }
 
-    private void setHood(double pNow) {
+    private void setHood() {
         HoodState state = db.flywheel.get(HOOD_STATE, HoodState.class);
         if (state == null) state = HoodState.NONE;
 

@@ -56,7 +56,7 @@ public class DJSpinnerModule extends Module {
 
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         Color c = mColorSensorV3.getColor();
         db.color.set(EColorData.MEASURED_BLUE, c.blue);
         db.color.set(EColorData.MEASURED_GREEN, c.green);
@@ -69,7 +69,7 @@ public class DJSpinnerModule extends Module {
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         mVictor.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
 
         if( db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE) == EColorWheelState.ROTATION.ordinal() ) {

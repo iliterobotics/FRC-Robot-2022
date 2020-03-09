@@ -8,15 +8,14 @@ import us.ilite.common.types.ELimelightData;
 
 public class VisionGyro extends IMU {
 
-    private static final double[] kCollisionGains = {1.0};
 
     private RobotCodex<ELimelightData> mTargetingData;
     private Rotation2d mGyroOffsetX = new Rotation2d();
     private Rotation2d mGyroOffsetY = new Rotation2d();
 
-    public VisionGyro(Data pData) {
-        super(kCollisionGains);
-        mTargetingData = pData.goaltracking;
+    public VisionGyro(Clock pClock, RobotCodex<ELimelightData> pData) {
+        super(pClock, DEFAULT_GAINS);
+        mTargetingData = pData;
     }
 
     @Override
@@ -72,7 +71,7 @@ public class VisionGyro extends IMU {
     }
 
     @Override
-    protected void updateSensorCache(double pTimestampNow) {
+    protected void updateSensorCache() {
 
     }
 

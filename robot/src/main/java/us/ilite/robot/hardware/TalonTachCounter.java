@@ -59,13 +59,13 @@ public class TalonTachCounter extends Module {
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
 
     }
 
@@ -82,7 +82,7 @@ public class TalonTachCounter extends Module {
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         mCurrentState = getState();
         setTapeState(mCurrentState);
         if(mCurrentTapeState != lastTapeState) hasChanged = true;
@@ -92,7 +92,7 @@ public class TalonTachCounter extends Module {
     }
 
     @Override
-    public void shutdown(double pNow) {
+    public void shutdown() {
         // TODO Auto-generated method stub
 
     }

@@ -159,7 +159,7 @@ public class DriveModule extends Module {
 		mRightCtrl.setOutputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
-		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
+		mGyro = new Pigeon(clock, Settings.Hardware.CAN.kPigeon);
 		double ramprate = 0.20;
         mLeftMaster.setClosedLoopRampRate(ramprate);
         mLeftFollower.setClosedLoopRampRate(ramprate);
@@ -199,7 +199,7 @@ public class DriveModule extends Module {
 	}
 
 	@Override
-	public void modeInit(EMatchMode pMode, double pNow) {
+	public void modeInit(EMatchMode pMode) {
 		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 		mTargetAngleLockPid.setSetpoint(0);
@@ -216,9 +216,8 @@ public class DriveModule extends Module {
 	}
 
 	@Override
-	public void readInputs(double pNow) {
-	    mDeltaTime = pNow - mLastTime;
-	    mGyro.update(pNow);
+	public void readInputs() {
+	    mGyro.update();
 	    db.drivetrain.set(DELTA_HEADING, mGyro.getHeading().getDegrees() - mLastHeading);
 	    db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
 		db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
@@ -236,9 +235,8 @@ public class DriveModule extends Module {
 	}
 
 	@Override
-	public void setOutputs(double pNow) {
+	public void setOutputs() {
 	    mLastHeading = mGyro.getHeading().getDegrees();
-	    mLastTime = pNow;
 		EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
 		// Do this to prevent wonkiness while transitioning autonomous to teleop
 		if(mode == null) return;
@@ -277,7 +275,7 @@ public class DriveModule extends Module {
 				double pidOutput;
 				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(ELimelightData.TV) && targetData.isSet(ELimelightData.TX)) {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mLastTime);
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), clock.dt());
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
 					turn = pidOutput;

@@ -64,10 +64,10 @@ public class BaseTest {
             rc.reset();
         }
         randomizeAllInputs();
-        pController.update(0d);
+        pController.update();
         for(String key : db.mMappedCodex.keySet()) {
             RobotCodex rc = db.mMappedCodex.get(key).copy();
-            pController.update(0d);
+            pController.update();
             String msg = "=== Idempotency test for " + key + " === ";
             Assert.assertEquals(msg, db.mMappedCodex.get(key), rc);
             System.out.println(msg + "PASSED");

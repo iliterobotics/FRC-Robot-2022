@@ -56,12 +56,12 @@ public class RawLimelight extends Module{
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
         db.rawLimelight.set(TARGET_ID, (double) NONE.id());
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         mVisionTarget = Field2020.FieldElement.values()[(int) db.rawLimelight.get(TARGET_ID)];
 
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
@@ -115,7 +115,7 @@ public class RawLimelight extends Module{
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         setLedMode();
         setCamMode();
         setStreamMode();

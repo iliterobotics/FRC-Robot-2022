@@ -9,7 +9,7 @@ public class LineAutonController extends BaseAutonController {
     }
 
     @Override
-    protected void updateImpl(double pNow) {
-        super.updateImpl(pNow);
+    protected void updateImpl() {
+        super.updateImpl();
     }
 }

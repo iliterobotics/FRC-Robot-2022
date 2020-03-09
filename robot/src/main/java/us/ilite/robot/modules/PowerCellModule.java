@@ -141,7 +141,7 @@ public class PowerCellModule extends Module {
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
         HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotUpGains);
 //        HardwareUtils.setGains(mIntakePivotEncoder, mIntakePivotUpGains);
 //        HardwareUtils.setGains(mIntakePivotCtrl, mIntakePivotDownGains);
@@ -155,7 +155,7 @@ public class PowerCellModule extends Module {
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
 //        mIntakeState = EIntakeState.values()[db.powercell.get(EPowerCellData.DESIRED_INTAKE_STATE).intValue()];
         Object[] brokenArray = Arrays.stream(mDigitalBeamSensors).map(e -> !e.isBroken()).toArray();
 
@@ -174,7 +174,7 @@ public class PowerCellModule extends Module {
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         mConveyorMotorHorizontal.set(ControlMode.PercentOutput, db.powercell.get(SET_H_pct));
         mConveyorMotorVertical.set(ControlMode.PercentOutput, db.powercell.get(SET_V_pct));
         setPivotArm();
@@ -203,7 +203,7 @@ public class PowerCellModule extends Module {
     }
 
     @Override
-    public void shutdown(double pNow) {
+    public void shutdown() {
 //        mIntakeState = EIntakeState.STOP;
 //        mArmState = EArmState.DISENGAGED;
 //        mIndexingState = EIndexingState.NOT_INDEXING;

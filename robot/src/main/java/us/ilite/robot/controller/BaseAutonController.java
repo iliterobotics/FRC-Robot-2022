@@ -47,22 +47,22 @@ public class BaseAutonController extends AbstractController {
     }
 
     @Override
-    protected void updateImpl(double pNow) {
+    protected void updateImpl() {
         if (mDelayCycleCount <= 0) {
             if (!mInitializedPathFollower) {
                 mPathFollower.initialize();
                 mInitializedPathFollower = true;
             }
             if (mPathStartTime == 0) {
-                mPathStartTime = pNow;
+                mPathStartTime = clock.time();
             }
             if (mPathFollower != null && mPathFollower.isFinished()) {
                 mPathFollower = null;
             }
             if (mPathFollower == null) {
-                stopDrivetrain(pNow);
+                stopDrivetrain();
             } else {
-                mPathFollower.execute(pNow);
+                mPathFollower.execute();
             }
         } else {
             mDelayCycleCount--;
@@ -154,8 +154,8 @@ public class BaseAutonController extends AbstractController {
             db.drivetrain.set(EDriveData.PATH_ERR_ft, mDistanceController.getError());
         }
 
-        protected void moveToNextSegment(double pNow) {
-            currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
+        protected void moveToNextSegment() {
+            currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, clock.time(), mPathStartTime);
 
             if (currentSegment == 0) {
                 mHitFirst = true;
@@ -167,14 +167,14 @@ public class BaseAutonController extends AbstractController {
             }
         }
 
-        public void execute(double pNow) {
+        public void execute() {
             super.execute();
-            moveToNextSegment(pNow);
+            moveToNextSegment();
             if (!mIsTargetTracking) {
                 super.calculateOutputs();
             }
             if(isFinished()) {
-                stopDrivetrain(0.0);
+                stopDrivetrain();
             }
         }
     }

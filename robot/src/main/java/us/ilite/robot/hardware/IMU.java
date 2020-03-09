@@ -18,6 +18,8 @@ public abstract  class IMU {
     ROLL
   }
 
+  protected static final double[] DEFAULT_GAINS = new double[]{1.0};
+
   //Collision Threshold => Temporary Value
   protected transient double mCollisionThreshold_DeltaG;
   protected transient final FilteredAverage mAccelerationX;
@@ -26,13 +28,15 @@ public abstract  class IMU {
   protected transient double mJerkY = 0d;
   protected double mLastUpdate = 0d;
   protected double dt = 0d;
+  protected final Clock mClock;
   protected Rotation2d mLastYaw = Rotation2d.fromDegrees(0d);
 
-  public IMU(List<Double>pFilterGains) { 
-    this(ArrayUtils.toPrimitive(pFilterGains.toArray(new Double[0])));
+  public IMU(Clock pRobotClock, List<Double>pFilterGains) {
+    this(pRobotClock, ArrayUtils.toPrimitive(pFilterGains.toArray(new Double[0])));
   }
   
-  public IMU(double[] pFilterGains) {
+  public IMU(Clock pRobotClock, double[] pFilterGains) {
+    mClock = pRobotClock;
     mAccelerationX = new FilteredAverage(pFilterGains);
     mAccelerationY = new FilteredAverage(pFilterGains);
   }
@@ -60,21 +64,18 @@ public abstract  class IMU {
   
   /**
    * Pre-populates the filters & calculated values so it's done only once per cycle
-   * @param pTimestampNow
    */
-  public void update(double pTimestampNow) {
+  public void update() {
     mLastYaw = getYaw();
-    updateSensorCache(pTimestampNow);
+    updateSensorCache();
     double currentAccelX = getRawAccelX();
     double currentAccelY = getRawAccelY();
     
-    mJerkX = (currentAccelX - mAccelerationX.getAverage()) / (pTimestampNow - mLastUpdate);
-    mJerkY = (currentAccelY - mAccelerationY.getAverage()) / (pTimestampNow - mLastUpdate);
+    mJerkX = (currentAccelX - mAccelerationX.getAverage()) / (mClock.dt());
+    mJerkY = (currentAccelY - mAccelerationY.getAverage()) / (mClock.dt());
     
     mAccelerationX.addNumber(currentAccelX);
     mAccelerationY.addNumber(currentAccelY);
-    dt = pTimestampNow - mLastUpdate;
-    mLastUpdate = pTimestampNow;
   }
   
   public abstract Rotation2d getYaw();
@@ -89,9 +90,8 @@ public abstract  class IMU {
    * use that cache for every get() required by this IMU class. It is NOT
    * recommended to call sensor.get(...), since there may be many rapid
    * calls to the gyro in rapid succession.
-   * @param pTimestampNow
    */
-  protected abstract void updateSensorCache(double pTimestampNow);
+  protected abstract void updateSensorCache();
 
 
   /**

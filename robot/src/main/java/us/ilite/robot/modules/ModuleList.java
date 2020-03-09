@@ -15,39 +15,39 @@ public class ModuleList extends Module {
     protected List<Module> mModules = new LinkedList<>();
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
-        mModules.forEach(module -> module.modeInit(pMode, pNow));
+    public void modeInit(EMatchMode pMode) {
+        mModules.forEach(module -> module.modeInit(pMode));
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         if(Robot.mode() == EMatchMode.TEST) {
-            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.readInputs(pNow)));
+            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.readInputs()));
         } else {
-            mModules.forEach(module -> module.readInputs(pNow));
+            mModules.forEach(module -> module.readInputs());
         }
 
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         if(Robot.mode() == EMatchMode.TEST) {
-            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.setOutputs(pNow)));
+            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.setOutputs()));
         } else {
-            mModules.forEach(module -> module.setOutputs(pNow));
+            mModules.forEach(module -> module.setOutputs());
         }
     }
 
     @Override
-    public void shutdown(double pNow) {
-        mModules.forEach(module -> module.shutdown(pNow));
+    public void shutdown() {
+        mModules.forEach(module -> module.shutdown());
     }
 
     @Override
-    public boolean checkModule(double pNow) {
+    public boolean checkModule() {
         boolean allSuccessful = true;
             for (Module module : mModules) {
-                boolean moduleSuccessful = module.checkModule(pNow);
+                boolean moduleSuccessful = module.checkModule();
             allSuccessful = allSuccessful && moduleSuccessful;
             if (!moduleSuccessful) {
                 mLogger.error("Self-check failure for module: ", module.getClass());

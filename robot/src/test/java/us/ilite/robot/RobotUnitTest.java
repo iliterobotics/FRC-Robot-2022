@@ -38,7 +38,7 @@ public class RobotUnitTest extends BaseTest{
     public void testUnusedCodex() {
         TestController t = TestController.getInstance();
         randomizeAllInputs();
-        t.update(0d);
+        t.update();
         System.out.println(t.getUnusedCodexReport());
     }
 

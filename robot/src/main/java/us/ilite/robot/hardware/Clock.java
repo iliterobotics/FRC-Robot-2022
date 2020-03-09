@@ -19,10 +19,16 @@ public class Clock {
 
     private double mStartTime = 0.0;
     private double mCurrentTime = 0.0;
-    private boolean hasTimeUpdatedThisCycle = false;
+    private double mDT = 0.0;
     private boolean mIsSimulated = false;
 
     public Clock() {
+    }
+
+    public void update() {
+        double t = (mIsSimulated) ? getJavaTime() : getRobotTime() - mStartTime;
+        mDT = t - mCurrentTime;
+        mCurrentTime = t;
     }
 
     /**
@@ -30,13 +36,16 @@ public class Clock {
      * @return A cycle-consistent time, in seconds.
      */
     public double time() {
-        if(hasTimeUpdatedThisCycle == false) {
-            mCurrentTime = (mIsSimulated) ? getJavaTime() : getRobotTime();
-            mCurrentTime -= mStartTime;
-            hasTimeUpdatedThisCycle = true;
-        }
-
         return mCurrentTime;
+    }
+
+
+    /**
+     *
+     * @return A cycle-consistent delta-time, in seconds.
+     */
+    public double dt() {
+        return mDT;
     }
 
     /**
@@ -44,7 +53,7 @@ public class Clock {
      * @return A cycle-consistent time, in milliseconds.
      */
     public double getCurrentTimeInMillis() {
-        return time() * 1000;
+        return time() * 1e3;
     }
 
     /**
@@ -52,7 +61,7 @@ public class Clock {
      * @return A cycle-consistent time, in microseconds.
      */
     public double getCurrentTimeInMicros() {
-        return time() * 1000000;
+        return time() * 1e6;
     }
 
     /**
@@ -60,14 +69,7 @@ public class Clock {
      * @return A cycle-consistent time, in nanoseconds.
      */
     public double getCurrentTimeInNanos() {
-        return time() * 1000000000;
-    }
-
-    /**
-     * Call this to signify the end of a robot cycle and tell the time to update next time it's retrieved.
-     */
-    public void cycleEnded() {
-        hasTimeUpdatedThisCycle = false;
+        return time() * 1e9;
     }
 
     public void setTime(double time) {

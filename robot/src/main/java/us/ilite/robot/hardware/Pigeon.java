@@ -20,17 +20,17 @@ public class Pigeon extends IMU{
 	private double mYawRate = 0;
 	private PigeonIMU mPigeon;
 
-  //TODO - single value for now - could be VERY noisy
-	// others to try: {0.75, 0.25}, {0.6, 0.4}, {0.5, 0.3, 0.2}
 	/**
 	 * Made this a singleton list because it is unmodifiable. When it was an array, it was possible for 
 	 * the value to be changed. 
 	 */
+	//TODO - single value for now - could be VERY noisy
+	// others to try: {0.75, 0.25}, {0.6, 0.4}, {0.5, 0.3, 0.2}
 	private static List<Double>kCollisionGains = Collections.singletonList(Double.valueOf(1.0));
 	
-	public Pigeon(int pPigeonCANId){
+	public Pigeon(Clock pClock, int pPigeonCANId){
 //	    mPigeon.
-		super(kCollisionGains);
+		super(pClock, kCollisionGains);
 		ypr = new double[3];
 		xyz = new short[3];
 		this.mPigeon = new PigeonIMU(pPigeonCANId);
@@ -45,9 +45,8 @@ public class Pigeon extends IMU{
 	
 	/**
 	 * Pre-populates the filters & calculated values so it's done only once per cycle
-	 * @param pTimestampNow
 	 */
-	protected void updateSensorCache(double pTimestampNow) {
+	protected void updateSensorCache() {
 		mLastYaw = ypr[0];
 		mPigeon.getYawPitchRoll(ypr);
 		for(int i = 0 ; i < ypr.length; i++) {

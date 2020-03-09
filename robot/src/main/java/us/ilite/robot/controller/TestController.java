@@ -83,18 +83,20 @@ public class TestController extends BaseManualController {
 
     private double mMaxSpeed = 0.0;
     private double mMaxYaw = 0.0;
-    protected void updateImpl(double pNow) {
+
+    @Override
+    protected void updateImpl() {
         ELogitech310.map(flywheelinput, mFlywheelJoystick);
         ELogitech310.map(limelightinput, mLimelightJoystick);
 
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        Robot.CLOCK.report("updateLimelightTargetLock", t -> updateTargetTracking(pNow));
-        Robot.CLOCK.report("updateFlywheel", t -> updateFlywheel(pNow));
-        Robot.CLOCK.report("updateDrivetrain", t -> updateDrivetrain(pNow));
-        Robot.CLOCK.report("updateIntake", t -> updatePowerCells(pNow));
-        Robot.CLOCK.report("updateDJBooth", t -> updateDJBooth(pNow));
+        clock.report("updateLimelightTargetLock", t -> updateTargetTracking());
+        clock.report("updateFlywheel", t -> updateFlywheel());
+        clock.report("updateDrivetrain", t -> updateDrivetrain());
+        clock.report("updateIntake", t -> updatePowerCells());
+        clock.report("updateDJBooth", t -> updateDJBooth());
 //        updateArm(pNow);
 
         double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
@@ -106,7 +108,7 @@ public class TestController extends BaseManualController {
         SmartDashboard.putNumber("Max Robot Omega (deg/s)", mMaxYaw);
     }
 
-    private void updateFlywheel(double pNow) {
+    private void updateFlywheel() {
 //        db.flywheel.set(TURRET_CONTROL, TurretControlType.MANUAL);
 //        double turretDirection = db.operatorinput.get(InputMap.OPERATOR_REFACTOR.MANUAL_TURRET);
 //        turretDirection = Math.abs(turretDirection) > 0.02 ? turretDirection : 0.0; //Handling Deadband
@@ -191,7 +193,7 @@ public class TestController extends BaseManualController {
 //        }
     }
 
-    public void updateTargetTracking(double pNow) {
+    public void updateTargetTracking() {
         boolean isOffset = !(Robot.DATA.goaltracking.get(TS) > 0 - mLimelightGoalThreshold || Robot.DATA.goaltracking.get(TS) < -90 + mLimelightGoalThreshold);
 
         if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_TARGET)) {
@@ -214,7 +216,7 @@ public class TestController extends BaseManualController {
         mLastTargetTrackingType = Robot.DATA.goaltracking.get(TARGET_ID.ordinal());
     }
 
-    public void updateGroundTracking(double pNow) {
+    public void updateGroundTracking() {
         if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_BALL)) {
             Robot.DATA.groundTracking.set(TARGET_ID, Field2020.FieldElement.BALL.id());
         } else if (limelightinput.isSet(InputMap.LIMELIGHT.LIMELIGHT_LOCK_BALL_DUAL)) {
@@ -231,7 +233,7 @@ public class TestController extends BaseManualController {
         mLastGroundTrackingType = Robot.DATA.goaltracking.get(TARGET_ID.ordinal());
     }
 
-    protected void updatePowerCells(double pNow) {
+    protected void updatePowerCells() {
         if(flywheelinput.isSet(InputMap.FLYWHEEL.RESET_INTAKE_COUNT)) {
             resetSerializerState();
         }
@@ -239,14 +241,14 @@ public class TestController extends BaseManualController {
         db.powercell.set(INTAKE_STATE, EArmState.NONE);
 
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE) || flywheelinput.isSet(InputMap.FLYWHEEL.BASIC_INTAKE)) {
-            setIntakeArmEnabled(pNow, true);
-            activateSerializer(pNow);
+            setIntakeArmEnabled(true);
+            activateSerializer();
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE) || flywheelinput.isSet(InputMap.FLYWHEEL.REVERSE_INTAKE)) {
             db.powercell.set(INTAKE_STATE, EArmState.STOW);
-            reverseSerializer(pNow);
+            reverseSerializer();
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW) || flywheelinput.isSet(InputMap.FLYWHEEL.INTAKE_STOW)) {
-            setIntakeArmEnabled(pNow, false);
-            activateSerializer(pNow);
+            setIntakeArmEnabled(false);
+            activateSerializer();
         } else {
             // TODO - only enable once we have set the hold gains
 //            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
@@ -260,7 +262,7 @@ public class TestController extends BaseManualController {
         }
     }
 
-    void updateDJBooth(double pNow) {
+    void updateDJBooth() {
         if (db.operatorinput.isSet(InputMap.OPERATOR.COLOR_POSITION)) {
             int i = (int) db.color.get(EColorData.SENSED_COLOR);
             EColorMatch m = EColorMatch.values()[i];

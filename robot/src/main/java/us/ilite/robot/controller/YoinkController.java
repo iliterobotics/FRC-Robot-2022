@@ -22,24 +22,24 @@ public class YoinkController extends BaseAutonController {
     }
 
     @Override
-    public void updateImpl(double pNow) {
-        SmartDashboard.putNumber("INDEX", BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime));
-        super.updateImpl(pNow);
+    public void updateImpl() {
+        SmartDashboard.putNumber("INDEX", BobUtils.getIndexForCumulativeTime(mActivePath, clock.time(), mPathStartTime));
+        super.updateImpl();
 //        setIntakeArmEnabled(pNow, true);
 //        activateSerializer(pNow);
 
-        if (BobUtils.isFinished(pNow, mYoinkTo, mPathStartTime)) {
+        if (BobUtils.isFinished(clock.time(), mYoinkTo, mPathStartTime)) {
             if (mIntakingCount <= 0 && !mHasReversed) {
                 setNewActivePath(mYoinkFrom, true);
-                mYoinkFromStartTime = pNow;
+                mYoinkFromStartTime = clock.time();
                 mHasReversed = true;
 
                 // Update again since path has changed, follows process of BaseAutonController
-                super.updateImpl(pNow);
+                super.updateImpl();
             } else {
                 mIntakingCount--;
             }
-            if (BobUtils.isFinished(pNow, mYoinkFrom, mYoinkFromStartTime)) {
+            if (BobUtils.isFinished(clock.time(), mYoinkFrom, mYoinkFromStartTime)) {
                 setTargetTracking(true);
             }
         }

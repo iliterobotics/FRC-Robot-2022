@@ -25,7 +25,7 @@ public class SitAndShootController extends BaseAutonController
     }
 
     @Override
-    protected void updateImpl(double pNow) {
+    protected void updateImpl() {
         firingSequence(Enums.FlywheelSpeeds.INITIATION_LINE, Field2020.FieldElement.OUTER_GOAL);
         mIsBroken = db.powercell.isSet(EPowerCellData.EXIT_BEAM);
 

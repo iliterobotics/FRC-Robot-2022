@@ -120,7 +120,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        CLOCK.cycleEnded();
     }
 
     @Override
@@ -138,7 +137,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
-        mRunningModules.modeInit(AUTONOMOUS, CLOCK.time());
+        mRunningModules.modeInit(AUTONOMOUS);
     }
 
     @Override
@@ -174,7 +173,8 @@ public class Robot extends TimedRobot {
         MODE=DISABLED;
         mLogger.info("Disabled Initialization");
 
-        mRunningModules.shutdown(CLOCK.time());
+        mRunningModules.shutdown();
+        // Don't clear the modules - we want them to continue updating shuffleboard with sensor readings
 
 //        mCSVLogger.stop();
 
@@ -185,10 +185,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        mOI.readInputs(0d);
-        mDrive.readInputs(0d);
-        mShooter.readInputs(0d);
-        mIntake.readInputs(0d);
+        mOI.readInputs();
+        mDrive.readInputs();
+        mShooter.readInputs();
+        mIntake.readInputs();
         Shuffleboard.update();
     }
 
@@ -217,8 +217,8 @@ public class Robot extends TimedRobot {
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }
-        mRunningModules.modeInit(TEST, CLOCK.time());
-        mRunningModules.checkModule(CLOCK.time());
+        mRunningModules.modeInit(TEST);
+        mRunningModules.checkModule();
     }
 
     @Override
@@ -234,6 +234,7 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
+        CLOCK.update();
         if ( Settings.kIsLogging && MODE != DISABLED) {
             for ( RobotCodex c : DATA.mLoggedCodexes ) {
                 if ( c.hasChanged() ) {
@@ -246,11 +247,11 @@ public class Robot extends TimedRobot {
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
 
-        mRunningModules.readInputs(CLOCK.time());
-        mActiveController.update(CLOCK.time());
-        mRunningModules.setOutputs(CLOCK.time());
+        mRunningModules.readInputs();
+        mActiveController.update();
+        mRunningModules.setOutputs();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
-        SmartDashboard.putNumber("FPGA Time", Timer.getFPGATimestamp());
+        SmartDashboard.putNumber("Clock Time", CLOCK.time());
     }
 
     private void initMatchMetadata() {
