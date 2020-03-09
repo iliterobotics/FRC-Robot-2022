@@ -120,8 +120,8 @@ public class FlywheelModule extends Module {
         HardwareUtils.setGains(mTurretCtrlPID, kTurretCtrlGains);
 
 //        mHoodPot = new AnalogPotentiometer(0);
-        SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
-        SmartDashboard.putNumber("kVelocityConversion", kVelocityConversion);
+//        SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
+//        SmartDashboard.putNumber("kVelocityConversion", kVelocityConversion);
         mFlywheelFalconMaster = new TalonFX(Settings.Hardware.CAN.kFalconMasterId);
         mFlywheelFalconMaster.setInverted(true);
         mFlywheelFalconMaster.setNeutralMode(NeutralMode.Coast);
