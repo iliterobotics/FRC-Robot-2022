@@ -16,11 +16,11 @@ public class ShootIntakeController extends BaseAutonController {
     @Override
     protected void updateImpl() {
         super.updateImpl();
-        int pathIndex = BobUtils.getIndexForCumulativeTime(simplePath, clock.time(), mPathStartTime);
+        int pathIndex = BobUtils.getIndexForCumulativeTime(simplePath, clock.now(), mPathStartTime);
         if (pathIndex != -1 ){
-            mPathDistance = BobUtils.getPathValueForCumulativeTime(simplePath, clock.time(), mPathStartTime, Path.SegmentValue.CENTER_POSITION);
+            mPathDistance = BobUtils.getPathValueForCumulativeTime(simplePath, clock.now(), mPathStartTime, Path.SegmentValue.CENTER_POSITION);
             SmartDashboard.putNumber("PATH DISTANCE", mPathDistance);
-            mSimpleSequence.updateSequence(clock.time(), mPathDistance);
+            mSimpleSequence.updateSequence(clock.now(), mPathDistance);
         }
     }
 

@@ -96,7 +96,7 @@ public class Robot extends TimedRobot {
         ICodexTimeProvider provider = new ICodexTimeProvider() {
             @Override
             public double getTimestamp() {
-                return CLOCK.time();
+                return CLOCK.now();
             }
         };
         CodexMetadata.overrideTimeProvider(provider);
@@ -130,7 +130,6 @@ public class Robot extends TimedRobot {
 
         MODE=AUTONOMOUS;
         mActiveController = mAutonSelection.getSelectedAutonController();
-        SmartDashboard.putNumber("AUTON INIT", CLOCK.time());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mLimelight);
@@ -251,7 +250,7 @@ public class Robot extends TimedRobot {
         mActiveController.update();
         mRunningModules.setOutputs();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
-        SmartDashboard.putNumber("Clock Time", CLOCK.time());
+        SmartDashboard.putNumber("Clock Time", CLOCK.now());
     }
 
     private void initMatchMetadata() {

@@ -2,17 +2,14 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.EPowerCellData;
 import static us.ilite.common.types.EPowerCellData.*;
 
 import us.ilite.robot.Robot;
@@ -21,9 +18,6 @@ import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
 import us.ilite.robot.hardware.TalonSRXFactory;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class PowerCellModule extends Module {
 
@@ -49,11 +43,6 @@ public class PowerCellModule extends Module {
     private DigitalBeamSensor mEntryBeam;
     private DigitalBeamSensor mSecondaryBeam;
     private DigitalBeamSensor mExitBeam;
-
-    private boolean allBeamsBroken;
-    private int mEntryBeamNotBrokenCycles = 0;
-    private int mSecondaryBeamNotBrokenCycles = 0;
-    private int mExitBeamNotBrokenCycles = 0;
 
     //Constants
     public static double kIntakeTalonPower = 1d;
@@ -100,12 +89,6 @@ public class PowerCellModule extends Module {
     private static final double kPivotAbsoluteMax = 0.25;
     private static final ProfileGains mIntakePivotUpGains = mIntakePivotDownGains;
 
-    //For indexing
-    private int mGoalBeamCountBroken = 0;
-    private int mBeamCountBroken = 0;
-    //Array of beam-breakers (Used when indexing PowerCells)
-    private DigitalBeamSensor[] mDigitalBeamSensors;
-
     private ILog mLog = Logger.createLog(this.getClass());
 
     public PowerCellModule() {
@@ -128,7 +111,6 @@ public class PowerCellModule extends Module {
         mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel, debounceTime_s);
         mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel, debounceTime_s);
         mExitBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kExitBeamChannel, debounceTime_s);
-        mDigitalBeamSensors = new DigitalBeamSensor[]{mEntryBeam, mSecondaryBeam, mExitBeam};
 
         mIntakePivotEncoder = new CANEncoder(mIntakePivot);
         mIntakePivotAbsoluteEncoder = new DutyCycleEncoder(0);
@@ -156,10 +138,6 @@ public class PowerCellModule extends Module {
 
     @Override
     public void readInputs() {
-//        mIntakeState = EIntakeState.values()[db.powercell.get(EPowerCellData.DESIRED_INTAKE_STATE).intValue()];
-        Object[] brokenArray = Arrays.stream(mDigitalBeamSensors).map(e -> !e.isBroken()).toArray();
-
-        db.powercell.set(CURRENT_AMOUNT_OF_SENSORS_BROKEN, List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count());
         db.powercell.set(INTAKE_ROLLER_CURRENT, mIntakeRoller.getOutputCurrent());
         db.powercell.set(INTAKE_VEL_ft_s, mIntakeRollerEncoder.getVelocity() * kIntakeRollerSpeedConversion);
         db.powercell.set(ARM_ANGLE_deg, mIntakePivotEncoder.getPosition() * kPivotConversion);
@@ -170,7 +148,6 @@ public class PowerCellModule extends Module {
         db.powercell.set(ENTRY_BEAM, mEntryBeam.isBroken());
         db.powercell.set(H_BEAM, mSecondaryBeam.isBroken());
         db.powercell.set(EXIT_BEAM, mExitBeam.isBroken());
-        //TODO Determine Indexer State
     }
 
     @Override
@@ -200,32 +177,5 @@ public class PowerCellModule extends Module {
         } else {
             mIntakePivot.set(0.0);
         }
-    }
-
-    @Override
-    public void shutdown() {
-//        mIntakeState = EIntakeState.STOP;
-//        mArmState = EArmState.DISENGAGED;
-//        mIndexingState = EIndexingState.NOT_INDEXING;
-    }
-
-    public void startIndexing() {
-        //TODO determine V_Motor and H_Motor specifics with Beam breaker
-        mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count();
-
-//        SmartDashboard.putNumber("BeamCountBroken" , mBeamCountBroken);
-//        SmartDashboard.putNumber("BeamCountBrokenGoal" , mGoalBeamCountBroken);
-
-
-//        for (DigitalBeamSensor mDigitalBeamSensor : mDigitalBeamSensors) {
-//            if (mDigitalBeamSensor.isBroken()) mBeamCountBroken++;
-//        }
-        if ( mBeamCountBroken < mGoalBeamCountBroken) {
-            mConveyorMotorHorizontal.set( ControlMode.PercentOutput, db.powercell.get(EPowerCellData.SET_H_pct) );
-        } else {
-            mConveyorMotorHorizontal.set( ControlMode.PercentOutput, 0.0 );
-        }
-
-        mGoalBeamCountBroken = mBeamCountBroken + 1;
     }
 }

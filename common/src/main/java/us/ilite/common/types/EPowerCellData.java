@@ -4,8 +4,12 @@ import com.flybotix.hfr.codex.CodexOf;
 
 public enum EPowerCellData implements CodexOf<Double> {
     ENTRY_BEAM,
+    ENTRY_GATE,
     H_BEAM,
+    H_GATE,
     EXIT_BEAM,
+    EXIT_GATE,
+    NUM_BALLS,
 
     SET_H_pct,
     SET_V_pct,
@@ -16,11 +20,6 @@ public enum EPowerCellData implements CodexOf<Double> {
 
     INTAKE_VEL_ft_s,
     SET_INTAKE_VEL_ft_s,
-
-    CURRENT_AMOUNT_OF_SENSORS_BROKEN,
-    DESIRED_AMOUNT_OF_SENSORS_BROKEN,
-
-    ALL_BEAMS_BROKEN,
 
     INTAKE_PIVOT_CURRENT,
     INTAKE_ROLLER_CURRENT,

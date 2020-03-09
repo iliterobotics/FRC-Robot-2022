@@ -43,9 +43,9 @@ public class CommandManager extends Module {
         // Don't initialize and update on same cycle
         if (shouldInitializeCommandQueue()) {
             mLog.warn(mManagerTag, ": Initializing command queue");
-            desiredCommandQueue.init(clock.time());
+            desiredCommandQueue.init(clock.now());
         } else if(isRunningCommands()) {
-            desiredCommandQueue.update(clock.time());
+            desiredCommandQueue.update(clock.now());
         }
 
         // Only check if we're done with queue if we're actually running...otherwise we're just spamming stopRunningCommands()
@@ -91,7 +91,7 @@ public class CommandManager extends Module {
     public void stopRunningCommands() {
         mLog.warn(mManagerTag, ": Stopping command queue");
         runCommandQueue = false;
-        desiredCommandQueue.shutdown(clock.time());
+        desiredCommandQueue.shutdown(clock.now());
         desiredCommandQueue.clear();
     }
 

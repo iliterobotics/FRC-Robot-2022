@@ -15,6 +15,8 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 
+import static us.ilite.common.types.ELimelightData.TV;
+import static us.ilite.common.types.ELimelightData.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.sensor.EGyro;
@@ -240,8 +242,8 @@ public class DriveModule extends Module {
 		EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
 		// Do this to prevent wonkiness while transitioning autonomous to teleop
 		if(mode == null) return;
-		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
-		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
+		double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
+		double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
 		switch (mode) {
 			case RESET:
 				reset();
@@ -270,22 +272,21 @@ public class DriveModule extends Module {
 				}
 				break;
 			case TARGET_ANGLE_LOCK:
-				RobotCodex<ELimelightData> targetData = Robot.DATA.goaltracking;
 //				targetData.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
 				double pidOutput;
-				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(ELimelightData.TV) && targetData.isSet(ELimelightData.TX)) {
+				if(mTargetAngleLockPid != null && db.goaltracking != null && db.goaltracking.isSet(TV) && db.goaltracking.isSet(TX)) {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), clock.dt());
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.goaltracking.get(TX), clock.dt());
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
+//					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
 					turn = pidOutput;
 				}
+				// NOTE - fall through here
 			case VELOCITY:
 				mStartHoldingPosition = false;
 //				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
 //				turn = mYawPid.calculate(mGyro.getYaw().getDegrees(), turn * kMaxDegreesPerSecond);
-				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
-				SmartDashboard.putNumber("ACTUAL YAW", (db.drivetrain.get(GYRO_RATE)));
+				db.drivetrain.set(SET_YAW_RATE_deg_s, mYawPid.getSetpoint());
 				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
 				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
 				break;

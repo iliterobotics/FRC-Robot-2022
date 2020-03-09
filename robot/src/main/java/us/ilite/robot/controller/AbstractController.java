@@ -50,7 +50,7 @@ public abstract class AbstractController {
             // Every 10s or so
             mCycleCount++;
         }
-        mLastTime = clock.time();
+        mLastTime = clock.now();
     }
 
     /**
@@ -113,9 +113,9 @@ public abstract class AbstractController {
                 mNumBalls++;
             }
         }
-        SmartDashboard.putString("Entry State", mEntryLatch.get().name());
-        SmartDashboard.putString("Secon State", mSecondaryLatch.get().name());
-        SmartDashboard.putNumber("# Balls", mNumBalls);
+        db.powercell.set(NUM_BALLS, mNumBalls);
+        db.powercell.set(ENTRY_GATE, mEntryLatch.get());
+        db.powercell.set(H_GATE, mSecondaryLatch.get());
     }
 
     protected void reverseSerializer() {
@@ -146,7 +146,7 @@ public abstract class AbstractController {
      */
     protected final void setFlywheelClosedLoop(FlywheelSpeeds pSpeed, boolean pSetHoodState) {
         db.flywheel.set(FLYWHEEL_WHEEL_STATE, pSpeed.wheelstate);
-        db.flywheel.set(BALL_VELOCITY_ft_s, pSpeed.speed);
+        db.flywheel.set(SET_BALL_VELOCITY_ft_s, pSpeed.speed);
         if (pSetHoodState) {
             setHood(pSpeed);
         }
@@ -212,30 +212,33 @@ public abstract class AbstractController {
     }
 
     protected boolean isFlywheelUpToSpeed() {
-        SmartDashboard.putBoolean("Flywheel up to speed", db.flywheel.get(SET_BALL_VELOCITY_ft_s) > 0.0 &&
-                db.flywheel.get(SET_BALL_VELOCITY_ft_s) >= db.flywheel.get(BALL_VELOCITY_ft_s) - 2.0);
-        return db.flywheel.get(SET_BALL_VELOCITY_ft_s) > 0.0 &&
-                db.flywheel.get(SET_BALL_VELOCITY_ft_s) >= db.flywheel.get(BALL_VELOCITY_ft_s) - 2.0;
+        boolean result = db.flywheel.get(BALL_VELOCITY_ft_s) > 0.0 &&
+                db.flywheel.get(BALL_VELOCITY_ft_s) >= db.flywheel.get(SET_BALL_VELOCITY_ft_s) - 2.0;
+        SmartDashboard.putBoolean("FLYWHEEL", result);
+        return result;
     }
 
     protected boolean isFeederUpToSpeed() {
-        SmartDashboard.putBoolean("Feeder up to speed", db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
-                db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8);
-        return db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
+        boolean result = db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
                 db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8;
+        SmartDashboard.putBoolean("FEEDER", result);
+        return result;
     }
 
     protected boolean isTurretAtCorrectAngle(){
-        SmartDashboard.putBoolean("Turret at correct angle", db.flywheel.isSet(IS_TARGET_LOCKED));
+        boolean result = db.flywheel.isSet(IS_TARGET_LOCKED);
+        SmartDashboard.putBoolean("TURRET", result);
 //        TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
 //        if (turretControlType != TurretControlType.MANUAL) {
-            return db.flywheel.isSet(IS_TARGET_LOCKED);
+            return result;
 //        return true;
 //        }
 //        return true;
     }
     protected boolean isHoodAtCorrectAngle(FlywheelSpeeds pSpeed) {
-        return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 1.0;
+        boolean result = Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 1.0;
+        SmartDashboard.putBoolean("HOOD", result);
+        return result;
     }
 
     protected abstract void updateImpl();

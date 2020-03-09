@@ -54,7 +54,7 @@ public class BaseAutonController extends AbstractController {
                 mInitializedPathFollower = true;
             }
             if (mPathStartTime == 0) {
-                mPathStartTime = clock.time();
+                mPathStartTime = clock.now();
             }
             if (mPathFollower != null && mPathFollower.isFinished()) {
                 mPathFollower = null;
@@ -113,7 +113,7 @@ public class BaseAutonController extends AbstractController {
 
         @Override
         public void resetDistance() {
-            mPathStartTime = Robot.CLOCK.time();
+            mPathStartTime = Robot.CLOCK.now();
             mLastDistance = 0;
             db.drivetrain.set(EDriveData.STATE, EDriveState.RESET);
         }
@@ -155,7 +155,7 @@ public class BaseAutonController extends AbstractController {
         }
 
         protected void moveToNextSegment() {
-            currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, clock.time(), mPathStartTime);
+            currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, clock.now(), mPathStartTime);
 
             if (currentSegment == 0) {
                 mHitFirst = true;

@@ -35,7 +35,7 @@ public class Clock {
      *
      * @return A cycle-consistent time, in seconds.
      */
-    public double time() {
+    public double now() {
         return mCurrentTime;
     }
 
@@ -53,7 +53,7 @@ public class Clock {
      * @return A cycle-consistent time, in milliseconds.
      */
     public double getCurrentTimeInMillis() {
-        return time() * 1e3;
+        return now() * 1e3;
     }
 
     /**
@@ -61,7 +61,7 @@ public class Clock {
      * @return A cycle-consistent time, in microseconds.
      */
     public double getCurrentTimeInMicros() {
-        return time() * 1e6;
+        return now() * 1e6;
     }
 
     /**
@@ -69,7 +69,7 @@ public class Clock {
      * @return A cycle-consistent time, in nanoseconds.
      */
     public double getCurrentTimeInNanos() {
-        return time() * 1e9;
+        return now() * 1e9;
     }
 
     public void setTime(double time) {

@@ -1,12 +1,6 @@
 package us.ilite.robot.controller;
 
-import com.team2363.commands.IliteHelixFollower;
-import com.team319.trajectory.Path;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.types.EPowerCellData;
-import us.ilite.common.types.EShooterSystemData;
-import us.ilite.common.types.drive.EDriveData;
-import us.ilite.robot.Enums;
 import us.ilite.robot.auto.paths.*;
 
 public class YoinkController extends BaseAutonController {
@@ -23,15 +17,15 @@ public class YoinkController extends BaseAutonController {
 
     @Override
     public void updateImpl() {
-        SmartDashboard.putNumber("INDEX", BobUtils.getIndexForCumulativeTime(mActivePath, clock.time(), mPathStartTime));
+        SmartDashboard.putNumber("INDEX", BobUtils.getIndexForCumulativeTime(mActivePath, clock.now(), mPathStartTime));
         super.updateImpl();
 //        setIntakeArmEnabled(pNow, true);
 //        activateSerializer(pNow);
 
-        if (BobUtils.isFinished(clock.time(), mYoinkTo, mPathStartTime)) {
+        if (BobUtils.isFinished(clock.now(), mYoinkTo, mPathStartTime)) {
             if (mIntakingCount <= 0 && !mHasReversed) {
                 setNewActivePath(mYoinkFrom, true);
-                mYoinkFromStartTime = clock.time();
+                mYoinkFromStartTime = clock.now();
                 mHasReversed = true;
 
                 // Update again since path has changed, follows process of BaseAutonController
@@ -39,7 +33,7 @@ public class YoinkController extends BaseAutonController {
             } else {
                 mIntakingCount--;
             }
-            if (BobUtils.isFinished(clock.time(), mYoinkFrom, mYoinkFromStartTime)) {
+            if (BobUtils.isFinished(clock.now(), mYoinkFrom, mYoinkFromStartTime)) {
                 setTargetTracking(true);
             }
         }
