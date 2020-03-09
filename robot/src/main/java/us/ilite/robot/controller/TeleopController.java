@@ -84,7 +84,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             super.firingSequence(Enums.FlywheelSpeeds.OFF);
 //            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
         }
-        SmartDashboard.putString("Flywheel State", currentState.name());
+//        SmartDashboard.putString("Flywheel State", currentState.name());
     }
 
 //    public void updateLimelightTargetLock() {

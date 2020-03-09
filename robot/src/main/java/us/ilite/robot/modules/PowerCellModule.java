@@ -149,8 +149,8 @@ public class PowerCellModule extends Module {
         HardwareUtils.setGains(mIntakeRollerCtrl, mIntakeRollerGains);
         mIntakePivotEncoder.setPosition(0.0);
         mIntakePivotCtrl.setOutputRange(0.0, 95.0);
-        SmartDashboard.putNumber("Rotation Conversion (deg)", mIntakePivotDownGains.POSITION_CONVERSION_FACTOR);
-        SmartDashboard.putNumber("Max Rotation Speed (deg/s)", kMaxIntakePivotVelocityDeg_s * kPivotVelocityConversion);
+//        SmartDashboard.putNumber("Rotation Conversion (deg)", mIntakePivotDownGains.POSITION_CONVERSION_FACTOR);
+//        SmartDashboard.putNumber("Max Rotation Speed (deg/s)", kMaxIntakePivotVelocityDeg_s * kPivotVelocityConversion);
         mIntakeRollerEncoder.setPosition(0.0);
     }
 
@@ -185,7 +185,7 @@ public class PowerCellModule extends Module {
         if(db.powercell.isSet(INTAKE_STATE)) {
 //            mIntakeRoller.set(db.powercell.get(SET_INTAKE_VEL_ft_s) / 18.0); // 18ft/s theoretical max
             double rpm = db.powercell.get(SET_INTAKE_VEL_ft_s) / kIntakeRollerSpeedConversion;
-            SmartDashboard.putNumber("Target Intake Roller RPM", rpm);
+//            SmartDashboard.putNumber("Target Intake Roller RPM", rpm);
             mIntakeRollerCtrl.setReference(rpm, ControlType.kSmartVelocity, INTAKE_ROLLER_SLOT);
 //            mIntakeRoller.set(0.6);
             EArmState state = db.powercell.get(INTAKE_STATE, EArmState.class);
@@ -213,8 +213,8 @@ public class PowerCellModule extends Module {
         //TODO determine V_Motor and H_Motor specifics with Beam breaker
         mBeamCountBroken = (int) List.of(mDigitalBeamSensors).stream().filter(e -> !e.isBroken()).count();
 
-        SmartDashboard.putNumber("BeamCountBroken" , mBeamCountBroken);
-        SmartDashboard.putNumber("BeamCountBrokenGoal" , mGoalBeamCountBroken);
+//        SmartDashboard.putNumber("BeamCountBroken" , mBeamCountBroken);
+//        SmartDashboard.putNumber("BeamCountBrokenGoal" , mGoalBeamCountBroken);
 
 
 //        for (DigitalBeamSensor mDigitalBeamSensor : mDigitalBeamSensors) {
