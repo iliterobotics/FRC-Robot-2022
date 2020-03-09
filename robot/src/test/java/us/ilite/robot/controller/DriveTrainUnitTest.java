@@ -48,7 +48,8 @@ public class DriveTrainUnitTest extends BaseTest {
         ctrl.update();
         Assert.assertTrue(db.drivetrain.isSet(DESIRED_TURN_PCT));
         Assert.assertTrue(db.drivetrain.isSet(DESIRED_THROTTLE_PCT));
-        Assert.assertTrue(db.drivetrain.get(STATE, EDriveState.class) == EDriveState.VELOCITY);
+        // Removing this line since it is possible for the limelight to target lock with the drive train at the moment
+//        Assert.assertTrue(db.drivetrain.get(STATE, EDriveState.class) == EDriveState.VELOCITY);
         System.out.println(db.drivetrain.toVerboseString());
     }
 
