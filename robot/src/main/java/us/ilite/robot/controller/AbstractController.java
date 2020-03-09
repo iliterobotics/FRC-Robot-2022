@@ -13,6 +13,7 @@ import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
+import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.Limelight;
 
 import static us.ilite.robot.Enums.*;
@@ -21,6 +22,7 @@ import java.util.List;
 
 public abstract class AbstractController {
     protected final Data db = Robot.DATA;
+    protected final Clock clock = Robot.CLOCK;
     private boolean mEnabled = false;
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
@@ -39,34 +41,33 @@ public abstract class AbstractController {
     }
 
     /**
-     * @param pNow the amount of time since the robot started
      */
-    public void update(double pNow){
-        dt = pNow - mLastTime;
+    public void update(){
         if(mEnabled) {
             // split this out so we can put additional common elements here
-            updateImpl(pNow);
+            updateImpl();
 
             // Every 10s or so
             mCycleCount++;
         }
-        mLastTime = pNow;
+        mLastTime = clock.now();
     }
 
     /**
-     * TODO - adjust arm angles
-     * @param pNow - Current Timestamp
      * @param pEnabled if TRUE, the arm is put down and rollers activated; if FALSE, it is stowed
      */
-    protected void setIntakeArmEnabled(double pNow, boolean pEnabled) {
+    protected void setIntakeArmEnabled(boolean pEnabled) {
         if(pEnabled) {
-            double speed = Math.max(Math.abs(db.drivetrain.get(L_ACTUAL_VEL_FT_s)), Math.abs(db.drivetrain.get(R_ACTUAL_VEL_FT_s)));
-//            if(speed <= 1.0) {
-//                speed = 3.0;
-//            }
+            // Divide the drive train adder in half
+            double speed = Math.max(Math.abs(db.drivetrain.get(L_ACTUAL_VEL_FT_s)), Math.abs(db.drivetrain.get(R_ACTUAL_VEL_FT_s))) / 2.0;
+
+            // Add a static speed, in case we're human loading
             speed += 3.0;
+
+            // Cap the speed to ensure the intake doesn't over-vibrate loose. This is close to the max drivetrain speed.
+            speed = Math.min(speed, 10.5);
             db.powercell.set(INTAKE_STATE, EArmState.OUT);
-            db.powercell.set(SET_INTAKE_VEL_ft_s, speed + 1);
+            db.powercell.set(SET_INTAKE_VEL_ft_s , speed);
         } else {
             db.powercell.set(INTAKE_STATE, EArmState.STOW);
             db.powercell.set(SET_INTAKE_VEL_ft_s, 0.0);
@@ -82,9 +83,8 @@ public abstract class AbstractController {
 
     /**
      * Activates the serializer based upon the beam breaker states
-     * @param pNow - current timestamp
      */
-    protected void activateSerializer(double pNow) {
+    protected void activateSerializer() {
         mEntryLatch.update(db.powercell.isSet(ENTRY_BEAM));
         mSecondaryLatch.update(db.powercell.isSet(H_BEAM));
         if(mNumBalls >= 3) {
@@ -115,18 +115,18 @@ public abstract class AbstractController {
                 mNumBalls++;
             }
         }
-        SmartDashboard.putString("Entry State", mEntryLatch.get().name());
-        SmartDashboard.putString("Secon State", mSecondaryLatch.get().name());
-        SmartDashboard.putNumber("# Balls", mNumBalls);
+        db.powercell.set(NUM_BALLS, mNumBalls);
+        db.powercell.set(ENTRY_GATE, mEntryLatch.get());
+        db.powercell.set(H_GATE, mSecondaryLatch.get());
     }
 
-    protected void reverseSerializer(double pNow) {
+    protected void reverseSerializer() {
         db.powercell.set(SET_H_pct, -1.0);
         db.powercell.set(SET_V_pct, -0.5);
         db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP,-0.75);
     }
 
-    protected void stopDrivetrain(double pNow) {
+    protected void stopDrivetrain() {
         db.drivetrain.set(STATE, EDriveState.PERCENT_OUTPUT);
         db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
         db.drivetrain.set(DESIRED_TURN_PCT,0.0);
@@ -148,7 +148,7 @@ public abstract class AbstractController {
      */
     protected final void setFlywheelClosedLoop(FlywheelSpeeds pSpeed, boolean pSetHoodState) {
         db.flywheel.set(FLYWHEEL_WHEEL_STATE, pSpeed.wheelstate);
-        db.flywheel.set(BALL_VELOCITY_ft_s, pSpeed.speed);
+        db.flywheel.set(SET_BALL_VELOCITY_ft_s, pSpeed.speed);
         if (pSetHoodState) {
             setHood(pSpeed);
         }
@@ -171,6 +171,12 @@ public abstract class AbstractController {
     protected final void setTurretHandling(TurretControlType pTurretControlType, int pTrackingId) {
         db.goaltracking.set(ELimelightData.TARGET_ID, pTrackingId);
         db.flywheel.set(EShooterSystemData.TURRET_CONTROL, pTurretControlType);
+    }
+
+    private boolean mIsTurretReversed = false;
+    protected final void reverseTurretHome() {
+        mIsTurretReversed = !mIsTurretReversed;
+        db.flywheel.set(HOME_REVERSED, mIsTurretReversed);
     }
 
     protected void
@@ -208,33 +214,36 @@ public abstract class AbstractController {
     }
 
     protected boolean isFlywheelUpToSpeed() {
-        SmartDashboard.putBoolean("Flywheel up to speed", db.flywheel.get(SET_BALL_VELOCITY_ft_s) > 0.0 &&
-                db.flywheel.get(SET_BALL_VELOCITY_ft_s) >= db.flywheel.get(BALL_VELOCITY_ft_s) - 2.0);
-        return db.flywheel.get(SET_BALL_VELOCITY_ft_s) > 0.0 &&
-                db.flywheel.get(SET_BALL_VELOCITY_ft_s) >= db.flywheel.get(BALL_VELOCITY_ft_s) - 2.0;
+        boolean result = db.flywheel.get(BALL_VELOCITY_ft_s) > 0.0 &&
+                db.flywheel.get(BALL_VELOCITY_ft_s) >= db.flywheel.get(SET_BALL_VELOCITY_ft_s) - 2.0;
+        SmartDashboard.putBoolean("FLYWHEEL", result);
+        return result;
     }
 
     protected boolean isFeederUpToSpeed() {
-        SmartDashboard.putBoolean("Feeder up to speed", db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
-                db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8);
-        return db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
+        boolean result = db.flywheel.get(SET_FEEDER_rpm) > 0.0 &&
                 db.flywheel.get(FEEDER_rpm) >= db.flywheel.get(SET_FEEDER_rpm)*0.8;
+        SmartDashboard.putBoolean("FEEDER", result);
+        return result;
     }
 
     protected boolean isTurretAtCorrectAngle(){
-        SmartDashboard.putBoolean("Turret at correct angle", db.flywheel.isSet(IS_TARGET_LOCKED));
+        boolean result = db.flywheel.isSet(IS_TARGET_LOCKED);
+        SmartDashboard.putBoolean("TURRET", result);
 //        TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
 //        if (turretControlType != TurretControlType.MANUAL) {
-            return db.flywheel.isSet(IS_TARGET_LOCKED);
+            return result;
 //        return true;
 //        }
 //        return true;
     }
     protected boolean isHoodAtCorrectAngle(FlywheelSpeeds pSpeed) {
-        return Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 1.0;
+        boolean result = Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 1.0;
+        SmartDashboard.putBoolean("HOOD", result);
+        return result;
     }
 
-    protected abstract void updateImpl(double pNow);
+    protected abstract void updateImpl();
 
     /**
      * Provides a way to report on what is used in our codex vs not used. This should help reduce the

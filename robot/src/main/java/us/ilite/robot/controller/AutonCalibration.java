@@ -11,8 +11,8 @@ public class AutonCalibration extends BaseAutonController {
     }
 
     @Override
-    protected void updateImpl(double pNow) {
-        super.updateImpl(pNow);
+    protected void updateImpl() {
+        super.updateImpl();
 //        // Add a time check to prevent errors when things go wrong
 //        if(mActivePath != null && pNow - mPathStartTime <= mMaxAllowedPathTime) {
 //            int index = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);

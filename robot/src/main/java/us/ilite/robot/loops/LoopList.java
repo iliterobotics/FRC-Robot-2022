@@ -15,30 +15,30 @@ public class LoopList extends Loop {
     protected List<Loop> mLoops = new ArrayList<>();
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
-        mLoops.forEach(module -> module.modeInit(pMode, pNow));
+    public void modeInit(EMatchMode pMode) {
+        mLoops.forEach(module -> module.modeInit(pMode));
     }
 
     @Override
-    public void readInputs(double pNow) {
-        mLoops.forEach(module -> module.readInputs(pNow));
+    public void readInputs() {
+        mLoops.forEach(module -> module.readInputs());
     }
 
     @Override
-    public void setOutputs(double pNow) {
-        mLoops.forEach(module -> module.setOutputs(pNow));
+    public void setOutputs() {
+        mLoops.forEach(module -> module.setOutputs());
     }
 
     @Override
-    public void shutdown(double pNow) {
-        mLoops.forEach(module -> module.shutdown(pNow));
+    public void shutdown() {
+        mLoops.forEach(module -> module.shutdown());
     }
 
     @Override
-    public boolean checkModule(double pNow) {
+    public boolean checkModule() {
         boolean allSuccessful = true;
         for (Loop loop : mLoops) {
-            boolean moduleSuccessful = loop.checkModule(pNow);
+            boolean moduleSuccessful = loop.checkModule();
             allSuccessful = allSuccessful && moduleSuccessful;
             if (!moduleSuccessful) {
                 mLogger.error("Self-check failure for module: ", loop.getClass());

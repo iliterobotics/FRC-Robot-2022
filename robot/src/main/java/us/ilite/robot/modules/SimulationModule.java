@@ -12,7 +12,6 @@ public class SimulationModule extends Module {
 //    private Potentiometer mHoodPot;
     private double currentPositionDeg = 0d;
     private double currentVelocityDegPerSec = 0d;
-    private double lasttime = 0d;
 
     private static final double
             // REV is Speed: 0.14 s/60° (at 6V)
@@ -29,23 +28,22 @@ public class SimulationModule extends Module {
     }
 
     @Override
-    public void readInputs(double pNow) {
-        doPhysics(pNow);
+    public void readInputs() {
+        doPhysics();
         currentAngle = 0;
         currentPositionDeg += currentAngle - lastAngle;
-        currentVelocityDegPerSec = (currentAngle - lastAngle) / (lasttime - pNow);
+        currentVelocityDegPerSec = (currentAngle - lastAngle) / clock.dt();
         direction = Math.signum(currentAngle - lastAngle);
     }
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         lastAngle = currentAngle;
-        lasttime = pNow;
         SmartDashboard.putNumber("RAW POT", currentAngle);
         SmartDashboard.putNumber("POT POS", currentPositionDeg);
         SmartDashboard.putNumber("POT VEL", currentVelocityDegPerSec);
-        doPhysics(pNow);
+        doPhysics();
     }
 
-    private final void doPhysics(double pNow) {
+    private final void doPhysics() {
 
     }
 }

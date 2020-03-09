@@ -6,8 +6,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.*;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.Field2020;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
@@ -60,7 +58,11 @@ public class FlywheelModule extends Module {
     private final FilteredAverage mPotentiometerReadings = FilteredAverage.filteredAverageForTime(0.1);
     private static final double kMaxTurretPercentOutput = 0.8;
     private static final double kMaximumTurretAngle = 45.0;
+    private static final double kMaxTurretAngleLeft = -45.0;
+    private static final double kMaxTurretAngleRight = 190.0;
     private final double kTurretErrorTolerance = 5.0; //TODO - tune tolerance
+    private final double kTurretFront = 0.0;
+    private final double kTurretBack = 180.0;
 
     private static double kRadiansPerSecToTalonTicksPer100ms = (2 * Math.PI) / 2048.0 / 0.1;
     // https://docs.google.com/spreadsheets/d/1Po6exzGvfr0rMWMWVSyqxf49ZMSfGoYn/edit#gid=1858991275
@@ -77,9 +79,10 @@ public class FlywheelModule extends Module {
 //            .kA(0.00165)
 //            .kV(0.018)
             ;
+    private static final double kTurretPReduction = 0.8;
     // Smart motion turret gains
     private static ProfileGains kTurretCtrlGains = new ProfileGains()
-            .p(.0002)
+            .p(.0002 * kTurretPReduction)
             .maxVelocity(1000d)
             .maxAccel(1000d)
             .slot(TURRET_SLOT);
@@ -101,50 +104,52 @@ public class FlywheelModule extends Module {
     private final int kFlywheelFalconPIDSlot = 0;
 
     public FlywheelModule() {
-        mTurret = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kSRXTurretId, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mTurret = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kSRXTurretId, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         mTurretEncoder = mTurret.getEncoder();
         mTurretPID.setOutputRange(-kMaxTurretPercentOutput, kMaxTurretPercentOutput);
         mTurretCtrlPID = mTurret.getPIDController();
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         mTurret.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  (float) Units.degrees_to_rotations(kMaximumTurretAngle, kTurretGearRatio));
-        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) -Units.degrees_to_rotations(kMaximumTurretAngle, kTurretGearRatio));
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward,  (float) Units.degrees_to_rotations(kMaxTurretAngleRight, kTurretGearRatio));
+        mTurret.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, (float) Units.degrees_to_rotations(kMaxTurretAngleLeft, kTurretGearRatio));
         mTurretEncoder.setPosition(0.0);
         HardwareUtils.setGains(mTurretCtrlPID, kTurretCtrlGains);
 
 //        mHoodPot = new AnalogPotentiometer(0);
-        SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
-        SmartDashboard.putNumber("kVelocityConversion", kVelocityConversion);
-        mFlywheelFalconMaster = new TalonFX(Settings.Hardware.CAN.kFalconMasterId);
+//        SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
+//        SmartDashboard.putNumber("kVelocityConversion", kVelocityConversion);
+        mFlywheelFalconMaster = new TalonFX(Settings.HW.CAN.kFalconMasterId);
         mFlywheelFalconMaster.setInverted(true);
         mFlywheelFalconMaster.setNeutralMode(NeutralMode.Coast);
         mFlywheelFalconMaster.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
-        mFlywheelFalconFollower = new TalonFX(Settings.Hardware.CAN.kFalconFollowerId);
+        mFlywheelFalconFollower = new TalonFX(Settings.HW.CAN.kFalconFollowerId);
         mFlywheelFalconFollower.setNeutralMode(NeutralMode.Coast);
         mFlywheelFalconFollower.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-        mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kMAXFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
         mFeederInternalEncoder = new CANEncoder(mFeeder);
         mFeeder.setIdleMode(CANSparkMax.IdleMode.kBrake);
         mFeeder.setSmartCurrentLimit(30);
 
-        mHoodServo = new ContinuousRotationServo(Settings.Hardware.PWM.kHoodServoId).inverted(true);
+        mHoodServo = new ContinuousRotationServo(Settings.HW.PWM.kHoodServoId).inverted(true);
         mHoodPot = mFeeder.getAnalog(CANAnalog.AnalogMode.kAbsolute);
 //        mHoodAI = new AnalogInput(Settings.Hardware.Analog.kHoodPot);
 //        mHoodPot = new AnalogPotentiometer(mHoodAI);
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
         //Set PID gains & zero encoders here
         HardwareUtils.setGains(mFlywheelFalconMaster, kFlywheelGains);
         HardwareUtils.setGains(mFlywheelFalconFollower, kFlywheelGains);
     }
 
     @Override
-    public void readInputs(double pNow) {
-        db.flywheel.set(SET_BALL_VELOCITY_ft_s, mFlywheelFalconMaster.getSelectedSensorVelocity() / kVelocityConversion);
+    public void readInputs() {
+        double raw = mFlywheelFalconMaster.getSelectedSensorVelocity();
+        db.flywheel.set(BALL_VELOCITY_ft_s, raw / kVelocityConversion);
+        db.flywheel.set(FLYWHEEL_RAW_SPEED, raw);
         db.flywheel.set(FEEDER_rpm, mFeederInternalEncoder.getVelocity());
         double position = mHoodPot.getPosition();
         db.flywheel.set(POT_RAW_VALUE, position);
@@ -154,7 +159,8 @@ public class FlywheelModule extends Module {
         db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
         db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
         db.flywheel.set(CURRENT_TURRET_ANGLE, getCurrentTurretAngle());
-        db.flywheel.set(IS_TARGET_LOCKED, Math.abs(mTurretPID.getError()) <= kTurretErrorTolerance);
+        //TODO - undo this once the turret is physically fixed
+        db.flywheel.set(IS_TARGET_LOCKED, true);//Math.abs(mTurretPID.getError()) <= kTurretErrorTolerance);
 
 //        mPotentiometerReadings.addNumber(mHoodAI.getValue());
 //
@@ -182,22 +188,22 @@ public class FlywheelModule extends Module {
     }
 
     @Override
-    public void setOutputs(double pNow) {
-        setHood(pNow);
-        setTurret(pNow);
+    public void setOutputs() {
+        setHood();
+        setTurret();
         setFlywheel();
         setFeeder();
     }
 
     @Override
-    public void shutdown(double pNow) {
+    public void shutdown() {
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FLYWHEEL_VELOCITY, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_FEEDER_VELOCITY, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_SERVO_ANGLE, 0);
 //        Robot.DATA.flywheel.set(EShooterSystemData.TARGET_TURRET_POSITION, 0);
     }
 
-    private void setTurret(double pNow) {
+    private void setTurret() {
         if (db.flywheel.isSet(TURRET_CONTROL)) {
             TurretControlType turretControlType = db.flywheel.get(TURRET_CONTROL, TurretControlType.class);
 
@@ -214,7 +220,7 @@ public class FlywheelModule extends Module {
                 case TARGET_LOCKING:
                     if (db.goaltracking.isSet(ELimelightData.TX)) {
                         mTurretPID.setSetpoint(0.0);
-                        double output = -mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), pNow);
+                        double output = -mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), clock.now());
                         mTurret.set(output);
 //                        mTurretPID.setReference(Units.degrees_to_rotations(getCurrentTurretAngle() + db.goaltracking.get(ELimelightData.TX), kTurretGearRatio), ControlType.kSmartMotion, TURRET_SLOT, 0);
                     } else {
@@ -224,11 +230,15 @@ public class FlywheelModule extends Module {
                 case HOME:
                     db.goaltracking.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
 //                    mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
-                    mTurretPID.setSetpoint(0.0);
-                    double output = mTurretPID.calculate(getCurrentTurretAngle(), pNow);
+                    boolean reversed = db.flywheel.isSet(HOME_REVERSED);
+                    double turretHome = kTurretFront;
+                    if (reversed) {
+                        turretHome = kTurretBack;
+                    }
+                    mTurretPID.setSetpoint(turretHome);
+                    double output = mTurretPID.calculate(getCurrentTurretAngle(), clock.now());
                     mTurret.set(output);
                     break;
-
             }
         }
     }
@@ -249,8 +259,7 @@ public class FlywheelModule extends Module {
                 mFlywheelFalconFollower.set(TalonFXControlMode.PercentOutput, l);
                 break;
             case VELOCITY:
-                double flywheelOutput = db.flywheel.get(BALL_VELOCITY_ft_s) * kVelocityConversion;
-                SmartDashboard.putNumber("Flywheel Raw Output", flywheelOutput);
+                double flywheelOutput = db.flywheel.get(SET_BALL_VELOCITY_ft_s) * kVelocityConversion;
                 mFlywheelFalconMaster.set(TalonFXControlMode.Velocity, flywheelOutput);
                 mFlywheelFalconFollower.set(TalonFXControlMode.Velocity, flywheelOutput);
                 break;
@@ -276,7 +285,7 @@ public class FlywheelModule extends Module {
         return (90.0 - pHoodAngle - kMinShotDegrees) * kHoodConversionFactor;
     }
 
-    private void setHood(double pNow) {
+    private void setHood() {
         HoodState state = db.flywheel.get(HOOD_STATE, HoodState.class);
         if (state == null) state = HoodState.NONE;
 

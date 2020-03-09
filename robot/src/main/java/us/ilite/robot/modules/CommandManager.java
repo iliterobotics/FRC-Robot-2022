@@ -24,41 +24,41 @@ public class CommandManager extends Module {
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
         runCommandQueue = lastRunCommandQueue = false;
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
 
     }
 
     @Override
-    public void setOutputs(double pNow) {
-        updateCommands(pNow);
+    public void setOutputs() {
+        updateCommands();
     }
 
-    private void updateCommands(double pNow) {
+    private void updateCommands() {
 
         // Don't initialize and update on same cycle
         if (shouldInitializeCommandQueue()) {
             mLog.warn(mManagerTag, ": Initializing command queue");
-            desiredCommandQueue.init(pNow);
+            desiredCommandQueue.init(clock.now());
         } else if(isRunningCommands()) {
-            desiredCommandQueue.update(pNow);
+            desiredCommandQueue.update(clock.now());
         }
 
         // Only check if we're done with queue if we're actually running...otherwise we're just spamming stopRunningCommands()
         if(isRunningCommands() && desiredCommandQueue.isDone()) {
             mLog.warn(mManagerTag, ": Command queue has completed execution");
-            stopRunningCommands(pNow);
+            stopRunningCommands();
         }
 
         lastRunCommandQueue = runCommandQueue;
     }
 
     @Override
-    public void shutdown(double pNow) {
+    public void shutdown() {
 
     }
 
@@ -88,10 +88,10 @@ public class CommandManager extends Module {
         }
     }
 
-    public void stopRunningCommands(double pNow) {
+    public void stopRunningCommands() {
         mLog.warn(mManagerTag, ": Stopping command queue");
         runCommandQueue = false;
-        desiredCommandQueue.shutdown(pNow);
+        desiredCommandQueue.shutdown(clock.now());
         desiredCommandQueue.clear();
     }
 

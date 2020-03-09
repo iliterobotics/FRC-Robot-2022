@@ -15,7 +15,7 @@ public class ExampleModule extends Module {
     private boolean mOn = false;
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
         mLog.error("MODE INIT");
 
         mTimer.reset();
@@ -23,12 +23,12 @@ public class ExampleModule extends Module {
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
 
         if(mTimer.hasPeriodPassed(kDelaySeconds)) {
             mOn = !mOn;
@@ -45,12 +45,12 @@ public class ExampleModule extends Module {
     }
 
     @Override
-    public void shutdown(double pNow) {
+    public void shutdown() {
          mTimer.stop();
     }
 
     @Override
-    public boolean checkModule(double pNow) {
+    public boolean checkModule() {
         return false;
     }
 

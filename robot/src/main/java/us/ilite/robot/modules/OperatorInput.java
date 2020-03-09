@@ -21,7 +21,7 @@ public class OperatorInput extends Module {
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
 
         if(mDriverJoystick.getType() == null) {
             System.err.println("======= DRIVER JOYSTICK IS NOT PLUGGED IN =======");
@@ -33,13 +33,13 @@ public class OperatorInput extends Module {
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         ELogitech310.map(db.driverinput, mDriverJoystick);
         ELogitech310.map(db.operatorinput, mOperatorJoystick);
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
 
     }
 

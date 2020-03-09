@@ -2,25 +2,23 @@ package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
+import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
-import us.ilite.robot.Robot;
+import us.ilite.robot.modules.Limelight;
 
 import static us.ilite.common.types.EPowerCellData.*;
-import static us.ilite.robot.Robot.DATA;
 
 public class TeleopController extends BaseManualController { //copied from TestController, needs editing
 
     private ILog mLog = Logger.createLog(TeleopController.class);
     private static TeleopController INSTANCE;
     private Enums.FlywheelSpeeds currentState = Enums.FlywheelSpeeds.CLOSE;
+    private XorLatch mTurretReverseHome = new XorLatch();
 
     public static TeleopController getInstance() {
         if(INSTANCE == null) {
@@ -34,33 +32,44 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     @Override
-    protected void updateImpl(double pNow) {
+    protected void updateImpl() {
         db.registerAllWithShuffleboard();
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
         //updateLimelightTargetLock(); //waiting for merge to master
-        updateFlywheel(pNow);
-        super.updateDrivetrain(pNow);
-        updatePowerCells(pNow);
-        updateHanger(pNow); //not integrated yet
+        updateFlywheel();
+        super.updateDrivetrain();
+        updatePowerCells();
+        updateHanger(); //not integrated yet
         //updateDJBooth(pNow); //not integrated yet
     }
 
-    private void updateHanger(double pNow) {
+    private void updateHanger() {
         if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
-            db.hanger.set(EHangerModuleData.DESIRED_PCT, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS) / 5.0));
+            db.hanger.set(EHangerModuleData.SET_pct, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS)));
         }else{
-            db.hanger.set(EHangerModuleData.DESIRED_PCT, 0.0);
+            db.hanger.set(EHangerModuleData.SET_pct, 0.0);
         }
+
     }
 
-    private void updateFlywheel(double pNow) {
+    private void updateFlywheel() {
+
+        mTurretReverseHome.update(db.operatorinput.isSet(InputMap.OPERATOR.CLOSE_MODE));
+        if(mTurretReverseHome.mExit.get()) {
+            reverseTurretHome();
+            mTurretReverseHome.reset();
+        }
+
         if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE)) {
             currentState = Enums.FlywheelSpeeds.FAR;
-        }else if(db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
             currentState = Enums.FlywheelSpeeds.INITIATION_LINE;
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.CLOSE_MODE)) {
+            currentState = Enums.FlywheelSpeeds.CLOSE;
         }
+
 
         if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
             super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());
@@ -70,11 +79,11 @@ public class TeleopController extends BaseManualController { //copied from TestC
             super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());
             super.setFlywheelClosedLoop(currentState, true);
         } else {
+            db.goaltracking.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
             super.setTurretHandling(Enums.TurretControlType.HOME);
             super.firingSequence(Enums.FlywheelSpeeds.OFF);
 //            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
         }
-        SmartDashboard.putString("Flywheel State", currentState.name());
     }
 
 //    public void updateLimelightTargetLock() {
@@ -109,7 +118,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //        mLastTrackingType = DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
 //    }
 
-    protected void updatePowerCells(double pNow) {
+    protected void updatePowerCells() {
         if(db.operatorinput.isSet(InputMap.OPERATOR.RESET_INTAKE_COUNT)) {
             resetSerializerState();
         }
@@ -121,17 +130,17 @@ public class TeleopController extends BaseManualController { //copied from TestC
         }
         if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
 //            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
-                setIntakeArmEnabled(pNow, true);
-                activateSerializer(pNow);
+                setIntakeArmEnabled(true);
+                activateSerializer();
 //            }
 
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.STOW);
-            reverseSerializer(pNow);
+            reverseSerializer();
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW)) {
-            setIntakeArmEnabled(pNow, false);
+            setIntakeArmEnabled(false);
             if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
-                activateSerializer(pNow);
+                activateSerializer();
             }
         } else {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);

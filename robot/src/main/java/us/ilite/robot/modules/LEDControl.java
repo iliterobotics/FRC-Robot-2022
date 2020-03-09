@@ -2,8 +2,6 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.CANifier;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 
 import us.ilite.common.types.EColorData;
@@ -13,8 +11,6 @@ import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.LEDControlUtils.*;
-
-import static us.ilite.robot.modules.DJSpinnerModule.*;
 
 
 public class LEDControl extends Module {
@@ -47,7 +43,7 @@ public class LEDControl extends Module {
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
+    public void modeInit(EMatchMode pMode) {
         Robot.DATA.ledcontrol.set(ELEDControlData.LED_STATE , 1.0);
 
         this.mBlinkTimer.stop();
@@ -55,12 +51,12 @@ public class LEDControl extends Module {
     }
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         db.ledcontrol.set(ELEDControlData.LED_STATE , mLEDState.isOn() );
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         EColorMatch color = EColorMatch.values()[(int) db.color.get(EColorData.SENSED_COLOR)];
         boolean isDone = (db.color.get(EColorData.DESIRED_MOTOR_POWER) == EColorWheelState.OFF.power);
 
@@ -95,7 +91,7 @@ public class LEDControl extends Module {
 
         this.mBlinkTimer = new Timer();
         this.mBlinkTimer.reset();
-        mLEDCan = new CANifier(Settings.Hardware.CAN.kLEDControlCanifier);
+        mLEDCan = new CANifier(Settings.HW.CAN.kLEDControlCanifier);
     }
 
     public void controlLED(Message m) {

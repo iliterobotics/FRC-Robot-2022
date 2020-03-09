@@ -3,9 +3,7 @@ package us.ilite.robot.controller;
 import com.team2363.commands.IliteHelixFollower;
 import com.team2363.controller.PIDController;
 import com.team319.trajectory.Path;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
-import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
@@ -49,22 +47,22 @@ public class BaseAutonController extends AbstractController {
     }
 
     @Override
-    protected void updateImpl(double pNow) {
+    protected void updateImpl() {
         if (mDelayCycleCount <= 0) {
             if (!mInitializedPathFollower) {
                 mPathFollower.initialize();
                 mInitializedPathFollower = true;
             }
             if (mPathStartTime == 0) {
-                mPathStartTime = pNow;
+                mPathStartTime = clock.now();
             }
             if (mPathFollower != null && mPathFollower.isFinished()) {
                 mPathFollower = null;
             }
             if (mPathFollower == null) {
-                stopDrivetrain(pNow);
+                stopDrivetrain();
             } else {
-                mPathFollower.execute(pNow);
+                mPathFollower.execute();
             }
         } else {
             mDelayCycleCount--;
@@ -115,7 +113,7 @@ public class BaseAutonController extends AbstractController {
 
         @Override
         public void resetDistance() {
-            mPathStartTime = Robot.CLOCK.getCurrentTime();
+            mPathStartTime = Robot.CLOCK.now();
             mLastDistance = 0;
             db.drivetrain.set(EDriveData.STATE, EDriveState.RESET);
         }
@@ -156,8 +154,8 @@ public class BaseAutonController extends AbstractController {
             db.drivetrain.set(EDriveData.PATH_ERR_ft, mDistanceController.getError());
         }
 
-        protected void moveToNextSegment(double pNow) {
-            currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, pNow, mPathStartTime);
+        protected void moveToNextSegment() {
+            currentSegment = BobUtils.getIndexForCumulativeTime(mActivePath, clock.now(), mPathStartTime);
 
             if (currentSegment == 0) {
                 mHitFirst = true;
@@ -169,14 +167,14 @@ public class BaseAutonController extends AbstractController {
             }
         }
 
-        public void execute(double pNow) {
+        public void execute() {
             super.execute();
-            moveToNextSegment(pNow);
+            moveToNextSegment();
             if (!mIsTargetTracking) {
                 super.calculateOutputs();
             }
             if(isFinished()) {
-                stopDrivetrain(0.0);
+                stopDrivetrain();
             }
         }
     }

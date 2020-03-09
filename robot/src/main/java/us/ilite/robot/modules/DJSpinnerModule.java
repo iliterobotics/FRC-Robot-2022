@@ -9,7 +9,6 @@ import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EColorData;
@@ -43,7 +42,7 @@ public class DJSpinnerModule extends Module {
         eLastColorState = EColorMatch.NONE;
         eDesiredColorState = EColorMatch.NONE;
         mColorChangeCounter = 0;
-        mVictor = TalonSRXFactory.createDefaultVictor(Settings.Hardware.CAN.kDJSpinnerVictorID);
+        mVictor = TalonSRXFactory.createDefaultVictor(Settings.HW.CAN.kDJSpinnerVictorID);
         mVictor.setNeutralMode(NeutralMode.Brake);
 
 
@@ -56,7 +55,7 @@ public class DJSpinnerModule extends Module {
 
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         Color c = mColorSensorV3.getColor();
         db.color.set(EColorData.MEASURED_BLUE, c.blue);
         db.color.set(EColorData.MEASURED_GREEN, c.green);
@@ -69,7 +68,7 @@ public class DJSpinnerModule extends Module {
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         mVictor.set(ControlMode.PercentOutput, db.color.get(EColorData.DESIRED_MOTOR_POWER));
 
         if( db.color.get(EColorData.COLOR_WHEEL_MOTOR_STATE) == EColorWheelState.ROTATION.ordinal() ) {

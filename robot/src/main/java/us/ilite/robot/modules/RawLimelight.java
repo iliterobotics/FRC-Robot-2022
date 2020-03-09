@@ -56,58 +56,58 @@ public class RawLimelight extends Module{
     }
 
     @Override
-    public void modeInit(EMatchMode pMode, double pNow) {
-        Robot.DATA.rawLimelight.set(TARGET_ID, (double) NONE.id());
+    public void modeInit(EMatchMode pMode) {
+        db.rawLimelight.set(TARGET_ID, (double) NONE.id());
     }
 
     @Override
-    public void readInputs(double pNow) {
-        mVisionTarget = Field2020.FieldElement.values()[(int) Robot.DATA.rawLimelight.get(TARGET_ID)];
+    public void readInputs() {
+        mVisionTarget = Field2020.FieldElement.values()[(int) db.rawLimelight.get(TARGET_ID)];
 
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
-        Robot.DATA.rawLimelight.set(TV, targetValid ? 1.0d : null);
+        db.rawLimelight.set(TV, targetValid ? 1.0d : null);
 
         if(targetValid) {
-            Robot.DATA.rawLimelight.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TX_0, mTable.getEntry("tx0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TX_1, mTable.getEntry("tx1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TX_2, mTable.getEntry("tx2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TY_0,mTable.getEntry("ty0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TY_1,mTable.getEntry("ty1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TY_2,mTable.getEntry("ty2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TA,mTable.getEntry("ta").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TA_0,mTable.getEntry("ta0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TA_1,mTable.getEntry("ta1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TA_2,mTable.getEntry("ta2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TS_0,mTable.getEntry("ts0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TS_1,mTable.getEntry("ts1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TS_2,mTable.getEntry("ts2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TSHORT,mTable.getEntry("tshort").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TSHORT_0,mTable.getEntry("tshort0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TSHORT_1,mTable.getEntry("tshort1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TSHORT_2,mTable.getEntry("tshort2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TLONG_0,mTable.getEntry("tlong0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TLONG_1,mTable.getEntry("tlong1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TLONG_2,mTable.getEntry("tlong2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(THORIZ_0,mTable.getEntry("thoriz0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(THORIZ_1,mTable.getEntry("thoriz1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(THORIZ_2,mTable.getEntry("thoriz2").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TVERT_0,mTable.getEntry("tvert0").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TVERT_1,mTable.getEntry("tvert1").getDouble(Double.NaN));
-            Robot.DATA.rawLimelight.set(TVERT_2,mTable.getEntry("tvert2").getDouble(Double.NaN));
+            db.rawLimelight.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
+            db.rawLimelight.set(TX_0, mTable.getEntry("tx0").getDouble(Double.NaN));
+            db.rawLimelight.set(TX_1, mTable.getEntry("tx1").getDouble(Double.NaN));
+            db.rawLimelight.set(TX_2, mTable.getEntry("tx2").getDouble(Double.NaN));
+            db.rawLimelight.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
+            db.rawLimelight.set(TY_0,mTable.getEntry("ty0").getDouble(Double.NaN));
+            db.rawLimelight.set(TY_1,mTable.getEntry("ty1").getDouble(Double.NaN));
+            db.rawLimelight.set(TY_2,mTable.getEntry("ty2").getDouble(Double.NaN));
+            db.rawLimelight.set(TA,mTable.getEntry("ta").getDouble(Double.NaN));
+            db.rawLimelight.set(TA_0,mTable.getEntry("ta0").getDouble(Double.NaN));
+            db.rawLimelight.set(TA_1,mTable.getEntry("ta1").getDouble(Double.NaN));
+            db.rawLimelight.set(TA_2,mTable.getEntry("ta2").getDouble(Double.NaN));
+            db.rawLimelight.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
+            db.rawLimelight.set(TS_0,mTable.getEntry("ts0").getDouble(Double.NaN));
+            db.rawLimelight.set(TS_1,mTable.getEntry("ts1").getDouble(Double.NaN));
+            db.rawLimelight.set(TS_2,mTable.getEntry("ts2").getDouble(Double.NaN));
+            db.rawLimelight.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
+            db.rawLimelight.set(TSHORT,mTable.getEntry("tshort").getDouble(Double.NaN));
+            db.rawLimelight.set(TSHORT_0,mTable.getEntry("tshort0").getDouble(Double.NaN));
+            db.rawLimelight.set(TSHORT_1,mTable.getEntry("tshort1").getDouble(Double.NaN));
+            db.rawLimelight.set(TSHORT_2,mTable.getEntry("tshort2").getDouble(Double.NaN));
+            db.rawLimelight.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
+            db.rawLimelight.set(TLONG_0,mTable.getEntry("tlong0").getDouble(Double.NaN));
+            db.rawLimelight.set(TLONG_1,mTable.getEntry("tlong1").getDouble(Double.NaN));
+            db.rawLimelight.set(TLONG_2,mTable.getEntry("tlong2").getDouble(Double.NaN));
+            db.rawLimelight.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
+            db.rawLimelight.set(THORIZ_0,mTable.getEntry("thoriz0").getDouble(Double.NaN));
+            db.rawLimelight.set(THORIZ_1,mTable.getEntry("thoriz1").getDouble(Double.NaN));
+            db.rawLimelight.set(THORIZ_2,mTable.getEntry("thoriz2").getDouble(Double.NaN));
+            db.rawLimelight.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
+            db.rawLimelight.set(TVERT_0,mTable.getEntry("tvert0").getDouble(Double.NaN));
+            db.rawLimelight.set(TVERT_1,mTable.getEntry("tvert1").getDouble(Double.NaN));
+            db.rawLimelight.set(TVERT_2,mTable.getEntry("tvert2").getDouble(Double.NaN));
 //            if(mVisionTarget.equals(NONE)) {
-//                Robot.DATA.rawLimelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget.height()));
-//                Robot.DATA.rawLimelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
+//                db.rawLimelight.set(CALC_DIST_TO_TARGET, calcTargetDistance(mVisionTarget.height()));
+//                db.rawLimelight.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
 //                Optional<Translation2d> p = calcTargetLocation(mVisionTarget);
 //                if(p.isPresent()) {
-//                    Robot.DATA.rawLimelight.set(CALC_TARGET_X, p.get().getX());
-//                    Robot.DATA.rawLimelight.set(CALC_TARGET_Y, p.get().getY());
+//                    db.rawLimelight.set(CALC_TARGET_X, p.get().getX());
+//                    db.rawLimelight.set(CALC_TARGET_Y, p.get().getY());
 //                }
 //            }
         }
@@ -115,7 +115,7 @@ public class RawLimelight extends Module{
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
         setLedMode();
         setCamMode();
         setStreamMode();
@@ -124,27 +124,27 @@ public class RawLimelight extends Module{
     }
 
     private void setPipeline() {
-        mTable.getEntry("pipeline").setNumber(Robot.DATA.rawLimelight.get(mVisionTarget.pipeline()));
+        mTable.getEntry("pipeline").setNumber(db.rawLimelight.get(mVisionTarget.pipeline()));
     }
 
     private void setLedMode() {
-        mTable.getEntry("ledMode").setNumber(Robot.DATA.rawLimelight.get(LED_MODE));
+        mTable.getEntry("ledMode").setNumber(db.rawLimelight.get(LED_MODE));
     }
 
     private void setCamMode() {
-        mTable.getEntry("camMode").setNumber(Robot.DATA.rawLimelight.get(CAM_MODE));
+        mTable.getEntry("camMode").setNumber(db.rawLimelight.get(CAM_MODE));
     }
 
     private void setStreamMode() {
-        mTable.getEntry("stream").setNumber(Robot.DATA.rawLimelight.get(STREAM_MODE));
+        mTable.getEntry("stream").setNumber(db.rawLimelight.get(STREAM_MODE));
     }
 
     private void setSnapshotMode() {
-        mTable.getEntry("snapshot").setNumber(Robot.DATA.rawLimelight.get(SNAPSHOT_MODE));
+        mTable.getEntry("snapshot").setNumber(db.rawLimelight.get(SNAPSHOT_MODE));
     }
 
     public String toString() {
-        return Robot.DATA.goaltracking.toCSV();
+        return db.goaltracking.toCSV();
     }
 
 }

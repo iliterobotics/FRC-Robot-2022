@@ -5,11 +5,8 @@ import com.flybotix.hfr.util.log.Logger;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.IFieldComponent;
-import us.ilite.robot.Robot;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * @author Stephen Welch
@@ -22,24 +19,33 @@ public class Clock {
 
     private double mStartTime = 0.0;
     private double mCurrentTime = 0.0;
-    private boolean hasTimeUpdatedThisCycle = false;
+    private double mDT = 0.0;
     private boolean mIsSimulated = false;
 
     public Clock() {
+    }
+
+    public void update() {
+        double t = (mIsSimulated) ? getJavaTime() : getRobotTime() - mStartTime;
+        mDT = t - mCurrentTime;
+        mCurrentTime = t;
     }
 
     /**
      *
      * @return A cycle-consistent time, in seconds.
      */
-    public double getCurrentTime() {
-        if(hasTimeUpdatedThisCycle == false) {
-            mCurrentTime = (mIsSimulated) ? getJavaTime() : getRobotTime();
-            mCurrentTime -= mStartTime;
-            hasTimeUpdatedThisCycle = true;
-        }
-
+    public double now() {
         return mCurrentTime;
+    }
+
+
+    /**
+     *
+     * @return A cycle-consistent delta-time, in seconds.
+     */
+    public double dt() {
+        return mDT;
     }
 
     /**
@@ -47,7 +53,7 @@ public class Clock {
      * @return A cycle-consistent time, in milliseconds.
      */
     public double getCurrentTimeInMillis() {
-        return getCurrentTime() * 1000;
+        return now() * 1e3;
     }
 
     /**
@@ -55,7 +61,7 @@ public class Clock {
      * @return A cycle-consistent time, in microseconds.
      */
     public double getCurrentTimeInMicros() {
-        return getCurrentTime() * 1000000;
+        return now() * 1e6;
     }
 
     /**
@@ -63,14 +69,7 @@ public class Clock {
      * @return A cycle-consistent time, in nanoseconds.
      */
     public double getCurrentTimeInNanos() {
-        return getCurrentTime() * 1000000000;
-    }
-
-    /**
-     * Call this to signify the end of a robot cycle and tell the time to update next time it's retrieved.
-     */
-    public void cycleEnded() {
-        hasTimeUpdatedThisCycle = false;
+        return now() * 1e9;
     }
 
     public void setTime(double time) {

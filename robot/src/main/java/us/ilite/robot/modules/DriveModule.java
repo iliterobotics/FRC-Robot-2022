@@ -1,20 +1,18 @@
 package us.ilite.robot.modules;
 
-import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
 import static com.revrobotics.ControlType.*;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
-import us.ilite.common.Field2020;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 
+import static us.ilite.common.types.ELimelightData.TV;
+import static us.ilite.common.types.ELimelightData.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.sensor.EGyro;
@@ -145,22 +143,22 @@ public class DriveModule extends Module {
 	}
 
 	public DriveModule() {
-		mLeftMaster = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveLeftMaster, kDriveConfig);
-		mLeftFollower = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveLeftFollower, kDriveConfig);
+		mLeftMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveLeftMaster, kDriveConfig);
+		mLeftFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveLeftFollower, kDriveConfig);
 		mLeftFollower.follow(mLeftMaster);
 		mLeftEncoder = new CANEncoder(mLeftMaster);
 		mLeftCtrl = mLeftMaster.getPIDController();
 		mLeftCtrl.setOutputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
-		mRightMaster = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveRightMaster, kDriveConfig);
-		mRightFollower = SparkMaxFactory.createSparkMax(Settings.Hardware.CAN.kDriveRightFollower, kDriveConfig);
+		mRightMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveRightMaster, kDriveConfig);
+		mRightFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveRightFollower, kDriveConfig);
 		mRightFollower.follow(mRightMaster);
 		mRightEncoder = new CANEncoder(mRightMaster);
 		mRightCtrl = mRightMaster.getPIDController();
 		mRightCtrl.setOutputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
-		mGyro = new Pigeon(Settings.Hardware.CAN.kPigeon);
-		double ramprate = 0.01;
+		mGyro = new Pigeon(clock, Settings.HW.CAN.kPigeon);
+		double ramprate = 0.20;
         mLeftMaster.setClosedLoopRampRate(ramprate);
         mLeftFollower.setClosedLoopRampRate(ramprate);
         mRightMaster.setClosedLoopRampRate(ramprate);
@@ -199,7 +197,7 @@ public class DriveModule extends Module {
 	}
 
 	@Override
-	public void modeInit(EMatchMode pMode, double pNow) {
+	public void modeInit(EMatchMode pMode) {
 		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 		mTargetAngleLockPid.setSetpoint(0);
@@ -216,9 +214,8 @@ public class DriveModule extends Module {
 	}
 
 	@Override
-	public void readInputs(double pNow) {
-	    mDeltaTime = pNow - mLastTime;
-	    mGyro.update(pNow);
+	public void readInputs() {
+	    mGyro.update();
 	    db.drivetrain.set(DELTA_HEADING, mGyro.getHeading().getDegrees() - mLastHeading);
 	    db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
 		db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
@@ -236,14 +233,13 @@ public class DriveModule extends Module {
 	}
 
 	@Override
-	public void setOutputs(double pNow) {
+	public void setOutputs() {
 	    mLastHeading = mGyro.getHeading().getDegrees();
-	    mLastTime = pNow;
 		EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
 		// Do this to prevent wonkiness while transitioning autonomous to teleop
 		if(mode == null) return;
-		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
-		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
+		double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
+		double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
 		switch (mode) {
 			case RESET:
 				reset();
@@ -272,22 +268,21 @@ public class DriveModule extends Module {
 				}
 				break;
 			case TARGET_ANGLE_LOCK:
-				RobotCodex<ELimelightData> targetData = Robot.DATA.goaltracking;
-				targetData.set(ELimelightData.TARGET_ID, Field2020.FieldElement.TARGET.id());
+//				targetData.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
 				double pidOutput;
-				if(mTargetAngleLockPid != null && targetData != null && targetData.isSet(ELimelightData.TV) && targetData.isSet(ELimelightData.TX)) {
+				if(mTargetAngleLockPid != null && db.goaltracking != null && db.goaltracking.isSet(TV) && db.goaltracking.isSet(TX)) {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * targetData.get(ELimelightData.TX), pNow - mLastTime);
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.goaltracking.get(TX), clock.dt());
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
+//					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
 					turn = pidOutput;
 				}
+				// NOTE - fall through here
 			case VELOCITY:
 				mStartHoldingPosition = false;
 //				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
 //				turn = mYawPid.calculate(mGyro.getYaw().getDegrees(), turn * kMaxDegreesPerSecond);
-				SmartDashboard.putNumber("DESIRED YAW", mYawPid.getSetpoint());
-				SmartDashboard.putNumber("ACTUAL YAW", (db.drivetrain.get(GYRO_RATE)));
+				db.drivetrain.set(SET_YAW_RATE_deg_s, mYawPid.getSetpoint());
 				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
 				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
 				break;

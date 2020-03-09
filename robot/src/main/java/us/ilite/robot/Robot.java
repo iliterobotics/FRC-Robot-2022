@@ -6,7 +6,6 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -15,18 +14,14 @@ import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.auto.paths.AutonSelection;
-import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
 import us.ilite.robot.network.EForwardableConnections;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.TimerTask;
 
 import static us.ilite.common.types.EMatchMode.*;
 
@@ -39,7 +34,7 @@ public class Robot extends TimedRobot {
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
-    public static final CSVLogger mCSVLogger = new CSVLogger( Settings.kIsLogging );
+    private CSVLogger mCSVLogger;
     private HangerModule mHanger;
     private Timer initTimer = new Timer();
 
@@ -70,6 +65,7 @@ public class Robot extends TimedRobot {
         // Init the actual robot
 //        initTimer.reset();
 //        initTimer.start();
+        mCSVLogger = new CSVLogger( Settings.kIsLogging );
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -98,8 +94,9 @@ public class Robot extends TimedRobot {
         // Init static variables and get singleton instances first
 
         ICodexTimeProvider provider = new ICodexTimeProvider() {
-            public long getTimestamp() {
-                return (long) CLOCK.getCurrentTimeInNanos();
+            @Override
+            public double getTimestamp() {
+                return CLOCK.now();
             }
         };
         CodexMetadata.overrideTimeProvider(provider);
@@ -123,7 +120,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        CLOCK.cycleEnded();
     }
 
     @Override
@@ -134,14 +130,13 @@ public class Robot extends TimedRobot {
 
         MODE=AUTONOMOUS;
         mActiveController = mAutonSelection.getSelectedAutonController();
-        SmartDashboard.putNumber("AUTON INIT", CLOCK.getCurrentTime());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
-        mRunningModules.modeInit(AUTONOMOUS, CLOCK.getCurrentTime());
+        mRunningModules.modeInit(AUTONOMOUS);
     }
 
     @Override
@@ -177,7 +172,8 @@ public class Robot extends TimedRobot {
         MODE=DISABLED;
         mLogger.info("Disabled Initialization");
 
-        mRunningModules.shutdown(CLOCK.getCurrentTime());
+        mRunningModules.shutdown();
+        // Don't clear the modules - we want them to continue updating shuffleboard with sensor readings
 
 //        mCSVLogger.stop();
 
@@ -188,10 +184,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        mOI.readInputs(0d);
-        mDrive.readInputs(0d);
-        mShooter.readInputs(0d);
-        mIntake.readInputs(0d);
+        mOI.readInputs();
+        mDrive.readInputs();
+        mShooter.readInputs();
+        mIntake.readInputs();
         Shuffleboard.update();
     }
 
@@ -220,8 +216,8 @@ public class Robot extends TimedRobot {
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }
-        mRunningModules.modeInit(TEST, CLOCK.getCurrentTime());
-        mRunningModules.checkModule(CLOCK.getCurrentTime());
+        mRunningModules.modeInit(TEST);
+        mRunningModules.checkModule();
     }
 
     @Override
@@ -237,7 +233,8 @@ public class Robot extends TimedRobot {
 
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
-        if ( Settings.kIsLogging ) {
+        CLOCK.update();
+        if ( Settings.kIsLogging && MODE != DISABLED) {
             for ( RobotCodex c : DATA.mLoggedCodexes ) {
                 if ( c.hasChanged() ) {
                     mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
@@ -249,11 +246,11 @@ public class Robot extends TimedRobot {
         }
 //        EPowerDistPanel.map(mData.pdp, pdp);
 
-        mRunningModules.readInputs(CLOCK.getCurrentTime());
-        mActiveController.update(CLOCK.getCurrentTime());
-        mRunningModules.setOutputs(CLOCK.getCurrentTime());
+        mRunningModules.readInputs();
+        mActiveController.update();
+        mRunningModules.setOutputs();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
-        SmartDashboard.putNumber("FPGA Time", Timer.getFPGATimestamp());
+        SmartDashboard.putNumber("Clock Time", CLOCK.now());
     }
 
     private void initMatchMetadata() {

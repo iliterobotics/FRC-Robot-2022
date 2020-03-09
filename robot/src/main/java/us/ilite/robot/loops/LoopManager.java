@@ -40,19 +40,16 @@ public class LoopManager implements Runnable{
     }
 
     public synchronized void start() {
-
+        mClock.update();
         if(!mIsRunning) {
             mLog.info("Starting us.ilite.common.lib.control loop");
             synchronized(mTaskLock) {
-                mLoopList.modeInit(EMatchMode.TELEOPERATED, Timer.getFPGATimestamp());
-                mLoopList.readInputs(Timer.getFPGATimestamp());
+                mLoopList.modeInit(EMatchMode.TELEOPERATED);
+                mLoopList.readInputs();
                 mIsRunning = true;
             }
             mWpiNotifier.startPeriodic(kLoopPeriodSeconds);
         }
-
-        mClock.cycleEnded();
-
     }
 
     public synchronized void stop() {
@@ -62,14 +59,12 @@ public class LoopManager implements Runnable{
             mWpiNotifier.stop();
             synchronized(mTaskLock) {
                 mIsRunning = false;
-                mLoopList.shutdown(Timer.getFPGATimestamp());
+                mLoopList.shutdown();
             }
 
             if(numLoops != 0) {
                 mLog.error("Experienced ", numOverruns, "/", numLoops, " timing overruns, or ", ((double)numOverruns/(double)numLoops) * 100.0, "%.");
             }
-
-            mClock.cycleEnded();
         }
 
     }
@@ -86,7 +81,7 @@ public class LoopManager implements Runnable{
                     if (mIsRunning) {
 //                        inputTimer.reset();
 //                        inputTimer.start();
-                        mLoopList.readInputs(Timer.getFPGATimestamp());
+                        mLoopList.readInputs();
 //                        inputTimer.stop();
 //                        updateTimer.reset();
 //                        updateTimer.start();
@@ -105,7 +100,7 @@ public class LoopManager implements Runnable{
 //            loopTimer.stop();
             double dt = Timer.getFPGATimestamp() - start;
             numLoops++;
-            SmartDashboard.putNumber("highfreq_loop_dt", dt);
+//            SmartDashboard.putNumber("highfreq_loop_dt", dt);
             if (dt > Settings.kControlLoopPeriod) {
 //                mLog.error("Overrun: ", /*loopTimer.get()*/dt, " Input took: "/*, inputTimer.get()*/, " Update took: "/*,updateTimer.get()*/);
                 numOverruns++;

@@ -22,12 +22,12 @@ public class GroundTracking extends Module {
     private boolean mIsTracking = false;
 
     @Override
-    public void readInputs(double pNow) {
+    public void readInputs() {
         sortTrackingData();
     }
 
     @Override
-    public void setOutputs(double pNow) {
+    public void setOutputs() {
     }
 
     public void sortTrackingData() {
