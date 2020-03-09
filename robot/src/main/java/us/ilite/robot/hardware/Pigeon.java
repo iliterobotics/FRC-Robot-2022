@@ -7,7 +7,6 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import us.ilite.common.Angle;
 import us.ilite.common.config.Settings;
 
 public class Pigeon extends IMU{
@@ -34,9 +33,9 @@ public class Pigeon extends IMU{
 		ypr = new double[3];
 		xyz = new short[3];
 		this.mPigeon = new PigeonIMU(pPigeonCANId);
-		ErrorCode ec = mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, (int)(1.0 / kUpdateRate * 1000.0), Settings.Hardware.CAN.kLongTimeoutMs);
+		ErrorCode ec = mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, (int)(1.0 / kUpdateRate * 1000.0), Settings.HW.CAN.kLongTimeoutMs);
 		System.err.println("===== PIGEON ERROR CODE: " + ec);
-		mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_6_SensorFusion, (int)(1.0 / kUpdateRate * 1000.0), Settings.Hardware.CAN.kLongTimeoutMs);
+		mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_6_SensorFusion, (int)(1.0 / kUpdateRate * 1000.0), Settings.HW.CAN.kLongTimeoutMs);
 
 		setCollisionThreshold_DeltaG(kCollisionThreshold);
 		//mAccelerationX = new FilteredAverage(kCollisionGains);

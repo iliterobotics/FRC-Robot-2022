@@ -33,80 +33,51 @@ public class Settings {
 
     // ================================
     // System ID's
+    // DO NOT CHANGE ANY OF THE FOLLOWING VALUES. PERIOD.
     // ================================
-    public static class Hardware {
-        // =============================================================================
-        // IMU Constants
-        // =============================================================================
-
-
+    public static class HW {
         public static class CAN {
-            public static int kDJBoothTalonId = 72;
-            public static int kHangerNeoID1 = 5;
-            public static int kHangerNeoID2 = 6;
-//            public static int kTalonThreeID = 65; // Change later
-
-            public static final int kDJSpinnerVictorID = 12; //ID of intake on Aria
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
-            public static final int kShooterID = 66; // BunnyBot Shooter
+            public static final int kDriveRightMaster = 1;
+            public static final int kDriveRightFollower = 2;
+            public static final int kDriveLeftMaster = 3;
+            public static final int kDriveLeftFollower = 4;
+            // TODO - double check that this is correct when the robot is right-side-up.
+            public static final int kMAXHanger1_left = 5;
+            public static final int kMAXHanger2_right = 6;
+            public static final int kMAXIntakeRollerId = 7;
+            public static final int kMAXIntakeArm = 8;
+            public static final int kSRXTurretId = 9;
+            public static final int kMAXFeederId = 10;
+            public static final int kTalonPowerCellSerializer = 11;
+            public static final int kTalonVerticalID = 12;
+            public static final int kFalconMasterId = 13;
+            public static final int kFalconFollowerId = 14;
+            public static final int kDJSpinnerVictorID = 15;
 
-
-            public static int kSRXTurretId = 9;
-            public static int kLEDControlCanifierID = 0;
-
-//            public static double kGyroCollisionThreshold = 0.0;
-
-            // =============================================
-            // DO NOT CHANGE ANY OF THE FOLLOWING CAN ID's
-            // =============================================
-            public static int kPDP = 20;
-            public static int kPigeon = 21;
-            // ===== 2020 Drive =====
-            public static int kDriveRightMaster = 1;
-            public static int kDriveRightFollower = 2;
-            public static int kDriveLeftMaster = 3;
-            public static int kDriveLeftFollower = 4;
-
-            public static int kMAXIntakeRollerId = 7;
-            public static int kMAXIntakeArm = 8;
-            public static int kFeederId = 10;
-            public static int kTalonPowerCellSerializer = 11;
-            public static int kTalonVerticalID = 12;
-            public static int kFalconMasterId = 13;
-            public static int kFalconFollowerId = 14;
+            public static final int kPDP = 20;
+            public static final int kPigeon = 21;
 
             public static int kLEDControlCanifier = 40;
-
-
-            // ===== 2019 Drive =====
-//            public static  int kDriveLeftMaster = 1;
-//            public static int kDriveLeftFollower = 3;
-//            public static  int kDriveRightMaster = 2;
-//            public static int kDriveRightFollower = 4;
-
         }
 
         public static class Analog {
-            public static int kHoodPot = 0; //Current bunnybot analog port
         }
 
         public static class DIO {
-            public static int kEntryBeamChannel = 9;
-            public static int kSecondaryBeamChannel = 8; // Change later
-            public static int kExitBeamChannel = 7; // Change later
+            public static final int kEntryBeamChannel = 9;
+            public static final int kSecondaryBeamChannel = 8; // Change later
+            public static final int kExitBeamChannel = 7; // Change later
             public static final int kAnglerID = 8; // BunnyBot Catapult
         }
 
         public static class PWM {
-            public static int kHoodServoId = 9;
+            public static final int kHoodServoId = 9;
         }
 
         public static class PCM {
-            public static int kFourBarDoubleSolenoidForward = 0;
-            public static int kFourBarDoubleSolenoidReverse = 1;
-            public static int kFourBarPusher = 0;
         }
 
     }

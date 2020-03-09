@@ -104,7 +104,7 @@ public class FlywheelModule extends Module {
     private final int kFlywheelFalconPIDSlot = 0;
 
     public FlywheelModule() {
-        mTurret = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kSRXTurretId, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mTurret = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kSRXTurretId, CANSparkMaxLowLevel.MotorType.kBrushless);
 
         mTurretEncoder = mTurret.getEncoder();
         mTurretPID.setOutputRange(-kMaxTurretPercentOutput, kMaxTurretPercentOutput);
@@ -119,20 +119,20 @@ public class FlywheelModule extends Module {
 //        mHoodPot = new AnalogPotentiometer(0);
 //        SmartDashboard.putNumber("kRadiansPerSecToTalonTicksPer100ms", kRadiansPerSecToTalonTicksPer100ms);
 //        SmartDashboard.putNumber("kVelocityConversion", kVelocityConversion);
-        mFlywheelFalconMaster = new TalonFX(Settings.Hardware.CAN.kFalconMasterId);
+        mFlywheelFalconMaster = new TalonFX(Settings.HW.CAN.kFalconMasterId);
         mFlywheelFalconMaster.setInverted(true);
         mFlywheelFalconMaster.setNeutralMode(NeutralMode.Coast);
         mFlywheelFalconMaster.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
-        mFlywheelFalconFollower = new TalonFX(Settings.Hardware.CAN.kFalconFollowerId);
+        mFlywheelFalconFollower = new TalonFX(Settings.HW.CAN.kFalconFollowerId);
         mFlywheelFalconFollower.setNeutralMode(NeutralMode.Coast);
         mFlywheelFalconFollower.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-        mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kMAXFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
         mFeederInternalEncoder = new CANEncoder(mFeeder);
         mFeeder.setIdleMode(CANSparkMax.IdleMode.kBrake);
         mFeeder.setSmartCurrentLimit(30);
 
-        mHoodServo = new ContinuousRotationServo(Settings.Hardware.PWM.kHoodServoId).inverted(true);
+        mHoodServo = new ContinuousRotationServo(Settings.HW.PWM.kHoodServoId).inverted(true);
         mHoodPot = mFeeder.getAnalog(CANAnalog.AnalogMode.kAbsolute);
 //        mHoodAI = new AnalogInput(Settings.Hardware.Analog.kHoodPot);
 //        mHoodPot = new AnalogPotentiometer(mHoodAI);

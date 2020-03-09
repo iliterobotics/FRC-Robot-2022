@@ -3,28 +3,28 @@ package us.ilite.robot.modules;
 import com.revrobotics.*;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.robot.Enums;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
+import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
+import static us.ilite.common.types.EHangerModuleData.*;
+
 public class HangerModule extends Module {
 
-    private CANSparkMax mHangerNeoMaster;
-    private CANSparkMax mHangerNeoFollower;
-    private CANPIDController mHangerPIDMaster;
-    private CANPIDController mHangerPIDFollower;
+    private CANSparkMax mLeftHanger;
+    private CANSparkMax mRightHanger;
+    private CANPIDController mLeftHangerPID;
+    private CANPIDController mRightHangerPID;
 
-    private CANEncoder mHangerEncoderOne;
-    private CANEncoder mHangerEncoderTwo;
+    private CANEncoder mLeftHangerEncoder;
+    private CANEncoder mRightHangerEncoder;
 
     public static double kMaxRPM = 2000.0;
     private static final int VELOCITY_PID_SLOT = 0;
     public static ProfileGains kHangerVelocityGains = new ProfileGains()
             .f(0.0002)
             .p(0.00015)
-            // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
             .maxVelocity(kMaxRPM)
             .maxAccel(kMaxRPM*1.5)
             .slot(VELOCITY_PID_SLOT);
@@ -33,37 +33,42 @@ public class HangerModule extends Module {
 
     public HangerModule(){
 
-        mHangerNeoMaster = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID1 ,
-                CANSparkMaxLowLevel.MotorType.kBrushless);
+        mLeftHanger = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kMAXHanger1_left,kBrushless);
+        mRightHanger = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kMAXHanger2_right, kBrushless);
 
-        mHangerNeoFollower = SparkMaxFactory.createDefaultSparkMax(Settings.Hardware.CAN.kHangerNeoID2 , CANSparkMaxLowLevel.MotorType.kBrushless);
+        mLeftHangerPID = new CANPIDController(mLeftHanger);
+        mRightHangerPID = new CANPIDController(mRightHanger);
 
+        mLeftHanger.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        mRightHanger.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-        mHangerPIDMaster = new CANPIDController(mHangerNeoMaster);
-        mHangerPIDFollower = new CANPIDController(mHangerNeoFollower);
-        HardwareUtils.setGains(mHangerPIDMaster, kHangerVelocityGains);
-        HardwareUtils.setGains(mHangerPIDFollower, kHangerVelocityGains);
+        HardwareUtils.setGains(mLeftHangerPID, kHangerVelocityGains);
+        HardwareUtils.setGains(mRightHangerPID, kHangerVelocityGains);
 
-        mHangerNeoMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
-        mHangerNeoFollower.setInverted(false);
-        mHangerNeoMaster.setInverted(true);
+        mLeftHanger.setInverted(true);
+        mRightHanger.setInverted(false);
 
+        mLeftHanger.setSmartCurrentLimit(kHangerWarnCurrentLimitThreshold);
+        mRightHanger.setSmartCurrentLimit(kHangerWarnCurrentLimitThreshold);
 
-        mHangerNeoMaster.burnFlash();
-        mHangerNeoFollower.burnFlash();
+        mLeftHangerEncoder = mLeftHanger.getEncoder();
+        mRightHangerEncoder = mRightHanger.getEncoder();
 
-        mHangerEncoderOne = mHangerNeoMaster.getEncoder();
-        mHangerEncoderTwo = mHangerNeoFollower.getEncoder();
+        mLeftHanger.burnFlash();
+        mRightHanger.burnFlash();
 
-        mHangerNeoMaster.setSmartCurrentLimit(kHangerWarnCurrentLimitThreshold);
-        mHangerNeoFollower.setSmartCurrentLimit(kHangerWarnCurrentLimitThreshold);
-
-        zeroTheEncoders();
+        mLeftHangerEncoder.setPosition(0);
+        mRightHangerEncoder.setPosition(0);
     }
 
     @Override
     public void readInputs() {
-        db.hanger.set(EHangerModuleData.OUTPUT_CURRENT , mHangerNeoMaster.getOutputCurrent());
+        db.hanger.set(L_OUTPUT_CURRENT, mLeftHanger.getOutputCurrent());
+        db.hanger.set(R_OUTPUT_CURRENT, mRightHanger.getOutputCurrent());
+        db.hanger.set(L_VEL_rpm, mLeftHangerEncoder.getVelocity());
+        db.hanger.set(R_VEL_rpm, mRightHangerEncoder.getVelocity());
+        db.hanger.set(L_POSITION_rot, mLeftHangerEncoder.getPosition());
+        db.hanger.set(R_POSITION_rot, mRightHangerEncoder.getPosition());
     }
 
     @Override
@@ -74,21 +79,8 @@ public class HangerModule extends Module {
 
     @Override
     public void setOutputs() {
-//        mHangerNeoFollower.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
-//        mHangerNeoMaster.set(Robot.DATA.hanger.get(EHangerModuleData.DESIRED_PCT));
-        double desiredPct = db.hanger.safeGet(EHangerModuleData.DESIRED_PCT, 0.0);
-        mHangerPIDMaster.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-        mHangerPIDFollower.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+        double desiredPct = db.hanger.safeGet(SET_pct, 0.0);
+        mLeftHangerPID.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+        mRightHangerPID.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
     }
-
-    public boolean isCurrentLimiting(){
-        return mHangerNeoMaster.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold ||
-                mHangerNeoFollower.getOutputCurrent() >= kHangerWarnCurrentLimitThreshold;
-    }
-
-    public void zeroTheEncoders(){
-        mHangerEncoderOne.setPosition(0);
-        mHangerEncoderTwo.setPosition(0);
-    }
-
 }

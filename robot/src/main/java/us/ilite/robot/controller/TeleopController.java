@@ -2,7 +2,6 @@ package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.lib.util.XorLatch;
@@ -48,9 +47,9 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     private void updateHanger() {
         if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
-            db.hanger.set(EHangerModuleData.DESIRED_PCT, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS)));
+            db.hanger.set(EHangerModuleData.SET_pct, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS)));
         }else{
-            db.hanger.set(EHangerModuleData.DESIRED_PCT, 0.0);
+            db.hanger.set(EHangerModuleData.SET_pct, 0.0);
         }
 
     }

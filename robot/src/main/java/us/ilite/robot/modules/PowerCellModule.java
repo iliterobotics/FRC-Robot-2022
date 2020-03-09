@@ -92,25 +92,25 @@ public class PowerCellModule extends Module {
     private ILog mLog = Logger.createLog(this.getClass());
 
     public PowerCellModule() {
-        mIntakeRoller = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeRollerId, CANSparkMaxLowLevel.MotorType.kBrushless );
+        mIntakeRoller = SparkMaxFactory.createDefaultSparkMax( Settings.HW.CAN.kMAXIntakeRollerId, CANSparkMaxLowLevel.MotorType.kBrushless );
         mIntakeRoller.setInverted(true);
         mIntakeRoller.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mIntakeRoller.setSmartCurrentLimit(40);
         mIntakeRollerEncoder = mIntakeRoller.getEncoder();
         mIntakeRollerCtrl = mIntakeRoller.getPIDController();
 
-        mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonPowerCellSerializer);
-        mConveyorMotorVertical = TalonSRXFactory.createDefaultTalon( Settings.Hardware.CAN.kTalonVerticalID );
+        mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.HW.CAN.kTalonPowerCellSerializer);
+        mConveyorMotorVertical = TalonSRXFactory.createDefaultTalon( Settings.HW.CAN.kTalonVerticalID );
         mConveyorMotorVertical.setInverted(true);
 
-        mIntakePivot = SparkMaxFactory.createDefaultSparkMax( Settings.Hardware.CAN.kMAXIntakeArm, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mIntakePivot = SparkMaxFactory.createDefaultSparkMax( Settings.HW.CAN.kMAXIntakeArm, CANSparkMaxLowLevel.MotorType.kBrushless);
         mIntakePivot.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mIntakePivot.setSmartCurrentLimit(40);
 
         double debounceTime_s = 0.1;
-        mEntryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kEntryBeamChannel, debounceTime_s);
-        mSecondaryBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kSecondaryBeamChannel, debounceTime_s);
-        mExitBeam = new DigitalBeamSensor( Settings.Hardware.DIO.kExitBeamChannel, debounceTime_s);
+        mEntryBeam = new DigitalBeamSensor( Settings.HW.DIO.kEntryBeamChannel, debounceTime_s);
+        mSecondaryBeam = new DigitalBeamSensor( Settings.HW.DIO.kSecondaryBeamChannel, debounceTime_s);
+        mExitBeam = new DigitalBeamSensor( Settings.HW.DIO.kExitBeamChannel, debounceTime_s);
 
         mIntakePivotEncoder = new CANEncoder(mIntakePivot);
         mIntakePivotAbsoluteEncoder = new DutyCycleEncoder(0);
