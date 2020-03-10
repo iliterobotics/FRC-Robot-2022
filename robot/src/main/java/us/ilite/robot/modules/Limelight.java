@@ -1,24 +1,40 @@
 package us.ilite.robot.modules;
 
-import java.util.Optional;
-
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.Distance;
 import us.ilite.common.Field2020;
-import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EShooterSystemData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.IFieldComponent;
-import us.ilite.robot.Robot;
+
+import static us.ilite.common.Field2020.FieldElement.OUTER_GOAL_UPPER_CORNERS;
+import static us.ilite.robot.Enums.*;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
-import static us.ilite.common.types.ELimelightData.*;
+import us.ilite.robot.vision.CameraConfig;
+import us.ilite.robot.vision.Ilite3DSolver;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static us.ilite.common.types.EVisionGoal2020.*;
+import static us.ilite.robot.vision.CameraConfig.LIMELIGHT_V2_LOW_RES;
+import static us.ilite.robot.vision.Ilite3DSolver.xSort;
+import static us.ilite.robot.vision.Ilite3DSolver.ySort;
 
 /**
  * A module for interfacing with the Goal Limelight
  */
 public class Limelight extends Module implements ITargetDataProvider {
+    // These are for V2
+    public static double llFOVVertical = 49.7;
+    public static double llFOVHorizontal = 59.6;
+
     public static final IFieldComponent NONE = new IFieldComponent() {
         public int id() {return -1;}
         public double height() {return 0;}
@@ -26,118 +42,96 @@ public class Limelight extends Module implements ITargetDataProvider {
         public String toString() { return "NONE"; }
     };
 
-    // =============================================================================
-    // LimeLight Camera Constants
-    // Note: These constants need to be recalculated for a specific robot geometry
-    // =============================================================================
-    public static double kHeightIn = 31.75;   //Measurements from Bunnybot for skew testing
-    public static double kToBumperIn = 22.125;
-    public static double kAngleDeg = 24.85;
+    public static double kHeightIn = 41.0; // This is approximately correct for all of the hood angles that matter
+    private IFieldComponent mGoal = OUTER_GOAL_UPPER_CORNERS; // The controller updates this
+    private final CameraConfig mLimelight;
+    private final Ilite3DSolver mIlite3DSolverSolver;
 
-    public static double llFOVVertical = 49.7;
-    public static double llFOVHorizontal = 59.6;
+    private final NetworkTable mTable;
 
-    // Left angle coefficients for angle = a + bx + cx^2
-    //    a	0.856905324060421
-    //    b	-3.01414088331715
-    //    c	-0.0331854848038372
-    public static double kLeftACoeff = 0.856905324060421;
-    public static double kLeftBCoeff = -3.01414088331715;
-    public static double kLeftCCoeff = -0.0331854848038372;
-
-    // Right angle coefficients for angle = a + bx + cx^2
-    // a	-54.3943883842204
-    // b	-4.53956454545558
-    // c	-0.0437470770400814
-    public static double kRightACoeff = -54.3943883842204;
-    public static double kRightBCoeff = -4.53956454545558;
-    public static double kRightCCoeff = -0.0437470770400814;
-
-    private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable(Settings.kFlywheelLimelightNetworkTable);
-
-
-    public Limelight() {
+    public Limelight(String pNetworkTableName) {
+        mLimelight = LIMELIGHT_V2_LOW_RES.setAddress(pNetworkTableName).setLensHeight(kHeightIn);
+        mIlite3DSolverSolver = new Ilite3DSolver(
+                mLimelight,
+                Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.height()),
+                Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.width()),
+                Distance.fromInches(29.25 - 8.755)
+        );
+        mTable = NetworkTableInstance.getDefault().getTable(pNetworkTableName);
     }
 
     @Override
     public void modeInit(EMatchMode pMode) {
-        Robot.DATA.goaltracking.set(TARGET_ID, NONE.id());
+        db.goaltracking.set(TARGET_ID, NONE.id());
     }
 
     @Override
     public void readInputs() {
         boolean targetValid = mTable.getEntry("tv").getDouble(Double.NaN) > 0.0;
-        Robot.DATA.goaltracking.set(TV, targetValid ? 1.0d : 0d);
-        if(targetValid) {
-            Robot.DATA.goaltracking.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
-            Robot.DATA.goaltracking.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
-            Robot.DATA.goaltracking.set(TA,mTable.getEntry("ta").getDouble(Double.NaN));
-            Robot.DATA.goaltracking.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
-            Robot.DATA.goaltracking.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
-            Robot.DATA.goaltracking.set(TSHORT,mTable.getEntry("tshort").getDouble(Double.NaN));
-            Robot.DATA.goaltracking.set(TLONG,mTable.getEntry("tlong").getDouble(Double.NaN));
-            Robot.DATA.goaltracking.set(THORIZ,mTable.getEntry("thoriz").getDouble(Double.NaN));
-            Robot.DATA.goaltracking.set(TVERT,mTable.getEntry("tvert").getDouble(Double.NaN));
-            if(Robot.DATA.goaltracking.get(TARGET_ID) != -1) {
-                Robot.DATA.goaltracking.set(CALC_DIST_TO_TARGET, calcTargetDistance(Field2020.FieldElement.values()[(int) Robot.DATA.goaltracking.get(TARGET_ID)].height()));
-                Robot.DATA.goaltracking.set(CALC_ANGLE_TO_TARGET, calcTargetApproachAngle());
-                Optional<Translation2d> p = calcTargetLocation(Field2020.FieldElement.values()[(int) Robot.DATA.goaltracking.get(TARGET_ID)]);
-                if(p.isPresent()) {
-                    Robot.DATA.goaltracking.set(CALC_TARGET_X, p.get().getX());
-                    Robot.DATA.goaltracking.set(CALC_TARGET_Y, p.get().getY());
-                }
+        db.goaltracking.set(TV, targetValid);
+        if(mGoal.id() >= 0 && targetValid) {
+            db.goaltracking.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
+            db.goaltracking.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
+            db.goaltracking.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
+            db.goaltracking.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
+            if(db.goaltracking.get(TARGET_ID) != NONE.id()) {
+                // Old way of doing it
+                db.goaltracking.set(TARGET_RANGE_in, calcTargetDistance(mGoal));
+
+                // New way of doing it
+                List<Translation2d> corners = getCorners();
+                mIlite3DSolverSolver.updatePoseToGoal(corners);
+                db.goaltracking.set(T3D_X_in, mIlite3DSolverSolver.x().inches());
+                db.goaltracking.set(T3D_Y_in, mIlite3DSolverSolver.y().inches());
+                db.goaltracking.set(T3D_AZIMUTH_deg, mIlite3DSolverSolver.azimuth().degrees());
+                db.goaltracking.set(T3D_AZ_OFFSET_deg, mIlite3DSolverSolver.offsetAzimuth().degrees());
+                db.goaltracking.set(T3D_GOAL_RANGE_in, mIlite3DSolverSolver.range().inches());
+                db.goaltracking.set(T3D_LEFT_RANGE_in, mIlite3DSolverSolver.leftRange().inches());
+                db.goaltracking.set(T3D_RIGHT_RANGE_in, mIlite3DSolverSolver.rightRange().inches());
             }
         }
     }
 
     @Override
     public void setOutputs() {
-        setLedMode();
-        setCamMode();
-        setStreamMode();
-        setSnapshotMode();
-        setPipeline();
-        Robot.DATA.goaltracking.set(ANGLE_FROM_HORIZON, kAngleDeg);
-//        Robot.DATA.limelight.set(ANGLE_FROM_HORIZON, Robot.DATA.flywheel.get(ANGLE_FROM_HORIZON)); //TODO Add angle functionality to flywheel module
+        setNetworkTableValue("ledMode", LED_MODE);
+        setNetworkTableValue("camMode", CAM_MODE);
+        setNetworkTableValue("snapshot", SNAPSHOT_MODE);
+        setNetworkTableValue("stream", STREAM_MODE);
+
+        mGoal = (db.goaltracking.isSet(TARGET_ID)) ? NONE : db.goaltracking.get(TARGET_ID, Field2020.FieldElement.class);
+        db.goaltracking.set(PIPELINE, mGoal.pipeline());
+        mTable.getEntry("pipeline").setNumber(mGoal.pipeline());
+        mLimelight.setElevationAngle(db.flywheel.safeGet(EShooterSystemData.HOOD_ANGLE_deg, 0d));
+//        db.limelight.set(ANGLE_FROM_HORIZON, db.flywheel.get(ANGLE_FROM_HORIZON)); //TODO Add angle functionality to flywheel module
+
+        SmartDashboard.putBoolean("Valid Goal", db.goaltracking.isSet(TV));
+        SmartDashboard.putNumber("LL Latency (ms)", db.goaltracking.get(TL));
+    }
+
+    /**
+     * Utility method
+     */
+    private void setNetworkTableValue(String pEntry, EVisionGoal2020 pEnum) {
+        if(db.goaltracking.isSet(pEnum)) {
+            mTable.getEntry(pEntry).setNumber(db.goaltracking.get(pEnum));
+        }
     }
 
     @Override
     public void shutdown() {
-        db.goaltracking.set(ELimelightData.PIPELINE, Limelight.NONE.id());
-    }
-
-    private void setPipeline() {
-        int mPipeline = (Robot.DATA.goaltracking.get(TARGET_ID) == -1) ?
-                        NONE.pipeline() :
-                        Field2020.FieldElement.values()[(int) Robot.DATA.goaltracking.get(TARGET_ID)].pipeline();
-
-        Robot.DATA.goaltracking.set(PIPELINE, mPipeline);
-        mTable.getEntry("pipeline").setNumber(Robot.DATA.goaltracking.get(PIPELINE));
-    }
-
-    private void setLedMode() {
-        mTable.getEntry("ledMode").setNumber(Robot.DATA.goaltracking.get(LED_MODE));
-    }
-
-    private void setCamMode() {
-        mTable.getEntry("camMode").setNumber(Robot.DATA.goaltracking.get(CAM_MODE));
-    }
-
-    private void setStreamMode() {
-        mTable.getEntry("stream").setNumber(Robot.DATA.goaltracking.get(STREAM_MODE));
-    }
-
-    private void setSnapshotMode() {
-        mTable.getEntry("snapshot").setNumber(Robot.DATA.goaltracking.get(SNAPSHOT_MODE));
+        db.goaltracking.set(EVisionGoal2020.PIPELINE, Limelight.NONE.id());
+        // Force LED off
+        mTable.getEntry("ledMode").setNumber(LimelightLedMode.LED_OFF.ordinal());
     }
 
     public String toString() {
-        return Robot.DATA.goaltracking.toCSV();
+        return db.goaltracking.toCSV();
     }
 
     @Override
-    public RobotCodex<ELimelightData> getTargetingData() {
-        return Robot.DATA.goaltracking;
+    public RobotCodex<EVisionGoal2020> getTargetingData() {
+        return db.goaltracking;
     }
 
     @Override
@@ -147,42 +141,104 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     @Override
     public double getCameraAngleDeg() {
-        return kAngleDeg;
+        return mLimelight.elevation_deg();
     }
 
     @Override
     public double getCameraToBumperIn() {
-        return kToBumperIn;
+        return 0d;
     }
 
     @Override
-    public double getLeftCoeffA() {
-        return kLeftACoeff;
+    public double ty() {
+        return 0;
     }
 
-    @Override
-    public double getLeftCoeffB() {
-        return kLeftBCoeff;
+
+    /**
+     * Credit to FRC254, from their 2019 public code
+     *
+     * Returns raw top-left and top-right corners
+     *
+     * @return list of corners: index 0 - top left, index 1 - top right
+     */
+    private double[] mZeroArray = new double[]{0, 0, 0, 0, 0, 0, 0, 0};
+    private List<Translation2d> getCorners() {
+        double[] xCorners = mTable.getEntry("tcornx").getDoubleArray(mZeroArray);
+        double[] yCorners = mTable.getEntry("tcorny").getDoubleArray(mZeroArray);
+        boolean tv = mTable.getEntry("tv").getDouble(0) == 1.0;
+
+        // something went wrong
+        if (!tv ||
+                Arrays.equals(xCorners, mZeroArray) || Arrays.equals(yCorners, mZeroArray)
+                || xCorners.length != 8 || yCorners.length != 8) {
+            return null;
+        }
+
+        List<Translation2d> corners = new ArrayList<>();
+        for (int i = 0; i < xCorners.length; i++) {
+            corners.add(new Translation2d(xCorners[i], yCorners[i]));
+        }
+        if(mGoal.id() == OUTER_GOAL_UPPER_CORNERS.id()) {
+            return topCorners(corners);
+        } else {
+            return bottomCorners(corners);
+        }
     }
 
-    @Override
-    public double getLeftCoeffC() {
-        return kLeftCCoeff;
+    /**
+     * Credit to FRC254, from their 2019 public code
+     * Returns raw top-left and top-right corners
+     *
+     * @return list of corners: index 0 - top left, index 1 - top right
+     */
+    public List<Translation2d> topCorners(List<Translation2d> pBoundingBoxPoints) {
+
+        pBoundingBoxPoints.sort(xSort);
+
+        List<Translation2d> left = pBoundingBoxPoints.subList(0, 4);
+        List<Translation2d> right = pBoundingBoxPoints.subList(4, 8);
+
+        left.sort(ySort);
+        right.sort(ySort);
+
+        List<Translation2d> leftTop = left.subList(0, 2);
+        List<Translation2d> rightTop = right.subList(0, 2);
+
+        leftTop.sort(xSort);
+        rightTop.sort(xSort);
+
+        Translation2d leftCorner = leftTop.get(0);
+        Translation2d rightCorner = rightTop.get(1);
+
+        return List.of(leftCorner, rightCorner);
     }
 
-    @Override
-    public double getRightCoeffA() {
-        return kRightACoeff;
-    }
+    /**
+     * Credit to FRC254, from their 2019 public code
+     * Returns raw top-left and top-right corners
+     *
+     * @return list of corners: index 0 - top left, index 1 - top right
+     */
+    // TODO - this is untested
+    public List<Translation2d> bottomCorners(List<Translation2d> pBoundingBoxPoints) {
+        pBoundingBoxPoints.sort(xSort);
 
-    @Override
-    public double getRightCoeffB() {
-        return kRightBCoeff;
-    }
+        List<Translation2d> left = pBoundingBoxPoints.subList(0, 4);
+        List<Translation2d> right = pBoundingBoxPoints.subList(4, 8);
 
-    @Override
-    public double getRightCoeffC() {
-        return kRightCCoeff;
-    }
+        left.sort(ySort);
+        right.sort(ySort);
 
+        left = left.subList(2,4);
+        right = right.subList(2, 4);
+
+        left.sort(xSort);
+        right.sort(xSort);
+
+        Translation2d leftCorner = left.get(0);
+        Translation2d rightCorner = right.get(1);
+
+        return List.of(leftCorner, rightCorner);
+    }
 }

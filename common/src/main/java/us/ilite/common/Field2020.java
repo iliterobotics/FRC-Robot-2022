@@ -39,21 +39,27 @@ public class Field2020 {
     public enum FieldElement implements IFieldComponent {
 
 //        TARGET(12d,0),
-        LINE(0d,5), //TODO detemine why these they have the same pipeline
-        OUTER_GOAL(98.25, 1),
-        POWER_CELL(0.0, 1),
-        TARGET_ZOOM(0d, 2),
-        BALL(0d, 3),
-        BALL_DUAL(0d, 5),
-        BALL_TRI(0d,6);
+        LINE                    (5,0d,      0d), //TODO detemine why these they have the same pipeline
+        OUTER_GOAL_UPPER_CORNERS(1,98.25,   36.641),
+        OUTER_GOAL_LOWER_CORNERS(1,83.25,   17.321),
+        POWER_CELL              (1,0.0,     0d),
+        TARGET_ZOOM             (3,0d,      0d),
+        BALL                    (3,0d,      0d),
+        BALL_DUAL               (5,0d,      0d),
+        BALL_TRI                (6,0d,      0d);
 
         private final double height;
         private final int pipeline;
+        private final double width;
 
-        private FieldElement(double pHeight, int pPipeline){
+        private FieldElement(int pPipeline, double pHeight, double pWidth){
+            width = pWidth;
             height = pHeight;
             pipeline = pPipeline;
         }
+
+        @Override
+        public double width() { return width; }
 
         @Override
         public double height() {

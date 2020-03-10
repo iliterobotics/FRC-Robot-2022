@@ -11,8 +11,8 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
 
-import static us.ilite.common.types.ELimelightData.TV;
-import static us.ilite.common.types.ELimelightData.TX;
+import static us.ilite.common.types.EVisionGoal2020.TV;
+import static us.ilite.common.types.EVisionGoal2020.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.sensor.EGyro;

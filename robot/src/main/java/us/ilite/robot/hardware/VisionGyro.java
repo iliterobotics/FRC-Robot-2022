@@ -3,17 +3,16 @@ package us.ilite.robot.hardware;
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
-import us.ilite.common.Data;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 
 public class VisionGyro extends IMU {
 
 
-    private RobotCodex<ELimelightData> mTargetingData;
+    private RobotCodex<EVisionGoal2020> mTargetingData;
     private Rotation2d mGyroOffsetX = new Rotation2d();
     private Rotation2d mGyroOffsetY = new Rotation2d();
 
-    public VisionGyro(Clock pClock, RobotCodex<ELimelightData> pData) {
+    public VisionGyro(Clock pClock, RobotCodex<EVisionGoal2020> pData) {
         super(pClock, DEFAULT_GAINS);
         mTargetingData = pData;
     }
@@ -50,7 +49,7 @@ public class VisionGyro extends IMU {
     }
 
     private Rotation2d getX() {
-        Double x = mTargetingData.get(ELimelightData.TX);
+        Double x = mTargetingData.get(EVisionGoal2020.TX);
 
         if(x != null) {
             // Invert?
@@ -61,7 +60,7 @@ public class VisionGyro extends IMU {
     }
 
     private Rotation2d getY() {
-        Double y = mTargetingData.get(ELimelightData.TY);
+        Double y = mTargetingData.get(EVisionGoal2020.TY);
 
         if(y != null) {
             return Rotation2d.fromDegrees(y);

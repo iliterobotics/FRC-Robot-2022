@@ -6,7 +6,8 @@ public interface IFieldComponent {
     public double height();
     public int pipeline();
 
-    public default double powerScalar() {
+    default double width(){ return 0.0; }
+    default double powerScalar() {
         return 1d;
     }
 

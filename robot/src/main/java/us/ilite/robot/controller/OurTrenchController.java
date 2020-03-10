@@ -4,7 +4,7 @@ import us.ilite.common.Angle;
 import us.ilite.common.Data;
 import us.ilite.common.Distance;
 import us.ilite.common.Field2020;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.types.EPowerCellData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
@@ -46,7 +46,7 @@ public class OurTrenchController extends BaseAutonController {
     }
 
     private boolean canHitInnerGoal() {
-        return Field2020.canHitInnerGoal(tempCalcAngleToInnerGoal() , Distance.fromFeet(db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET))); //TODO - Units??
+        return Field2020.canHitInnerGoal(tempCalcAngleToInnerGoal() , Distance.fromFeet(db.limelight.get(EVisionGoal2020.TARGET_RANGE_in))); //TODO - Units??
     }
 
     private void initiateShooter(){
@@ -66,8 +66,8 @@ public class OurTrenchController extends BaseAutonController {
 
     // TODO - figure out if this is the correct way we'll be targeting
     private Angle tempCalcAngleToInnerGoal() {
-        double thetaGoal = db.limelight.get(ELimelightData.CALC_ANGLE_TO_TARGET);
-        double distToGoal = db.limelight.get(ELimelightData.CALC_DIST_TO_TARGET); //TODO: Units??
+        double thetaGoal = db.limelight.get(EVisionGoal2020.TARGET_AZIMUTH_deg);
+        double distToGoal = db.limelight.get(EVisionGoal2020.TARGET_RANGE_in); //TODO: Units??
         double b = 29.25 + (distToGoal * Math.cos(thetaGoal));
         double a = distToGoal * Math.sin(thetaGoal);
         double thetab = Math.tanh(b/a);

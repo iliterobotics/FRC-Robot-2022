@@ -4,7 +4,7 @@ import us.ilite.common.Data;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.util.Utils;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
@@ -42,7 +42,7 @@ public class DriveToVisionTarget implements ICommand {
     public void init(double pNow) {
         mHasAcquiredTarget = false;
         mHeadingController.reset();
-        mInitialTargetAngle = mData.goaltracking.get(ELimelightData.TX);
+        mInitialTargetAngle = mData.goaltracking.get(EVisionGoal2020.TX);
     }
 
     @Override
@@ -51,13 +51,13 @@ public class DriveToVisionTarget implements ICommand {
         /*
          We either drove into the target and lost sight of it (meaning we're done) or we never had sight of it to begin with (in which case we quit)
          */
-        if(!mData.goaltracking.isSet(ELimelightData.TV)) {
+        if(!mData.goaltracking.isSet(EVisionGoal2020.TV)) {
             return true;
         }
 
         // Target "distance" is just area - min_area, clamped to a maximum and minimum value
-        double distanceFromTarget = Utils.clamp(mData.goaltracking.get(ELimelightData.TA) - kMinTargetArea, kMinTargetArea, kMaxTargetArea);
-        double angleToTarget = mData.goaltracking.get(ELimelightData.TX);
+        double distanceFromTarget = Utils.clamp(0.0 /*mData.goaltracking.get(EVisionGoal2020.TA)*/ - kMinTargetArea, kMinTargetArea, kMaxTargetArea);
+        double angleToTarget = mData.goaltracking.get(EVisionGoal2020.TX);
 
         // Only adjust target angle if we are far away
         if(distanceFromTarget < kAngleAdjustDistanceThreshold) {
