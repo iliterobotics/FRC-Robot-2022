@@ -18,7 +18,7 @@ import static java.lang.Math.random;
 
 public class BaseTest {
 
-    protected static final NumberFormat nf = new DecimalFormat("0.00");
+    protected static final NumberFormat nf = new DecimalFormat("000.00");
     protected static final Data db = Robot.DATA;
     protected static final TestController ctrl = TestController.getInstance();
     static{

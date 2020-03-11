@@ -125,7 +125,7 @@ public class Ilite3DSolver {
         mAbsoluteX = Distance.fromInches((pow(mLeftRange.inches(),2d) - pow(mRightRange.inches(),2d)) / (2 * mGoalWidth.inches())); // If negative, then we are left of the goal
         mAbsoluteY = Distance.fromInches(sqrt(pow(mLeftRange.inches(),2d) - pow(-mGoalWidth.inches() /2 - mAbsoluteX.inches(), 2)));
         mRangeToGoalCenter = Distance.hypot(mAbsoluteX,mAbsoluteY);
-        mAbsoluteAzimuthToGoalCenterThetaT = Distance.atan2(mAbsoluteX, mAbsoluteY);
+        mAbsoluteAzimuthToGoalCenterThetaT = Distance.atan2(mAbsoluteY, mAbsoluteX);
         if(mNormalOffset != null) {
             mOffsetAngle = Utils.calculateAngleOffsetY(
                     mAbsoluteAzimuthToGoalCenterThetaT,
@@ -145,37 +145,29 @@ public class Ilite3DSolver {
      */
     public Distance getRangeToPixelPoint(Translation2d pCorner) {
         // https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
-        double nx = (1.0 / (mConfig.hResolution/2.0)) * (pCorner.getX() - mConfig.hResolution/2.0);
-        double nz = (1.0 / (mConfig.vResolution/2.0)) * (pCorner.getY() - mConfig.vResolution/2.0);
+        // TODO - acount for inverted limelight
+        double nx = ((pCorner.getX() - mConfig.hResolution/2.0) / (mConfig.hResolution/2.0));
+        double nz = ((pCorner.getY() - mConfig.vResolution/2.0) / (mConfig.vResolution/2.0));
         double x = mConfig.vpw/2.0 * nx; // Left/right
         double z = mConfig.vph/2.0 * nz; // Height
-        double ax = atan2(1,x);
-        double az = atan2(1, z);
 
-        Rotation2d elevation = Rotation2d.fromDegrees(mConfig.elevation_deg());
         double result = Double.NaN;
-        // TODO - may need to just skip this if() check for consistency's sake
-        if(ax < 1e-3) {
-            System.out.println("x-angle is close to center of image");
-            // If point is close to the middle of the camera lens, use the simple math from LL's docs
-            result = (mGoalHeight.inches() - mConfig.lensheight()) / tan(elevation.getRadians() - az);
-        } else {
-            // 254-2019 RobotState::getCameraToVisionTargetPose()
-            Translation2d xy_translation = new Translation2d(x, z);
-            double y = z;
-            xy_translation.rotateBy(elevation);
-            z = elevation.getDegrees() - xy_translation.getY();
-            System.out.println("x-angle large enough to Pof it - x="+x+", z=" + z);
+        // 254-2019 RobotState::getCameraToVisionTargetPose()
+        Rotation2d elevation = Rotation2d.fromDegrees(mConfig.elevation_deg());
+        Translation2d xy_translation = new Translation2d(1.0, z).rotateBy(elevation);
+        x = toRadians(x);
+        double y = xy_translation.getX();
+        z = xy_translation.getY();
 
-            // find intersection with the goal
-            double differential_height = mConfig.lensheight() - mGoalHeight.inches();
-            if ((z < 0.0) == (differential_height > 0.0)) {
-                double scaling = differential_height / -z;
-                double distance = hypot(x, y) * scaling;
-                Rotation2d angle = new Rotation2d(x, y);
-                // TODO - this is redundant... x=distance*cos(theta) where distance = hypot...
-                result = hypot(distance * cos(angle.getRadians()), distance * sin(angle.getRadians()));
-            }
+        // find intersection with the goal
+        double differential_height = mConfig.lensheight_in() - mGoalHeight.inches();
+        if ((z < 0.0) == (differential_height > 0.0)) {
+            double scaling = differential_height / -z;
+            double distance = hypot(x, y) * scaling;
+            // The rest of this seems redundant, but it isn't - this accounts for spherical effect of camera lenses
+            // described in the CD post above
+            Rotation2d angle = new Rotation2d(y, x);
+            result = hypot(distance * cos(angle.getRadians()), distance * sin(angle.getRadians()));
         }
 
         return Distance.fromInches(result);

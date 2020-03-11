@@ -23,6 +23,7 @@ public class CameraConfig {
         ;
     private double lensheight = 0;
     private double elevationAngle = 0;
+    private boolean isInverted = false;
     public String address = "";
 
 
@@ -39,13 +40,15 @@ public class CameraConfig {
         vph = 2.0*tan(vFOV/2);
     }
 
-    public double lensheight() {
+    public double lensheight_in() {
         return lensheight;
     }
 
     public double elevation_deg() {
         return elevationAngle;
     }
+
+    public boolean isInverted() { return isInverted; }
 
     /**
      * Updates the floor height of the camera
@@ -66,6 +69,16 @@ public class CameraConfig {
      */
     public CameraConfig setLensHeight(double pLensHeight_in) {
         lensheight = pLensHeight_in;
+        return this;
+    }
+
+    /**
+     * Turns the camera upside down
+     * @param pIsInverted TRUE if camera is inverted. False otherwise.
+     * @return the config object, to support the builder pattern
+     */
+    public CameraConfig setInverted(boolean pIsInverted) {
+        isInverted = pIsInverted;
         return this;
     }
 
