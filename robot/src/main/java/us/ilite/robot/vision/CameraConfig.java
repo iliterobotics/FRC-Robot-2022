@@ -1,6 +1,7 @@
 package us.ilite.robot.vision;
 
 import static java.lang.Math.tan;
+import static java.lang.Math.toRadians;
 
 public class CameraConfig {
 
@@ -11,9 +12,9 @@ public class CameraConfig {
 
     public final double
             hResolution,
-            hFOV,
+            hFOV_deg,
             vResolution,
-            vFOV,
+            vFOV_deg,
             framerate,
             latency,
 
@@ -27,17 +28,17 @@ public class CameraConfig {
     public String address = "";
 
 
-    public CameraConfig(double _vFOV, double _hFOV, double _framerate, double _latency, double _hResolution, double _vResolution) {
-        vFOV = _vFOV;
-        hFOV = _hFOV;
+    public CameraConfig(double _vFOV_deg, double _hFOV_deg, double _framerate, double _latency, double _hResolution, double _vResolution) {
+        vFOV_deg = _vFOV_deg;
+        hFOV_deg = _hFOV_deg;
         hResolution = _hResolution;
         vResolution = _vResolution;
         framerate = _framerate;
         latency = _latency;
 
         // https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
-        vpw = 2.0*tan(hFOV/2);
-        vph = 2.0*tan(vFOV/2);
+        vpw = 2.0*tan(toRadians(hFOV_deg)/2);
+        vph = 2.0*tan(toRadians(vFOV_deg)/2);
     }
 
     public double lensheight_in() {

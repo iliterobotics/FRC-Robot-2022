@@ -145,19 +145,19 @@ public class Ilite3DSolver {
      */
     public Distance getRangeToPixelPoint(Translation2d pCorner) {
         // https://docs.limelightvision.io/en/latest/theory.html#from-pixels-to-angles
-        // TODO - acount for inverted limelight
-        double nx = ((pCorner.getX() - mConfig.hResolution/2.0) / (mConfig.hResolution/2.0));
-        double nz = ((pCorner.getY() - mConfig.vResolution/2.0) / (mConfig.vResolution/2.0));
+        double nx = ((getX(pCorner) - mConfig.hResolution/2.0) / (mConfig.hResolution/2.0));
+        double nz = ((getY(pCorner) - mConfig.vResolution/2.0) / (mConfig.vResolution/2.0));
         double x = mConfig.vpw/2.0 * nx; // Left/right
         double z = mConfig.vph/2.0 * nz; // Height
-
         double result = Double.NaN;
         // 254-2019 RobotState::getCameraToVisionTargetPose()
         Rotation2d elevation = Rotation2d.fromDegrees(mConfig.elevation_deg());
         Translation2d xy_translation = new Translation2d(1.0, z).rotateBy(elevation);
-        x = toRadians(x);
+        // Different from 254's - have to convert this to radians
+//        x = toRadians(x);
         double y = xy_translation.getX();
         z = xy_translation.getY();
+//        System.out.println(String.format("x=%f\ty=%f\tz=%f",x,y,z));
 
         // find intersection with the goal
         double differential_height = mConfig.lensheight_in() - mGoalHeight.inches();
@@ -173,4 +173,29 @@ public class Ilite3DSolver {
         return Distance.fromInches(result);
     }
 
+    /**
+     * Utility method to handle camera inversion
+     * @param pCorner - the detected point
+     * @return the y pixel value, accounting for inversion
+     */
+    private double getY(Translation2d pCorner) {
+        if(mConfig.isInverted()) {
+            return mConfig.vResolution - pCorner.getY();
+        } else {
+            return pCorner.getY();
+        }
+    }
+
+    /**
+     * Utility method to handle camera inversion
+     * @param pCorner - the detected point
+     * @return the x pixel value, accounting for inversion
+     */
+    private double getX(Translation2d pCorner) {
+        if(mConfig.isInverted()) {
+            return mConfig.hResolution - pCorner.getX();
+        } else {
+            return pCorner.getX();
+        }
+    }
 }
