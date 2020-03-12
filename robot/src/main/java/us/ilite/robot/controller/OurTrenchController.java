@@ -13,7 +13,7 @@ import us.ilite.robot.Robot;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 public class OurTrenchController extends BaseAutonController {
-    private Distance mTargetDistance = Distance.fromInches(Field2020.Distances.INITIATION_LINE_TO_COLOR_WHEEL.mDistance);
+    private Distance mTargetDistance = Field2020.Distances.INITIATION_LINE_TO_COLOR_WHEEL.mDistance;
     private Data db = Robot.DATA;
     private boolean mIsFirstLegDone;
 

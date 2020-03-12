@@ -105,8 +105,10 @@ public class Ilite3DSovlerTest extends BaseTest{
                         config.setInverted(invert == 1);
                         config.setElevationAngle(elevation);
                         result = solve(solver, x1, (flip ?y2:y1), x2, (flip?y1:y2));
-                        if(abs(solver.offsetAzimuth().degrees()) < 0.25) {
-                            System.out.println(String.format("{e:%.0f,w:%.0f,h:%.0f / (%.0f,%.0f),(%.0f,%.0f)-->\t%s}", elevation,targetwidth,targetheight,x1,y1,x2,y2,result));
+                        if(abs(solver.range().inches()) < 12*27) {
+                            double inneraz = abs(solver.azimuth().degrees()) - abs(solver.offsetAzimuth().degrees());
+                            String goal = Field2020.canHitInnerGoal(Angle.fromDegrees(inneraz), solver.range()) ? "INNER" : "OUTER";
+                            System.out.println(String.format("{e:%.0f,w:%.0f,h:%.0f / (%.0f,%.0f),(%.0f,%.0f)-->\t%s ==> %s}", elevation,targetwidth,targetheight,x1,y1,x2,y2,result,goal));
                         }
                     }
                 }

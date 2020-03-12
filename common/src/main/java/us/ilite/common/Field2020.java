@@ -24,12 +24,13 @@ public class Field2020 {
     }
 
     public enum Distances{
-        INITIATION_LINE_TO_COLOR_WHEEL(0);
+        INITIATION_LINE_TO_COLOR_WHEEL(0),
+        TARGETTING_OFFSET(21.0);
 
-        public double mDistance;
+        public Distance mDistance;
 
         Distances(double pDist) {
-            mDistance = pDist;
+            mDistance = Distance.fromInches(pDist);
         }
     }
 

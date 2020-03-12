@@ -24,7 +24,7 @@ import static java.lang.Math.*;
  */
 public class Ilite3DSolver {
     private final Distance mNormalOffset;
-    private final Distance mGoalHeight;
+    private final Distance mGoalFloorHeight;
     private final Distance mGoalWidth;
     private final CameraConfig mConfig;
 
@@ -42,23 +42,23 @@ public class Ilite3DSolver {
     /**
      * Creates a Ilite3D Solver with the input parameters as the target objectives
      * @param pCameraConfig - Camera configuration that has FOV, resolution, etc
-     * @param pGoalHeight - Height of the physical target (and the resulting corner points), from the floor
+     * @param pGoalFloorHeight - Height of the physical target (and the resulting corner points), from the floor
      * @param pGoalWidth - Width of the physical target (corresponding to corner points)
      */
-    public Ilite3DSolver(CameraConfig pCameraConfig, Distance pGoalHeight, Distance pGoalWidth) {
-        this(pCameraConfig, pGoalHeight, pGoalWidth, null);
+    public Ilite3DSolver(CameraConfig pCameraConfig, Distance pGoalFloorHeight, Distance pGoalWidth) {
+        this(pCameraConfig, pGoalFloorHeight, pGoalWidth, null);
     }
 
     /**
      * Creates a Ilite3D Solver with the input parameters as the target objectives
      * @param pCameraConfig - Camera configuration that has FOV, resolution, etc
-     * @param pGoalHeight - Height of the physical target (and the resulting corner points), from the floor
+     * @param pGoalFloorHeight - Height of the physical target (and the resulting corner points), from the floor
      * @param pGoalWidth - Width of the physical target (corresponding to corner points)
      * @param pNormalOffset - The 3D normal offset which may need to be adjusted for. Set to 0 if you just want to aim at the goal.
      */
-    public Ilite3DSolver(CameraConfig pCameraConfig, Distance pGoalHeight, Distance pGoalWidth, Distance pNormalOffset) {
+    public Ilite3DSolver(CameraConfig pCameraConfig, Distance pGoalFloorHeight, Distance pGoalWidth, Distance pNormalOffset) {
         mConfig = pCameraConfig;
-        mGoalHeight = pGoalHeight;
+        mGoalFloorHeight = pGoalFloorHeight;
         mGoalWidth = pGoalWidth;
         mNormalOffset = pNormalOffset;
     }
@@ -160,7 +160,7 @@ public class Ilite3DSolver {
 //        System.out.println(String.format("x=%f\ty=%f\tz=%f",x,y,z));
 
         // find intersection with the goal
-        double differential_height = mConfig.lensheight_in() - mGoalHeight.inches();
+        double differential_height = mConfig.lensheight_in() - mGoalFloorHeight.inches();
         if ((z < 0.0) == (differential_height > 0.0)) {
             double scaling = differential_height / -z;
             double distance = hypot(x, y) * scaling;

@@ -12,7 +12,9 @@ import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.IFieldComponent;
 
+import static us.ilite.common.Field2020.FieldElement.OUTER_GOAL_LOWER_CORNERS;
 import static us.ilite.common.Field2020.FieldElement.OUTER_GOAL_UPPER_CORNERS;
+import static us.ilite.common.types.EVisionGoal2020.T3D_TOP_Y_in;
 import static us.ilite.robot.Enums.*;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 import us.ilite.robot.vision.CameraConfig;
@@ -43,19 +45,28 @@ public class Limelight extends Module implements ITargetDataProvider {
     };
 
     public static double kHeightIn = 41.0; // This is approximately correct for all of the hood angles that matter
-    private IFieldComponent mGoal = OUTER_GOAL_UPPER_CORNERS; // The controller updates this
+    private IFieldComponent mGoal = NONE; // The controller updates this
+    private List<Translation2d> mLowerCorners = new ArrayList<>();
+    private List<Translation2d> mUpperCorners = new ArrayList<>();
     private final CameraConfig mLimelight;
-    private final Ilite3DSolver mIlite3DSolverSolver;
+    private final Ilite3DSolver mUpperCornerSolver;
+    private final Ilite3DSolver mLowerCornerSolver;
 
     private final NetworkTable mTable;
 
     public Limelight(String pNetworkTableName) {
         mLimelight = LIMELIGHT_V2_LOW_RES.setAddress(pNetworkTableName).setLensHeight(kHeightIn);
-        mIlite3DSolverSolver = new Ilite3DSolver(
+        mUpperCornerSolver = new Ilite3DSolver(
                 mLimelight,
                 Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.height()),
                 Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.width()),
-                Distance.fromInches(29.25 - 8.755)
+                Field2020.Distances.TARGETTING_OFFSET.mDistance
+        );
+        mLowerCornerSolver = new Ilite3DSolver(
+                mLimelight,
+                Distance.fromInches(OUTER_GOAL_LOWER_CORNERS.height()),
+                Distance.fromInches(OUTER_GOAL_LOWER_CORNERS.width()),
+                Field2020.Distances.TARGETTING_OFFSET.mDistance
         );
         mTable = NetworkTableInstance.getDefault().getTable(pNetworkTableName);
     }
@@ -79,15 +90,27 @@ public class Limelight extends Module implements ITargetDataProvider {
                 db.goaltracking.set(TARGET_RANGE_in, calcTargetDistance(mGoal));
 
                 // New way of doing it
-                List<Translation2d> corners = getCorners();
-                mIlite3DSolverSolver.updatePoseToGoal(corners);
-                db.goaltracking.set(T3D_X_in, mIlite3DSolverSolver.x().inches());
-                db.goaltracking.set(T3D_Y_in, mIlite3DSolverSolver.y().inches());
-                db.goaltracking.set(T3D_AZIMUTH_deg, mIlite3DSolverSolver.azimuth().degrees());
-                db.goaltracking.set(T3D_AZ_OFFSET_deg, mIlite3DSolverSolver.offsetAzimuth().degrees());
-                db.goaltracking.set(T3D_GOAL_RANGE_in, mIlite3DSolverSolver.range().inches());
-                db.goaltracking.set(T3D_LEFT_RANGE_in, mIlite3DSolverSolver.leftRange().inches());
-                db.goaltracking.set(T3D_RIGHT_RANGE_in, mIlite3DSolverSolver.rightRange().inches());
+                updateCorners();
+                mUpperCornerSolver.updatePoseToGoal(mUpperCorners);
+                mLowerCornerSolver.updatePoseToGoal(mLowerCorners);
+                if(!mUpperCorners.isEmpty()) {
+                    db.goaltracking.set(T3D_TOP_X_in, mUpperCornerSolver.x().inches());
+                    db.goaltracking.set(T3D_TOP_Y_in, mUpperCornerSolver.y().inches());
+                    db.goaltracking.set(T3D_TOP_AZIMUTH_deg, mUpperCornerSolver.azimuth().degrees());
+                    db.goaltracking.set(T3D_TOP_AZ_OFFSET_deg, mUpperCornerSolver.offsetAzimuth().degrees());
+                    db.goaltracking.set(T3D_TOP_GOAL_RANGE_in, mUpperCornerSolver.range().inches());
+                    db.goaltracking.set(T3D_TOP_LEFT_RANGE_in, mUpperCornerSolver.leftRange().inches());
+                    db.goaltracking.set(T3D_TOP_RIGHT_RANGE_in, mUpperCornerSolver.rightRange().inches());
+                }
+                if(!mLowerCorners.isEmpty()) {
+                    db.goaltracking.set(T3D_BOT_X_in, mLowerCornerSolver.x().inches());
+                    db.goaltracking.set(T3D_BOT_Y_in, mLowerCornerSolver.y().inches());
+                    db.goaltracking.set(T3D_BOT_AZIMUTH_deg, mLowerCornerSolver.azimuth().degrees());
+                    db.goaltracking.set(T3D_BOT_AZ_OFFSET_deg, mLowerCornerSolver.offsetAzimuth().degrees());
+                    db.goaltracking.set(T3D_BOT_GOAL_RANGE_in, mLowerCornerSolver.range().inches());
+                    db.goaltracking.set(T3D_BOT_LEFT_RANGE_in, mLowerCornerSolver.leftRange().inches());
+                    db.goaltracking.set(T3D_BOT_RIGHT_RANGE_in, mLowerCornerSolver.rightRange().inches());
+                }
             }
         }
     }
@@ -102,11 +125,19 @@ public class Limelight extends Module implements ITargetDataProvider {
         mGoal = (db.goaltracking.isSet(TARGET_ID)) ? NONE : db.goaltracking.get(TARGET_ID, Field2020.FieldElement.class);
         db.goaltracking.set(PIPELINE, mGoal.pipeline());
         mTable.getEntry("pipeline").setNumber(mGoal.pipeline());
+        // TODO - calibrate this angle. The LL angle may have an offset from the hood, by a few degrees
         mLimelight.setElevationAngle(db.flywheel.safeGet(EShooterSystemData.HOOD_ANGLE_deg, 0d));
-//        db.limelight.set(ANGLE_FROM_HORIZON, db.flywheel.get(ANGLE_FROM_HORIZON)); //TODO Add angle functionality to flywheel module
 
         SmartDashboard.putBoolean("Valid Goal", db.goaltracking.isSet(TV));
-        SmartDashboard.putNumber("LL Latency (ms)", db.goaltracking.get(TL));
+        if(db.goaltracking.isSet(TV)) {
+            SmartDashboard.putNumber("LL Latency (ms)", db.goaltracking.get(TL));
+            SmartDashboard.putNumber("TY Range (in)", db.goaltracking.get(TARGET_RANGE_in));
+            SmartDashboard.putNumber("Upper Corner Range (in)", db.goaltracking.get(T3D_TOP_GOAL_RANGE_in));
+            SmartDashboard.putNumber("Lower Corner Range (in)", db.goaltracking.get(T3D_BOT_GOAL_RANGE_in));
+            SmartDashboard.putNumber("Absolute Azimuth (deg)", db.goaltracking.get(T3D_TOP_AZIMUTH_deg));
+            SmartDashboard.putNumber("Localized X (in)", db.goaltracking.get(T3D_TOP_X_in));
+            SmartDashboard.putNumber("Localized Y (in)", db.goaltracking.get(T3D_TOP_Y_in));
+        }
     }
 
     /**
@@ -163,7 +194,7 @@ public class Limelight extends Module implements ITargetDataProvider {
      * @return list of corners: index 0 - top left, index 1 - top right
      */
     private double[] mZeroArray = new double[]{0, 0, 0, 0, 0, 0, 0, 0};
-    private List<Translation2d> getCorners() {
+    private void updateCorners() {
         double[] xCorners = mTable.getEntry("tcornx").getDoubleArray(mZeroArray);
         double[] yCorners = mTable.getEntry("tcorny").getDoubleArray(mZeroArray);
         boolean tv = mTable.getEntry("tv").getDouble(0) == 1.0;
@@ -172,18 +203,17 @@ public class Limelight extends Module implements ITargetDataProvider {
         if (!tv ||
                 Arrays.equals(xCorners, mZeroArray) || Arrays.equals(yCorners, mZeroArray)
                 || xCorners.length != 8 || yCorners.length != 8) {
-            return null;
         }
 
         List<Translation2d> corners = new ArrayList<>();
         for (int i = 0; i < xCorners.length; i++) {
             corners.add(new Translation2d(xCorners[i], yCorners[i]));
         }
-        if(mGoal.id() == OUTER_GOAL_UPPER_CORNERS.id()) {
-            return topCorners(corners);
-        } else {
-            return bottomCorners(corners);
-        }
+
+        mLowerCorners.clear();
+        mLowerCorners.addAll(getBottomCorners(corners));
+        mUpperCorners.clear();
+        mUpperCorners.addAll(getTopCorners(corners));
     }
 
     /**
@@ -192,7 +222,7 @@ public class Limelight extends Module implements ITargetDataProvider {
      *
      * @return list of corners: index 0 - top left, index 1 - top right
      */
-    public List<Translation2d> topCorners(List<Translation2d> pBoundingBoxPoints) {
+    public List<Translation2d> getTopCorners(List<Translation2d> pBoundingBoxPoints) {
 
         pBoundingBoxPoints.sort(xSort);
 
@@ -221,7 +251,7 @@ public class Limelight extends Module implements ITargetDataProvider {
      * @return list of corners: index 0 - top left, index 1 - top right
      */
     // TODO - this is untested
-    public List<Translation2d> bottomCorners(List<Translation2d> pBoundingBoxPoints) {
+    public List<Translation2d> getBottomCorners(List<Translation2d> pBoundingBoxPoints) {
         pBoundingBoxPoints.sort(xSort);
 
         List<Translation2d> left = pBoundingBoxPoints.subList(0, 4);
