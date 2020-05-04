@@ -6,7 +6,7 @@ import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
 import us.ilite.robot.modules.Limelight;
@@ -72,14 +72,14 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
 
         if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
-            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());
+            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL_UPPER_CORNERS.id());
             super.firingSequence(currentState);
 //            super.setFlywheelClosedLoop(currentState);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.AIM)) {
-            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL.id());
+            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL_UPPER_CORNERS.id());
             super.setFlywheelClosedLoop(currentState, true);
         } else {
-            db.goaltracking.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
+            db.goaltracking.set(EVisionGoal2020.TARGET_ID, Limelight.NONE.id());
             super.setTurretHandling(Enums.TurretControlType.HOME);
             super.firingSequence(Enums.FlywheelSpeeds.OFF);
 //            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);

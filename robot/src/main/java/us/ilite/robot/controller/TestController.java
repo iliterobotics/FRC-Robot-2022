@@ -7,31 +7,18 @@ import us.ilite.common.types.EColorData;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.Field2020;
-import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.EShooterSystemData;
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.DriverStation;
 
-import com.flybotix.hfr.util.log.ILog;
-import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.apache.commons.math3.ml.neuralnet.twod.NeuronSquareMesh2D;
 import us.ilite.common.Data;
-import us.ilite.common.Field2020;
-import us.ilite.common.config.InputMap;
-import us.ilite.common.types.*;
-import us.ilite.common.Data;
-import us.ilite.common.Field2020;
-import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.*;
-import static us.ilite.common.types.ELimelightData.*;
-import static us.ilite.common.types.EHangerModuleData.*;
+import static us.ilite.common.types.EVisionGoal2020.*;
+
 import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
 import static us.ilite.robot.Enums.*;
@@ -115,9 +102,9 @@ public class TestController extends BaseManualController {
 //        db.flywheel.set(MANUAL_TURRET_DIRECTION, turretDirection);
 
         if (db.groundTracking.isSet(TX)) {
-            db.flywheel.set(DESIRED_TURRET_ANGLE, db.goaltracking.get(CALC_ANGLE_TO_TARGET));
+            db.flywheel.set(SET_TURRET_ANGLE_deg, db.goaltracking.get(TARGET_AZIMUTH_deg));
         } else {
-            db.flywheel.set(DESIRED_TURRET_ANGLE, 0);
+            db.flywheel.set(SET_TURRET_ANGLE_deg, 0);
         }
         if (flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_VELOCITY_10_TEST)) {
             firingSequence(FlywheelSpeeds.CLOSE);
@@ -135,18 +122,18 @@ public class TestController extends BaseManualController {
             db.flywheel.set(HOOD_STATE, Enums.HoodState.NONE);
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.HOOD)) {
             db.flywheel.set(HOOD_STATE, Enums.HoodState.MANUAL);
-            db.flywheel.set(HOOD_OPEN_LOOP, flywheelinput.get(InputMap.FLYWHEEL.HOOD));
+            db.flywheel.set(SET_HOOD_pct, flywheelinput.get(InputMap.FLYWHEEL.HOOD));
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.HOOD_TO_ANGLE)){
             db.flywheel.set(HOOD_STATE, Enums.HoodState.TARGET_ANGLE);
-            db.flywheel.set(TARGET_HOOD_ANGLE, 45.0);
+            db.flywheel.set(SET_HOOD_ANGLE_deg, 45.0);
         } else {
             db.flywheel.set(HOOD_STATE, Enums.HoodState.MANUAL);
-            db.flywheel.set(HOOD_OPEN_LOOP, 0.0);
+            db.flywheel.set(SET_HOOD_pct, 0.0);
         }
 
         Enums.FlywheelSpeeds state = Enums.FlywheelSpeeds.OFF;
         if(flywheelinput.isSet(InputMap.FLYWHEEL.FEEDER_SPINUP_TEST)) {
-            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.75);
+            db.flywheel.set(SET_FEEDER_pct, 0.75);
         } else if(flywheelinput.isSet(InputMap.FLYWHEEL.FLYWHEEL_SPINUP_TEST)) {
             db.flywheel.set(FLYWHEEL_WHEEL_STATE, Enums.FlywheelWheelState.OPEN_LOOP);
             db.flywheel.set(FLYWHEEL_OPEN_LOOP, 0.2);
@@ -164,10 +151,10 @@ public class TestController extends BaseManualController {
         db.flywheel.set(FLYWHEEL_SPEED_STATE, state);
         setFlywheelClosedLoop(state, true);
         if(flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE) && isFlywheelUpToSpeed()) {
-            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, state.feeder);
+            db.flywheel.set(SET_FEEDER_pct, state.feeder);
             db.flywheel.set(SET_FEEDER_rpm, state.feeder * 11000.0);
         } else {
-            db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, 0.0);
+            db.flywheel.set(SET_FEEDER_pct, 0.0);
         }
 //        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_FLYWHEEL)) {
 //            if (db.limelight.isSet(ELimelightData.TV)) {

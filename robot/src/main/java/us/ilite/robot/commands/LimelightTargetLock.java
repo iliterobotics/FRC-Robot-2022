@@ -2,7 +2,7 @@ package us.ilite.robot.commands;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.Limelight;
 
@@ -37,7 +37,7 @@ public class LimelightTargetLock extends TargetLock {
     public void shutdown(double pNow) {
         super.shutdown(pNow);
         mLog.warn("SHUT DOWN LIMELIGHT TARGET LOCK");
-        Robot.DATA.goaltracking.set(ELimelightData.TARGET_ID , (double)Limelight.NONE.id());
+        Robot.DATA.goaltracking.set(EVisionGoal2020.TARGET_ID , (double)Limelight.NONE.id());
     }
 
 }

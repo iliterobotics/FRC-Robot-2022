@@ -9,7 +9,7 @@ import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.lib.util.XorLatch;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.types.EShooterSystemData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -123,7 +123,7 @@ public abstract class AbstractController {
     protected void reverseSerializer() {
         db.powercell.set(SET_H_pct, -1.0);
         db.powercell.set(SET_V_pct, -0.5);
-        db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP,-0.75);
+        db.flywheel.set(SET_FEEDER_pct,-0.75);
     }
 
     protected void stopDrivetrain() {
@@ -156,11 +156,11 @@ public abstract class AbstractController {
 
     protected final void setHood(FlywheelSpeeds pSpeed) {
         db.flywheel.set(HOOD_STATE, pSpeed.hoodstate);
-        db.flywheel.set(TARGET_HOOD_ANGLE, pSpeed.angle);
+        db.flywheel.set(SET_HOOD_ANGLE_deg, pSpeed.angle);
     }
 
     protected final void setFeederClosedLoop(Enums.FlywheelSpeeds pFlywheelSpeed) {
-        db.flywheel.set(FEEDER_OUTPUT_OPEN_LOOP, pFlywheelSpeed.feeder);
+        db.flywheel.set(SET_FEEDER_pct, pFlywheelSpeed.feeder);
         db.flywheel.set(SET_FEEDER_rpm, pFlywheelSpeed.feeder * 11000.0);
     }
 
@@ -169,7 +169,7 @@ public abstract class AbstractController {
     }
 
     protected final void setTurretHandling(TurretControlType pTurretControlType, int pTrackingId) {
-        db.goaltracking.set(ELimelightData.TARGET_ID, pTrackingId);
+        db.goaltracking.set(EVisionGoal2020.TARGET_ID, pTrackingId);
         db.flywheel.set(EShooterSystemData.TURRET_CONTROL, pTurretControlType);
     }
 
@@ -238,7 +238,7 @@ public abstract class AbstractController {
 //        return true;
     }
     protected boolean isHoodAtCorrectAngle(FlywheelSpeeds pSpeed) {
-        boolean result = Math.abs(db.flywheel.get(CURRENT_HOOD_ANGLE) - pSpeed.angle) <= 1.0;
+        boolean result = Math.abs(db.flywheel.get(HOOD_ANGLE_deg) - pSpeed.angle) <= 1.0;
         SmartDashboard.putBoolean("HOOD", result);
         return result;
     }

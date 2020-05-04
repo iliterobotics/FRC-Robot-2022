@@ -10,45 +10,33 @@ package us.ilite.robot.modules.targetData;
 import java.util.Optional;
 import java.util.function.Function;
 
-import com.flybotix.hfr.codex.Codex;
-
 import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.IFieldComponent;
 
 /**
  * Add your docs here.
  */
 public interface ITargetDataProvider {
-    public RobotCodex<ELimelightData> getTargetingData();
+    RobotCodex<EVisionGoal2020> getTargetingData();
 
-    public double getCameraHeightIn();
+    double getCameraHeightIn();
 
-    public double getCameraAngleDeg();
+    double getCameraAngleDeg();
 
-    public double getCameraToBumperIn();
+    double getCameraToBumperIn();
 
-    public double getLeftCoeffA();
-
-    public double getLeftCoeffB();
-
-    public double getLeftCoeffC();
-
-    public double getRightCoeffA();
-
-    public double getRightCoeffB();
-
-    public double getRightCoeffC();
-
-    
+    /**
+     * @return Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees) parameter from the limelight
+     */
+    double ty();
 
     /**
      * Calculate the distance to the currently tracked target.
-     * @param targetHeight
      * @return Distance to target
      */
-    public default double calcTargetDistance( double targetHeight ) {
+    default double calcTargetDistance(double pTargetHeight) {
         // d = h/(tan(Ac - ty)) - db
         // hc = measured height of camera lens: Settings.llCameraHeightIn
         // ht = height of the target being tracked: targetHeight
@@ -61,9 +49,9 @@ public interface ITargetDataProvider {
         // we read the lime light values from mCurrentTarget, but this may be null if update is not
         // called for the first time
 
-        double d = (getCameraHeightIn() - targetHeight) / 
-            Math.tan( getCameraAngleDeg() - getTargetingData().get(ELimelightData.TY) ) -
-            getCameraToBumperIn();
+        double d = (getCameraHeightIn() - pTargetHeight) /
+                Math.tan( getCameraAngleDeg() - ty() ) -
+                getCameraToBumperIn();
 
         return d;
     }
@@ -77,77 +65,4 @@ public interface ITargetDataProvider {
         return this.calcTargetDistance( target.height() );
     }
 
-
-    /**
-     * Calculate the approach angle to the currently tracked target.
-     * A value of 0 deg means we are perpendicular to the target,
-     * A negative angle means the robot is to the left of the target
-     * A positive angle means the robot is to the right of the target
-     * @return Approach angle to target
-     */
-    public default double calcTargetApproachAngle() {
-        // ts = ts angle or skew parameter from the limelight
-
-        // we read the lime light values from mCurrentTarget, but this may be null if update is not
-        // called for the first time
-
-        double approachAngle = 0.0;  
-        
-        // TODO throw an execption on error???
-        // For -90 < Ts < -45 use the right hand function. For -45 < Ts <= 0 use the left hand function.
-
-
-        // get the skew angle and figure out which conversion to use
-        double ts = getTargetingData().get(ELimelightData.TS);
-
-        if ( ts <= 0.0 && ts > -45.0 ) {
-            // left hand angle
-            // approachAngle = - Settings.llLeftACoeff + ts*Settings.llLeftBCoeff + ts*Math.pow(Settings.llLeftCCoeff, 2.0);
-            approachAngle = - getLeftCoeffA() * ts + ts * getLeftCoeffB() + ts * Math.pow(getLeftCoeffC(), 2.0);
-        }
-        // TODO should we verify the  -90 < Ts < -45 for right hand angles and throw an exception if we don't meet it?
-        else { 
-            // right hand angle
-            // approachAngle = Settings.llRightACoeff + ts*Settings.llRightBCoeff + ts*Math.pow(Settings.llRightCCoeff, 2.0);
-            approachAngle = getRightCoeffA() + ts * getRightCoeffB() + ts * Math.pow(getRightCoeffC(), 2.0);
-        }
-
-
-        return approachAngle;
-    }
-
-    public default Optional<Translation2d> calcTargetLocation(IFieldComponent target) {
-        return calcTargetLocation(target, this::calcTargetDistance, (v)->this.calcTargetApproachAngle());
-    }
-
-    /**
-     * Find the target as point (x,y) in front of the robot
-     * Returns (-1,-1) to indicate an error
-     * @param target the target to look form
-     * @param distanceCalculator the calculating method used to calculate the distance of the target
-     * @param approachAngleCalculator the calculating method used to calculate the approach angle of 
-     * the target.
-     * @return
-     *  The target location. The optional will be empty if there was an error
-     */
-    public default Optional<Translation2d>  calcTargetLocation( IFieldComponent target,
-        Function<IFieldComponent,Double>distanceCalculator, Function<Void,Double> approachAngleCalculator)
-    {
-        double distance = distanceCalculator.apply(target);
-        if ( distance < 0.0 ) {
-            return Optional.empty();
-        }
-        double angle = approachAngleCalculator.apply(null);
-
-        // is target to the left of the robot?
-        boolean bLeft = ( angle < 0 );
-
-        angle = Math.abs(angle);
-
-        // Calculate X with correct sign, negative if target is to the left of the robot
-        double x = distance * Math.sin( angle ) * ( bLeft ? -1.0 : 1.0 );
-        double y = distance * Math.cos( angle );
-
-        return Optional.of(new Translation2d(x,y));
-    }
 }

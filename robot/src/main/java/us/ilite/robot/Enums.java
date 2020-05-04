@@ -6,6 +6,47 @@ import edu.wpi.first.wpilibj.util.Color;
 
 public class Enums {
     // =============================================================================
+    // Limelight States
+    // =============================================================================
+    //  Limelight LED state
+    // 0 - Use Pipeline LED state
+    // 1 - Force LED off
+    // 2 - Force LED blink
+    // 3 - Force LED on
+    public enum LimelightLedMode {
+        NO_CHANGE,
+        LED_OFF,
+        LED_BLINK,
+        LED_ON;
+    }
+
+    //  Limelight camera mode
+    // 0 - Vision Processor
+    // 1 - Driver Camera (Increases exposure, disables vision processing)
+    public enum LimelightCamMode {
+        VISION_PROCESSOR,
+        DRIVER_CAMERA;
+    }
+
+    //  Limelight stream mode
+    // 0 - Standard - Side-by-side streams if a webcam is attached to Limelight
+    // 1 - PiP Main - The secondary camera stream is placed in the lower-right corner of the primary camera stream
+    // 2 - PiP Secondary - The primary camera stream is placed in the lower-right corner of the secondary camera stream
+    public enum LimelightStreamMode {
+        STANDARD,
+        PIP_MAIN,
+        PIP_SECONDARY;
+    }
+
+    //  Limelight snapshot state
+    // 0 - Stop taking snapshots
+    // 1 - Take two snapshots per second
+    public enum LimelightSnapshotMode {
+        STOP_SNAPSHOTS,
+        START_SNAPSHOTS;
+    }
+
+    // =============================================================================
     // Drivetrain States
     // =============================================================================
     public enum EDriveState {

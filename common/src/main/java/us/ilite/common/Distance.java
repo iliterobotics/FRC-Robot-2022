@@ -26,4 +26,8 @@ public class Distance implements Science {
     public String toString() {
         return nf.format(si);
     }
+
+    // Some trig functions. Just add these as we need them.
+    public static Distance hypot(Distance x, Distance y) {return fromSI(Math.hypot(x.si, y.si));}
+    public static Angle atan2(Distance x, Distance y) { return Angle.fromRadians(Math.atan2(y.si, x.si)); }
 }

@@ -2,7 +2,7 @@ package us.ilite.robot.commands;
 
 import us.ilite.common.Angle;
 import us.ilite.common.Distance;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.robot.Robot;
 
 public class DriveStraightVision extends DriveStraight {
@@ -14,7 +14,7 @@ public class DriveStraightVision extends DriveStraight {
 
     @Override
     protected Angle getHeading() {
-        return Angle.fromDegrees(Robot.DATA.goaltracking.get(ELimelightData.CALC_ANGLE_TO_TARGET));
+        return Angle.fromDegrees(Robot.DATA.goaltracking.get(EVisionGoal2020.TARGET_AZIMUTH_deg));
     }
 
 }

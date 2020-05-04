@@ -48,11 +48,12 @@ public class RawLimelight extends Module{
     public static double kRightBCoeff = -4.53956454545558;
     public static double kRightCCoeff = -0.0437470770400814;
 
-    private final NetworkTable mTable = NetworkTableInstance.getDefault().getTable(Settings.kGroundLimelightNetworkTable);
+    private final NetworkTable mTable;
 
     protected IFieldComponent mVisionTarget;
 
-    public RawLimelight() {
+    public RawLimelight(String pNetworkTableName) {
+        mTable = NetworkTableInstance.getDefault().getTable(pNetworkTableName);
     }
 
     @Override

@@ -1,9 +1,10 @@
 package us.ilite.robot.commands;
 
 import us.ilite.common.Data;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.robot.modules.Limelight;
 
+@Deprecated
 public class WaitForVisionTarget implements ICommand {
 
     private Data mData;
@@ -25,11 +26,11 @@ public class WaitForVisionTarget implements ICommand {
     public boolean update(double pNow) {
 
         // If target is valid
-        if(mData.goaltracking.isSet(ELimelightData.TV)) {
+        if(mData.goaltracking.isSet(EVisionGoal2020.TV)) {
             // If area above threshold exit command
-            if(mData.goaltracking.get(ELimelightData.TA) > mTargetAreaThreshold) {
+//            if(mData.goaltracking.get(EVisionGoal2020.TA) > mTargetAreaThreshold) {
                 return true;
-            }
+//            }
         }
 
         return false;

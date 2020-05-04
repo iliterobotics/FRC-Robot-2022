@@ -3,12 +3,12 @@ package us.ilite.robot.commands;
 import com.flybotix.hfr.codex.RobotCodex;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 
-import static us.ilite.common.types.ELimelightData.*;
+import static us.ilite.common.types.EVisionGoal2020.*;
 
 @Deprecated
 public class TargetLock implements ICommand {
@@ -36,7 +36,7 @@ public class TargetLock implements ICommand {
 
     @Override
     public boolean update(double pNow) {
-        RobotCodex<ELimelightData> currentData = Robot.DATA.goaltracking;
+        RobotCodex<EVisionGoal2020> currentData = Robot.DATA.goaltracking;
 
         Robot.DATA.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, Robot.DATA.operatorinput.get(InputMap.DRIVER.THROTTLE_AXIS) * Settings.Input.kSnailModePercentThrottleReduction);
 

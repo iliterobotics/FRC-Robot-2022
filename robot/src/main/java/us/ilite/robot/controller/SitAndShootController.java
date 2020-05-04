@@ -1,14 +1,10 @@
 package us.ilite.robot.controller;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Field2020;
-import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EPowerCellData;
-import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
-import us.ilite.robot.modules.DriveModule;
 
 public class SitAndShootController extends BaseAutonController
 {
@@ -26,7 +22,7 @@ public class SitAndShootController extends BaseAutonController
 
     @Override
     protected void updateImpl() {
-        firingSequence(Enums.FlywheelSpeeds.INITIATION_LINE, Field2020.FieldElement.OUTER_GOAL);
+        firingSequence(Enums.FlywheelSpeeds.INITIATION_LINE, Field2020.FieldElement.OUTER_GOAL_UPPER_CORNERS);
         mIsBroken = db.powercell.isSet(EPowerCellData.EXIT_BEAM);
 
         if (mPreviouslyBroken && !mIsBroken) {

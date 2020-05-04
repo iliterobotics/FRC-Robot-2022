@@ -10,7 +10,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
 import us.ilite.common.lib.util.Units;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.types.EMatchMode;
 import static us.ilite.robot.Enums.*;
 
@@ -153,12 +153,9 @@ public class FlywheelModule extends Module {
         db.flywheel.set(FEEDER_rpm, mFeederInternalEncoder.getVelocity());
         double position = mHoodPot.getPosition();
         db.flywheel.set(POT_RAW_VALUE, position);
-        db.flywheel.set(CURRENT_HOOD_ANGLE, convertToHoodAngle(position));
-//        db.flywheel.set(POT_NORM_VALUE, mHoodPot.get());
-//        db.flywheel.set(POT_RAW_VALUE, mHoodPID.getValue());
+        db.flywheel.set(HOOD_ANGLE_deg, convertToHoodAngle(position));
         db.flywheel.set(HOOD_SERVO_RAW_VALUE, mHoodServo.getRawOutputValue());
-        db.flywheel.set(HOOD_SERVO_LAST_VALUE, mHoodServo.getLastValue());
-        db.flywheel.set(CURRENT_TURRET_ANGLE, getCurrentTurretAngle());
+        db.flywheel.set(TURRET_ANGLE_deg, getCurrentTurretAngle());
         //TODO - undo this once the turret is physically fixed
         db.flywheel.set(IS_TARGET_LOCKED, true);//Math.abs(mTurretPID.getError()) <= kTurretErrorTolerance);
 
@@ -218,9 +215,9 @@ public class FlywheelModule extends Module {
                     }
                     break;
                 case TARGET_LOCKING:
-                    if (db.goaltracking.isSet(ELimelightData.TX)) {
+                    if (db.goaltracking.isSet(EVisionGoal2020.TX)) {
                         mTurretPID.setSetpoint(0.0);
-                        double output = -mTurretPID.calculate(db.goaltracking.get(ELimelightData.TX), clock.now());
+                        double output = -mTurretPID.calculate(db.goaltracking.get(EVisionGoal2020.TX), clock.now());
                         mTurret.set(output);
 //                        mTurretPID.setReference(Units.degrees_to_rotations(getCurrentTurretAngle() + db.goaltracking.get(ELimelightData.TX), kTurretGearRatio), ControlType.kSmartMotion, TURRET_SLOT, 0);
                     } else {
@@ -228,7 +225,7 @@ public class FlywheelModule extends Module {
                     }
                     break;
                 case HOME:
-                    db.goaltracking.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
+                    db.goaltracking.set(EVisionGoal2020.TARGET_ID, Limelight.NONE.id());
 //                    mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
                     boolean reversed = db.flywheel.isSet(HOME_REVERSED);
                     double turretHome = kTurretFront;
@@ -291,11 +288,11 @@ public class FlywheelModule extends Module {
 
         switch (state) {
             case MANUAL:
-                mHoodServo.setServo(db.flywheel.get(HOOD_OPEN_LOOP));
+                mHoodServo.setServo(db.flywheel.get(SET_HOOD_pct));
                 break;
             case TARGET_ANGLE:
-                double target = convertFromHoodAngle(db.flywheel.get(TARGET_HOOD_ANGLE));
-                double current = convertFromHoodAngle(db.flywheel.get(CURRENT_HOOD_ANGLE));
+                double target = convertFromHoodAngle(db.flywheel.get(SET_HOOD_ANGLE_deg));
+                double current = convertFromHoodAngle(db.flywheel.get(HOOD_ANGLE_deg));
 
                 double output = mHoodPID.calculate(current, target);
                 mHoodServo.setServo(output);
