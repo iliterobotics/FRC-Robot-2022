@@ -10,7 +10,7 @@ import us.ilite.robot.hardware.Clock;
  * It also contains optional design patterns to adhere to.
  * All methods are passed a time, which is expected to be consistent between all modules updated in the same [mode]Periodic() call.
  */
-public abstract class Module {
+public abstract class Module implements IModule {
 
     protected final Data db = Robot.DATA;
     protected final Clock clock = Robot.CLOCK;
@@ -23,23 +23,15 @@ public abstract class Module {
     /**
      * Runs when we init a new robot mode, for example teleopInit() or autonomousInit()
      */
+    @Override
     public void modeInit(EMatchMode pMode){
 
     }
 
     /**
-     * The module's update function. Runs every time [mode]Periodic() is called (Roughly ~50Hz), or in a loop running at a custom frequency.
-     */
-    public abstract void readInputs();
-
-    /**
-     * Optional design pattern to keep hardware outputs all in one place.
-     */
-    public abstract void setOutputs();
-
-    /**
      * Shutdown/Cleanup tasks are performed here.
      */
+    @Override
     public void shutdown() {
 
     }
@@ -47,6 +39,7 @@ public abstract class Module {
     /**
      * Runs a self-test routine on this module's hardware.
      */
+    @Override
     public boolean checkModule() {
 
         return true;
@@ -55,6 +48,7 @@ public abstract class Module {
     /**
      * Zeroes sensors.
      */
+    @Override
     public void zeroSensors() {
     }
 
