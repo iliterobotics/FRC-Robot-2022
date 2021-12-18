@@ -76,6 +76,7 @@ dependencies {
     // Enable simulation gui support. Must check the box in vscode to enable support
     // upon debugging
     simulation wpi.deps.sim.gui(wpi.platforms.desktop, false)
+    implementation 'org.springframework.boot:spring-boot-starter:2.6.1'
 
 }
 
