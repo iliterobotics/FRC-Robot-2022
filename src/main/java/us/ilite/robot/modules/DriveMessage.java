@@ -27,8 +27,8 @@ public class DriveMessage {
   private double mThrottle = 0;
   private double mLeftOutput = 0;
   private double mRightOutput = 0;
-  private ECommonControlMode mControlMode = ECommonControlMode.PERCENT_OUTPUT;
-  private ECommonNeutralMode mNeutralMode = ECommonNeutralMode.BRAKE;
+//  private ECommonControlMode mControlMode = ECommonControlMode.PERCENT_OUTPUT;
+//  private ECommonNeutralMode mNeutralMode = ECommonNeutralMode.BRAKE;
 
   public DriveMessage() {
 
@@ -69,13 +69,13 @@ public class DriveMessage {
 
   public double getThrottle() { return mThrottle; }
 
-  public ECommonControlMode getMode() {
-    return mControlMode;
-  }
-
-  public ECommonNeutralMode getNeutral() {
-    return mNeutralMode;
-  }
+//  public ECommonControlMode getMode() {
+//    return mControlMode;
+//  }
+//
+//  public ECommonNeutralMode getNeutral() {
+//    return mNeutralMode;
+//  }
 
   /**
    Normalizes the drivetrain inputs so the driver does not over-saturate the commands.  For example, if both turn + throttle
@@ -156,7 +156,7 @@ public class DriveMessage {
    * @return this DriveMessage object to support the builder pattern.
    */
   public DriveMessage mode(ECommonControlMode pControlMode) {
-    mControlMode = pControlMode;
+//    mControlMode = pControlMode;
     return this;
   }
 
@@ -175,27 +175,27 @@ public class DriveMessage {
   }
 
   public DriveMessage neutral(ECommonNeutralMode pMode) {
-    this.mNeutralMode = pMode;
+//    this.mNeutralMode = pMode;
     return this;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    DriveMessage that = (DriveMessage) o;
-    return
-            this.mIsDirect == that.mIsDirect &&
-            Double.compare(that.mLeftOutput, mLeftOutput) == 0 &&
-            Double.compare(that.mRightOutput, mRightOutput) == 0 &&
-            mControlMode == that.mControlMode &&
-            mNeutralMode == that.mNeutralMode
-    ;
-  }
+//  @Override
+//  public boolean equals(Object o) {
+//    if (this == o) return true;
+//    if (o == null || getClass() != o.getClass()) return false;
+//    DriveMessage that = (DriveMessage) o;
+//    return
+//            this.mIsDirect == that.mIsDirect &&
+//            Double.compare(that.mLeftOutput, mLeftOutput) == 0 &&
+//            Double.compare(that.mRightOutput, mRightOutput) == 0 &&
+//            mControlMode == that.mControlMode &&
+//            mNeutralMode == that.mNeutralMode
+//    ;
+//  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(mIsDirect, mTurn, mThrottle, mLeftOutput, mRightOutput, mControlMode, mNeutralMode);
-  }
+//  @Override
+//  public int hashCode() {
+//    return Objects.hash(mIsDirect, mTurn, mThrottle, mLeftOutput, mRightOutput, mControlMode, mNeutralMode);
+//  }
 
 }

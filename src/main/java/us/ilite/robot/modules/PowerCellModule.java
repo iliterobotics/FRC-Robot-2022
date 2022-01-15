@@ -33,11 +33,11 @@ public class PowerCellModule extends Module {
     //Arm
     private CANSparkMax mIntakePivot;
     private CANSparkMax mIntakeRoller;
-    private CANPIDController mIntakePivotCtrl;
-    private CANEncoder mIntakePivotEncoder;
+    private SparkMaxPIDController mIntakePivotCtrl;
+    private RelativeEncoder mIntakePivotEncoder;
     private DutyCycleEncoder mIntakePivotAbsoluteEncoder;
-    private CANEncoder mIntakeRollerEncoder;
-    private CANPIDController mIntakeRollerCtrl;
+    private RelativeEncoder mIntakeRollerEncoder;
+    private SparkMaxPIDController mIntakeRollerCtrl;
 
 //    Beam Breakers
     private DigitalBeamSensor mEntryBeam;
@@ -112,7 +112,7 @@ public class PowerCellModule extends Module {
         mSecondaryBeam = new DigitalBeamSensor( Settings.HW.DIO.kSecondaryBeamChannel, debounceTime_s);
         mExitBeam = new DigitalBeamSensor( Settings.HW.DIO.kExitBeamChannel, debounceTime_s);
 
-        mIntakePivotEncoder = new CANEncoder(mIntakePivot);
+        mIntakePivotEncoder = mIntakePivot.getEncoder();
         mIntakePivotAbsoluteEncoder = new DutyCycleEncoder(0);
         mIntakePivotCtrl = mIntakePivot.getPIDController();
 
@@ -163,13 +163,13 @@ public class PowerCellModule extends Module {
 //            mIntakeRoller.set(db.powercell.get(SET_INTAKE_VEL_ft_s) / 18.0); // 18ft/s theoretical max
             double rpm = db.powercell.get(SET_INTAKE_VEL_ft_s) / kIntakeRollerSpeedConversion;
 //            SmartDashboard.putNumber("Target Intake Roller RPM", rpm);
-            mIntakeRollerCtrl.setReference(rpm, ControlType.kSmartVelocity, INTAKE_ROLLER_SLOT);
+//            mIntakeRollerCtrl.setReference(rpm, ControlType.kSmartVelocity, INTAKE_ROLLER_SLOT);
 //            mIntakeRoller.set(0.6);
             EArmState state = db.powercell.get(INTAKE_STATE, EArmState.class);
             switch(state) {
                 case OUT:
                 case STOW:
-                    mIntakePivotCtrl.setReference(state.angle / kPivotConversion, ControlType.kSmartMotion, INTAKE_PIVOT_DOWN_SLOT, 0.01);
+//                    mIntakePivotCtrl.setReference(state.angle / kPivotConversion, ControlType.kSmartMotion, INTAKE_PIVOT_DOWN_SLOT, 0.01);
                     break;
                 default:
                     mIntakePivot.set(0.0);
