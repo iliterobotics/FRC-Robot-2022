@@ -98,14 +98,14 @@ public class LEDControl extends Module {
         // Timer wants elapsed time in double seconds, pulse period specified in ms.
         double blinkPeriod = ((double) m.pulse) / 1000.0;
 
-//        if(m.pulse == 0) {
-//            mLEDState = LEDState.ON;
-//        } else if( this.mBlinkTimer.hasPeriodPassed(blinkPeriod) ) {
-//            mLEDState = mLEDState.flip();
-//            this.mBlinkTimer.stop();
-//            this.mBlinkTimer.reset();
-//            this.mBlinkTimer.start();
-//        }
+        if(m.pulse == 0) {
+            mLEDState = LEDState.ON;
+        } else if( this.mBlinkTimer.hasPeriodPassed(blinkPeriod) ) {
+            mLEDState = mLEDState.flip();
+            this.mBlinkTimer.stop();
+            this.mBlinkTimer.reset();
+            this.mBlinkTimer.start();
+        }
 
         if(mLEDState.isOn()) {
             setLED(m.color);
