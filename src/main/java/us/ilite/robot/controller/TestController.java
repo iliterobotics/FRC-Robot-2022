@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import us.ilite.common.Data;
+import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
@@ -70,6 +71,30 @@ public class TestController extends BaseManualController {
 
     private double mMaxSpeed = 0.0;
     private double mMaxYaw = 0.0;
+
+    public void updateHanger() {
+//        if(db.driverinput.isSet(ELogitech310.Y_BTN)) {
+//            db.hanger.set(EHangerModuleData.SET_pct, 0.1);
+//        }
+//        else if(db.driverinput.isSet(ELogitech310.B_BTN)) {
+//            db.hanger.set(EHangerModuleData.SET_pct, 0.3);
+//        }
+//        else if(db.driverinput.isSet(ELogitech310.A_BTN)) {
+//            db.hanger.set(EHangerModuleData.SET_pct, 0.5);
+//        }
+//        else if(db.driverinput.isSet(ELogitech310.X_BTN)) {
+//            db.hanger.set(EHangerModuleData.SET_pct, 0.7);
+//        }
+        if(db.driverinput.isSet(ELogitech310.R_BTN) && db.operatorinput.isSet(ELogitech310.R_BTN)) {
+            db.hanger.set(EHangerModuleData.SET_pct, 0.3);
+        }
+        else if (db.driverinput.isSet(ELogitech310.L_BTN) && db.operatorinput.isSet(ELogitech310.L_BTN)) {
+            db.hanger.set(EHangerModuleData.SET_pct, -0.3);
+        }
+        else {
+            db.hanger.set(EHangerModuleData.SET_pct, 0);
+        }
+    }
 
     @Override
     protected void updateImpl() {
