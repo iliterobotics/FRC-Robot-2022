@@ -151,7 +151,7 @@ public class BaseAutonController extends AbstractController {
             db.drivetrain.set(EDriveData.STATE, EDriveState.PATH_FOLLOWING_HELIX);
             db.drivetrain.set(EDriveData.L_PATH_FT_s, left);
             db.drivetrain.set(EDriveData.R_PATH_FT_s, right);
-            db.drivetrain.set(EDriveData.PATH_ERR_ft, mDistanceController.getError());
+//            db.drivetrain.set(EDriveData.PATH_ERR_ft, mDistanceController.getError());
         }
 
         protected void moveToNextSegment() {

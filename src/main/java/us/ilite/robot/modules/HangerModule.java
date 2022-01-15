@@ -14,11 +14,11 @@ public class HangerModule extends Module {
 
     private CANSparkMax mLeftHanger;
     private CANSparkMax mRightHanger;
-    private CANPIDController mLeftHangerPID;
-    private CANPIDController mRightHangerPID;
+    private SparkMaxPIDController mLeftHangerPID;
+    private SparkMaxPIDController mRightHangerPID;
 
-    private CANEncoder mLeftHangerEncoder;
-    private CANEncoder mRightHangerEncoder;
+    private RelativeEncoder mLeftHangerEncoder;
+    private RelativeEncoder mRightHangerEncoder;
 
     public static double kMaxRPM = 2000.0;
     private static final int VELOCITY_PID_SLOT = 0;
@@ -36,8 +36,8 @@ public class HangerModule extends Module {
         mLeftHanger = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kMAXHanger1_left,kBrushless);
         mRightHanger = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kMAXHanger2_right, kBrushless);
 
-        mLeftHangerPID = new CANPIDController(mLeftHanger);
-        mRightHangerPID = new CANPIDController(mRightHanger);
+        mLeftHangerPID = mLeftHanger.getPIDController();
+        mRightHangerPID = mLeftHanger.getPIDController();
 
         mLeftHanger.setIdleMode(CANSparkMax.IdleMode.kBrake);
         mRightHanger.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -80,7 +80,7 @@ public class HangerModule extends Module {
     @Override
     public void setOutputs() {
         double desiredPct = db.hanger.safeGet(SET_pct, 0.0);
-        mLeftHangerPID.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-        mRightHangerPID.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+//        mLeftHangerPID.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+//        mRightHangerPID.setReference(desiredPct * kMaxRPM, ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
     }
 }

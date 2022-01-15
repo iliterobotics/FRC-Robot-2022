@@ -276,9 +276,9 @@ public class Robot extends TimedRobot {
         if (this.isAutonomous()) {
             mRobotMode = "Autonomous";
         }
-        if (this.isOperatorControl()) {
-            mRobotMode = "OPERATOR Control";
-        }
+//        if (this.isOperatorControl()) {
+//            mRobotMode = "OPERATOR Control";
+//        }
         if (this.isTest()) {
             mRobotEnabledDisabled = "Test";
         }

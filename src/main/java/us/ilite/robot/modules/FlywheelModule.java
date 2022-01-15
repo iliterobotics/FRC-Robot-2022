@@ -35,7 +35,7 @@ public class FlywheelModule extends Module {
 //    private AnalogPotentiometer mHoodPot;
 
     // This is for the feeder MAX connection
-    private CANAnalog mHoodPot;
+    private AnalogInput mHoodPot;
 
     // Constants
     private static final double kHoodGearRatio = 32.0 / 20.0 * 14.0 / 360.0;//First stage was 32/20 in code but 36/20 in integration
@@ -92,12 +92,12 @@ public class FlywheelModule extends Module {
 
     private PIDController mHoodPID = new PIDController(5, 0, 0);
 
-    private CANEncoder mFeederInternalEncoder;
+    private RelativeEncoder mFeederInternalEncoder;
 
-    private CANPIDController mTurretCtrlPID;
+    private SparkMaxPIDController mTurretCtrlPID;
     private us.ilite.common.lib.control.PIDController mTurretPID = new us.ilite.common.lib.control.PIDController(kTurretGains, -90, 90, Settings.kControlLoopPeriod);
 
-    private CANEncoder mTurretEncoder;
+    private RelativeEncoder mTurretEncoder;
 
 
     private double mIntegral = 0;
@@ -128,12 +128,12 @@ public class FlywheelModule extends Module {
         mFlywheelFalconFollower.setNeutralMode(NeutralMode.Coast);
         mFlywheelFalconFollower.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
         mFeeder = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kMAXFeederId, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mFeederInternalEncoder = new CANEncoder(mFeeder);
+        mFeederInternalEncoder = mFeeder.getEncoder();
         mFeeder.setIdleMode(CANSparkMax.IdleMode.kBrake);
         mFeeder.setSmartCurrentLimit(30);
 
         mHoodServo = new ContinuousRotationServo(Settings.HW.PWM.kHoodServoId).inverted(true);
-        mHoodPot = mFeeder.getAnalog(CANAnalog.AnalogMode.kAbsolute);
+        mHoodPot = mFeeder.getAnalog(SparkMaxAnalogSensor.Mode.kAbsolute);
 //        mHoodAI = new AnalogInput(Settings.Hardware.Analog.kHoodPot);
 //        mHoodPot = new AnalogPotentiometer(mHoodAI);
     }
@@ -209,9 +209,9 @@ public class FlywheelModule extends Module {
                     double mTurretDirection = db.flywheel.get(MANUAL_TURRET_DIRECTION);
                     if (db.flywheel.isSet(MANUAL_TURRET_DIRECTION)) {
 //                        mTurret.set(.25 * mTurretDirection);
-                        mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
+//                        mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
                     } else {
-                        mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
+//                        mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
                     }
                     break;
                 case TARGET_LOCKING:
@@ -221,7 +221,7 @@ public class FlywheelModule extends Module {
                         mTurret.set(output);
 //                        mTurretPID.setReference(Units.degrees_to_rotations(getCurrentTurretAngle() + db.goaltracking.get(ELimelightData.TX), kTurretGearRatio), ControlType.kSmartMotion, TURRET_SLOT, 0);
                     } else {
-                        mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
+//                        mTurretCtrlPID.setReference(0.0, ControlType.kPosition, TURRET_SLOT, 0);
                     }
                     break;
                 case HOME:
