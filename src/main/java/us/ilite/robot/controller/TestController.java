@@ -19,7 +19,6 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.modules.*;
 import static us.ilite.common.types.EVisionGoal2020.*;
 
-import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
 import static us.ilite.robot.Enums.*;
 import static us.ilite.common.types.EPowerCellData.*;
