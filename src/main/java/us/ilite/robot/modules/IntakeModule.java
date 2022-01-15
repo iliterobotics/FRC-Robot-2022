@@ -22,8 +22,8 @@ public class IntakeModule extends Module{
     private final int kMaxNeoVelocity = 5676;
 
     public IntakeModule() {
-        mIntakeOne = SparkMaxFactory.createDefaultSparkMax(7, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mIntakeConveyer = SparkMaxFactory.createDefaultSparkMax(9, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mIntakeOne = SparkMaxFactory.createDefaultSparkMax(9, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mIntakeConveyer = SparkMaxFactory.createDefaultSparkMax(7, CANSparkMaxLowLevel.MotorType.kBrushless);
         mIntakeEncoderOne = mIntakeOne.getEncoder();
         mIntakeConveyerEncoder = mIntakeConveyer.getEncoder();
     }
@@ -38,7 +38,7 @@ public class IntakeModule extends Module{
     //sets the outputs for things in this module, what this module will do on robot
     @Override
     public void setOutputs() {
-        mIntakeOne.set(db.intake.get(SET_INTAKE_VEL_ft_s) / kMaxNeoVelocity); //setting the motors to the variable given
+        mIntakeOne.set(db.intake.get(SET_INTAKE_VEL_ft_s)); //setting the motors to the variable given
         mIntakeConveyer.set(db.intake.get(SET_H_pct));
     }
 }

@@ -221,8 +221,8 @@ public class TestController extends BaseManualController {
     }
 
     protected void updatePowerCells() {
-        if(db.driverinput.isSet(ELogitech310.A_BTN)) {
-            db.intake.set(SET_INTAKE_VEL_ft_s, 2500);
+        if(db.driverinput.isSet(ELogitech310.R_BTN)) {
+            db.intake.set(SET_INTAKE_VEL_ft_s, 0.2);
         }
         else {
             db.intake.set(SET_INTAKE_VEL_ft_s, 0);
