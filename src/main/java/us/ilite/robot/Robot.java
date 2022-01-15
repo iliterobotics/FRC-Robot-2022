@@ -38,14 +38,14 @@ public class Robot extends TimedRobot {
     private HangerModule mHanger;
     private Timer initTimer = new Timer();
 
-    private DriveModule mDrive;
-    private Limelight mLimelight;
-    private PowerCellModule mIntake;
-    private RawLimelight mRawLimelight;
-    private DJSpinnerModule mDJSpinnerModule;
-    private LEDControl mLEDControl;
-    private SimulationModule mSimulation;
-    private FlywheelModule mShooter;
+//    private DriveModule mDrive;
+//    private Limelight mLimelight;
+      private IntakeModule mIntake;
+//    private RawLimelight mRawLimelight;
+//    private DJSpinnerModule mDJSpinnerModule;
+//    private LEDControl mLEDControl;
+//    private SimulationModule mSimulation;
+//    private FlywheelModule mShooter;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -70,17 +70,17 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
-        mDrive = new DriveModule();
-        mShooter = new FlywheelModule();
-        mIntake = new PowerCellModule();
-        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
-//        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
-        mDJSpinnerModule = new DJSpinnerModule();
-        mLEDControl = new LEDControl();
-        mHanger = new HangerModule();
-        if(IS_SIMULATED) {
-            mSimulation = new SimulationModule();
-        }
+//        mDrive = new DriveModule();
+//        mShooter = new FlywheelModule();
+        mIntake = new IntakeModule();
+//        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
+////        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
+//        mDJSpinnerModule = new DJSpinnerModule();
+//        mLEDControl = new LEDControl();
+//        mHanger = new HangerModule();
+//        if(IS_SIMULATED) {
+//            mSimulation = new SimulationModule();
+//        }
 
         //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
@@ -132,11 +132,11 @@ public class Robot extends TimedRobot {
         mActiveController = mAutonSelection.getSelectedAutonController();
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
-        mRunningModules.addModule(mLimelight);
-        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mDrive);
-        mRunningModules.modeInit(AUTONOMOUS);
+//        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mDrive);
+//        mRunningModules.modeInit(AUTONOMOUS);
     }
 
     @Override
@@ -152,11 +152,11 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mDrive);
         mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mHanger);
-        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mHanger);
+//        mRunningModules.addModule(mLimelight);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -185,8 +185,8 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.readInputs();
-        mDrive.readInputs();
-        mShooter.readInputs();
+//        mDrive.readInputs();
+//        mShooter.readInputs();
         mIntake.readInputs();
         Shuffleboard.update();
     }
@@ -206,16 +206,16 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mLimelight);
-        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
-        mRunningModules.addModule(mHanger);
+//        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mHanger);
         mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
 //        mRunningModules.addModule(mLEDControl);
-        if(IS_SIMULATED) {
-            mRunningModules.addModule(mSimulation);
-        }
+//        if(IS_SIMULATED) {
+//            mRunningModules.addModule(mSimulation);
+//        }
         mRunningModules.modeInit(TEST);
         mRunningModules.checkModule();
     }

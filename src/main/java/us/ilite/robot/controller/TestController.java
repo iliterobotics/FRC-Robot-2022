@@ -221,32 +221,43 @@ public class TestController extends BaseManualController {
     }
 
     protected void updatePowerCells() {
-        if(flywheelinput.isSet(InputMap.FLYWHEEL.RESET_INTAKE_COUNT)) {
-            resetSerializerState();
+        if(db.driverinput.isSet(ELogitech310.A_BTN)) {
+            db.intake.set(SET_INTAKE_VEL_ft_s, 2500);
         }
-        // Default to none
-        db.powercell.set(INTAKE_STATE, EArmState.NONE);
-
-        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE) || flywheelinput.isSet(InputMap.FLYWHEEL.BASIC_INTAKE)) {
-            setIntakeArmEnabled(true);
-            activateSerializer();
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE) || flywheelinput.isSet(InputMap.FLYWHEEL.REVERSE_INTAKE)) {
-            db.powercell.set(INTAKE_STATE, EArmState.STOW);
-            reverseSerializer();
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW) || flywheelinput.isSet(InputMap.FLYWHEEL.INTAKE_STOW)) {
-            setIntakeArmEnabled(false);
-            activateSerializer();
-        } else {
-            // TODO - only enable once we have set the hold gains
-//            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
-            db.powercell.set(INTAKE_STATE, EArmState.NONE);
-            db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
+        else {
+            db.intake.set(SET_INTAKE_VEL_ft_s, 0);
         }
 
-        if((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) && isFlywheelUpToSpeed() && isFeederUpToSpeed()) {
-            db.powercell.set(SET_V_pct, 0.6);
-            db.powercell.set(SET_H_pct, 0.5);
-        }
+        db.intake.set(SET_H_pct, db.driverinput.get(ELogitech310.RIGHT_Y_AXIS) / 5);
+
+
+
+//        if(flywheelinput.isSet(InputMap.FLYWHEEL.RESET_INTAKE_COUNT)) {
+//            resetSerializerState();
+//        }
+//        // Default to none
+//        db.powercell.set(INTAKE_STATE, EArmState.NONE);
+//
+//        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE) || flywheelinput.isSet(InputMap.FLYWHEEL.BASIC_INTAKE)) {
+//            setIntakeArmEnabled(true);
+//            activateSerializer();
+//        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE) || flywheelinput.isSet(InputMap.FLYWHEEL.REVERSE_INTAKE)) {
+//            db.powercell.set(INTAKE_STATE, EArmState.STOW);
+//            reverseSerializer();
+//        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW) || flywheelinput.isSet(InputMap.FLYWHEEL.INTAKE_STOW)) {
+//            setIntakeArmEnabled(false);
+//            activateSerializer();
+//        } else {
+//            // TODO - only enable once we have set the hold gains
+////            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
+//            db.powercell.set(INTAKE_STATE, EArmState.NONE);
+//            db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
+//        }
+//
+//        if((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) && isFlywheelUpToSpeed() && isFeederUpToSpeed()) {
+//            db.powercell.set(SET_V_pct, 0.6);
+//            db.powercell.set(SET_H_pct, 0.5);
+//        }
     }
 
     void updateDJBooth() {

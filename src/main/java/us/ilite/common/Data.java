@@ -49,6 +49,7 @@ public class Data {
     public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
     public final RobotCodex<EVisionGoal2020> limelight = new RobotCodex(NULL_CODEX_VALUE , EVisionGoal2020.class);
     public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
+    public final RobotCodex<EPowerCellData> intake = new RobotCodex<EPowerCellData>(NULL_CODEX_VALUE, EPowerCellData.class);
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
             imu,
             drivetrain,
