@@ -8,6 +8,7 @@ import us.ilite.robot.hardware.SparkMaxFactory;
 
 public class FlywheelTestModule extends Module {
 
+
     private CANSparkMax mFlywheel;
     private RelativeEncoder mFlywheelEncoder;
 
