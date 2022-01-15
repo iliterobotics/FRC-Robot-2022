@@ -14,7 +14,8 @@ public enum EPowerCellData implements CodexOf<Double> {
     SET_H_pct,
     SET_V_pct,
 
-    INTAKE_STATE,
+    LEFT_PNEUMATIC_STATE,
+    RIGHT_PNEUMATIC_STATE,
     ARM_ANGLE_deg,
     PIVOT_ABSOLUTE_ENCODER_RAW,
 

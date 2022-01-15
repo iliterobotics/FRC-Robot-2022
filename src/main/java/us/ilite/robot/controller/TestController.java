@@ -229,6 +229,15 @@ public class TestController extends BaseManualController {
 
         db.intake.set(SET_H_pct, db.driverinput.get(ELogitech310.RIGHT_Y_AXIS) / 3);
         SmartDashboard.putNumber("Right Axis Y Velocity", db.driverinput.get(ELogitech310.RIGHT_Y_AXIS));
+
+        if(db.driverinput.isSet(ELogitech310.L_BTN)) {
+            db.intake.set(LEFT_PNEUMATIC_STATE, 1.0);
+            db.intake.set(RIGHT_PNEUMATIC_STATE, 1.0);
+        }
+        else if (db.driverinput.isSet(ELogitech310.R_BTN)) {
+            db.intake.set(LEFT_PNEUMATIC_STATE, 0.0);
+            db.intake.set(RIGHT_PNEUMATIC_STATE, 0.0);
+        }
     }
 
     void updateDJBooth() {

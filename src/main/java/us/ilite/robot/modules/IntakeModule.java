@@ -43,6 +43,9 @@ public class IntakeModule extends Module{
     public void readInputs() {
         db.intake.set(INTAKE_VEL_ft_s, mIntakeEncoderOne.getVelocity()); //send data to db constantly
         db.intake.set(INTAKE_VEL_ft_s, mIntakeConveyorEncoder.getVelocity());
+
+        db.intake.set(LEFT_PNEUMATIC_STATE, mArmSolenoidLeft.get());
+        db.intake.set(RIGHT_PNEUMATIC_STATE, mArmSolenoidRight.get());
     }
 
     //sets the outputs for things in this module, what this module will do on robot
@@ -50,5 +53,20 @@ public class IntakeModule extends Module{
     public void setOutputs() {
         mIntakeConveyor.set(db.intake.get(SET_INTAKE_VEL_ft_s)); //setting the motors to the variable given
         mIntakeRoller.set(db.intake.get(SET_H_pct));
+
+        setPneumaticIntake();
+    }
+
+    public void setPneumaticIntake() {
+        //convert the double values of the pneumatic states to booleans
+        if (db.intake.get(LEFT_PNEUMATIC_STATE) == 1.0) {
+            mArmSolenoidLeft.set(true);
+        }
+        mArmSolenoidLeft.set(false);
+
+        if (db.intake.get(RIGHT_PNEUMATIC_STATE) == 1.0) {
+            mArmSolenoidRight.set(true);
+        }
+        mArmSolenoidRight.set(false);
     }
 }
