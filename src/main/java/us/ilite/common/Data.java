@@ -143,7 +143,7 @@ public class Data {
         //For testing make sure to comment out the method and
         //return a single char for the symbol of the color.
         String gameData;
-        gameData = DriverStation.getInstance().getGameSpecificMessage();
+        gameData = DriverStation.getGameSpecificMessage();
         if (gameData.length() > 0) {
             return gameData.charAt(0);
         } else {

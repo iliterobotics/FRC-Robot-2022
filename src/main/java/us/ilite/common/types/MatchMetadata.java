@@ -16,13 +16,13 @@ public class MatchMetadata {
 
     public MatchMetadata() {
         
-        if(DriverStation.getInstance().isFMSAttached()) {
-            mEventName = DriverStation.getInstance().getEventName();
-            mLocation = DriverStation.getInstance().getLocation();
-            mAlliance = DriverStation.getInstance().getAlliance();
-            mMatchType = DriverStation.getInstance().getMatchType();
-            mReplayNumber = DriverStation.getInstance().getReplayNumber();
-            mMatchNumber = DriverStation.getInstance().getMatchNumber();
+        if(DriverStation.isFMSAttached()) {
+            mEventName = DriverStation.getEventName();
+            mLocation = DriverStation.getLocation();
+            mAlliance = DriverStation.getAlliance();
+            mMatchType = DriverStation.getMatchType();
+            mReplayNumber = DriverStation.getReplayNumber();
+            mMatchNumber = DriverStation.getMatchNumber();
             int i = 7;
             i += mEventName.hashCode();
             i += 7 * mMatchType.ordinal();

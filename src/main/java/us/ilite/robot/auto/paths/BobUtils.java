@@ -102,7 +102,7 @@ public class BobUtils {
     public static double calculateCurvature(Path pPath, int i) {
         // https://www.math24.net/curvature-radius/
         // https://math.dartmouth.edu/~m8f19/lectures/m8f19curvature.pdf
-        // Ref edu.wpi.first.wpilibj.spline.Spline
+        // Ref edu.wpi.first.math.spline.Spline
         double dt = pPath.getValue(i, TIME_STAMP);
         double dx = (getMeters(pPath, X, i) - getMeters(pPath, X, i-1))/dt/dt;
         double ddx = (getMeters(pPath, X, i) - getMeters(pPath, X, i-2))/dt/dt;
