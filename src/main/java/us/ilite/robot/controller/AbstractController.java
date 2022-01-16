@@ -58,6 +58,15 @@ public abstract class AbstractController {
         mNumBalls = 0;
     }
 
+    /**
+     * Enables / Disables this controller.
+     * @param pEnabled TRUE if enabled
+     */
+    public final void setEnabled(boolean pEnabled) {
+        mCycleCount = 0;
+        mEnabled = pEnabled;
+    }
+
     protected void stopDrivetrain() {
         db.drivetrain.set(STATE, EDriveState.PERCENT_OUTPUT);
         db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);

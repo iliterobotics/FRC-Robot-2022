@@ -15,7 +15,7 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.robot.auto.paths.AutonSelection;
+import us.ilite.robot.auto.AutonSelection;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
@@ -125,7 +125,7 @@ public class Robot extends TimedRobot {
 
         MODE=AUTONOMOUS;
         mActiveController = mAutonSelection.getSelectedAutonController();
-        mActiveController.setEnabled(true);
+      //  mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);

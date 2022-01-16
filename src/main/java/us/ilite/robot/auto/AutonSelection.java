@@ -27,7 +27,7 @@ public class AutonSelection {
                .getDouble(0.0)))
                .intValue();
 
-        mSendableAutonControllers.setDefaultOption("Default - Auton Calibration", BaseAutonController.class);
+        mSendableAutonControllers.setDefaultOption("Default - BaseAuton", BaseAutonController.class);
         for (Class<?> c : mAutonControllers) {
             mSendableAutonControllers.addOption(c.getSimpleName(), c);
         }
