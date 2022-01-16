@@ -40,9 +40,7 @@ public class Robot extends TimedRobot {
 
     private DriveModule mDrive;
     private Limelight mLimelight;
-    private PowerCellModule mIntake;
     private RawLimelight mRawLimelight;
-    private DJSpinnerModule mDJSpinnerModule;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
@@ -72,10 +70,8 @@ public class Robot extends TimedRobot {
         mOI = new OperatorInput();
         mDrive = new DriveModule();
         mShooter = new FlywheelModule();
-        mIntake = new PowerCellModule();
         mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
-        mDJSpinnerModule = new DJSpinnerModule();
         mLEDControl = new LEDControl();
         mHanger = new HangerModule();
         if(IS_SIMULATED) {
@@ -187,7 +183,6 @@ public class Robot extends TimedRobot {
         mOI.readInputs();
         mDrive.readInputs();
         mShooter.readInputs();
-        mIntake.readInputs();
         Shuffleboard.update();
     }
 
