@@ -16,11 +16,7 @@ public class AutonSelection {
      * Update these Auton Controllers whenever new ones are added
      */
     private Class<?>[] mAutonControllers = {
-            LineAutonController.class,
-            ShootIntakeController.class,
-            YoinkController.class,
-            OurTrenchController.class,
-            SitAndShootController.class
+
     };
 
     public AutonSelection() {

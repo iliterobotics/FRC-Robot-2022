@@ -7,6 +7,7 @@ import us.ilite.common.types.EMatchMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+@Deprecated
 
 public class LoopList extends Loop {
 
