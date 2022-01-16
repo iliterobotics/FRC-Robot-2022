@@ -51,12 +51,12 @@ public class DriveStraight implements ICommand {
      * Indicates whether we use velocity control or pure % output for drivebase outputs.
      */
     public enum EDriveControlMode {
-        MOTION_MAGIC(ECommonControlMode.MOTION_PROFILE),
-        PERCENT_OUTPUT(ECommonControlMode.PERCENT_OUTPUT);
-        public final ECommonControlMode kMotorControlMode;
-        EDriveControlMode(ECommonControlMode pMotorControlMode) {
-            kMotorControlMode = pMotorControlMode;
-        }
+//        MOTION_MAGIC(ECommonControlMode.MOTION_PROFILE),
+//        PERCENT_OUTPUT(ECommonControlMode.PERCENT_OUTPUT);
+//        public final ECommonControlMode kMotorControlMode;
+//        EDriveControlMode(ECommonControlMode pMotorControlMode) {
+//            kMotorControlMode = pMotorControlMode;
+//        }
     }
 
     @Override

@@ -30,10 +30,10 @@ public class ExampleModule extends Module {
     @Override
     public void setOutputs() {
 
-        if(mTimer.hasPeriodPassed(kDelaySeconds)) {
-            mOn = !mOn;
-            mTimer.reset();
-        }
+//        if(mTimer.hasPeriodPassed(kDelaySeconds)) {
+//            mOn = !mOn;
+//            mTimer.reset();
+//        }
 
         if(mOn) {
             mLog.error("ON");

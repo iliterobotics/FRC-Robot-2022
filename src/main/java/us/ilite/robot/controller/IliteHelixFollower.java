@@ -90,8 +90,8 @@ public abstract class IliteHelixFollower {
     public void initialize() {
         resetDistance();
         //Make sure we're starting at the beginning of the path
-        getDistanceController().reset();
-        getHeadingController().reset();
+//        getDistanceController().reset();
+//        getHeadingController().reset();
         currentSegment = 0;
         isFinished = false;
 
@@ -99,8 +99,8 @@ public abstract class IliteHelixFollower {
     }
 
     protected void execute () {
-        SmartDashboard.putNumber("Distance Path Error", getDistanceController().getError());
-        SmartDashboard.putNumber("Heading Path Error", getHeadingController().getError());
+//        SmartDashboard.putNumber("Distance Path Error", getDistanceController().getError());
+//        SmartDashboard.putNumber("Heading Path Error", getHeadingController().getError());
     }
 
     public boolean isFinished() {
@@ -138,20 +138,20 @@ public abstract class IliteHelixFollower {
         // Set our expected position to be the setpoint of our distance controller
         // The position will be an average of both the left and right to give us the overall distance
         double expectedPosition = trajectory.getValue(segment, CENTER_POSITION);
-        getDistanceController().setReference(reverse ? -expectedPosition : expectedPosition);
+//        getDistanceController().setReference(reverse ? -expectedPosition : expectedPosition);
         double currentPosition = getCurrentDistance();
 
         // Set our expected heading to be the setpoint of our direction controller
         double expectedHeading = trajectory.getValue(segment, HEADING);
         // If the path is flipped, invert the sign of the heading
-        getHeadingController().setReference(mirror ? -expectedHeading : expectedHeading);
+//        getHeadingController().setReference(mirror ? -expectedHeading : expectedHeading);
         double currentHeading = getCurrentHeading();
 
         // The final velocity is going to be a combination of our expected velocity corrected by our distance error and our heading error
         // velocity = expected + distanceError +/- headingError
-        double correctedLeftVelocity = leftVelocity + getDistanceController().calculate(currentPosition) - getHeadingController().calculate(currentHeading);
-        double correctedRightVelocity = rightVelocity + getDistanceController().calculate(currentPosition) + getHeadingController().calculate(currentHeading);
+//        double correctedLeftVelocity = leftVelocity + getDistanceController().calculate(currentPosition) - getHeadingController().calculate(currentHeading);
+//        double correctedRightVelocity = rightVelocity + getDistanceController().calculate(currentPosition) + getHeadingController().calculate(currentHeading);
 
-        useOutputs(correctedLeftVelocity, correctedRightVelocity);
+//        useOutputs(correctedLeftVelocity, correctedRightVelocity);
     }
 }
