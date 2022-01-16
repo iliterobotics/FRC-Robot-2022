@@ -38,11 +38,8 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
         //updateLimelightTargetLock(); //waiting for merge to master
-        updateFlywheel();
         super.updateDrivetrain();
-        updatePowerCells();
         updateHanger(); //not integrated yet
-        //updateDJBooth(pNow); //not integrated yet
     }
 
     private void updateHanger() {
@@ -52,38 +49,6 @@ public class TeleopController extends BaseManualController { //copied from TestC
             db.hanger.set(EHangerModuleData.SET_pct, 0.0);
         }
 
-    }
-
-    private void updateFlywheel() {
-
-        mTurretReverseHome.update(db.operatorinput.isSet(InputMap.OPERATOR.CLOSE_MODE));
-        if(mTurretReverseHome.mExit.get()) {
-            reverseTurretHome();
-            mTurretReverseHome.reset();
-        }
-
-        if(db.operatorinput.isSet(InputMap.OPERATOR.FAR_MODE)) {
-            currentState = Enums.FlywheelSpeeds.FAR;
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.NEAR_MODE)){
-            currentState = Enums.FlywheelSpeeds.INITIATION_LINE;
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.CLOSE_MODE)) {
-            currentState = Enums.FlywheelSpeeds.CLOSE;
-        }
-
-
-        if(db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
-            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL_UPPER_CORNERS.id());
-            super.firingSequence(currentState);
-//            super.setFlywheelClosedLoop(currentState);
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.AIM)) {
-            super.setTurretHandling(Enums.TurretControlType.TARGET_LOCKING, Field2020.FieldElement.OUTER_GOAL_UPPER_CORNERS.id());
-            super.setFlywheelClosedLoop(currentState, true);
-        } else {
-            db.goaltracking.set(EVisionGoal2020.TARGET_ID, Limelight.NONE.id());
-            super.setTurretHandling(Enums.TurretControlType.HOME);
-            super.firingSequence(Enums.FlywheelSpeeds.OFF);
-//            super.setFlywheelClosedLoop(Enums.FlywheelSpeeds.OFF);
-        }
     }
 
 //    public void updateLimelightTargetLock() {
@@ -118,83 +83,5 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //        mLastTrackingType = DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
 //    }
 
-    protected void updatePowerCells() {
-        if(db.operatorinput.isSet(InputMap.OPERATOR.RESET_INTAKE_COUNT)) {
-            resetSerializerState();
-        }
-        // Default to none
-        db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
-
-        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_BULLDOZE)) {
-
-        }
-        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) {
-//            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
-                setIntakeArmEnabled(true);
-                activateSerializer();
-//            }
-
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
-            db.powercell.set(INTAKE_STATE, Enums.EArmState.STOW);
-            reverseSerializer();
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW)) {
-            setIntakeArmEnabled(false);
-            if (!db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS)) {
-                activateSerializer();
-            }
-        } else {
-            db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
-            db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
-        }
-//
-//        if ((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) && isFlywheelUpToSpeed() && isFeederUpToSpeed())) {
-//            db.powercell.set(SET_V_pct, 0.6);
-//            db.powercell.set(SET_H_pct, 0.5);
-//        }
-    }
-
-//    void updateDJBooth(double pNow) {
-//        if (db.operatorinput.isSet(InputMap.OPERATOR.COLOR_POSITION)) {
-//            db.color.set(EColorData.DESIRED_MOTOR_POWER, Enums.EColorWheelState.POSITION.getPower());
-//            int i = (int) db.color.get(EColorData.SENSED_COLOR);
-//            Enums.EColorMatch m = Enums.EColorMatch.values()[i];
-//            Color DJ_COLOR = null;
-//            switch (db.recieveColorFmsRelay()) {
-//                case 'B':
-//                    DJ_COLOR = Enums.EColorMatch.BLUE.color;
-//                    break;
-//                case 'G':
-//                    DJ_COLOR = Enums.EColorMatch.GREEN.color;
-//                    break;
-//                case 'R':
-//                    DJ_COLOR = Enums.EColorMatch.RED.color;
-//                    break;
-//                case 'Y':
-//                    DJ_COLOR = Enums.EColorMatch.YELLOW.color;
-//                    break;
-//                default:
-//                    DJ_COLOR = null;
-//                    break;
-//            }
-//            if (m.color.equals(DJ_COLOR)) {
-//                //TODO stop using the module for the desired power
-//                db.color.set(EColorData.DESIRED_MOTOR_POWER, Enums.EColorWheelState.OFF.getPower());
-//            } else {
-//                db.color.set(EColorData.DESIRED_MOTOR_POWER, Enums.EColorWheelState.POSITION.getPower());
-//                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, Enums.EColorWheelState.POSITION.ordinal());
-//            }
-//        }
-//        else if ( db.operatorinput.isSet(InputMap.OPERATOR.COLOR_ROTATION)) {
-//            db.color.set(EColorData.DESIRED_MOTOR_POWER, Enums.EColorWheelState.ROTATION.getPower());
-//            if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.TARGET_ROTATION_COUNT) {
-//                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, Enums.EColorWheelState.OFF.ordinal());
-//                db.color.set(EColorData.DESIRED_MOTOR_POWER, Enums.EColorWheelState.OFF.getPower());
-//            } else {
-//                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, Enums.EColorWheelState.ROTATION.ordinal());
-//                db.color.set(EColorData.DESIRED_MOTOR_POWER, Enums.EColorWheelState.ROTATION.getPower());
-//            }
-//        }
-//
-//    }
 
 }

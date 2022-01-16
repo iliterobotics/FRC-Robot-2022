@@ -130,7 +130,7 @@ public class Enums {
             return pPower;
         }
     }
-    
+
 
     public enum EIndexingState {
         BROKEN (true),
