@@ -28,11 +28,6 @@ public abstract class AbstractController {
     protected double mLastTime = 0d;
     protected double dt = 1d;
 
-
-    public static double kIntakeRollerPower_on = 0.6;
-    public static double kIntakeRollerPower_off = 0.0;
-    protected final XorLatch mSecondaryLatch = new XorLatch();
-    protected final XorLatch mEntryLatch = new XorLatch();
     protected int mNumBalls = 0;
 
     public AbstractController(){
@@ -52,12 +47,6 @@ public abstract class AbstractController {
     }
 
 
-    protected final void resetSerializerState() {
-        mEntryLatch.reset();
-        mSecondaryLatch.reset();
-        mNumBalls = 0;
-    }
-
     /**
      * Enables / Disables this controller.
      * @param pEnabled TRUE if enabled
@@ -71,45 +60,6 @@ public abstract class AbstractController {
         db.drivetrain.set(STATE, EDriveState.PERCENT_OUTPUT);
         db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
         db.drivetrain.set(DESIRED_TURN_PCT,0.0);
-    }
-
-    /**
-     * Activates the serializer based upon the beam breaker states
-     */
-    protected void activateSerializer() {
-        mEntryLatch.update(db.powercell.isSet(ENTRY_BEAM));
-        mSecondaryLatch.update(db.powercell.isSet(H_BEAM));
-        if(mNumBalls >= 3) {
-            if (db.powercell.isSet(ENTRY_BEAM) && mNumBalls < 5) {
-                db.powercell.set(SET_H_pct, 0.3);
-            } else {
-                db.powercell.set(SET_H_pct, 0.0);
-                db.powercell.set(SET_V_pct, 0.0);
-            }
-            if(mEntryLatch.get() == XorLatch.State.BOTH) {
-                mNumBalls++;
-                mEntryLatch.reset();
-            }
-        } else {
-            if (mSecondaryLatch.get() == XorLatch.State.XOR) {
-                // Ball has entered but not exited
-                db.powercell.set(SET_H_pct, 0.0);
-                db.powercell.set(SET_V_pct, 0.35);
-            } else if (mSecondaryLatch.get() == XorLatch.State.NONE) {
-                // Ball has not entered
-                db.powercell.set(SET_H_pct, 0.25);
-                db.powercell.set(SET_V_pct, 0.0);
-            } else {
-                // Ball has exited
-                db.powercell.set(SET_H_pct, 0.0);
-                db.powercell.set(SET_V_pct, 0.0);
-                mSecondaryLatch.reset();
-                mNumBalls++;
-            }
-        }
-        db.powercell.set(NUM_BALLS, mNumBalls);
-        db.powercell.set(ENTRY_GATE, mEntryLatch.get());
-        db.powercell.set(H_GATE, mSecondaryLatch.get());
     }
 
     protected abstract void updateImpl();
