@@ -20,7 +20,6 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.modules.*;
 import static us.ilite.common.types.EVisionGoal2020.*;
 
-import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
 import static us.ilite.robot.Enums.*;
 import static us.ilite.common.types.EPowerCellData.*;
@@ -107,8 +106,6 @@ public class TestController extends BaseManualController {
         clock.report("updateLimelightTargetLock", t -> updateTargetTracking());
         clock.report("updateFlywheel", t -> updateFlywheel());
         clock.report("updateDrivetrain", t -> updateDrivetrain());
-        clock.report("updateIntake", t -> updatePowerCells());
-        clock.report("updateDJBooth", t -> updateDJBooth());
 //        updateArm(pNow);
 
         double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
@@ -245,78 +242,7 @@ public class TestController extends BaseManualController {
         mLastGroundTrackingType = Robot.DATA.goaltracking.get(TARGET_ID.ordinal());
     }
 
-    protected void updatePowerCells() {
-        if(flywheelinput.isSet(InputMap.FLYWHEEL.RESET_INTAKE_COUNT)) {
-            resetSerializerState();
-        }
-        // Default to none
-        db.powercell.set(INTAKE_STATE, EArmState.NONE);
 
-        if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE) || flywheelinput.isSet(InputMap.FLYWHEEL.BASIC_INTAKE)) {
-            setIntakeArmEnabled(true);
-            activateSerializer();
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE) || flywheelinput.isSet(InputMap.FLYWHEEL.REVERSE_INTAKE)) {
-            db.powercell.set(INTAKE_STATE, EArmState.STOW);
-            reverseSerializer();
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.INTAKE_STOW) || flywheelinput.isSet(InputMap.FLYWHEEL.INTAKE_STOW)) {
-            setIntakeArmEnabled(false);
-            activateSerializer();
-        } else {
-            // TODO - only enable once we have set the hold gains
-//            db.powercell.set(INTAKE_STATE, PowerCellModule.EArmState.HOLD);
-            db.powercell.set(INTAKE_STATE, EArmState.NONE);
-            db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
-        }
-
-        if((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) || flywheelinput.isSet(InputMap.FLYWHEEL.TEST_FIRE)) && isFlywheelUpToSpeed() && isFeederUpToSpeed()) {
-            db.powercell.set(SET_V_pct, 0.6);
-            db.powercell.set(SET_H_pct, 0.5);
-        }
-    }
-
-    void updateDJBooth() {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.COLOR_POSITION)) {
-            int i = (int) db.color.get(EColorData.SENSED_COLOR);
-            EColorMatch m = EColorMatch.values()[i];
-            Color DJ_COLOR = null;
-            switch (db.recieveColorFmsRelay()) {
-                case 'B':
-                    DJ_COLOR = EColorMatch.BLUE.color;
-                    break;
-                case 'G':
-                    DJ_COLOR = EColorMatch.GREEN.color;
-                    break;
-                case 'R':
-                    DJ_COLOR = EColorMatch.RED.color;
-                    break;
-                case 'Y':
-                    DJ_COLOR = EColorMatch.YELLOW.color;
-                    break;
-                default:
-                    DJ_COLOR = null;
-                    break;
-            }
-            if ( DJ_COLOR == null ) {
-                DriverStation.reportError("NO FMS RELAY RECEIVED! SWITCHING TO MANUAL!", false );
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.POSITION.power);
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) EColorWheelState.POSITION.ordinal());
-            } else if (m.color.equals(DJ_COLOR)) {
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.OFF.power);
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, (double) EColorWheelState.POSITION.ordinal());
-            } else {
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.POSITION.getPower());
-                db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.POSITION.ordinal());
-            }
-        }
-        else if ( db.operatorinput.isSet(InputMap.OPERATOR.COLOR_ROTATION )) {
-            if(db.color.get(EColorData.WHEEL_ROTATION_COUNT) >= DJSpinnerModule.TARGET_ROTATION_COUNT) {
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.OFF.getPower());
-            } else {
-                db.color.set(EColorData.DESIRED_MOTOR_POWER, EColorWheelState.ROTATION.getPower());
-            }
-            db.color.set(EColorData.COLOR_WHEEL_MOTOR_STATE, EColorWheelState.ROTATION.ordinal());
-        }
-    }
 }
 
 

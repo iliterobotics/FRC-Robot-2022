@@ -2,7 +2,7 @@ package us.ilite.robot.controller;
 
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
-import us.ilite.robot.modules.DriveMessage;
+
 import static us.ilite.robot.Enums.*;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
@@ -34,9 +34,6 @@ public abstract class BaseManualController extends AbstractController {
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.01;
             }
-            DriveMessage  d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
-            throttle = d.getThrottle();
-            rotate = d.getTurn();
             if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
                 throttle *= Settings.Input.kSnailModePercentThrottleReduction;
                 rotate *= Settings.Input.kSnailModePercentRotateReduction;

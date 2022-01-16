@@ -14,6 +14,8 @@ import us.ilite.robot.hardware.Clock;
  * a set time.  Tune loop period to the desired,
  * but monitor CPU usage.
  */
+@Deprecated
+
 public class LoopManager implements Runnable{
     private ILog mLog = Logger.createLog(LoopManager.class);
 
