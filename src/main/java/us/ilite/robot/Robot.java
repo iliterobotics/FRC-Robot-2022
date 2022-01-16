@@ -132,11 +132,11 @@ public class Robot extends TimedRobot {
         mActiveController = mAutonSelection.getSelectedAutonController();
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
-        mRunningModules.addModule(mLimelight);
-        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
-        mRunningModules.modeInit(AUTONOMOUS);
+//        mRunningModules.modeInit(AUTONOMOUS);
     }
 
     @Override
@@ -151,12 +151,12 @@ public class Robot extends TimedRobot {
         }
 
         mRunningModules.clearModules();
-        mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mOI);
+//        mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
-        mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mHanger);
-        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mHanger);
+//        mRunningModules.addModule(mLimelight);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -205,12 +205,12 @@ public class Robot extends TimedRobot {
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
-        mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mLimelight);
-        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mOI);
+//        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
-        mRunningModules.addModule(mHanger);
-        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mHanger);
+//        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
 //        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
