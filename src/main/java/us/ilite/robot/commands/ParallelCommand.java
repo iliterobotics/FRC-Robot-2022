@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+@Deprecated
 public class ParallelCommand implements ICommand {
 
   List<ICommand> mCommandList;

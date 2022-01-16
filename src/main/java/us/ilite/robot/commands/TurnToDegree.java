@@ -13,7 +13,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-
+@Deprecated
 public class TurnToDegree implements ICommand {
 
   private ILog mLogger = Logger.createLog( this.getClass() );

@@ -5,6 +5,7 @@ import us.ilite.common.Distance;
 import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.robot.Robot;
 
+@Deprecated
 public class DriveStraightVision extends DriveStraight {
 
 
