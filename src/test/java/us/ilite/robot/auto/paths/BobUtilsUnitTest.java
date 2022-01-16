@@ -1,7 +1,7 @@
 package us.ilite.robot.auto.paths;
 
 import com.team319.trajectory.Path;
-//import edu.wpi.first.wpilibj.trajectory.Trajectory;
+//import edu.wpi.first.math.trajectory.Trajectory;
 import org.junit.Test;
 
 import java.text.DecimalFormat;
