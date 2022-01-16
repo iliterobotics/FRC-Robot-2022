@@ -19,36 +19,35 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BobUtilsUnitTest {
-    private static final Path
-            T_LINE_27_FT = new T_LINE_27_FT(),
-            T_90DEG_12FT = new T_90DEG_12FT(),
-            T_180DEG_24FT = new T_180DEG_24FT(),
-            SQUIGGLE = new Squiggle(),
-            WONKY = new Wonky(),
-            YOINK = new Yoink(),
-            LOOP = new Loop(),
-            OURTRENCH = new OurTrench()
-    ;
+//            T_LINE_27_FT = new T_LINE_27_FT(),
+//            T_90DEG_12FT = new T_90DEG_12FT(),
+//            T_180DEG_24FT = new T_180DEG_24FT(),
+//            SQUIGGLE = new Squiggle(),
+//            WONKY = new Wonky(),
+//            YOINK = new Yoink(),
+//            LOOP = new Loop(),
+//            OURTRENCH = new OurTrench()
+
     private static final Path[] ANALYSIS_PATHS = new Path[] {
-            SQUIGGLE,
-            WONKY,
-            LOOP,
-            OURTRENCH,
-            YOINK,
+//            SQUIGGLE,
+//            WONKY,
+//            LOOP,
+//            OURTRENCH,
+//            YOINK,
     };
 
     private static final Path[] TEST_PATHS = new Path[] {
-            T_LINE_27_FT,
-            T_90DEG_12FT,
-            T_180DEG_24FT
+//            T_LINE_27_FT,
+//            T_90DEG_12FT,
+//            T_180DEG_24FT
     };
 
     private static final Set<Class<? extends Path>> PATH_CLASSES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            Loop.class,
-            OurTrench.class,
-            Squiggle.class,
-            Wonky.class,
-            Yoink.class
+//            Loop.class,
+//            OurTrench.class,
+//            Squiggle.class,
+//            Wonky.class,
+//            Yoink.class
     )));
 
     @Test
