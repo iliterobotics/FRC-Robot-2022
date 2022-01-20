@@ -1,5 +1,6 @@
 package us.ilite.robot.controller;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.InputMap;
@@ -221,22 +222,18 @@ public class TestController extends BaseManualController {
     }
 
     protected void updatePowerCells() {
-        if(db.driverinput.isSet(ELogitech310.A_BTN)) {
-            db.intake.set(SET_INTAKE_VEL_ft_s, 0.2);
-        }  else {
-            db.intake.set(SET_INTAKE_VEL_ft_s, 0);
-        }
 
-        db.intake.set(SET_H_pct, db.driverinput.get(ELogitech310.RIGHT_Y_AXIS) / 3);
-        SmartDashboard.putNumber("Right Axis Y Velocity", db.driverinput.get(ELogitech310.RIGHT_Y_AXIS));
+//        db.intake.set(SET_H_pct, db.driverinput.get(ELogitech310.RIGHT_Y_AXIS) / 3);
 
         if(db.driverinput.isSet(ELogitech310.L_BTN)) {
             db.intake.set(LEFT_PNEUMATIC_STATE, 1.0);
             db.intake.set(RIGHT_PNEUMATIC_STATE, 1.0);
+            db.intake.set(SET_INTAKE_VEL_ft_s, 0.2);
         }
         else if (db.driverinput.isSet(ELogitech310.R_BTN)) {
             db.intake.set(LEFT_PNEUMATIC_STATE, 0.0);
             db.intake.set(RIGHT_PNEUMATIC_STATE, 0.0);
+            db.intake.set(SET_INTAKE_VEL_ft_s, 0);
         }
     }
 
