@@ -3,6 +3,7 @@ package us.ilite.robot.commands;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 
+@Deprecated
 public class Delay implements ICommand {
 	private ILog mLog = Logger.createLog(Delay.class);
 

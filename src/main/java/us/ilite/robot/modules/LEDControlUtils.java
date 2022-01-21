@@ -87,36 +87,5 @@ public class LEDControlUtils {
                 this.pulse = 0;
             }
         }
-
-        static Message fromColorMatch(EColorMatch color, boolean isDone) {
-            if ( Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.COLOR_ROTATION ) || Robot.DATA.operatorinput.isSet(InputMap.OPERATOR.COLOR_POSITION )) {
-                if (isDone) {
-                    if (color == EColorMatch.BLUE) {
-                        return FINISHED_ON_BLUE;
-                    } else if (color == EColorMatch.RED) {
-                        return FINISHED_ON_RED;
-                    } else if (color == EColorMatch.GREEN) {
-                        return FINISHED_ON_GREEN;
-                    } else if (color == EColorMatch.YELLOW) {
-                        return FINISHED_ON_YELLOW;
-                    } else {
-                        return NONE;
-                    }
-                } else {
-                    if (color == EColorMatch.BLUE) {
-                        return ON_BLUE;
-                    } else if (color == EColorMatch.RED) {
-                        return ON_RED;
-                    } else if (color == EColorMatch.GREEN) {
-                        return ON_GREEN;
-                    } else if (color == EColorMatch.YELLOW) {
-                        return ON_YELLOW;
-                    } else {
-                        return NONE;
-                    }
-                }
-            }
-            return NONE;
-        }
     }
 }

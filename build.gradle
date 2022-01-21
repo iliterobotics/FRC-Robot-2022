@@ -8,7 +8,7 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
-def ROBOT_MAIN_CLASS = "frc.robot.Main"
+def ROBOT_MAIN_CLASS = "us.ilite.robot.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -65,14 +65,11 @@ dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
     implementation name: 'BobTrajectory'
-    implementation 'com.github.TripleHelixProgramming:HelixUtilities:2020-SNAPSHOT'
     implementation 'org.reflections:reflections:0.9.12'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
     implementation 'com.github.flybotix:highfrequencyrobots:' + HFRVER
     implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
-
-
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
@@ -89,12 +86,6 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     testImplementation 'junit:junit:4.12'
-
-
-
-
-
-
 }
 
 // Simulation configuration (e.g. environment variables).
