@@ -4,7 +4,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.*;
 
-import static us.ilite.common.types.EPowerCellData.*;
+import static us.ilite.common.types.EIntakeData.*;
 import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
@@ -57,21 +57,21 @@ public abstract class AbstractController {
      * @param pEnabled if TRUE, the arm is put down and rollers activated; if FALSE, it is stowed
      */
     protected void setIntakeArmEnabled(boolean pEnabled) {
-        if(pEnabled) {
-            // Divide the drive train adder in half
-            double speed = Math.max(Math.abs(db.drivetrain.get(L_ACTUAL_VEL_FT_s)), Math.abs(db.drivetrain.get(R_ACTUAL_VEL_FT_s))) / 2.0;
-
-            // Add a static speed, in case we're human loading
-            speed += 3.0;
-
-            // Cap the speed to ensure the intake doesn't over-vibrate loose. This is close to the max drivetrain speed.
-            speed = Math.min(speed, 10.5);
-            db.powercell.set(INTAKE_STATE, EArmState.OUT);
-            db.powercell.set(SET_INTAKE_VEL_ft_s , speed);
-        } else {
-            db.powercell.set(INTAKE_STATE, EArmState.STOW);
-            db.powercell.set(SET_INTAKE_VEL_ft_s, 0.0);
-        }
+//        if(pEnabled) {
+//            // Divide the drive train adder in half
+//            double speed = Math.max(Math.abs(db.drivetrain.get(L_ACTUAL_VEL_FT_s)), Math.abs(db.drivetrain.get(R_ACTUAL_VEL_FT_s))) / 2.0;
+//
+//            // Add a static speed, in case we're human loading
+//            speed += 3.0;
+//
+//            // Cap the speed to ensure the intake doesn't over-vibrate loose. This is close to the max drivetrain speed.
+//            speed = Math.min(speed, 10.5);
+//            db.powercell.set(INTAKE_STATE, EArmState.OUT);
+//            db.powercell.set(SET_ROLLER_VEL_ft_s , speed);
+//        } else {
+//            db.powercell.set(INTAKE_STATE, EArmState.STOW);
+//            db.powercell.set(SET_ROLLER_VEL_ft_s, 0.0);
+//        }
     }
 
     protected final void resetSerializerState() {
@@ -85,44 +85,44 @@ public abstract class AbstractController {
      * Activates the serializer based upon the beam breaker states
      */
     protected void activateSerializer() {
-        mEntryLatch.update(db.powercell.isSet(ENTRY_BEAM));
-        mSecondaryLatch.update(db.powercell.isSet(H_BEAM));
-        if(mNumBalls >= 3) {
-            if (db.powercell.isSet(ENTRY_BEAM) && mNumBalls < 5) {
-                db.powercell.set(SET_H_pct, 0.3);
-            } else {
-                db.powercell.set(SET_H_pct, 0.0);
-                db.powercell.set(SET_V_pct, 0.0);
-            }
-            if(mEntryLatch.get() == XorLatch.State.BOTH) {
-                mNumBalls++;
-                mEntryLatch.reset();
-            }
-        } else {
-            if (mSecondaryLatch.get() == XorLatch.State.XOR) {
-                // Ball has entered but not exited
-                db.powercell.set(SET_H_pct, 0.0);
-                db.powercell.set(SET_V_pct, 0.35);
-            } else if (mSecondaryLatch.get() == XorLatch.State.NONE) {
-                // Ball has not entered
-                db.powercell.set(SET_H_pct, 0.25);
-                db.powercell.set(SET_V_pct, 0.0);
-            } else {
-                // Ball has exited
-                db.powercell.set(SET_H_pct, 0.0);
-                db.powercell.set(SET_V_pct, 0.0);
-                mSecondaryLatch.reset();
-                mNumBalls++;
-            }
-        }
-        db.powercell.set(NUM_BALLS, mNumBalls);
-        db.powercell.set(ENTRY_GATE, mEntryLatch.get());
-        db.powercell.set(H_GATE, mSecondaryLatch.get());
+//        mEntryLatch.update(db.powercell.isSet(ENTRY_BEAM));
+//        mSecondaryLatch.update(db.powercell.isSet(H_BEAM));
+//        if(mNumBalls >= 3) {
+//            if (db.powercell.isSet(ENTRY_BEAM) && mNumBalls < 5) {
+//                db.powercell.set(SET_H_pct, 0.3);
+//            } else {
+//                db.powercell.set(SET_H_pct, 0.0);
+//                db.powercell.set(SET_V_pct, 0.0);
+//            }
+//            if(mEntryLatch.get() == XorLatch.State.BOTH) {
+//                mNumBalls++;
+//                mEntryLatch.reset();
+//            }
+//        } else {
+//            if (mSecondaryLatch.get() == XorLatch.State.XOR) {
+//                // Ball has entered but not exited
+//                db.powercell.set(SET_H_pct, 0.0);
+//                db.powercell.set(SET_V_pct, 0.35);
+//            } else if (mSecondaryLatch.get() == XorLatch.State.NONE) {
+//                // Ball has not entered
+//                db.powercell.set(SET_H_pct, 0.25);
+//                db.powercell.set(SET_V_pct, 0.0);
+//            } else {
+//                // Ball has exited
+//                db.powercell.set(SET_H_pct, 0.0);
+//                db.powercell.set(SET_V_pct, 0.0);
+//                mSecondaryLatch.reset();
+//                mNumBalls++;
+//            }
+//        }
+//        db.powercell.set(NUM_BALLS, mNumBalls);
+//        db.powercell.set(ENTRY_GATE, mEntryLatch.get());
+//        db.powercell.set(H_GATE, mSecondaryLatch.get());
     }
 
     protected void reverseSerializer() {
-        db.powercell.set(SET_H_pct, -1.0);
-        db.powercell.set(SET_V_pct, -0.5);
+//        db.powercell.set(SET_H_pct, -1.0);
+//        db.powercell.set(SET_V_pct, -0.5);
         db.flywheel.set(SET_FEEDER_pct,-0.75);
     }
 
@@ -181,36 +181,36 @@ public abstract class AbstractController {
 
     protected void
     firingSequence(FlywheelSpeeds speed, Field2020.FieldElement trackedElement) {
-        setHood(speed);
-        setFlywheelClosedLoop(speed, false);
-        if (isHoodAtCorrectAngle(speed)) {
-            setTurretHandling(TurretControlType.TARGET_LOCKING, trackedElement.id());
-            if (isTurretAtCorrectAngle() && isFlywheelUpToSpeed()) {
-                setFeederClosedLoop(speed);
-                if (isFeederUpToSpeed()) {
-                    db.powercell.set(SET_V_pct, 0.5);
-                    db.powercell.set(SET_H_pct, 0.5);
-                } else {
-                    db.powercell.set(SET_V_pct, 0);
-                    db.powercell.set(SET_H_pct, 0);
-                }
-            }
-        }
+//        setHood(speed);
+//        setFlywheelClosedLoop(speed, false);
+//        if (isHoodAtCorrectAngle(speed)) {
+//            setTurretHandling(TurretControlType.TARGET_LOCKING, trackedElement.id());
+//            if (isTurretAtCorrectAngle() && isFlywheelUpToSpeed()) {
+//                setFeederClosedLoop(speed);
+//                if (isFeederUpToSpeed()) {
+//                    db.powercell.set(SET_V_pct, 0.5);
+//                    db.powercell.set(SET_H_pct, 0.5);
+//                } else {
+//                    db.powercell.set(SET_V_pct, 0);
+//                    db.powercell.set(SET_H_pct, 0);
+//                }
+//            }
+//        }
     }
 
     protected void firingSequence(FlywheelSpeeds speed) {
-        setFlywheelClosedLoop(speed, true);
-        if (isHoodAtCorrectAngle(speed) && isFlywheelUpToSpeed()) {
-            db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
-            if (isFeederUpToSpeed()) {
-                db.powercell.set(SET_V_pct, 0.5);
-                db.powercell.set(SET_H_pct, 0.5);
-            } else {
-                db.powercell.set(SET_V_pct, 0);
-                db.powercell.set(SET_H_pct, 0);
-            }
-
-        }
+//        setFlywheelClosedLoop(speed, true);
+//        if (isHoodAtCorrectAngle(speed) && isFlywheelUpToSpeed()) {
+//            db.flywheel.set(SET_FEEDER_rpm, speed.feeder);
+//            if (isFeederUpToSpeed()) {
+//                db.powercell.set(SET_V_pct, 0.5);
+//                db.powercell.set(SET_H_pct, 0.5);
+//            } else {
+//                db.powercell.set(SET_V_pct, 0);
+//                db.powercell.set(SET_H_pct, 0);
+//            }
+//
+//        }
     }
 
     protected boolean isFlywheelUpToSpeed() {

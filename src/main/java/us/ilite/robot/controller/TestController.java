@@ -1,6 +1,5 @@
 package us.ilite.robot.controller;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.common.config.InputMap;
@@ -23,7 +22,7 @@ import static us.ilite.common.types.EVisionGoal2020.*;
 import us.ilite.robot.modules.DJSpinnerModule;
 import us.ilite.robot.modules.Limelight;
 import static us.ilite.robot.Enums.*;
-import static us.ilite.common.types.EPowerCellData.*;
+import static us.ilite.common.types.EIntakeData.*;
 import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
@@ -222,19 +221,18 @@ public class TestController extends BaseManualController {
     }
 
     protected void updatePowerCells() {
-
-//        db.intake.set(SET_H_pct, db.driverinput.get(ELogitech310.RIGHT_Y_AXIS) / 3);
-
         if(db.driverinput.isSet(ELogitech310.L_BTN)) {
             db.intake.set(LEFT_PNEUMATIC_STATE, 1.0);
             db.intake.set(RIGHT_PNEUMATIC_STATE, 1.0);
-            db.intake.set(SET_INTAKE_VEL_ft_s, 0.2);
+            db.intake.set(SET_ROLLER_VEL_ft_s, 0.2);
         }
         else if (db.driverinput.isSet(ELogitech310.R_BTN)) {
             db.intake.set(LEFT_PNEUMATIC_STATE, 0.0);
             db.intake.set(RIGHT_PNEUMATIC_STATE, 0.0);
-            db.intake.set(SET_INTAKE_VEL_ft_s, 0);
+            db.intake.set(SET_ROLLER_VEL_ft_s, 0);
         }
+
+
     }
 
     void updateDJBooth() {

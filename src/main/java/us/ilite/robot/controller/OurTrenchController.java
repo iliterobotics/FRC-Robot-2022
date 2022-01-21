@@ -5,7 +5,7 @@ import us.ilite.common.Data;
 import us.ilite.common.Distance;
 import us.ilite.common.Field2020;
 import us.ilite.common.types.EVisionGoal2020;
-import us.ilite.common.types.EPowerCellData;
+import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -50,18 +50,18 @@ public class OurTrenchController extends BaseAutonController {
     }
 
     private void initiateShooter(){
-        Enums.FlywheelSpeeds flywheelState = Enums.FlywheelSpeeds.FAR;
-        if (canHitInnerGoal()){
-            setTargetTracking(true);
-            setFlywheelClosedLoop(flywheelState, true);
-            if (isFlywheelUpToSpeed()) {
-                setFeederClosedLoop(flywheelState);
-                if (isFeederUpToSpeed()) {
-                    db.powercell.set(EPowerCellData.SET_V_pct, 0.6);
-                    db.powercell.set(EPowerCellData.SET_H_pct, 0.5);
-                }
-            }
-        }
+//        Enums.FlywheelSpeeds flywheelState = Enums.FlywheelSpeeds.FAR;
+//        if (canHitInnerGoal()){
+//            setTargetTracking(true);
+//            setFlywheelClosedLoop(flywheelState, true);
+//            if (isFlywheelUpToSpeed()) {
+//                setFeederClosedLoop(flywheelState);
+//                if (isFeederUpToSpeed()) {
+//                    db.powercell.set(EIntakeData.SET_V_pct, 0.6);
+//                    db.powercell.set(EIntakeData.SET_H_pct, 0.5);
+//                }
+//            }
+//        }
     }
 
     // TODO - figure out if this is the correct way we'll be targeting

@@ -11,7 +11,7 @@ import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
 import us.ilite.robot.modules.Limelight;
 
-import static us.ilite.common.types.EPowerCellData.*;
+import static us.ilite.common.types.EIntakeData.*;
 
 public class TeleopController extends BaseManualController { //copied from TestController, needs editing
 
@@ -144,7 +144,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             }
         } else {
             db.powercell.set(INTAKE_STATE, Enums.EArmState.NONE);
-            db.powercell.set(SET_INTAKE_VEL_ft_s, 0d);
+            db.powercell.set(SET_ROLLER_VEL_ft_s, 0d);
         }
 //
 //        if ((db.driverinput.isSet(InputMap.DRIVER.FIRE_POWER_CELLS) && isFlywheelUpToSpeed() && isFeederUpToSpeed())) {
