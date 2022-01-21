@@ -4,17 +4,12 @@ import com.flybotix.hfr.codex.RobotCodex;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.*;
 
-import static us.ilite.common.types.EPowerCellData.*;
-import static us.ilite.common.types.EShooterSystemData.*;
+
 import static us.ilite.common.types.drive.EDriveData.*;
 
-import us.ilite.common.lib.util.XorLatch;
-import us.ilite.common.types.EVisionGoal2020;
-import us.ilite.common.types.EShooterSystemData;
-import us.ilite.robot.Enums;
+
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Clock;
-import us.ilite.robot.modules.Limelight;
 
 import static us.ilite.robot.Enums.*;
 
