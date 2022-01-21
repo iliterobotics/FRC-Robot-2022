@@ -128,7 +128,7 @@ public class Robot extends TimedRobot {
         mActiveController = mAutonSelection.getSelectedAutonController();
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
-        mRunningModules.addModule(mLimelight);
+    //    mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(AUTONOMOUS);
@@ -199,7 +199,7 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mLimelight);
+    //    mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
         mRunningModules.addModule(mHanger);

@@ -6,7 +6,7 @@ import us.ilite.robot.auto.paths.*;
 public class AutonCalibration extends BaseAutonController {
 
     public AutonCalibration() {
-        super(new Kate_test_path(), false);
+
         // Time to go through path plus any delay
     }
 

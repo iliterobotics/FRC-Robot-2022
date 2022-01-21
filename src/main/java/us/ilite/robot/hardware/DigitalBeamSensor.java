@@ -1,6 +1,5 @@
 package us.ilite.robot.hardware;
 
-import com.team2363.utilities.RollingAverager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.lib.util.FilteredAverage;

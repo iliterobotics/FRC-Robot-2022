@@ -122,6 +122,7 @@ public class DriveModule extends Module {
 
 	private Rotation2d mGyroOffset = new Rotation2d();
 	private PIDController mTargetAngleLockPid;
+	private PIDController mNewController;
 	private PIDController mYawPid;
 	private double mLeftHoldSetpoint;
 	private double mRightHoldSetpoint;
@@ -281,7 +282,9 @@ public class DriveModule extends Module {
 				mStartHoldingPosition = false;
 //				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
 //				turn = mYawPid.calculate(mGyro.getYaw().getDegrees(), turn * kMaxDegreesPerSecond);
-				db.drivetrain.set(SET_YAW_RATE_deg_s, mYawPid.getSetpoint());
+		//		db.drivetrain.set(SET_YAW_RATE_deg_s, mYawPid.getSetpoint());
+				mLeftMaster.set(throttle+turn);
+				mRightMaster.set(throttle-turn);
 //				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
 //				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
 				break;

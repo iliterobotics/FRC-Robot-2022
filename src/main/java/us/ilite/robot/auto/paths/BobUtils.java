@@ -1,6 +1,5 @@
 package us.ilite.robot.auto.paths;
 
-import com.team2363.commands.HelixFollower;
 
 import static com.team319.trajectory.Path.SegmentValue.*;
 
@@ -27,7 +26,6 @@ public class BobUtils {
     static final double METERS_TO_FEET = 1/FEET_TO_METERS;
 
     private static final Map<String, Double> mMaxTimeCache = new HashMap<>();
-    private HelixFollower hf;
 
     public static double getMeters(Path pPath, Path.SegmentValue pKey, int i) {
         return Distance.fromFeet(pPath.getValue(i, pKey)).meters();
