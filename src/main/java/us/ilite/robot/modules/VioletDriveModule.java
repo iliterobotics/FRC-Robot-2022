@@ -4,6 +4,7 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
@@ -104,6 +105,15 @@ public class VioletDriveModule extends Module {
     private double mDeltaTime = 0;
     private double mLastTime = 0;
 
+    public static ProfileGains kVelocityGains = new ProfileGains()
+            .p(0.165)
+            .d(0)
+            .maxVelocity(kDriveTrainMaxVelocityRPM)
+            .kV(.105)
+            .kA(.0676)
+            .kS(0.31332)
+            .slot(4);
+
     // =============================================================================
     // Hold Gains
     // =============================================================================
@@ -168,12 +178,14 @@ public class VioletDriveModule extends Module {
 //		mGyro = new ADIS16470();
 
 
-        HardwareUtils.setGains(mLeftCtrl, vPID);
-        HardwareUtils.setGains(mRightCtrl, vPID);
-        HardwareUtils.setGains(mLeftCtrl, dPID);
-        HardwareUtils.setGains(mRightCtrl, dPID);
-        HardwareUtils.setGains(mLeftCtrl, smartMotionPID);
-        HardwareUtils.setGains(mRightCtrl, smartMotionPID);
+//        HardwareUtils.setGains(mLeftCtrl, vPID);
+//        HardwareUtils.setGains(mRightCtrl, vPID);
+        HardwareUtils.setGains(mLeftCtrl, kVelocityGains);
+        HardwareUtils.setGains(mRightCtrl, kVelocityGains);
+//        HardwareUtils.setGains(mLeftCtrl, dPID);
+//        HardwareUtils.setGains(mRightCtrl, dPID);
+//        HardwareUtils.setGains(mLeftCtrl, smartMotionPID);
+//        HardwareUtils.setGains(mRightCtrl, smartMotionPID);
 
         //TODO - we want to do use our conversion factor calculated above, but that requires re-turning of F & P
         mLeftEncoder.setPositionConversionFactor(1d);
@@ -234,12 +246,21 @@ public class VioletDriveModule extends Module {
 
     @Override
     public void setOutputs() {
-        mLastHeading = mGyro.getHeading().getDegrees();
+//        mLeftMaster.set(0.1);
+//        mRightMaster.set(0.1);
+//
+//        mLastHeading = mGyro.getHeading().getDegrees();
+//        EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
+
         EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
         // Do this to prevent wonkiness while transitioning autonomous to teleop
         if(mode == null) return;
         double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
         double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
+
+        mLeftCtrl.setReference((throttle+turn)*kDriveTrainMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, 4);
+        mRightCtrl.setReference((throttle-turn)*kDriveTrainMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, 4);
+
         switch (mode) {
             case RESET:
                 reset();
@@ -283,10 +304,12 @@ public class VioletDriveModule extends Module {
 //				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
 //				turn = mYawPid.calculate(mGyro.getYaw().getDegrees(), turn * kMaxDegreesPerSecond);
                 //		db.drivetrain.set(SET_YAW_RATE_deg_s, mYawPid.getSetpoint());
-                mLeftMaster.set(throttle+turn);
-                mRightMaster.set(throttle-turn);
-//				mLeftCtrl.setReference((throttle+turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
-//				mRightCtrl.setReference((throttle-turn) * kDriveTrainMaxVelocityRPM, kVelocity, VELOCITY_PID_SLOT, 0);
+
+//                mLeftCtrl.setReference((throttle+turn), CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT);
+//                mRightCtrl.setReference((throttle-turn), CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT);
+
+                mLeftMaster.set(0.1);
+                mRightMaster.set(0.1);
                 break;
             case PATH_FOLLOWING_BASIC:
             case PATH_FOLLOWING_HELIX:

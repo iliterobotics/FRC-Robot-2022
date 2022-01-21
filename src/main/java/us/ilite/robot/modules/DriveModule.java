@@ -71,7 +71,8 @@ public class DriveModule extends Module {
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kYawGains = new ProfileGains().p(0.1);
 
-
+	private final int kVelocitySlot = 0;
+	private final int kPositionSlot = 1;
 
 	private final ProfileGains vGains = new ProfileGains()
 			.p(0.0001)
@@ -104,6 +105,14 @@ public class DriveModule extends Module {
 		vPID = new PIDController(vGains, -kMaxDriveThreshold*kMaxFalconVelocity, kMaxDriveThreshold*kMaxFalconVelocity, Settings.kControlLoopPeriod);
 		dPID = new PIDController(dGains, -kMaxDriveThreshold*kMaxFalconVelocity, kMaxDriveThreshold*kMaxFalconVelocity, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
+
+		mLeftMaster.config_kP(kVelocitySlot, 0.0001);
+		mLeftMaster.config_kI(kVelocitySlot, 0);
+		mLeftMaster.config_kD(kVelocitySlot, 0);
+
+		mRightMaster.config_kP(kVelocitySlot, 0.0001);
+		mRightMaster.config_kI(kVelocitySlot, 0);
+		mRightMaster.config_kD(kVelocitySlot, 0);
 	}
 
 	@Override
@@ -157,8 +166,19 @@ public class DriveModule extends Module {
 				mRightMaster.set(ControlMode.PercentOutput, right);
 				break;
 			case VELOCITY:
-				mLeftMaster.set(ControlMode.Velocity, vPID.calculate(left*kDriveTrainMaxVelocityRPM, clock.dt()));
-				mRightMaster.set(ControlMode.Velocity, vPID.calculate(right*kDriveTrainMaxVelocityRPM, clock.dt()));
+				double leftPIDValue =  vPID.calculate(left*kDriveTrainMaxVelocityRPM, clock.dt());
+				double rightPIDValue =  vPID.calculate(right*kDriveTrainMaxVelocityRPM, clock.dt());
+
+				if (db.drivetrain.get(DESIRED_THROTTLE_PCT) < 0.05) {
+					db.drivetrain.set(DESIRED_THROTTLE_PCT, 0);
+				}
+
+				if (db.drivetrain.get(DESIRED_TURN_PCT) < 0.05) {
+					db.drivetrain.set(DESIRED_TURN_PCT, 0);
+				}
+
+				mLeftMaster.set(ControlMode.Velocity,left*kDriveTrainMaxVelocityRPM);
+				mRightMaster.set(ControlMode.Velocity, right*kDriveTrainMaxVelocityRPM);
 				mCyclesHolding = 0;
 				break;
 			case TARGET_ANGLE_LOCK:

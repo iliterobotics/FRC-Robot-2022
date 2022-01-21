@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
+    private VioletDriveModule mViolet;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -69,6 +70,7 @@ public class Robot extends TimedRobot {
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mDrive = new DriveModule();
+        mViolet = new VioletDriveModule();
         mShooter = new FlywheelModule();
         mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
@@ -148,7 +150,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
 //        mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mViolet);
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mLimelight);
@@ -202,7 +204,7 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mViolet);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
