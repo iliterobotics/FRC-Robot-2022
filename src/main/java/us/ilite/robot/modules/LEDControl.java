@@ -57,12 +57,6 @@ public class LEDControl extends Module {
 
     @Override
     public void setOutputs() {
-        EColorMatch color = EColorMatch.values()[(int) db.color.get(EColorData.SENSED_COLOR)];
-        boolean isDone = (db.color.get(EColorData.DESIRED_MOTOR_POWER) == EColorWheelState.OFF.power);
-
-        //Prioritization of LED control
-        mCurrentMessage = Message.fromColorMatch(color, isDone);
-
         if (isCurrentLimiting()) {
             mCurrentMessage = Message.CURRENT_LIMITING;
         }

@@ -1,8 +1,9 @@
-package us.ilite.robot.auto.paths;
+package us.ilite.robot.auto;
 
 
 import static com.team319.trajectory.Path.SegmentValue.*;
 
+import com.team2363.commands.HelixFollower;
 import com.team319.trajectory.Path;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -141,7 +142,7 @@ public class BobUtils {
                         getMeters(pPath, X, i),
                         getMeters(pPath, Y, i),
                         new Rotation2d(
-                            pPath.getValue(i, HEADING)
+                                pPath.getValue(i, HEADING)
                         )
                 ),
                 curve
@@ -163,7 +164,7 @@ public class BobUtils {
 //        SmartDashboard.putBoolean ("Pnow < pathstart", (pNow < pPathStartTimestamp));
         if(
                 pNow < pPathStartTimestamp ||
-                dt > (getPathTotalTime(pPath) + AutonSelection.mDelaySeconds)
+                        dt > (getPathTotalTime(pPath) + AutonSelection.mDelaySeconds)
         ) {
             return -1;
         }

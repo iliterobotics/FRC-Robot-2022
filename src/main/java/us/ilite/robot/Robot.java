@@ -15,7 +15,7 @@ import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
-import us.ilite.robot.auto.paths.AutonSelection;
+import us.ilite.robot.auto.AutonSelection;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger;
-    private HangerModule mHanger;
+   // private HangerModule mHanger;
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
@@ -73,7 +73,6 @@ public class Robot extends TimedRobot {
         mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
         mLEDControl = new LEDControl();
-        mHanger = new HangerModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -126,7 +125,7 @@ public class Robot extends TimedRobot {
 
         MODE=AUTONOMOUS;
         mActiveController = mAutonSelection.getSelectedAutonController();
-        mActiveController.setEnabled(true);
+      //  mActiveController.setEnabled(true);
         mRunningModules.clearModules();
     //    mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);
@@ -149,7 +148,6 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
-        mRunningModules.addModule(mHanger);
         mRunningModules.addModule(mLimelight);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
@@ -202,9 +200,7 @@ public class Robot extends TimedRobot {
     //    mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
-        mRunningModules.addModule(mHanger);
-//        mRunningModules.addModule(mDJSpinnerModule);
-//        mRunningModules.addModule(mLEDControl);
+
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }

@@ -21,6 +21,7 @@ import us.ilite.robot.modules.DriveModule;
  * Acceleration/deceleration can be controlled using either a custom implementation relying on
  * % output or the Talon's motion magic control mode.
  */
+@Deprecated
 public class DriveStraight implements ICommand {
 
     private final EDriveControlMode mDriveControlMode;
