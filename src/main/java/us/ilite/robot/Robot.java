@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
@@ -22,6 +24,7 @@ import us.ilite.robot.modules.*;
 import us.ilite.robot.network.EForwardableConnections;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import static us.ilite.common.types.EMatchMode.*;
 
@@ -134,7 +137,9 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
-        mContainer.getCommand().execute();
+        Command practice = mContainer.getCommand();
+        practice.initialize();
+        practice.execute();
         mRunningModules.modeInit(AUTONOMOUS);
     }
 
