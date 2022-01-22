@@ -48,6 +48,8 @@ public class Robot extends TimedRobot {
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
     private RobotContainer mContainer;
+    private Command practice;
+
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -70,6 +72,7 @@ public class Robot extends TimedRobot {
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mDrive = new VioletDriveModule();
         mContainer = new RobotContainer(mDrive);
+        practice = mContainer.getCommand();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -136,15 +139,15 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mShooter);
 //        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
-        Command practice = mContainer.getCommand();
         practice.initialize();
-        practice.execute();
+
         mRunningModules.modeInit(AUTONOMOUS);
     }
 
     @Override
     public void autonomousPeriodic() {
         commonPeriodic();
+        practice.execute();
     }
 
     @Override
