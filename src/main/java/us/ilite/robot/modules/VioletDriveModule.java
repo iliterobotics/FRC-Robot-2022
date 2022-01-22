@@ -369,7 +369,7 @@ public class VioletDriveModule extends Module {
     }
 
 
-    private SubsystemBase subBase = new SubsystemBase() {
+    public static final SubsystemBase subBase = new SubsystemBase() {
         @Override
         public String getName() {
             return super.getName();

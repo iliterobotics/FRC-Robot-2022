@@ -134,8 +134,8 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
-        mContainer.getCommand();
-//        mRunningModules.modeInit(AUTONOMOUS);
+        mContainer.getCommand().execute();
+        mRunningModules.modeInit(AUTONOMOUS);
     }
 
     @Override
