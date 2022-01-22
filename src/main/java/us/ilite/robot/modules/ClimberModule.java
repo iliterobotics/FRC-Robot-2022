@@ -7,6 +7,8 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
+import java.io.IOException;
+
 public class ClimberModule extends Module{
 
     private CANSparkMax mSparkMaxOne;
@@ -33,7 +35,11 @@ public class ClimberModule extends Module{
     }
     @Override
     public void readInputs() {
-        mHangerModule.set(EHangerModuleData.L_VEL_rpm, mEncoderSparkMaxOne.getVelocity());
+        try {
+            mHangerModule.set(EHangerModuleData.L_VEL_rpm, mEncoderSparkMaxOne.getVelocity());
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

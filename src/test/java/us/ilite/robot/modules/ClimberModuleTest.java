@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import us.ilite.common.types.EHangerModuleData;
 
+import java.io.IOException;
+
 import static org.mockito.Mockito.*;
 
 public class ClimberModuleTest {
@@ -27,7 +29,19 @@ public class ClimberModuleTest {
 
     @Test
     public void testReadInputs() {
+        when(mMockedRelativeEncoder.getVelocity()).thenReturn(50d);
 
+        mClimber.readInputs();
+
+        verify(mHangerModule, times(1)).set(EHangerModuleData.L_VEL_rpm, 50d);
+    }
+    @Test
+    public void testHandleInputs_IOException() {
+        when(mMockedRelativeEncoder.getVelocity()).thenThrow(RuntimeException.class);
+
+        mClimber.readInputs();
+
+        verify(mHangerModule, never()).set(EHangerModuleData.L_VEL_rpm, 50d);
     }
     @Test
     public void testSetOutputs() {
