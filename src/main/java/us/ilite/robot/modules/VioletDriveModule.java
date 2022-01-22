@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import us.ilite.common.Distance;
@@ -49,7 +50,8 @@ public class VioletDriveModule extends Module {
     public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveNEOVelocityFactor);
     //	public static Distance kDriveMaxAccel_measured = Distance.fromFeet()
     public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
-    public static double kMaxVelocityMS = kDriveTrainMaxVelocityRPM * kDriveNEOVelocityFactor * 0.3408;
+    public static double feetToMeters = 0.3408;
+    public static double kMaxVelocityMS = kDriveTrainMaxVelocityRPM * kDriveNEOVelocityFactor * feetToMeters;
 
 
     // This is approx 290 Degrees per second, measured with a Pigeon
@@ -143,10 +145,10 @@ public class VioletDriveModule extends Module {
     private final RelativeEncoder mRightEncoder;
     private final SparkMaxPIDController mLeftCtrl;
     private final SparkMaxPIDController mRightCtrl;
+
+    //RAMSETE STUFF DO NOT MODIFY
     private final DifferentialDriveOdometry mOdometry;
     private DifferentialDrive mDrive;
-
-
 
 
     private static final SparkMaxFactory.Configuration kDriveConfig = new SparkMaxFactory.Configuration();
@@ -246,8 +248,8 @@ public class VioletDriveModule extends Module {
         db.imu.set(EGyro.YAW_OMEGA_DEGREES, mGyro.getYawRate().getDegrees());
 
         mOdometry.update(
-                mGyro.getHeading(), mLeftEncoder.getPosition() * kDriveNEOPositionFactor * 0.348,
-                mRightEncoder.getPosition() * kDriveNEOPositionFactor * 0.348);
+                mGyro.getHeading(), Units.feetToMeters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
+                Units.feetToMeters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
 
     }
 
@@ -343,8 +345,8 @@ public class VioletDriveModule extends Module {
      * @return The current wheel speeds.
      */
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-        return new DifferentialDriveWheelSpeeds(mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor * 0.348,
-                mRightEncoder.getVelocity() * kDriveNEOVelocityFactor * 0.348);
+        return new DifferentialDriveWheelSpeeds(Units.feetToMeters(mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor),
+                Units.feetToMeters(mRightEncoder.getVelocity() * kDriveNEOVelocityFactor));
     }
 
     /**
