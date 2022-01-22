@@ -19,7 +19,7 @@ public class ClimberModule extends Module{
         mSparkMaxOne = SparkMaxFactory.createDefaultSparkMax(9, CANSparkMaxLowLevel.MotorType.kBrushless);
         mEncdoerSparkMaxOne = mSparkMaxOne.getEncoder();
         kHangerProfile = new ProfileGains().p(.001).i(0).d(0);
-        mHangerPid = new PIDController(kHangerProfile, -maxVelocity, minVelocity, clock.dt());
+        //mHangerPid = new PIDController(kHangerProfile, -maxVelocity, minVelocity, clock.dt());
     }
     @Override
     public void readInputs() {
@@ -29,6 +29,6 @@ public class ClimberModule extends Module{
     @Override
     public void setOutputs() {
         mSparkMaxOne.set(db.hanger.get(EHangerModuleData.SET_pct));
-        double desiredVelocity = mHangerPid.
+        //double desiredVelocity = mHangerPid.
     }
 }
