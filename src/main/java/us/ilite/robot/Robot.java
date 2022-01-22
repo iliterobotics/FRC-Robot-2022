@@ -41,7 +41,7 @@ public class Robot extends TimedRobot {
    // private HangerModule mHanger;
     private Timer initTimer = new Timer();
 
-    private DriveModule mDrive;
+    private VioletDriveModule mDrive;
     private Limelight mLimelight;
     private RawLimelight mRawLimelight;
     private LEDControl mLEDControl;
@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
-        mDrive = new DriveModule();
+        mDrive = new VioletDriveModule();
         mShooter = new FlywheelModule();
         mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
@@ -134,7 +134,6 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
-//        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
         Command practice = mContainer.getCommand();

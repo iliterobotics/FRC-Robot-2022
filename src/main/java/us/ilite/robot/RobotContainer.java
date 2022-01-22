@@ -12,20 +12,13 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import us.ilite.common.config.Settings;
-import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.VioletDriveModule;
 
 import java.util.List;
-import java.util.Set;
 
 public class RobotContainer {
-    private final VioletDriveModule mDrive;
-    public RobotContainer() {
-        mDrive = new VioletDriveModule();
-    }
-
+    private final VioletDriveModule mDrive = new VioletDriveModule();
     public Command getCommand() {
         // Create a voltage constraint to ensure we don't accelerate too fast
         var autoVoltageConstraint =
