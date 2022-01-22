@@ -68,12 +68,12 @@ public class Robot extends TimedRobot {
 //        initTimer.reset();
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
-        mContainer = new RobotContainer();
+        mDrive = new VioletDriveModule();
+        mContainer = new RobotContainer(mDrive);
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
-        mDrive = new VioletDriveModule();
         mShooter = new FlywheelModule();
         mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);

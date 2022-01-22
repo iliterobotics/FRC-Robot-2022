@@ -18,7 +18,10 @@ import us.ilite.robot.modules.VioletDriveModule;
 import java.util.List;
 
 public class RobotContainer {
-    private final VioletDriveModule mDrive = new VioletDriveModule();
+    private final VioletDriveModule mDrive;
+    public RobotContainer(VioletDriveModule pModule) {
+        mDrive = pModule;
+    }
     public Command getCommand() {
         // Create a voltage constraint to ensure we don't accelerate too fast
         var autoVoltageConstraint =
