@@ -3,7 +3,13 @@ package us.ilite.robot.modules;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
@@ -44,6 +50,9 @@ public class VioletDriveModule extends Module {
     public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveNEOVelocityFactor);
     //	public static Distance kDriveMaxAccel_measured = Distance.fromFeet()
     public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
+    public static double feetToMeters = 0.3408;
+    public static double kMaxVelocityMS = kDriveTrainMaxVelocityRPM * kDriveNEOVelocityFactor * feetToMeters;
+
 
     // This is approx 290 Degrees per second, measured with a Pigeon
     // Actual measured was 825 Degrees per second, with a resting battery voltage of 12.57V
@@ -137,6 +146,11 @@ public class VioletDriveModule extends Module {
     private final SparkMaxPIDController mLeftCtrl;
     private final SparkMaxPIDController mRightCtrl;
 
+    //RAMSETE STUFF DO NOT MODIFY
+    private final DifferentialDriveOdometry mOdometry;
+    private DifferentialDrive mDrive;
+
+
     private static final SparkMaxFactory.Configuration kDriveConfig = new SparkMaxFactory.Configuration();
     static {
         kDriveConfig.IDLE_MODE = CANSparkMax.IdleMode.kCoast;
@@ -163,6 +177,7 @@ public class VioletDriveModule extends Module {
         mLeftFollower.setClosedLoopRampRate(ramprate);
         mRightMaster.setClosedLoopRampRate(ramprate);
         mRightFollower.setClosedLoopRampRate(ramprate);
+        mDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
 
 
 //		mGyro = new ADIS16470();
@@ -184,6 +199,8 @@ public class VioletDriveModule extends Module {
         mLeftFollower.burnFlash();
         mRightMaster.burnFlash();
         mRightFollower.burnFlash();
+
+        mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
 
 
 //		mYawPid = new PIDController(kYawGains,kYawGains.P,
@@ -229,6 +246,10 @@ public class VioletDriveModule extends Module {
         db.drivetrain.set(IS_CURRENT_LIMITING, EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots));
         db.imu.set(EGyro.HEADING_DEGREES, -mGyro.getHeading().getDegrees());
         db.imu.set(EGyro.YAW_OMEGA_DEGREES, mGyro.getYawRate().getDegrees());
+
+        mOdometry.update(
+                mGyro.getHeading(), Units.feetToMeters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
+                Units.feetToMeters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
 
     }
 
@@ -307,6 +328,65 @@ public class VioletDriveModule extends Module {
     private void reset() {
         mLeftEncoder.setPosition(0.0);
         mRightEncoder.setPosition(0.0);
+    }
+
+    /**
+     * Returns the currently-estimated pose of the robot.
+     *
+     * @return The pose.
+     */
+    public Pose2d getPose() {
+        return mOdometry.getPoseMeters();
+    }
+
+    /**
+     * Returns the current wheel speeds of the robot.
+     *
+     * @return The current wheel speeds.
+     */
+    public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+        return new DifferentialDriveWheelSpeeds(Units.feetToMeters(mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor),
+                Units.feetToMeters(mRightEncoder.getVelocity() * kDriveNEOVelocityFactor));
+    }
+
+    /**
+     * Returns the heading of the robot.
+     *
+     * @return the robot's heading in degrees, from -180 to 180
+     */
+    public double getHeading() {
+        return mGyro.getHeading().getDegrees();
+    }
+
+    /**
+     * Controls the left and right sides of the drive directly with voltages.
+     *
+     * @param leftVolts the commanded left output
+     * @param rightVolts the commanded right output
+     */
+    public void tankDriveVolts(double leftVolts, double rightVolts) {
+        mLeftMaster.setVoltage(leftVolts);
+        mRightMaster.setVoltage(rightVolts);
+        mDrive.feed();
+    }
+
+
+    public static final SubsystemBase subBase = new SubsystemBase() {
+        @Override
+        public String getName() {
+            return super.getName();
+        }
+    };
+
+    /**
+     * Resets the odometry to the specified pose.
+     *
+     * @param pose The pose to which to set the odometry.
+     */
+    public void resetOdometry(Pose2d pose) {
+        mLeftEncoder.setPosition(0);
+        mRightEncoder.setPosition(0);
+        mOdometry.resetPosition(pose, mGyro.getHeading());
     }
 
 }
