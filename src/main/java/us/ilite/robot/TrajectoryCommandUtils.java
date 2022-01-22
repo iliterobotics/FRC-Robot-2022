@@ -17,12 +17,17 @@ import us.ilite.robot.modules.VioletDriveModule;
 
 import java.util.List;
 
-public class RobotContainer {
-    private final VioletDriveModule mDrive;
-    public RobotContainer(VioletDriveModule pModule) {
-        mDrive = pModule;
-    }
-    public Command getCommand() {
+public class TrajectoryCommandUtils {
+
+    /**
+     * Method to build the necessary {@link Command} for running a trajectory. This
+     * method will run a basic Trajectory and is designed for testing
+     * @param pDriveModule
+     *  The drive module that is used by the Trajectory for actually moving the robot
+     * @return
+     *  A fully constructed command that can be used to move the robot through a trajectory
+     */
+    public static Command buildTrajectoryCommand(VioletDriveModule pDriveModule) {
         // Create a voltage constraint to ensure we don't accelerate too fast
         var autoVoltageConstraint =
                 new DifferentialDriveVoltageConstraint(
@@ -54,28 +59,50 @@ public class RobotContainer {
                         // Pass config
                         config);
 
+        return buildTrajectoryCommand(pDriveModule, exampleTrajectory);
+    }
+
+    /**
+     * Method to build the necessary {@link Command} for running a trajectory. This method will accept a Trajectory and
+     * is designed.
+     * @param pDriveModule
+     *  The drive module that is used to control the drive train motors
+     * @param pExampleTrajectory
+     *  The trajectory to use
+     * @return
+     *  A command that can be used to move the robot along the desired trajectory
+     */
+    public static Command buildTrajectoryCommand(VioletDriveModule pDriveModule, Trajectory pExampleTrajectory) {
         RamseteCommand ramseteCommand =
                 new RamseteCommand(
-                        exampleTrajectory,
-                        mDrive::getPose,
+                        pExampleTrajectory,
+                        pDriveModule::getPose,
                         new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta),
                         new SimpleMotorFeedforward(
                                 Settings.kS,
                                 Settings.kV,
                                 Settings.kA),
                         Settings.kDriveKinematics,
-                        mDrive::getWheelSpeeds,
+                        pDriveModule::getWheelSpeeds,
                         new PIDController(Settings.kP, 0, 0),
                         new PIDController(Settings.kP, 0, 0),
                         // RamseteCommand passes volts to the callback
-                        mDrive::tankDriveVolts, VioletDriveModule.subBase
-                        );
+                        pDriveModule::tankDriveVolts, VioletDriveModule.subBase
+                );
 
         // Reset odometry to the starting pose of the trajectory.
-        mDrive.resetOdometry(exampleTrajectory.getInitialPose());
+        pDriveModule.resetOdometry(pExampleTrajectory.getInitialPose());
 
         // Run path following command, then stop at the end.
-        return ramseteCommand.andThen(() -> mDrive.tankDriveVolts(0, 0));
+        return ramseteCommand.andThen(() -> pDriveModule.tankDriveVolts(0, 0));
+
+    }
+
+    /**
+     * Private constructor to prevent instantiation, since this is a utility class
+     */
+    private TrajectoryCommandUtils() {
+
     }
 
 

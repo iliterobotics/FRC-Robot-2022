@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
@@ -24,7 +23,6 @@ import us.ilite.robot.modules.*;
 import us.ilite.robot.network.EForwardableConnections;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import static us.ilite.common.types.EMatchMode.*;
 
@@ -47,7 +45,7 @@ public class Robot extends TimedRobot {
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
-    private RobotContainer mContainer;
+    private TrajectoryCommandUtils mContainer;
     private Command practice;
 
 
@@ -71,8 +69,7 @@ public class Robot extends TimedRobot {
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mDrive = new VioletDriveModule();
-        mContainer = new RobotContainer(mDrive);
-        practice = mContainer.getCommand();
+        practice = TrajectoryCommandUtils.buildTrajectoryCommand(mDrive);
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
