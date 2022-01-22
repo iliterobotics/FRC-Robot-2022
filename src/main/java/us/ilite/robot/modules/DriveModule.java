@@ -13,6 +13,7 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Enums.EDriveState;
 import us.ilite.robot.Robot;
+import us.ilite.robot.hardware.LidarLite;
 
 import static us.ilite.common.types.EVisionGoal2020.TV;
 import static us.ilite.common.types.EVisionGoal2020.TX;
