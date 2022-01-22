@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
+    private RobotContainer mContainer;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -64,6 +65,7 @@ public class Robot extends TimedRobot {
 //        initTimer.reset();
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
+        mContainer = new RobotContainer();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -130,7 +132,9 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
 //        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
+        mContainer.getCommand();
 //        mRunningModules.modeInit(AUTONOMOUS);
     }
 
