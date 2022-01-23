@@ -3,11 +3,11 @@ package us.ilite.robot.modules;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
 
@@ -15,6 +15,7 @@ import static us.ilite.common.types.EVisionGoal2020.TV;
 import static us.ilite.common.types.EVisionGoal2020.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -112,7 +113,9 @@ public class VioletDriveModule extends Module {
             .kV(.105)
             .kA(.0676)
             .kS(0.31332)
-            .slot(4);
+            .slot(1);
+
+    private PIDController mDrivePID;
 
     // =============================================================================
     // Hold Gains
@@ -174,6 +177,8 @@ public class VioletDriveModule extends Module {
         mRightMaster.setClosedLoopRampRate(ramprate);
         mRightFollower.setClosedLoopRampRate(ramprate);
 
+//        mDrivePID = new PIDController( kVelocityGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, clock.dt());
+        mDrivePID = new PIDController(0.0001332, 0, 0.0001);
 
 //		mGyro = new ADIS16470();
 
@@ -210,10 +215,10 @@ public class VioletDriveModule extends Module {
 
     @Override
     public void modeInit(EMatchMode pMode) {
-        mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
-        mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
-        mTargetAngleLockPid.setSetpoint(0);
-        mTargetAngleLockPid.reset();
+//        mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
+//        mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
+//        mTargetAngleLockPid.setSetpoint(0);
+//        mTargetAngleLockPid.reset();
         mStartHoldingPosition = false;
 
         reset();
@@ -246,20 +251,12 @@ public class VioletDriveModule extends Module {
 
     @Override
     public void setOutputs() {
-//        mLeftMaster.set(0.1);
-//        mRightMaster.set(0.1);
-//
-//        mLastHeading = mGyro.getHeading().getDegrees();
-//        EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
-
+        mLastHeading = mGyro.getHeading().getDegrees();
         EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
         // Do this to prevent wonkiness while transitioning autonomous to teleop
         if(mode == null) return;
         double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
         double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
-
-        mLeftCtrl.setReference((throttle+turn)*kDriveTrainMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, 4);
-        mRightCtrl.setReference((throttle-turn)*kDriveTrainMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, 4);
 
         switch (mode) {
             case RESET:
@@ -301,15 +298,16 @@ public class VioletDriveModule extends Module {
                 // NOTE - fall through here
             case VELOCITY:
                 mStartHoldingPosition = false;
-//				mYawPid.setSetpoint(db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0) * kMaxDegreesPerSecond);
-//				turn = mYawPid.calculate(mGyro.getYaw().getDegrees(), turn * kMaxDegreesPerSecond);
-                //		db.drivetrain.set(SET_YAW_RATE_deg_s, mYawPid.getSetpoint());
 
-//                mLeftCtrl.setReference((throttle+turn), CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT);
-//                mRightCtrl.setReference((throttle-turn), CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT);
+//                mLeftCtrl.setReference(1000, CANSparkMax.ControlType.kVelocity);
+//                mRightCtrl.setReference(1000, CANSparkMax.ControlType.kVelocity);
 
-                mLeftMaster.set(0.1);
-                mRightMaster.set(0.1);
+                SmartDashboard.putNumber("Left", mDrivePID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), (throttle+turn)*kDriveTrainMaxVelocityRPM));
+                SmartDashboard.putNumber("Right", mDrivePID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s), (throttle-turn)*kDriveTrainMaxVelocityRPM));
+
+//                mLeftMaster.set(mDrivePID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), (throttle+turn)*kDriveTrainMaxVelocityRPM));
+//                mRightMaster.set(mDrivePID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s), (throttle-turn)*kDriveTrainMaxVelocityRPM));
+
                 break;
             case PATH_FOLLOWING_BASIC:
             case PATH_FOLLOWING_HELIX:
