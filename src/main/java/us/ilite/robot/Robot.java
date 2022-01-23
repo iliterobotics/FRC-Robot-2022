@@ -17,6 +17,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.auto.AutonSelection;
+import us.ilite.robot.auto.PracticeTrajectory;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.modules.*;
@@ -69,7 +70,7 @@ public class Robot extends TimedRobot {
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mDrive = new VioletDriveModule();
-        practice = TrajectoryCommandUtils.buildTrajectoryCommand(mDrive);
+        practice = TrajectoryCommandUtils.buildTrajectoryCommand(mDrive, PracticeTrajectory.runStraight());
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();

@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
@@ -220,6 +221,7 @@ public class VioletDriveModule extends Module {
         mTargetAngleLockPid.setSetpoint(0);
         mTargetAngleLockPid.reset();
         mStartHoldingPosition = false;
+        SmartDashboard.putNumber("Heading", mGyro.getHeading().getDegrees());
 
         reset();
         HardwareUtils.setGains(mLeftCtrl, vPID);
