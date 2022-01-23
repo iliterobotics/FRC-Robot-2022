@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
@@ -38,13 +39,14 @@ public class Robot extends TimedRobot {
    // private HangerModule mHanger;
     private Timer initTimer = new Timer();
 
-    private DriveModule mDrive;
+    private VioletDriveModule mDrive;
     private Limelight mLimelight;
     private RawLimelight mRawLimelight;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
     private VioletDriveModule mViolet;
+
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -65,6 +67,8 @@ public class Robot extends TimedRobot {
 //        initTimer.reset();
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
+        mDrive = new VioletDriveModule();
+        practice = TrajectoryCommandUtils.buildTrajectoryCommand(mDrive);
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -133,12 +137,15 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mShooter);
 //        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
-//        mRunningModules.modeInit(AUTONOMOUS);
+        practice.initialize();
+
+        mRunningModules.modeInit(AUTONOMOUS);
     }
 
     @Override
     public void autonomousPeriodic() {
         commonPeriodic();
+        practice.execute();
     }
 
     @Override
