@@ -184,7 +184,7 @@ public class VioletDriveModule extends Module {
         mRightFollower.setClosedLoopRampRate(ramprate);
 
 //        mDrivePID = new PIDController( kVelocityGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, clock.dt());
-        mDrivePID = new PIDController(0.0001332, 0, 0.0001);
+        mDrivePID = new PIDController(0.3, 0.0, 0.0);
 
 //		mGyro = new ADIS16470();
 
@@ -305,14 +305,11 @@ public class VioletDriveModule extends Module {
             case VELOCITY:
                 mStartHoldingPosition = false;
 
-//                mLeftCtrl.setReference(1000, CANSparkMax.ControlType.kVelocity);
-//                mRightCtrl.setReference(1000, CANSparkMax.ControlType.kVelocity);
+                SmartDashboard.putNumber("Left", mDrivePID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), (throttle+turn)));
+                SmartDashboard.putNumber("Right", mDrivePID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s), (throttle-turn)));
 
-                SmartDashboard.putNumber("Left", mDrivePID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), (throttle+turn)*kDriveTrainMaxVelocityRPM));
-                SmartDashboard.putNumber("Right", mDrivePID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s), (throttle-turn)*kDriveTrainMaxVelocityRPM));
-
-//                mLeftMaster.set(mDrivePID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), (throttle+turn)*kDriveTrainMaxVelocityRPM));
-//                mRightMaster.set(mDrivePID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s), (throttle-turn)*kDriveTrainMaxVelocityRPM));
+//                mLeftMaster.set(mDrivePID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s)/kDriveTrainMaxVelocityRPM, (throttle+turn)));
+//                mRightMaster.set(mDrivePID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s)/kDriveTrainMaxVelocityRPM, (throttle-turn)));
 
                 break;
             case PATH_FOLLOWING_BASIC:
