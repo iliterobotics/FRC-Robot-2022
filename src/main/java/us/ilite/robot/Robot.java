@@ -46,6 +46,10 @@ public class Robot extends TimedRobot {
     private FlywheelModule mShooter;
     private VioletDriveModule mViolet;
 
+    private TrajectoryCommandUtils mContainer;
+    private Command practice;
+
+
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private OperatorInput mOI;
@@ -65,6 +69,8 @@ public class Robot extends TimedRobot {
 //        initTimer.reset();
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
+        mDrive = new DriveModule();
+        practice = TrajectoryCommandUtils.buildTrajectoryCommand(mViolet);
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
