@@ -32,12 +32,12 @@ public class DriveModule extends Module {
 	public static double kWheelDiameterInches = 5.875;
 	public static double kWheelCircumferenceFeet = kWheelDiameterInches*Math.PI/12.0;
 	// For position, getPosition() returns raw rotations - so convert that to feet
-	public static double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
-	public static double kDriveNEOVelocityFactor = kDriveNEOPositionFactor / 60.0;
+	public static double kDriveFalconPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
+	public static double kDriveFalconVelocityFactor = kDriveFalconPositionFactor / 60.0;
 
 	// Actual measured was 5514 with a resting battery voltage of 12.75V
 	public static double kDriveTrainMaxVelocityRPM = 5500.0;
-	public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveNEOVelocityFactor);
+	public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveFalconVelocityFactor);
 	//	public static Distance kDriveMaxAccel_measured = Distance.fromFeet()
 	public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
 
@@ -168,14 +168,6 @@ public class DriveModule extends Module {
 			case VELOCITY:
 				double leftPIDValue =  vPID.calculate(left*kDriveTrainMaxVelocityRPM, clock.dt());
 				double rightPIDValue =  vPID.calculate(right*kDriveTrainMaxVelocityRPM, clock.dt());
-
-				if (db.drivetrain.get(DESIRED_THROTTLE_PCT) < 0.05) {
-					db.drivetrain.set(DESIRED_THROTTLE_PCT, 0);
-				}
-
-				if (db.drivetrain.get(DESIRED_TURN_PCT) < 0.05) {
-					db.drivetrain.set(DESIRED_TURN_PCT, 0);
-				}
 
 				mLeftMaster.set(ControlMode.Velocity,left*kDriveTrainMaxVelocityRPM);
 				mRightMaster.set(ControlMode.Velocity, right*kDriveTrainMaxVelocityRPM);
