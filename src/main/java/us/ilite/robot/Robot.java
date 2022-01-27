@@ -154,7 +154,7 @@ public class Robot extends TimedRobot {
         }
 
         mRunningModules.clearModules();
-//        mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mIntake);
@@ -207,14 +207,14 @@ public class Robot extends TimedRobot {
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
-//        mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
-//        mRunningModules.addModule(mLEDControl);
+        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }

@@ -1,11 +1,16 @@
 package us.ilite.robot.controller;
 
+import com.ctre.phoenix.CANifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.ELEDControlData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
+import us.ilite.robot.Enums;
+import us.ilite.robot.modules.LEDControl;
+
 import static us.ilite.robot.Enums.*;
 import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
@@ -50,6 +55,7 @@ public class TestController extends BaseManualController {
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
         clock.report("updateDrivetrain", t -> updateDrivetrain());
+        clock.report("updateLED", t -> updateLED());
 
         double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
         mMaxSpeed = Math.max(mMaxSpeed, spd);
@@ -69,6 +75,15 @@ public class TestController extends BaseManualController {
         }
         else {
             db.hanger.set(EHangerModuleData.SET_pct, 0);
+        }
+    }
+
+    public void updateLED() {
+        if(db.driverinput.isSet(ELogitech310.X_BTN)) {
+            db.ledcontrol.set(ELEDControlData.LED_STATE, 1.0);
+        }
+        else {
+            db.ledcontrol.set(ELEDControlData.LED_STATE, 0.0);
         }
     }
 

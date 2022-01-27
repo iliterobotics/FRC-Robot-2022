@@ -3,6 +3,7 @@ package us.ilite.robot;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import edu.wpi.first.wpilibj.util.Color;
+import us.ilite.robot.modules.LEDControl;
 
 public class Enums {
     // =============================================================================
@@ -18,6 +19,41 @@ public class Enums {
         LED_OFF,
         LED_BLINK,
         LED_ON;
+    }
+
+    // LED control and colors
+    public enum LEDColorMode {
+        PURPLE( 255, 0, 200 ),
+        RED( 255, 0, 0 ),
+        LIGHT_BLUE( 0, 100, 220 ),
+        WHITE( 255, 255, 255 ),
+        GREEN( 0, 255, 0 ),
+        YELLOW( 255, 255, 0 ),
+        GREEN_HSV( 84, 255, 255 ),
+        BLUE( 0, 0, 255 ),
+        RED_HSV( 0, 255, 255 ),
+        YELLOW_HSV( 20, 255, 255 ),
+        PURPLE_HSV( 212, 255, 255 ),
+        ORANGE( 255, 165, 0 ),
+        DEFAULT( 0, 0, 0 );
+        double red;
+        double green;
+        double blue;
+        LEDColorMode(double pR, double pG, double pB) {
+            red = pR;
+            green = pG;
+            blue = pB;
+        }
+
+        public double getRed() {
+            return red;
+        }
+
+//        Color clr = new Color(red, green, blue);
+//
+//        public Color getColor() {
+//            return this.clr;
+//        }
     }
 
     //  Limelight camera mode
