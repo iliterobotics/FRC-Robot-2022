@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Enums;
+import us.ilite.robot.modules.VioletDriveModule;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -21,17 +23,19 @@ import java.util.function.Supplier;
 
 public class BaseAutonController extends AbstractController {
 
-    private Timer mTimer;
-    private boolean mUsePid;
-    private Trajectory mTrajectory;
-    private Supplier<Pose2d> mPoses;
-    private RamseteController mFollower;
-    private SimpleMotorFeedforward mFeedforward;
+    private final Timer mTimer;
+    private final boolean mUsePid;
+
+    //TODO figure out way to store trajectories and switch between them
+    private Trajectory mTrajectory = null;
+
+    private Pose2d mPoses = null;
+    private final RamseteController mFollower;
+    private final SimpleMotorFeedforward mFeedforward;
     private DifferentialDriveKinematics mDriveKinematics;
-    private DifferentialDriveWheelSpeeds m_speeds;
-    private PIDController mLeftController;
-    private PIDController mRightController;
-    private BiConsumer<Double, Double> mOutput;
+    private DifferentialDriveWheelSpeeds mSpeeds;
+    private final PIDController mLeftController;
+    private final PIDController mRightController;
     private DifferentialDriveWheelSpeeds mPrevSpeeds;
     private double mPrevTime;
 
@@ -45,44 +49,45 @@ public class BaseAutonController extends AbstractController {
                                 initialState.velocityMetersPerSecond,
                                 0,
                                 initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
-        m_speeds = new DifferentialDriveWheelSpeeds(Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)
-        ), Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s)));
+
         mTimer.reset();
         mTimer.start();
         mUsePid = true;
-        mFollower = new RamseteController();
+        mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kP, Settings.kA);
         mRightController = new PIDController(Settings.kP, 0, 0);
         mLeftController = new PIDController(Settings.kP, 0, 0);
-        if (mUsePid) {
-            mLeftController.reset();
-            mRightController.reset();
-        }
+        mLeftController.reset();
+        mRightController.reset();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackwidthMeters);
     }
     @Override
     protected void updateImpl() {
 
     }
+    //TODO figure where to call this method
     public void execute() {
+        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         double curTime = mTimer.get();
         double dt = curTime - mPrevTime;
 
         if (mPrevTime < 0) {
-            mOutput.accept(0.0, 0.0);
+            db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, 0.0);
+            db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, 0.0);
             mPrevTime = curTime;
             return;
         }
 
-        //Setup the differential drive wheel speeds class
-        double leftSpeeds = Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
-        double rightSpeeds = Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
-        DifferentialDriveWheelSpeeds driveSpeeds = new DifferentialDriveWheelSpeeds(leftSpeeds, rightSpeeds);
-        double leftSpeedSetpoint = driveSpeeds.leftMetersPerSecond;
-        double rightSpeedSetpoint = driveSpeeds.rightMetersPerSecond;
+        //TODO figure out a way to read mPoses (current robot pose2d) from the database
+        DifferentialDriveWheelSpeeds targetDriveSpeeds = mDriveKinematics.toWheelSpeeds(mFollower.calculate(mPoses, mTrajectory.sample(curTime)));
+        double leftSpeedSetpoint = targetDriveSpeeds.leftMetersPerSecond;
+        double rightSpeedSetpoint = targetDriveSpeeds.rightMetersPerSecond;
 
-        double leftOutput = 0;
-        double rightOutput = 0;
+        double leftOutput;
+        double rightOutput;
+
+        mSpeeds = new DifferentialDriveWheelSpeeds(Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)
+        ), Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s)));
 
         if (mUsePid) {
             double leftFeedforward =
@@ -95,18 +100,28 @@ public class BaseAutonController extends AbstractController {
 
             leftOutput =
                     leftFeedforward
-                            + mLeftController.calculate(m_speeds.leftMetersPerSecond, leftSpeedSetpoint);
+                            + mLeftController.calculate(mSpeeds.leftMetersPerSecond, leftSpeedSetpoint);
 
             rightOutput =
                     rightFeedforward
-                            + mRightController.calculate(
-                            m_speeds.rightMetersPerSecond, rightSpeedSetpoint);
+                            + mRightController.calculate(mSpeeds.rightMetersPerSecond, rightSpeedSetpoint);
         } else {
             leftOutput = leftSpeedSetpoint;
             rightOutput = rightSpeedSetpoint;
         }
-        mOutput.accept(leftOutput, rightOutput);
-        mPrevSpeeds = driveSpeeds;
+        db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, leftOutput);
+        db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, rightOutput);
+        mPrevSpeeds = targetDriveSpeeds;
         mPrevTime = curTime;
+    }
+    public boolean isFinished() {
+        return mTimer.hasElapsed(mTrajectory.getTotalTimeSeconds());
+    }
+    public void end(boolean interrupted) {
+        mTimer.stop();
+        if (interrupted) {
+            db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, 0);
+            db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, 0);
+        }
     }
 }
