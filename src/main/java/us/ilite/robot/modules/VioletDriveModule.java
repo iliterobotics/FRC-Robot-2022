@@ -324,6 +324,10 @@ public class VioletDriveModule extends Module {
 //				mLeftCtrl.setReference( db.drivetrain.get(L_DESIRED_POS) / kDriveNEOPositionFactor, kSmartMotion, POSITION_PID_SLOT, 0 );
 //				mRightCtrl.setReference( db.drivetrain.get(R_DESIRED_POS) / kDriveNEOPositionFactor, kSmartMotion, POSITION_PID_SLOT, 0 );
                 break;
+            case PATH_FOLLOWING_RAMSETE:
+                mLeftMaster.setVoltage(db.drivetrain.get(DESIRED_LEFT_VOLTAGE));
+                mRightMaster.setVoltage(db.drivetrain.get(DESIRED_RIGHT_VOLTAGE));
+                mDrive.feed();
         }
     }
 
