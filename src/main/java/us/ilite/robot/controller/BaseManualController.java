@@ -23,6 +23,14 @@ public abstract class BaseManualController extends AbstractController {
         rotate = Math.abs(rotate) > 0.02 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.02 ? throttle : 0.0; //Handling Deadband
 
+        if (Math.abs(db.drivetrain.get(DESIRED_THROTTLE_PCT)) < 0.05) {
+            throttle = 0;
+        }
+
+        if (Math.abs(db.drivetrain.get(DESIRED_TURN_PCT)) < 0.005) {
+            rotate = 0;
+        }
+
         if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
             db.drivetrain.set(STATE, EDriveState.TARGET_ANGLE_LOCK);
         } else if(throttle == 0.0 && rotate == 0.0) {
