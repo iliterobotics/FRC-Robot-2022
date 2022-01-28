@@ -39,12 +39,12 @@ public class VioletDriveModule extends Module {
     public static double kWheelCircumferenceFeet = kWheelDiameterInches*Math.PI/12.0;
 
     // For position, getPosition() returns raw rotations - so convert that to feet
-    public static double kDriveFalconPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
-    public static double kDriveFalconVelocityFactor = kDriveFalconPositionFactor / 60.0;
+    public static double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
+    public static double kDriveNEOVelocityFactor = kDriveNEOPositionFactor / 60.0;
 
     // Actual measured was 5514 with a resting battery voltage of 12.75V
     public static double kDriveTrainMaxVelocityRPM = 5500.0;
-    public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveFalconVelocityFactor);
+    public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveNEOVelocityFactor);
     public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
 
     // This is approx 290 Degrees per second, measured with a Pigeon
@@ -79,7 +79,7 @@ public class VioletDriveModule extends Module {
             .f(0.00015)
             .maxAccel(5676d)
             .slot(POSITION_PID_SLOT)
-            .velocityConversion(kDriveFalconPositionFactor);
+            .velocityConversion(kDriveNEOPositionFactor);
 
     public static ProfileGains kSmartMotionGains = new ProfileGains()
             .p(.00025)
@@ -87,17 +87,18 @@ public class VioletDriveModule extends Module {
             .maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
             .maxAccel(1000d)
             .slot(SMART_MOTION_PID_SLOT)
-            .velocityConversion(kDriveFalconPositionFactor);
+            .velocityConversion(kDriveNEOPositionFactor);
 
-    public static ProfileGains kVelocityGains = new ProfileGains()
-            .f(0.00015)
-            .p(0.0001)
+    public static ProfileGains kVelocityGains = new ProfileGains() // TODO Maybe incorporate an i gain to make the output more exact
+            .p(.000015)
+            //.d(0.000005)
+            .f(0.0002)
             // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
             .maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
             // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
-//			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveFalconVelocityFactor / 1.2 * 0.8)
+			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
             .slot(VELOCITY_PID_SLOT)
-            .velocityConversion(kDriveFalconVelocityFactor);
+            .velocityConversion(1d);
 
     public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 
@@ -215,7 +216,7 @@ public class VioletDriveModule extends Module {
         mStartHoldingPosition = false;
 
         reset();
-        System.err.println(" ==== DRIVE MAX ACCEL (RPM): " + (kDriveMaxAccel_simulated.feet() / kDriveFalconVelocityFactor / 1.2 * 0.4));
+        System.err.println(" ==== DRIVE MAX ACCEL (RPM): " + (kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4));
     }
 
     @Override
@@ -223,10 +224,10 @@ public class VioletDriveModule extends Module {
         mGyro.update();
         db.drivetrain.set(DELTA_HEADING, mGyro.getHeading().getDegrees() - mLastHeading);
         db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
-        db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveFalconPositionFactor);
-        db.drivetrain.set(L_ACTUAL_VEL_FT_s, mLeftEncoder.getVelocity() * kDriveFalconVelocityFactor);
-        db.drivetrain.set(R_ACTUAL_POS_FT, mRightEncoder.getPosition() * kDriveFalconPositionFactor);
-        db.drivetrain.set(R_ACTUAL_VEL_FT_s, mRightEncoder.getVelocity() * kDriveFalconVelocityFactor);
+        db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
+        db.drivetrain.set(L_ACTUAL_VEL_FT_s, mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor);
+        db.drivetrain.set(R_ACTUAL_POS_FT, mRightEncoder.getPosition() * kDriveNEOPositionFactor);
+        db.drivetrain.set(R_ACTUAL_VEL_FT_s, mRightEncoder.getVelocity() * kDriveNEOVelocityFactor);
         db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getOutputCurrent());
         db.drivetrain.set(RIGHT_CURRENT, mRightMaster.getOutputCurrent());
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
@@ -285,12 +286,20 @@ public class VioletDriveModule extends Module {
                 // NOTE - fall through here
             case VELOCITY:
                 mStartHoldingPosition = false;
-                
-                mLeftPID.setSetpoint((throttle+turn));
-                mRightPID.setSetpoint((throttle-turn));
 
-                double left = mLeftPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), clock.getCurrentTimeInMillis());
-                double right = mRightPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s), clock.getCurrentTimeInMillis());
+                if (Math.abs(db.drivetrain.get(DESIRED_THROTTLE_PCT)) < 0.05) {
+                    throttle = 0;
+                }
+
+                if (Math.abs(db.drivetrain.get(DESIRED_TURN_PCT)) < 0.005) {
+                    turn = 0;
+                }
+                
+                mLeftPID.setSetpoint((throttle+turn)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
+                mRightPID.setSetpoint((throttle-turn)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
+
+                double left = mLeftPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s)/kDriveNEOVelocityFactor, clock.getCurrentTimeInMillis());
+                double right = mRightPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s)/kDriveNEOVelocityFactor, clock.getCurrentTimeInMillis());
 
                 SmartDashboard.putNumber("Left Velocity", left);
                 SmartDashboard.putNumber("Right Velocity", right);
