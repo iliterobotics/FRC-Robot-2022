@@ -59,7 +59,17 @@ public class LEDControl extends Module {
     @Override
     public void setOutputs() {
         //trying to set the LED output to a color
-//        mLEDCan.setLEDOutput(db.ledcontrol.get(LEDColorMode.BLUE.getRed()), CANifier.LEDChannel.LEDChannelA);
+        if (db.ledcontrol.get(ELEDControlData.LED_STATE) == 1.0) {
+            mLEDCan.setLEDOutput(db.ledcontrol.get(ELEDControlData.DESIRED_R)/ 255, CANifier.LEDChannel.LEDChannelB);
+            mLEDCan.setLEDOutput(db.ledcontrol.get(ELEDControlData.DESIRED_G)/ 255, CANifier.LEDChannel.LEDChannelA);
+            mLEDCan.setLEDOutput(db.ledcontrol.get(ELEDControlData.DESIRED_B)/ 255, CANifier.LEDChannel.LEDChannelC);
+        }
+        else {
+            mLEDCan.setLEDOutput(0, CANifier.LEDChannel.LEDChannelB);
+            mLEDCan.setLEDOutput(0, CANifier.LEDChannel.LEDChannelA);
+            mLEDCan.setLEDOutput(0, CANifier.LEDChannel.LEDChannelC);
+        }
+
     }
 
     public LEDControl() {

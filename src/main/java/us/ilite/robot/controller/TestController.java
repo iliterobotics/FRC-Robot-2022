@@ -81,6 +81,9 @@ public class TestController extends BaseManualController {
     public void updateLED() {
         if(db.driverinput.isSet(ELogitech310.X_BTN)) {
             db.ledcontrol.set(ELEDControlData.LED_STATE, 1.0);
+            db.ledcontrol.set(ELEDControlData.DESIRED_R, 255);
+            db.ledcontrol.set(ELEDControlData.DESIRED_G, 0);
+            db.ledcontrol.set(ELEDControlData.DESIRED_B, 255);
         }
         else {
             db.ledcontrol.set(ELEDControlData.LED_STATE, 0.0);
