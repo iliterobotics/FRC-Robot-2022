@@ -29,7 +29,7 @@ public class TrajectoryCommandUtils {
      */
     public static Command buildTrajectoryCommand(VioletDriveModule pDriveModule) {
         // Create a voltage constraint to ensure we don't accelerate too fast
-        var autoVoltageConstraint =
+        DifferentialDriveVoltageConstraint autoVoltageConstraint =
                 new DifferentialDriveVoltageConstraint(
                         new SimpleMotorFeedforward(
                                 Settings.kS,
@@ -41,8 +41,8 @@ public class TrajectoryCommandUtils {
         // Create config for trajectory
         TrajectoryConfig config =
                 new TrajectoryConfig(
-                        VioletDriveModule.kMaxVelocityMS,
-                        VioletDriveModule.kMaxVelocityMS)
+                        Settings.kMaxSpeedMetersPerSecond,
+                        Settings.kMaxAccelerationMetersPerSecondSquared)
                         // Add kinematics to ensure max speed is actually obeyed
                         .setKinematics(Settings.kDriveKinematics)
                         // Apply the voltage constraint
@@ -98,6 +98,39 @@ public class TrajectoryCommandUtils {
 
     }
 
+    public static Trajectory getTrajectory() {
+        // Create a voltage constraint to ensure we don't accelerate too fast
+        DifferentialDriveVoltageConstraint autoVoltageConstraint =
+                new DifferentialDriveVoltageConstraint(
+                        new SimpleMotorFeedforward(
+                                Settings.kS,
+                                Settings.kV,
+                                Settings.kA),
+                        Settings.kDriveKinematics,
+                        10);
+
+        // Create config for trajectory
+        TrajectoryConfig config =
+                new TrajectoryConfig(
+                        Settings.kMaxSpeedMetersPerSecond,
+                        Settings.kMaxAccelerationMetersPerSecondSquared)
+                        // Add kinematics to ensure max speed is actually obeyed
+                        .setKinematics(Settings.kDriveKinematics)
+                        // Apply the voltage constraint
+                        .addConstraint(autoVoltageConstraint);
+
+        Trajectory exampleTrajectory =
+                TrajectoryGenerator.generateTrajectory(
+                        // Start at the origin facing the +X direction
+                        new Pose2d(0, 0, new Rotation2d(0)),
+                        // Pass through these two interior waypoints, making an 's' curve path
+                        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+                        // End 3 meters straight ahead of where we started, facing forward
+                        new Pose2d(3, 0, new Rotation2d(0)),
+                        // Pass config
+                        config);
+        return exampleTrajectory;
+    }
     /**
      * Private constructor to prevent instantiation, since this is a utility class
      */

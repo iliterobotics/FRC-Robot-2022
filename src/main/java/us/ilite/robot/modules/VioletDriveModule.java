@@ -21,6 +21,7 @@ import static us.ilite.common.types.EVisionGoal2020.TV;
 import static us.ilite.common.types.EVisionGoal2020.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -179,10 +180,7 @@ public class VioletDriveModule extends Module {
         mRightMaster.setClosedLoopRampRate(ramprate);
         mRightFollower.setClosedLoopRampRate(ramprate);
         mDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
-
-
-//		mGyro = new ADIS16470();
-
+        
 
         HardwareUtils.setGains(mLeftCtrl, vPID);
         HardwareUtils.setGains(mRightCtrl, vPID);
@@ -243,6 +241,9 @@ public class VioletDriveModule extends Module {
         db.drivetrain.set(R_ACTUAL_VEL_FT_s, mRightEncoder.getVelocity() * kDriveNEOVelocityFactor);
         db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getOutputCurrent());
         db.drivetrain.set(RIGHT_CURRENT, mRightMaster.getOutputCurrent());
+       // db.drivetrain.set(GET_X_OFFSET, Units.feetToMeters(db.drivetrain.get(L_ACTUAL_POS_FT) + db.drivetrain.get(EDriveData.)));
+        db.drivetrain.set(GET_X_OFFSET, mOdometry.getPoseMeters().getX() - 0);
+        db.drivetrain.set(GET_Y_OFFSET, mOdometry.getPoseMeters().getY() - 0);
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(IS_CURRENT_LIMITING, EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots));

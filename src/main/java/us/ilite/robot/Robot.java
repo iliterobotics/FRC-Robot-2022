@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
+    private BaseAutonController mBaseAutonController;
 //    private final AbstractController mBaseAutonController = new BaseAutonController();
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
@@ -69,8 +70,9 @@ public class Robot extends TimedRobot {
 //        initTimer.reset();
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
+        mBaseAutonController = new BaseAutonController();
         mDrive = new VioletDriveModule();
-        practice = TrajectoryCommandUtils.buildTrajectoryCommand(mDrive, PracticeTrajectory.runStraight());
+        //practice = TrajectoryCommandUtils.buildTrajectoryCommand(mDrive, PracticeTrajectory.runStraight());
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -130,14 +132,14 @@ public class Robot extends TimedRobot {
         }
 
         MODE=AUTONOMOUS;
-        mActiveController = mAutonSelection.getSelectedAutonController();
+        mActiveController = mBaseAutonController;
       //  mActiveController.setEnabled(true);
         mRunningModules.clearModules();
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
 //        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
-        practice.initialize();
+       // practice.initialize();
 
         mRunningModules.modeInit(AUTONOMOUS);
     }
@@ -145,7 +147,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
         commonPeriodic();
-        practice.execute();
+       // practice.execute();
     }
 
     @Override

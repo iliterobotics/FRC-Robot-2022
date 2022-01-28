@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -14,6 +15,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
+import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.modules.VioletDriveModule;
 
 import java.util.ArrayList;
@@ -27,9 +29,9 @@ public class BaseAutonController extends AbstractController {
     private final boolean mUsePid;
 
     //TODO figure out way to store trajectories and switch between them
-    private Trajectory mTrajectory = null;
+    private final Trajectory mTrajectory;
 
-    private Pose2d mPoses = null;
+    private Pose2d mPoses;
     private final RamseteController mFollower;
     private final SimpleMotorFeedforward mFeedforward;
     private DifferentialDriveKinematics mDriveKinematics;
@@ -42,6 +44,8 @@ public class BaseAutonController extends AbstractController {
     public BaseAutonController() {
         mTimer = new Timer();
         mPrevTime = -1;
+        mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackwidthMeters);
+        mTrajectory = TrajectoryCommandUtils.getTrajectory();
         var initialState = mTrajectory.sample(0);
         mPrevSpeeds =
                 mDriveKinematics.toWheelSpeeds(
@@ -59,13 +63,15 @@ public class BaseAutonController extends AbstractController {
         mLeftController = new PIDController(Settings.kP, 0, 0);
         mLeftController.reset();
         mRightController.reset();
-        mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackwidthMeters);
     }
     @Override
     protected void updateImpl() {
-
+        execute();
+        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
+        db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.2);
+        System.out.println("asdfasdf");
     }
-    //TODO figure where to call this method
+
     public void execute() {
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         double curTime = mTimer.get();
@@ -77,8 +83,9 @@ public class BaseAutonController extends AbstractController {
             mPrevTime = curTime;
             return;
         }
+        Rotation2d r2d = new Rotation2d(Units.degrees_to_radians(db.drivetrain.get(EDriveData.DELTA_HEADING)));
+        mPoses = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET), db.drivetrain.get(EDriveData.GET_Y_OFFSET), r2d);
 
-        //TODO figure out a way to read mPoses (current robot pose2d) from the database
         DifferentialDriveWheelSpeeds targetDriveSpeeds = mDriveKinematics.toWheelSpeeds(mFollower.calculate(mPoses, mTrajectory.sample(curTime)));
         double leftSpeedSetpoint = targetDriveSpeeds.leftMetersPerSecond;
         double rightSpeedSetpoint = targetDriveSpeeds.rightMetersPerSecond;
