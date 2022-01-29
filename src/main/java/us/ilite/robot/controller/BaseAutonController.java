@@ -122,6 +122,7 @@ public class BaseAutonController extends AbstractController {
 
         }
         updateDriveTrain(leftOutput, rightOutput);
+        mPrevTime = curTime;
     }
 
     private void updateDriveTrain(double leftOutput, double rightOutput) {
