@@ -42,6 +42,7 @@ public class BaseAutonController extends AbstractController {
     private double mPrevTime;
 
     public BaseAutonController() {
+        setEnabled(true);
         mTimer = new Timer();
         mPrevTime = -1;
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackwidthMeters);
@@ -67,9 +68,6 @@ public class BaseAutonController extends AbstractController {
     @Override
     protected void updateImpl() {
         execute();
-        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
-        db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.2);
-        System.out.println("asdfasdf");
     }
 
     public void execute() {
