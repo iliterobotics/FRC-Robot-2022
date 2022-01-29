@@ -11,18 +11,11 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.TrajectoryCommandUtils;
-import us.ilite.robot.modules.VioletDriveModule;
-
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 public class BaseAutonController extends AbstractController {
 
@@ -95,31 +88,18 @@ public class BaseAutonController extends AbstractController {
         var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
         var rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;
 
-        double leftOutput;
-        double rightOutput;
+        double leftOutput = -1.0d; //Value will never be used
+        double rightOutput = -1.0d;//Value will never be used
 
         if (mUsePid) {
-            double leftFeedforward =
-                    mFeedforward.calculate(
-                            leftSpeedSetpoint, (leftSpeedSetpoint - mPrevSpeeds.leftMetersPerSecond) / dt);
+            DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds(leftSpeedSetpoint, rightSpeedSetpoint);
 
-            double rightFeedforward =
-                    mFeedforward.calculate(
-                            rightSpeedSetpoint, (rightSpeedSetpoint - mPrevSpeeds.rightMetersPerSecond) / dt);
-            double actualLeftSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
-            double actualRightSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
+            double leftFeedforward = calculateFeedsForward(leftSpeedSetpoint, mPrevSpeeds.leftMetersPerSecond, dt);
+            double rightFeedforward = calculateFeedsForward(rightSpeedSetpoint, mPrevSpeeds.rightMetersPerSecond, dt);
 
-//            System.out.println("BaseAutonController: actualSpeeds: ["+actualLeftSpeed+","+actualRightSpeed+"]");
+            leftOutput = calculateOutputFromFeedForward(leftFeedforward, mLeftController,actualSpeeds.leftMetersPerSecond,leftSpeedSetpoint);
+            rightOutput = calculateOutputFromFeedForward(rightFeedforward, mRightController,actualSpeeds.rightMetersPerSecond,rightSpeedSetpoint);
 
-            DifferentialDriveWheelSpeeds actualSpeeds = new DifferentialDriveWheelSpeeds(actualLeftSpeed, actualRightSpeed);
-            leftOutput =
-                    leftFeedforward
-                            + mLeftController.calculate(actualSpeeds.leftMetersPerSecond, leftSpeedSetpoint);
-
-            rightOutput =
-                    rightFeedforward
-                            + mRightController.calculate(
-                            actualSpeeds.rightMetersPerSecond, rightSpeedSetpoint);
         } else {
             leftOutput = leftSpeedSetpoint;
             rightOutput = rightSpeedSetpoint;
@@ -129,6 +109,21 @@ public class BaseAutonController extends AbstractController {
         mPrevSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
         updateDriveTrain(leftOutput, rightOutput);
+    }
+
+    private double calculateFeedsForward(double speedSetpoint, double prevSpeedsMetersPerSec, double dt) {
+        return mFeedforward.calculate(
+                speedSetpoint, (speedSetpoint - prevSpeedsMetersPerSec) / dt);
+    }
+    private double calculateOutputFromFeedForward(double feedForward, PIDController pidController, double actualSpeeds, double setPoint) {
+        return feedForward + pidController.calculate(actualSpeeds, setPoint);
+    }
+
+    private DifferentialDriveWheelSpeeds calculateActualSpeeds(double leftSpeedSetpoint, double rightSpeedSetpoint) {
+
+        double actualLeftSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
+        double actualRightSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
+        return new DifferentialDriveWheelSpeeds(actualLeftSpeed, actualRightSpeed);
     }
 
     private DifferentialDriveWheelSpeeds getTargetWheelSpeeds(double curTime, Pose2d robotPose) {
