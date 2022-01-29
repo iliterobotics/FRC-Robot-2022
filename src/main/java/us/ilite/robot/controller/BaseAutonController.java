@@ -93,9 +93,14 @@ public class BaseAutonController extends AbstractController {
             double leftSpeedSetpoint = targetDriveSpeeds.leftMetersPerSecond;
             double rightSpeedSetpoint = targetDriveSpeeds.rightMetersPerSecond;
 
+            System.out.println("BaseAutonController: setpoints[" + leftSpeedSetpoint + ","+rightSpeedSetpoint+"]");
 
-            mSpeeds = new DifferentialDriveWheelSpeeds(Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)
-            ), Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s)));
+            double actualLeftSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
+            double actualRightSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
+
+            System.out.println("BaseAutonController: actualSpeeds: ["+actualLeftSpeed+","+actualRightSpeed+"]");
+
+            mSpeeds = new DifferentialDriveWheelSpeeds(actualLeftSpeed, actualRightSpeed);
 
             if (mUsePid) {
                 double leftFeedforward =
@@ -105,7 +110,7 @@ public class BaseAutonController extends AbstractController {
                 double rightFeedforward =
                         mFeedforward.calculate(
                                 rightSpeedSetpoint, (rightSpeedSetpoint - mPrevSpeeds.rightMetersPerSecond) / dt);
-
+                System.out.println("BaseAutonController: Feedforward= [" + leftFeedforward+"," + rightFeedforward+"]");
                 leftOutput =
                         leftFeedforward
                                 + mLeftController.calculate(mSpeeds.leftMetersPerSecond, leftSpeedSetpoint);
@@ -126,7 +131,7 @@ public class BaseAutonController extends AbstractController {
     }
 
     private void updateDriveTrain(double leftOutput, double rightOutput) {
-        System.out.println("BaseAutonController: Setting leftoutput= " + leftOutput+", rightOutput= "+ rightOutput);
+        System.out.println("BaseAutonController: Setting desired voltage= [" + leftOutput+","+ rightOutput+"]");
         db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, leftOutput);
         db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, rightOutput);
 
