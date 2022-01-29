@@ -89,16 +89,18 @@ public class BaseAutonController extends AbstractController {
             Rotation2d r2d = new Rotation2d(Units.degrees_to_radians(db.drivetrain.get(EDriveData.DELTA_HEADING)));
             mPoses = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET), db.drivetrain.get(EDriveData.GET_Y_OFFSET), r2d);
 
-            DifferentialDriveWheelSpeeds targetDriveSpeeds = mDriveKinematics.toWheelSpeeds(mFollower.calculate(mPoses, mTrajectory.sample(curTime)));
+            Trajectory.State desiredTrajState = mTrajectory.sample(curTime);
+            System.out.println("BaseAutonController: Desired Traj state: " + desiredTrajState.toString() +" for time: " + curTime);
+            DifferentialDriveWheelSpeeds targetDriveSpeeds = mDriveKinematics.toWheelSpeeds(mFollower.calculate(mPoses, desiredTrajState));
             double leftSpeedSetpoint = targetDriveSpeeds.leftMetersPerSecond;
             double rightSpeedSetpoint = targetDriveSpeeds.rightMetersPerSecond;
 
-            System.out.println("BaseAutonController: setpoints[" + leftSpeedSetpoint + ","+rightSpeedSetpoint+"]");
+//            System.out.println("BaseAutonController: setpoints[" + leftSpeedSetpoint + ","+rightSpeedSetpoint+"]");
 
             double actualLeftSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
             double actualRightSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
 
-            System.out.println("BaseAutonController: actualSpeeds: ["+actualLeftSpeed+","+actualRightSpeed+"]");
+//            System.out.println("BaseAutonController: actualSpeeds: ["+actualLeftSpeed+","+actualRightSpeed+"]");
 
             mSpeeds = new DifferentialDriveWheelSpeeds(actualLeftSpeed, actualRightSpeed);
 
@@ -110,7 +112,7 @@ public class BaseAutonController extends AbstractController {
                 double rightFeedforward =
                         mFeedforward.calculate(
                                 rightSpeedSetpoint, (rightSpeedSetpoint - mPrevSpeeds.rightMetersPerSecond) / dt);
-                System.out.println("BaseAutonController: Feedforward= [" + leftFeedforward+"," + rightFeedforward+"]");
+//                System.out.println("BaseAutonController: Feedforward= [" + leftFeedforward+"," + rightFeedforward+"]");
                 leftOutput =
                         leftFeedforward
                                 + mLeftController.calculate(mSpeeds.leftMetersPerSecond, leftSpeedSetpoint);
