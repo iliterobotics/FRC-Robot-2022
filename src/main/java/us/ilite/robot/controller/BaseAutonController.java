@@ -11,6 +11,9 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
@@ -21,15 +24,14 @@ public class BaseAutonController extends AbstractController {
 
     private final Timer mTimer;
     private final boolean mUsePid;
+    private final RamseteController mFollower;
+    private final SimpleMotorFeedforward mFeedforward;
+    private final DifferentialDriveKinematics mDriveKinematics;
+    private final PIDController mLeftController;
+    private final PIDController mRightController;
 
     //TODO figure out way to store trajectories and switch between them
     private Trajectory mTrajectory;
-
-    private final RamseteController mFollower;
-    private final SimpleMotorFeedforward mFeedforward;
-    private DifferentialDriveKinematics mDriveKinematics;
-    private final PIDController mLeftController;
-    private final PIDController mRightController;
     private DifferentialDriveWheelSpeeds mPrevSpeeds;
     private double mPrevTime;
 
@@ -78,37 +80,32 @@ public class BaseAutonController extends AbstractController {
         double dt = curTime - mPrevTime;
 
         if (mPrevTime < 0) {
-            updateDriveTrain(0,0);
+            updateDriveTrain(new ImmutablePair<Double,Double>(0d,0d));
             mPrevTime = curTime;
             return;
         }
         Pose2d robotPose = getRobotPose();
         var targetWheelSpeeds = getTargetWheelSpeeds(curTime, robotPose);
 
-        var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
-        var rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;
-
-        double leftOutput = -1.0d; //Value will never be used
-        double rightOutput = -1.0d;//Value will never be used
+        MutablePair<Double,Double> output = new MutablePair<>();
 
         if (mUsePid) {
-            DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds(leftSpeedSetpoint, rightSpeedSetpoint);
+            DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds(targetWheelSpeeds.leftMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
 
-            double leftFeedforward = calculateFeedsForward(leftSpeedSetpoint, mPrevSpeeds.leftMetersPerSecond, dt);
-            double rightFeedforward = calculateFeedsForward(rightSpeedSetpoint, mPrevSpeeds.rightMetersPerSecond, dt);
+            double leftFeedforward = calculateFeedsForward(targetWheelSpeeds.leftMetersPerSecond, mPrevSpeeds.leftMetersPerSecond, dt);
+            double rightFeedforward = calculateFeedsForward(targetWheelSpeeds.rightMetersPerSecond, mPrevSpeeds.rightMetersPerSecond, dt);
 
-            leftOutput = calculateOutputFromFeedForward(leftFeedforward, mLeftController,actualSpeeds.leftMetersPerSecond,leftSpeedSetpoint);
-            rightOutput = calculateOutputFromFeedForward(rightFeedforward, mRightController,actualSpeeds.rightMetersPerSecond,rightSpeedSetpoint);
+            output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController,actualSpeeds.leftMetersPerSecond,leftSpeedSetpoint);
+            output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController,actualSpeeds.rightMetersPerSecond,targetWheelSpeeds.rightMetersPerSecond);
 
         } else {
-            leftOutput = leftSpeedSetpoint;
-            rightOutput = rightSpeedSetpoint;
+            output.left = targetWheelSpeeds.leftMetersPerSecond;
+            output.right = targetWheelSpeeds.rightMetersPerSecond;
         }
 
-        updateDriveTrain(leftOutput, rightOutput);
+        updateDriveTrain(output);
         mPrevSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
-        updateDriveTrain(leftOutput, rightOutput);
     }
 
     private double calculateFeedsForward(double speedSetpoint, double prevSpeedsMetersPerSec, double dt) {
@@ -137,10 +134,10 @@ public class BaseAutonController extends AbstractController {
         return robotPose;
     }
 
-    private void updateDriveTrain(double leftOutput, double rightOutput) {
-        System.out.println("BaseAutonController: Setting desired voltage= [" + leftOutput+","+ rightOutput+"]");
-        db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, leftOutput);
-        db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, rightOutput);
+    private void updateDriveTrain(Pair<Double,Double> pOutput) {
+        System.out.println("BaseAutonController: Setting desired voltage= ["+pOutput+"]");
+        db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, pOutput.getFirst());
+        db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, pOutput.getSecond());
 
     }
     public boolean isFinished() {
