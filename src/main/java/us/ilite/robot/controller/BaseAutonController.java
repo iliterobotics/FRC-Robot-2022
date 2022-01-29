@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
@@ -75,49 +76,59 @@ public class BaseAutonController extends AbstractController {
         double curTime = mTimer.get();
         double dt = curTime - mPrevTime;
 
-        if (mPrevTime < 0) {
-            db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, 0.0);
-            db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, 0.0);
-            mPrevTime = curTime;
-            return;
+        double leftOutput = 0.0;
+        double rightOutput = 0.0;
+
+//        if (mPrevTime < 0) {
+//            db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, 0.0);
+//            db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, 0.0);
+//            mPrevTime = curTime;
+//            return;
+//        }
+        if(mPrevTime >=0) {
+            Rotation2d r2d = new Rotation2d(Units.degrees_to_radians(db.drivetrain.get(EDriveData.DELTA_HEADING)));
+            mPoses = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET), db.drivetrain.get(EDriveData.GET_Y_OFFSET), r2d);
+
+            DifferentialDriveWheelSpeeds targetDriveSpeeds = mDriveKinematics.toWheelSpeeds(mFollower.calculate(mPoses, mTrajectory.sample(curTime)));
+            double leftSpeedSetpoint = targetDriveSpeeds.leftMetersPerSecond;
+            double rightSpeedSetpoint = targetDriveSpeeds.rightMetersPerSecond;
+
+
+            mSpeeds = new DifferentialDriveWheelSpeeds(Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)
+            ), Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s)));
+
+            if (mUsePid) {
+                double leftFeedforward =
+                        mFeedforward.calculate(
+                                leftSpeedSetpoint, (leftSpeedSetpoint - mPrevSpeeds.leftMetersPerSecond) / dt);
+
+                double rightFeedforward =
+                        mFeedforward.calculate(
+                                rightSpeedSetpoint, (rightSpeedSetpoint - mPrevSpeeds.rightMetersPerSecond) / dt);
+
+                leftOutput =
+                        leftFeedforward
+                                + mLeftController.calculate(mSpeeds.leftMetersPerSecond, leftSpeedSetpoint);
+
+                rightOutput =
+                        rightFeedforward
+                                + mRightController.calculate(mSpeeds.rightMetersPerSecond, rightSpeedSetpoint);
+            } else {
+                leftOutput = leftSpeedSetpoint;
+                rightOutput = rightSpeedSetpoint;
+            }
+
+            mPrevSpeeds = targetDriveSpeeds;
+
         }
-        Rotation2d r2d = new Rotation2d(Units.degrees_to_radians(db.drivetrain.get(EDriveData.DELTA_HEADING)));
-        mPoses = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET), db.drivetrain.get(EDriveData.GET_Y_OFFSET), r2d);
+        updateDriveTrain(leftOutput, rightOutput);
+    }
 
-        DifferentialDriveWheelSpeeds targetDriveSpeeds = mDriveKinematics.toWheelSpeeds(mFollower.calculate(mPoses, mTrajectory.sample(curTime)));
-        double leftSpeedSetpoint = targetDriveSpeeds.leftMetersPerSecond;
-        double rightSpeedSetpoint = targetDriveSpeeds.rightMetersPerSecond;
-
-        double leftOutput;
-        double rightOutput;
-
-        mSpeeds = new DifferentialDriveWheelSpeeds(Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)
-        ), Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s)));
-
-        if (mUsePid) {
-            double leftFeedforward =
-                    mFeedforward.calculate(
-                            leftSpeedSetpoint, (leftSpeedSetpoint - mPrevSpeeds.leftMetersPerSecond) / dt);
-
-            double rightFeedforward =
-                    mFeedforward.calculate(
-                            rightSpeedSetpoint, (rightSpeedSetpoint - mPrevSpeeds.rightMetersPerSecond) / dt);
-
-            leftOutput =
-                    leftFeedforward
-                            + mLeftController.calculate(mSpeeds.leftMetersPerSecond, leftSpeedSetpoint);
-
-            rightOutput =
-                    rightFeedforward
-                            + mRightController.calculate(mSpeeds.rightMetersPerSecond, rightSpeedSetpoint);
-        } else {
-            leftOutput = leftSpeedSetpoint;
-            rightOutput = rightSpeedSetpoint;
-        }
+    private void updateDriveTrain(double leftOutput, double rightOutput) {
+        System.out.println("BaseAutonController: Setting leftoutput= " + leftOutput+", rightOutput= "+ rightOutput);
         db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, leftOutput);
         db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, rightOutput);
-        mPrevSpeeds = targetDriveSpeeds;
-        mPrevTime = curTime;
+
     }
     public boolean isFinished() {
         return mTimer.hasElapsed(mTrajectory.getTotalTimeSeconds());
