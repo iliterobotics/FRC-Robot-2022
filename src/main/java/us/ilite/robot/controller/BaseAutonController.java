@@ -32,7 +32,6 @@ public class BaseAutonController extends AbstractController {
     //TODO figure out way to store trajectories and switch between them
     private Trajectory mTrajectory;
 
-    private Pose2d mPoses;
     private final RamseteController mFollower;
     private final SimpleMotorFeedforward mFeedforward;
     private DifferentialDriveKinematics mDriveKinematics;
@@ -86,16 +85,12 @@ public class BaseAutonController extends AbstractController {
         double dt = curTime - mPrevTime;
 
         if (mPrevTime < 0) {
-            db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, 0.0);
-            db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, 0.0);
+            updateDriveTrain(0,0);
             mPrevTime = curTime;
             return;
         }
-        Rotation2d r2d = new Rotation2d(Units.degrees_to_radians(db.drivetrain.get(EDriveData.DELTA_HEADING)));
-        mPoses = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET), db.drivetrain.get(EDriveData.GET_Y_OFFSET), r2d);
-        var targetWheelSpeeds =
-                mDriveKinematics.toWheelSpeeds(
-                        mFollower.calculate(mPoses, mTrajectory.sample(curTime)));
+        Pose2d robotPose = getRobotPose();
+        var targetWheelSpeeds = getTargetWheelSpeeds(curTime, robotPose);
 
         var leftSpeedSetpoint = targetWheelSpeeds.leftMetersPerSecond;
         var rightSpeedSetpoint = targetWheelSpeeds.rightMetersPerSecond;
@@ -134,6 +129,17 @@ public class BaseAutonController extends AbstractController {
         mPrevSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
         updateDriveTrain(leftOutput, rightOutput);
+    }
+
+    private DifferentialDriveWheelSpeeds getTargetWheelSpeeds(double curTime, Pose2d robotPose) {
+        return mDriveKinematics.toWheelSpeeds(
+                mFollower.calculate(robotPose, mTrajectory.sample(curTime)));
+    }
+
+    private Pose2d getRobotPose() {
+        Rotation2d r2d = new Rotation2d(Units.degrees_to_radians(db.drivetrain.get(EDriveData.DELTA_HEADING)));
+        Pose2d robotPose = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET), db.drivetrain.get(EDriveData.GET_Y_OFFSET), r2d);
+        return robotPose;
     }
 
     private void updateDriveTrain(double leftOutput, double rightOutput) {
