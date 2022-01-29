@@ -90,15 +90,25 @@ public class VioletDriveModule extends Module {
 //            .slot(SMART_MOTION_PID_SLOT)
 //            .velocityConversion(kDriveNEOPositionFactor);
 
-    public static ProfileGains kVelocityGains = new ProfileGains() // TODO Maybe incorporate an i gain to make the output more exact
-            .p(.000015)
-            .f(0.0002)
-            // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
-            .maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
-            // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
-			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
-            .slot(VELOCITY_PID_SLOT)
-            .velocityConversion(1d);
+//    public static ProfileGains kVelocityGains = new ProfileGains() // TODO Maybe incorporate an i gain to make the output more exact
+////            .p(.0000015)
+//            .f(0.00015)
+//            // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
+//            .maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
+//            // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
+////			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
+//            .maxAccel(0.05)
+//            .slot(VELOCITY_PID_SLOT)
+//            .velocityConversion(1d);
+    public static ProfileGains kVelocityGains = new ProfileGains()
+        .f(0.00015)
+        .p(0.00000025)
+        // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
+        .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
+        // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
+        .maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4)
+        .slot(VELOCITY_PID_SLOT)
+        .velocityConversion(1d);
 
     public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 
@@ -214,12 +224,12 @@ public class VioletDriveModule extends Module {
         mLeftVelocityPID.setOutputRange(-Settings.Input.kMaxAllowedVelocityMultiplier, Settings.Input.kMaxAllowedVelocityMultiplier);
         mLeftVelocityPID.setSetpoint(0);
         mLeftVelocityPID.reset();
-        mLeftVelocityPID.setDeadband(Settings.Input.kInputDeadbandF310Joystick);
+        mLeftVelocityPID.setDeadband(0.2);
 
         mRightVelocityPID.setOutputRange(-Settings.Input.kMaxAllowedVelocityMultiplier, Settings.Input.kMaxAllowedVelocityMultiplier);
         mRightVelocityPID.setSetpoint(0);
         mRightVelocityPID.reset();
-        mRightVelocityPID.setDeadband(Settings.Input.kInputDeadbandF310Joystick);
+        mRightVelocityPID.setDeadband(0.2);
 
         mLeftPositionPID.setOutputRange(-Settings.Input.kMaxAllowedVelocityMultiplier, Settings.Input.kMaxAllowedVelocityMultiplier);
         mLeftPositionPID.setSetpoint(0);
