@@ -30,7 +30,7 @@ public class BaseAutonController extends AbstractController {
     private final boolean mUsePid;
 
     //TODO figure out way to store trajectories and switch between them
-    private final Trajectory mTrajectory;
+    private Trajectory mTrajectory;
 
     private Pose2d mPoses;
     private final RamseteController mFollower;
@@ -42,31 +42,24 @@ public class BaseAutonController extends AbstractController {
     private double mPrevTime;
 
     public BaseAutonController() {
-        setEnabled(true);
-        mTimer = new Timer();
-        mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackwidthMeters);
-        mTrajectory = TrajectoryCommandUtils.getTrajectory();
-        var initialState = mTrajectory.sample(0);
-        mPrevSpeeds =
-                mDriveKinematics.toWheelSpeeds(
-                        new ChassisSpeeds(
-                                initialState.velocityMetersPerSecond,
-                                0,
-                                initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
-
-        mTimer.reset();
-        mTimer.start();
         mUsePid = true;
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kP, Settings.kA);
         mRightController = new PIDController(Settings.kP, 0, 0);
         mLeftController = new PIDController(Settings.kP, 0, 0);
+
+        mTimer = new Timer();
+        mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackwidthMeters);
+
+
+    }
+    public void initialize() {
+        mTimer.reset();
+        mTimer.start();
         mLeftController.reset();
         mRightController.reset();
-        initialize();
-    }
-    private void initialize() {
         mPrevTime = -1;
+        mTrajectory = TrajectoryCommandUtils.getTrajectory();
         var initialState = mTrajectory.sample(0);
         mPrevSpeeds =
                 mDriveKinematics.toWheelSpeeds(
@@ -80,6 +73,7 @@ public class BaseAutonController extends AbstractController {
             mLeftController.reset();
             mRightController.reset();
         }
+
     }
     @Override
     protected void updateImpl() {
