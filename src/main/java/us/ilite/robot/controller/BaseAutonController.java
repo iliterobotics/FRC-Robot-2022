@@ -36,7 +36,6 @@ public class BaseAutonController extends AbstractController {
     private final RamseteController mFollower;
     private final SimpleMotorFeedforward mFeedforward;
     private DifferentialDriveKinematics mDriveKinematics;
-    private DifferentialDriveWheelSpeeds mSpeeds;
     private final PIDController mLeftController;
     private final PIDController mRightController;
     private DifferentialDriveWheelSpeeds mPrevSpeeds;
@@ -118,15 +117,20 @@ public class BaseAutonController extends AbstractController {
             double rightFeedforward =
                     mFeedforward.calculate(
                             rightSpeedSetpoint, (rightSpeedSetpoint - mPrevSpeeds.rightMetersPerSecond) / dt);
+            double actualLeftSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
+            double actualRightSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
 
+//            System.out.println("BaseAutonController: actualSpeeds: ["+actualLeftSpeed+","+actualRightSpeed+"]");
+
+            DifferentialDriveWheelSpeeds actualSpeeds = new DifferentialDriveWheelSpeeds(actualLeftSpeed, actualRightSpeed);
             leftOutput =
                     leftFeedforward
-                            + mLeftController.calculate(mSpeeds.leftMetersPerSecond, leftSpeedSetpoint);
+                            + mLeftController.calculate(actualSpeeds.leftMetersPerSecond, leftSpeedSetpoint);
 
             rightOutput =
                     rightFeedforward
                             + mRightController.calculate(
-                            mSpeeds.rightMetersPerSecond, rightSpeedSetpoint);
+                            actualSpeeds.rightMetersPerSecond, rightSpeedSetpoint);
         } else {
             leftOutput = leftSpeedSetpoint;
             rightOutput = rightSpeedSetpoint;
