@@ -126,8 +126,8 @@ public class Settings {
     public static final DifferentialDriveKinematics kDriveKinematics =
             new DifferentialDriveKinematics(kTrackwidthMeters);
 
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxSpeedMetersPerSecond = 15;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 15;
 
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;

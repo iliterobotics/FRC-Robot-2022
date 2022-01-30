@@ -85,15 +85,12 @@ public class BaseAutonController extends AbstractController {
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kP, Settings.kA);
         mRightController = new PIDController(Settings.kP, 0, 0);
         mLeftController = new PIDController(Settings.kP, 0, 0);
-
         mTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackwidthMeters);
-
-
     }
 
     /**
-     * Method that should be called when the autonmous state is initialized. This is so that the overall
+     * Method that should be called when the autonomous state is initialized. This is so that the overall
      * state can be restarted, should the autonomous be run multiple times. (Something that only really happens
      * at home).
      */
@@ -117,7 +114,6 @@ public class BaseAutonController extends AbstractController {
             mLeftController.reset();
             mRightController.reset();
         }
-
     }
     @Override
     protected void updateImpl() {
@@ -145,13 +141,13 @@ public class BaseAutonController extends AbstractController {
         MutablePair<Double,Double> output = new MutablePair<>();
 
         if (mUsePid) {
-            DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds(targetWheelSpeeds.leftMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
+            DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds();
 
             double leftFeedforward = calculateFeedsForward(targetWheelSpeeds.leftMetersPerSecond, mPrevSpeeds.leftMetersPerSecond, dt);
             double rightFeedforward = calculateFeedsForward(targetWheelSpeeds.rightMetersPerSecond, mPrevSpeeds.rightMetersPerSecond, dt);
 
-            output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController,actualSpeeds.leftMetersPerSecond,leftSpeedSetpoint);
-            output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController,actualSpeeds.rightMetersPerSecond,targetWheelSpeeds.rightMetersPerSecond);
+            output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
+            output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
 
         } else {
             output.left = targetWheelSpeeds.leftMetersPerSecond;
@@ -193,16 +189,11 @@ public class BaseAutonController extends AbstractController {
     }
 
     /**
-     * Method to calcualte the actual speeds from the set points
-     * @param pLeftSpeedSetpoint
-     *  The left setpoint
-     * @param pRightSpeedSetpoint
-     *  The right setpoint
+     * Method to calcualte the actual speeds
      * @return
      *  Return the {@link DifferentialDriveWheelSpeeds}
      */
-    private DifferentialDriveWheelSpeeds calculateActualSpeeds(double pLeftSpeedSetpoint, double pRightSpeedSetpoint) {
-
+    private DifferentialDriveWheelSpeeds calculateActualSpeeds() {
         double actualLeftSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
         double actualRightSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
         return new DifferentialDriveWheelSpeeds(actualLeftSpeed, actualRightSpeed);
@@ -243,7 +234,6 @@ public class BaseAutonController extends AbstractController {
         System.out.println("BaseAutonController: Setting desired voltage= ["+pOutput+"]");
         db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, pOutput.getLeft());
         db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, pOutput.getRight());
-
     }
 
     /**
