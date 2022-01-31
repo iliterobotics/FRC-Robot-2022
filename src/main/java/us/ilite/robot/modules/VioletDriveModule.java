@@ -75,12 +75,15 @@ public class VioletDriveModule extends Module {
 
     public static ProfileGains kPositionGains = new ProfileGains()
 //			.p(5.0e-4)
-            .maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
+//            .maxAccel(5676d)
+
             .f(0.00015)
-            .maxAccel(5676d)
+            .p(0.00000025)
+            .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
+            // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
+            .maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
             .slot(POSITION_PID_SLOT)
-//            .velocityConversion(kDriveNEOPositionFactor);
-            .velocityConversion(1d);
+            .positionConversion(1d);
 
 //    public static ProfileGains kSmartMotionGains = new ProfileGains()
 //            .p(.00025)
@@ -90,23 +93,13 @@ public class VioletDriveModule extends Module {
 //            .slot(SMART_MOTION_PID_SLOT)
 //            .velocityConversion(kDriveNEOPositionFactor);
 
-//    public static ProfileGains kVelocityGains = new ProfileGains() // TODO Maybe incorporate an i gain to make the output more exact
-////            .p(.0000015)
-//            .f(0.00015)
-//            // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
-//            .maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
-//            // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
-////			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
-//            .maxAccel(0.05)
-//            .slot(VELOCITY_PID_SLOT)
-//            .velocityConversion(1d);
     public static ProfileGains kVelocityGains = new ProfileGains()
         .f(0.00015)
         .p(0.00000025)
         // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
         .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
         // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
-        .maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4)
+        .maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
         .slot(VELOCITY_PID_SLOT)
         .velocityConversion(1d);
 
@@ -342,8 +335,8 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set(vRight);
                 break;
             case PERCENT_OUTPUT:
-                mLeftMaster.set(throttle+turn);
-                mRightMaster.set(throttle-turn);
+                mLeftMaster.set((throttle+turn)*Settings.Input.kMaxAllowedVelocityMultiplier);
+                mRightMaster.set((throttle-turn)*Settings.Input.kMaxAllowedVelocityMultiplier);
                 break;
             case PATH_FOLLOWING_BASIC:
                 mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS));
@@ -351,6 +344,12 @@ public class VioletDriveModule extends Module {
 
                 double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
                 double posRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+
+                SmartDashboard.putNumber("Left Actual Position", db.drivetrain.get(L_DESIRED_POS));
+                SmartDashboard.putNumber("Right Actual Position", db.drivetrain.get(R_DESIRED_POS));
+
+                SmartDashboard.putNumber("Left Position PID Output", posLeft);
+                SmartDashboard.putNumber("Right Position PID Output", posRight);
 
                 mLeftMaster.set(posLeft);
                 mRightMaster.set(posRight);
