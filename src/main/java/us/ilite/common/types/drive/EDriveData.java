@@ -14,6 +14,9 @@ public enum EDriveData implements CodexOf<Double> {
     LEFT_VOLTAGE, RIGHT_VOLTAGE,
     IS_CURRENT_LIMITING,
 
+    DESIRED_TURN_ANGLE_deg,
+    ACTUAL_TURN_ANGLE_deg,
+
     // Outputs from a generated path
     L_PATH_FT_s, R_PATH_FT_s,
     PATH_ERR_ft,

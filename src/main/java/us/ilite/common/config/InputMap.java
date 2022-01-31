@@ -38,7 +38,7 @@ public class InputMap {
         TURN_AXIS = ELogitech310.RIGHT_X_AXIS,
         THROTTLE_AXIS = ELogitech310.LEFT_Y_AXIS,
         SNAIL_MODE = ELogitech310.RIGHT_TRIGGER_AXIS,
-        HOLD_MODE = ELogitech310.Y_BTN,
+        HOME_TO_DRIVER_STATION = ELogitech310.Y_BTN,
         DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.B_BTN;
 
 //        HANGER_LOCK = ELogitech310.START,

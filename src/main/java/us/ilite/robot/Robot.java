@@ -128,7 +128,7 @@ public class Robot extends TimedRobot {
 
         MODE=AUTONOMOUS;
 //        mActiveController = mAutonSelection.getSelectedAutonController();
-        mActiveController = new DriveStraightController();
+        mActiveController = new DriveStraightTurnController();
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
 //        mRunningModules.addModule(mLimelight);

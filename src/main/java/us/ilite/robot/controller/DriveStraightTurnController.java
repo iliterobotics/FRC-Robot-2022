@@ -1,14 +1,12 @@
 package us.ilite.robot.controller;
 
 
-import us.ilite.robot.Enums;
-
 import static us.ilite.common.types.drive.EDriveData.*;
 import static us.ilite.robot.Enums.EDriveState.*;
 
 // Moves the robot 6 ft forward and turns 2 ft
 // TODO Convert ft into degrees for turn
-public class DriveStraightController extends BaseAutonController {
+public class DriveStraightTurnController extends BaseAutonController {
 
     double mCyclesPastDistance = 0;
 
@@ -26,9 +24,10 @@ public class DriveStraightController extends BaseAutonController {
             mCyclesPastDistance++;
         }
 
+
         if (mCyclesPastDistance >= 50) {
-            db.drivetrain.set(L_DESIRED_POS, 2);
-            db.drivetrain.set(R_DESIRED_POS, -2);
+            db.drivetrain.set(STATE, TURN_FOR);
+            db.drivetrain.set(DESIRED_TURN_ANGLE_deg, 45);
         }
     }
 

@@ -37,6 +37,10 @@ public abstract class BaseManualController extends AbstractController {
 
         if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
             db.drivetrain.set(STATE, EDriveState.TARGET_ANGLE_LOCK);
+        } else if (db.driverinput.isSet(HOME_TO_DRIVER_STATION)) {
+            db.drivetrain.set(STATE, EDriveState.HOME);
+            throttle = 0;
+            rotate = 0;
         } else if(mCyclesHolding > 60) {
             db.drivetrain.set(STATE, EDriveState.HOLD);
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);

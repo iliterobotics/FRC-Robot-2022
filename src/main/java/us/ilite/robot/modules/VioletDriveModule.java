@@ -37,6 +37,7 @@ public class VioletDriveModule extends Module {
     // As of 2/9this is for omni wheels on a solid floor
     public static double kWheelDiameterInches = 5.875;
     public static double kWheelCircumferenceFeet = kWheelDiameterInches*Math.PI/12.0;
+    public static double kWheelbaseDiagonalFeet = 34.853; // TODO Verify whether this is accurate
 
     // For position, getPosition() returns raw rotations - so convert that to feet
     public static double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
@@ -72,6 +73,8 @@ public class VioletDriveModule extends Module {
     private static final int VELOCITY_PID_SLOT = 1;
     private static final int POSITION_PID_SLOT = 2;
     private static final int SMART_MOTION_PID_SLOT = 3;
+
+    private int mStartAngleDeg = 0;
 
     public static ProfileGains kPositionGains = new ProfileGains()
 //			.p(5.0e-4)
@@ -256,6 +259,7 @@ public class VioletDriveModule extends Module {
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(IS_CURRENT_LIMITING, EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots));
+        db.drivetrain.set(ACTUAL_TURN_ANGLE_deg, mGyro.getHeading().getDegrees());
         db.imu.set(EGyro.HEADING_DEGREES, -mGyro.getHeading().getDegrees());
         db.imu.set(EGyro.YAW_OMEGA_DEGREES, mGyro.getYawRate().getDegrees());
     }
@@ -268,6 +272,7 @@ public class VioletDriveModule extends Module {
         if(mode == null) return;
         double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
         double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
+
 
         switch (mode) {
             case RESET:
@@ -328,9 +333,6 @@ public class VioletDriveModule extends Module {
                 double vLeft = mLeftVelocityPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
                 double vRight = mRightVelocityPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
 
-                SmartDashboard.putNumber("Left Velocity", vLeft);
-                SmartDashboard.putNumber("Right Velocity", vRight);
-
                 mLeftMaster.set(vLeft);
                 mRightMaster.set(vRight);
                 break;
@@ -339,20 +341,50 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set((throttle-turn)*Settings.Input.kMaxAllowedVelocityMultiplier);
                 break;
             case PATH_FOLLOWING_BASIC:
-                mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS));
-                mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS));
+                mLeftPositionPID.setSetpoint(db.drivetrain.get(L_PATH_FT_s));
+                mRightPositionPID.setSetpoint(db.drivetrain.get(R_PATH_FT_s));
 
-                double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-                double posRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-
-                SmartDashboard.putNumber("Left Actual Position", db.drivetrain.get(L_DESIRED_POS));
-                SmartDashboard.putNumber("Right Actual Position", db.drivetrain.get(R_DESIRED_POS));
-
-                SmartDashboard.putNumber("Left Position PID Output", posLeft);
-                SmartDashboard.putNumber("Right Position PID Output", posRight);
+                double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), clock.getCurrentTimeInMillis());
+                double posRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s), clock.getCurrentTimeInMillis());
 
                 mLeftMaster.set(posLeft);
                 mRightMaster.set(posRight);
+                break;
+            case TURN_FOR:
+                double arcLengthFor = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * db.drivetrain.get(DESIRED_TURN_ANGLE_deg) / 360.0;
+
+                mLeftPositionPID.setSetpoint(arcLengthFor);
+                mRightPositionPID.setSetpoint(-arcLengthFor);
+
+                double leftOutputFor = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+                double rightOutputFor = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+
+                mLeftMaster.set(leftOutputFor);
+                mRightMaster.set(rightOutputFor);
+                break;
+            case TURN_TO:
+                double arcLengthTo = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * (db.drivetrain.get(DESIRED_TURN_ANGLE_deg) - mStartAngleDeg) / 360.0;
+
+                mLeftPositionPID.setSetpoint(arcLengthTo);
+                mRightPositionPID.setSetpoint(-arcLengthTo);
+
+                double leftOutputTo = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+                double rightOutputTo = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+
+                mLeftMaster.set(leftOutputTo);
+                mRightMaster.set(rightOutputTo);
+                break;
+            case HOME:
+                double arcLengthHome = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * -mStartAngleDeg / 360.0;
+
+                mLeftPositionPID.setSetpoint(arcLengthHome);
+                mLeftPositionPID.setSetpoint(-arcLengthHome);
+
+                double leftOutputHome = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+                double rightOutputHome = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+
+                mLeftMaster.set(leftOutputHome);
+                mRightMaster.set(rightOutputHome);
                 break;
         }
     }
