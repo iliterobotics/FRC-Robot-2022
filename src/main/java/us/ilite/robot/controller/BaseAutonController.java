@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -100,7 +101,12 @@ public class BaseAutonController extends AbstractController {
         mLeftController.reset();
         mRightController.reset();
         mPrevTime = -1;
-        mTrajectory = TrajectoryCommandUtils.getTrajectory();
+        //TODO figure out if we need to reset initial pose of robot to initial pose of trajectory
+        Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
+        Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
+        mTrajectory = trajectory.transformBy(transform);
+        mTrajectory = TrajectoryCommandUtils.getJSONTrajectory();
+        System.out.println(mTrajectory.getInitialPose());
         var initialState = mTrajectory.sample(0);
         mPrevSpeeds =
                 mDriveKinematics.toWheelSpeeds(
@@ -231,7 +237,7 @@ public class BaseAutonController extends AbstractController {
      *  The voltage values to set the motors
      */
     private void updateDriveTrain(Pair<Double,Double> pOutput) {
-        System.out.println("BaseAutonController: Setting desired voltage= ["+pOutput+"]");
+     //   System.out.println("BaseAutonController: Setting desired voltage= ["+pOutput+"]");
         db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, pOutput.getLeft());
         db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, pOutput.getRight());
     }
