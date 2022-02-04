@@ -149,7 +149,7 @@ public class VioletDriveModule extends Module {
     private final SparkMaxPIDController mRightCtrl;
 
     //RAMSETE STUFF DO NOT MODIFY
-    private final DifferentialDriveOdometry mOdometry;
+    private static DifferentialDriveOdometry mOdometry;
     private DifferentialDrive mDrive;
 
 
@@ -228,12 +228,14 @@ public class VioletDriveModule extends Module {
         HardwareUtils.setGains(mRightCtrl, dPID);
 
         System.err.println(" ==== DRIVE MAX ACCEL (RPM): " + (kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4));
+
+        mOdometry.resetPosition(new Pose2d(),new Rotation2d());
     }
 
     @Override
     public void readInputs() {
         mGyro.update();
-        db.drivetrain.set(DELTA_HEADING, mGyro.getHeading().getDegrees() - mLastHeading);
+        db.drivetrain.set(DELTA_HEADING, -mGyro.getHeading().getDegrees() -  mLastHeading);
         db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
         db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
         db.drivetrain.set(L_ACTUAL_VEL_FT_s, mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor);
@@ -258,7 +260,7 @@ public class VioletDriveModule extends Module {
 
     @Override
     public void setOutputs() {
-        mLastHeading = mGyro.getHeading().getDegrees();
+        mLastHeading = -mGyro.getHeading().getDegrees();
         EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
         // Do this to prevent wonkiness while transitioning autonomous to teleop
         if(mode == null) return;
@@ -342,7 +344,7 @@ public class VioletDriveModule extends Module {
      *
      * @return The pose.
      */
-    public Pose2d getPose() {
+    public static Pose2d getPose() {
         return mOdometry.getPoseMeters();
     }
 

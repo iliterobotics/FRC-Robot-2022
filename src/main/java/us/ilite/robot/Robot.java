@@ -9,9 +9,11 @@ import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import us.ilite.common.Data;
+import us.ilite.common.Field2020;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
@@ -38,6 +40,7 @@ public class Robot extends TimedRobot {
     private CSVLogger mCSVLogger;
    // private HangerModule mHanger;
     private Timer initTimer = new Timer();
+    private static Field2d mField = new Field2d();
 
     private VioletDriveModule mDrive;
     private Limelight mLimelight;
@@ -68,6 +71,7 @@ public class Robot extends TimedRobot {
         // Init the actual robot
 //        initTimer.reset();
 //        initTimer.start();
+
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
         mDrive = new VioletDriveModule();
@@ -122,6 +126,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
+        SmartDashboard.putData(mField);
+        mField.getObject("traj").setTrajectory(TrajectoryCommandUtils.getJSONTrajectory());
     }
 
     @Override

@@ -20,6 +20,7 @@ import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.TrajectoryCommandUtils;
+import us.ilite.robot.modules.VioletDriveModule;
 
 /**
  * Class responsible for executing {@link Trajectory} and moving the
