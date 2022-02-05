@@ -232,6 +232,7 @@ public class VioletDriveModule extends Module {
     @Override
     public void readInputs() {
         mGyro.update();
+        SmartDashboard.putNumber("VioletDrive::Gyro Heading",mGyro.getHeading().getDegrees());
         db.drivetrain.set(DELTA_HEADING, -mGyro.getHeading().getDegrees() + mLastHeading);
         db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
         db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
