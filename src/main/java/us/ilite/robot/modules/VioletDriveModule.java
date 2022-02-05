@@ -50,11 +50,8 @@ public class VioletDriveModule extends Module {
     // Actual measured was 5514 with a resting battery voltage of 12.75V
     public static double kDriveTrainMaxVelocityRPM = 5500.0;
     public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveNEOVelocityFactor);
-    //	public static Distance kDriveMaxAccel_measured = Distance.fromFeet()
     public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
     public static double feetToMeters = 0.3408;
-    public static double kMaxVelocityMS = kDriveTrainMaxVelocityRPM * kDriveNEOVelocityFactor * feetToMeters;
-
 
     // This is approx 290 Degrees per second, measured with a Pigeon
     // Actual measured was 825 Degrees per second, with a resting battery voltage of 12.57V
@@ -130,14 +127,13 @@ public class VioletDriveModule extends Module {
             CURRENT14,
 
     };
-
-    private Rotation2d mGyroOffset = new Rotation2d();
     private PIDController mTargetAngleLockPid;
-    private PIDController mNewController;
-    private PIDController mYawPid;
+   // private PIDController mYawPid;
     private double mLeftHoldSetpoint;
     private double mRightHoldSetpoint;
     private boolean mStartHoldingPosition;
+    private double initialXPosition;
+    private double initialYPosition;
 
     private final CANSparkMax mLeftMaster;
     private final CANSparkMax mLeftFollower;
@@ -149,7 +145,7 @@ public class VioletDriveModule extends Module {
     private final SparkMaxPIDController mRightCtrl;
 
     //RAMSETE STUFF DO NOT MODIFY
-    private static DifferentialDriveOdometry mOdometry;
+    public static DifferentialDriveOdometry mOdometry;
     private DifferentialDrive mDrive;
 
 
@@ -228,6 +224,9 @@ public class VioletDriveModule extends Module {
 
         System.err.println(" ==== DRIVE MAX ACCEL (RPM): " + (kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4));
         resetOdometry(new Pose2d());
+        initialXPosition = mOdometry.getPoseMeters().getX();
+        initialYPosition = mOdometry.getPoseMeters().getY();
+
     }
 
     @Override
@@ -242,8 +241,14 @@ public class VioletDriveModule extends Module {
         db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getOutputCurrent());
         db.drivetrain.set(RIGHT_CURRENT, mRightMaster.getOutputCurrent());
        // db.drivetrain.set(GET_X_OFFSET, Units.feetToMeters(db.drivetrain.get(L_ACTUAL_POS_FT) + db.drivetrain.get(EDriveData.)));
-        db.drivetrain.set(GET_X_OFFSET, mOdometry.getPoseMeters().getX() - 0);
-        db.drivetrain.set(GET_Y_OFFSET, mOdometry.getPoseMeters().getY() - 0);
+
+//        db.drivetrain.set(GET_X_OFFSET, Units.feetToMeters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor) - initialXPosition);
+//        db.drivetrain.set(GET_Y_OFFSET, Units.feetToMeters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor) - initialYPosition);
+
+        db.drivetrain.set(GET_X_OFFSET_METERS, mOdometry.getPoseMeters().getX() - initialXPosition);
+        db.drivetrain.set(GET_Y_OFFSET_METERS, mOdometry.getPoseMeters().getY() - initialYPosition);
+
+
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(IS_CURRENT_LIMITING, EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots));
@@ -259,7 +264,6 @@ public class VioletDriveModule extends Module {
 
     @Override
     public void setOutputs() {
-
         EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
         // Do this to prevent wonkiness while transitioning autonomous to teleop
         if(mode == null) return;

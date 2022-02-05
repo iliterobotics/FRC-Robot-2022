@@ -21,6 +21,7 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
+import us.ilite.robot.modules.VioletDriveModule;
 
 /**
  * Class responsible for executing {@link Trajectory} and moving the
@@ -80,7 +81,7 @@ public class BaseAutonController extends AbstractController {
     public BaseAutonController() {
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
-        mRightController = new PIDController(Settings.kP, 0, 0);
+        mRightController = new PIDController(Settings.kP,0 , 0);
         mLeftController = new PIDController(Settings.kP, 0, 0);
         mTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
@@ -124,6 +125,7 @@ public class BaseAutonController extends AbstractController {
     private void execute() {
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         double curTime = mTimer.get();
+        double dT = curTime - mPrevTime;
 
         if (mPrevTime < 0) {
             updateDriveTrain(new ImmutablePair<Double,Double>(0d,0d));
@@ -141,8 +143,8 @@ public class BaseAutonController extends AbstractController {
         double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
         double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
 
-        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, Robot.CLOCK.dt());
-        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, Robot.CLOCK.dt());
+        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dT);
+        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dT);
 
         output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
         output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
@@ -214,7 +216,7 @@ public class BaseAutonController extends AbstractController {
      */
     private Pose2d getRobotPose() {
         Rotation2d r2d = new Rotation2d(Units.degrees_to_radians(db.drivetrain.get(EDriveData.DELTA_HEADING)));
-        Pose2d robotPose = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET), db.drivetrain.get(EDriveData.GET_Y_OFFSET), r2d);
+        Pose2d robotPose = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET_METERS), db.drivetrain.get(EDriveData.GET_Y_OFFSET_METERS), r2d);
         return robotPose;
     }
 
