@@ -120,12 +120,9 @@ public class Settings {
     public static final double kV = 0.1398;
     public static final double kA = 0.0076288;
 
-    public static final double kP = 0.3;
+    public static final double kP = 0.1139;
 
-    public static final double kTrackwidthMeters = 0.5969;
-    public static final DifferentialDriveKinematics kDriveKinematics =
-            new DifferentialDriveKinematics(kTrackwidthMeters);
-
+    public static final double kTrackWidthMeters = 0.5969;
     public static final double kMaxSpeedMetersPerSecond = 15;
     public static final double kMaxAccelerationMetersPerSecondSquared = 15;
 

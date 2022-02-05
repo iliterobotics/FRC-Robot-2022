@@ -19,8 +19,8 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
+import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
-import us.ilite.robot.modules.VioletDriveModule;
 
 /**
  * Class responsible for executing {@link Trajectory} and moving the
@@ -36,10 +36,6 @@ public class BaseAutonController extends AbstractController {
      * used for temporal offsets.
      */
     private final Timer mTimer;
-    /**
-     * Flag indiciating if this run should use PID in it's calculation
-     */
-    private final boolean mUsePid;
     /**
      * The {@link RamseteController} that is used to follow a {@link Trajectory}. This
      * will be used to calculate the chasis speed based on the robots pose and velocity
@@ -82,13 +78,12 @@ public class BaseAutonController extends AbstractController {
      * state of autonomous. For those components, those will be initialized in the initialized method
      */
     public BaseAutonController() {
-        mUsePid = true;
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
-        mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kP, Settings.kA);
+        mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
         mRightController = new PIDController(Settings.kP, 0, 0);
         mLeftController = new PIDController(Settings.kP, 0, 0);
         mTimer = new Timer();
-        mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackwidthMeters);
+        mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
     }
 
     /**
@@ -102,7 +97,6 @@ public class BaseAutonController extends AbstractController {
         mLeftController.reset();
         mRightController.reset();
         mPrevTime = -1;
-        //TODO figure out if we need to reset initial pose of robot to initial pose of trajectory
         Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
         Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
         mTrajectory = trajectory.transformBy(transform);
@@ -114,12 +108,8 @@ public class BaseAutonController extends AbstractController {
                                 initialState.velocityMetersPerSecond,
                                 0,
                                 initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
-        mTimer.reset();
-        mTimer.start();
-        if (mUsePid) {
-            mLeftController.reset();
-            mRightController.reset();
-        }
+        mLeftController.reset();
+        mRightController.reset();
     }
     @Override
     protected void updateImpl() {
@@ -134,34 +124,28 @@ public class BaseAutonController extends AbstractController {
     private void execute() {
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         double curTime = mTimer.get();
-        double dt = curTime - mPrevTime;
 
         if (mPrevTime < 0) {
             updateDriveTrain(new ImmutablePair<Double,Double>(0d,0d));
             mPrevTime = curTime;
             return;
         }
+
         Pose2d robotPose = getRobotPose();
         DifferentialDriveWheelSpeeds targetWheelSpeeds = getTargetWheelSpeeds(curTime, robotPose);
 
         MutablePair<Double,Double> output = new MutablePair<>();
 
-        if (mUsePid) {
-            DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds();
+        DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds();
 
-            double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
-            double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
+        double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
+        double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
 
-            double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dt);
-            double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dt);
+        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, Robot.CLOCK.dt());
+        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, Robot.CLOCK.dt());
 
-            output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
-            output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
-
-        } else {
-            output.left = targetWheelSpeeds.leftMetersPerSecond;
-            output.right = targetWheelSpeeds.rightMetersPerSecond;
-        }
+        output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
+        output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
 
         updateDriveTrain(output);
         mPrevSpeeds = targetWheelSpeeds;
