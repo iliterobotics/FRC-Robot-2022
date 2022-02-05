@@ -242,7 +242,8 @@ public class BaseAutonController extends AbstractController {
      *  The robot pose represented as {@link Pose2d}
      */
     private Pose2d getRobotPose() {
-        Rotation2d r2d = new Rotation2d(db.drivetrain.get(EDriveData.ACTUAL_HEADING_RADIANS));
+//        Rotation2d r2d = new Rotation2d(db.drivetrain.get(EDriveData.ACTUAL_HEADING_RADIANS));
+        Rotation2d r2d = new Rotation2d(0d);
         Pose2d robotPose = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET_METERS), db.drivetrain.get(EDriveData.GET_Y_OFFSET_METERS), r2d);
         return robotPose;
     }
