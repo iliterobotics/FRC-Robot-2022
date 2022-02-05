@@ -158,12 +158,23 @@ public class BaseAutonController extends AbstractController {
         Pose2d robotPose = getRobotPose();
         Trajectory.State sample = mTrajectory.sample(curTime);
 
-        System.out.println("SAMPLE: "+sample.toString() +", pose= " + robotPose.toString());
+
+        SmartDashboard.putNumber("TrajectoryX", sample.poseMeters.getX());
+        SmartDashboard.putNumber("TrajectoryY", sample.poseMeters.getY());
+        SmartDashboard.putNumber("TrajectoryDegrees", sample.poseMeters.getRotation().getDegrees());
+        SmartDashboard.putNumber("TrajectoryVelocity",sample.velocityMetersPerSecond);
+        SmartDashboard.putNumber("TrajectoryAccel",sample.accelerationMetersPerSecondSq);
+
         DifferentialDriveWheelSpeeds targetWheelSpeeds = getTargetWheelSpeeds(sample, robotPose);
 
         MutablePair<Double,Double> output = new MutablePair<>();
 
         DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds();
+
+        SmartDashboard.putNumber("Target Speed Left: ", targetWheelSpeeds.leftMetersPerSecond);
+        SmartDashboard.putNumber("Target Speed Right: ", targetWheelSpeeds.rightMetersPerSecond);
+        SmartDashboard.putNumber("Actual Speed Left: ", actualSpeeds.leftMetersPerSecond);
+        SmartDashboard.putNumber("Actual Speed Right", actualSpeeds.rightMetersPerSecond);
 
         System.out.println("Speeds: target= " + targetWheelSpeeds+", actual= " + actualSpeeds.toString());
 
