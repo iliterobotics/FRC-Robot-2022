@@ -106,7 +106,6 @@ public class BaseAutonController extends AbstractController {
         Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
         Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
         mTrajectory = trajectory.transformBy(transform);
-        mTrajectory = TrajectoryCommandUtils.getJSONTrajectory();
         System.out.println(mTrajectory.getInitialPose());
         var initialState = mTrajectory.sample(0);
         mPrevSpeeds =
@@ -143,15 +142,18 @@ public class BaseAutonController extends AbstractController {
             return;
         }
         Pose2d robotPose = getRobotPose();
-        var targetWheelSpeeds = getTargetWheelSpeeds(curTime, robotPose);
+        DifferentialDriveWheelSpeeds targetWheelSpeeds = getTargetWheelSpeeds(curTime, robotPose);
 
         MutablePair<Double,Double> output = new MutablePair<>();
 
         if (mUsePid) {
             DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds();
 
-            double leftFeedforward = calculateFeedsForward(targetWheelSpeeds.leftMetersPerSecond, mPrevSpeeds.leftMetersPerSecond, dt);
-            double rightFeedforward = calculateFeedsForward(targetWheelSpeeds.rightMetersPerSecond, mPrevSpeeds.rightMetersPerSecond, dt);
+            double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
+            double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
+
+            double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dt);
+            double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dt);
 
             output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
             output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);

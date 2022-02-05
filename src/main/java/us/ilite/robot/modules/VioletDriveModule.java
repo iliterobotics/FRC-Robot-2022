@@ -221,21 +221,19 @@ public class VioletDriveModule extends Module {
         mStartHoldingPosition = false;
         SmartDashboard.putNumber("Heading", mGyro.getHeading().getDegrees());
 
-        reset();
         HardwareUtils.setGains(mLeftCtrl, vPID);
         HardwareUtils.setGains(mRightCtrl, vPID);
         HardwareUtils.setGains(mLeftCtrl, dPID);
         HardwareUtils.setGains(mRightCtrl, dPID);
 
         System.err.println(" ==== DRIVE MAX ACCEL (RPM): " + (kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4));
-
-        mOdometry.resetPosition(new Pose2d(),new Rotation2d());
+        resetOdometry(new Pose2d());
     }
 
     @Override
     public void readInputs() {
         mGyro.update();
-        db.drivetrain.set(DELTA_HEADING, -mGyro.getHeading().getDegrees() -  mLastHeading);
+        db.drivetrain.set(DELTA_HEADING, -mGyro.getHeading().getDegrees() + mLastHeading);
         db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
         db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
         db.drivetrain.set(L_ACTUAL_VEL_FT_s, mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor);
@@ -256,11 +254,12 @@ public class VioletDriveModule extends Module {
                 mGyro.getHeading(), Units.feetToMeters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
                 Units.feetToMeters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
 
+        mLastHeading = mGyro.getHeading().getDegrees();
     }
 
     @Override
     public void setOutputs() {
-        mLastHeading = -mGyro.getHeading().getDegrees();
+
         EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
         // Do this to prevent wonkiness while transitioning autonomous to teleop
         if(mode == null) return;
@@ -358,34 +357,6 @@ public class VioletDriveModule extends Module {
                 Units.feetToMeters(mRightEncoder.getVelocity() * kDriveNEOVelocityFactor));
     }
 
-    /**
-     * Returns the heading of the robot.
-     *
-     * @return the robot's heading in degrees, from -180 to 180
-     */
-    public double getHeading() {
-        return mGyro.getHeading().getDegrees();
-    }
-
-    /**
-     * Controls the left and right sides of the drive directly with voltages.
-     *
-     * @param leftVolts the commanded left output
-     * @param rightVolts the commanded right output
-     */
-    public void tankDriveVolts(double leftVolts, double rightVolts) {
-        mLeftMaster.setVoltage(leftVolts);
-        mRightMaster.setVoltage(rightVolts);
-        mDrive.feed();
-    }
-
-
-    public static final SubsystemBase subBase = new SubsystemBase() {
-        @Override
-        public String getName() {
-            return super.getName();
-        }
-    };
 
     /**
      * Resets the odometry to the specified pose.
