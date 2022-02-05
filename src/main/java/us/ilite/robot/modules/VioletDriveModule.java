@@ -234,7 +234,7 @@ public class VioletDriveModule extends Module {
     public void readInputs() {
         mGyro.update();
         SmartDashboard.putNumber("VioletDrive::Gyro Heading",mGyro.getHeading().getDegrees());
-        db.drivetrain.set(DELTA_HEADING, -mGyro.getHeading().getDegrees() + mLastHeading);
+        db.drivetrain.set(DELTA_HEADING, mGyro.getHeading().getDegrees() - mLastHeading);
         db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
         db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
         db.drivetrain.set(L_ACTUAL_VEL_FT_s, mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor);
@@ -261,11 +261,12 @@ public class VioletDriveModule extends Module {
                 mGyro.getHeading(), Units.feetToMeters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
                 Units.feetToMeters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
 
-        mLastHeading = mGyro.getHeading().getDegrees();
+
     }
 
     @Override
     public void setOutputs() {
+        mLastHeading = mGyro.getHeading().getDegrees();
         EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
         // Do this to prevent wonkiness while transitioning autonomous to teleop
         if(mode == null) return;
