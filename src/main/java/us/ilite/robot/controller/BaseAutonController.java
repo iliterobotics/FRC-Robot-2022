@@ -186,7 +186,7 @@ public class BaseAutonController extends AbstractController {
 //
 //        output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
 //        output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
-        double speed = isFinished() ? 0.0 : 3.0;
+        double speed = isFinished() ? 0.0 : 10.0;
         updateDriveTrain(new ImmutablePair<>(speed, speed));
         mPrevSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
