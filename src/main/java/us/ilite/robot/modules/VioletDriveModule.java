@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import us.ilite.common.Distance;
@@ -206,6 +207,7 @@ public class VioletDriveModule extends Module {
 //				Settings.kControlLoopPeriod);
 //		mYawPid.setOutputRange(-1, 1);
 
+
     }
 
     @Override
@@ -261,7 +263,7 @@ public class VioletDriveModule extends Module {
                 mGyro.getHeading(), Units.feetToMeters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
                 Units.feetToMeters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
 
-
+        Robot.mField.setRobotPose(mOdometry.getPoseMeters());
     }
 
     @Override

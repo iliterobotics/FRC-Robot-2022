@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
     private CSVLogger mCSVLogger;
    // private HangerModule mHanger;
     private Timer initTimer = new Timer();
-    private static Field2d mField = new Field2d();
+    public static Field2d mField = new Field2d();
 
     private VioletDriveModule mDrive;
     private Limelight mLimelight;
