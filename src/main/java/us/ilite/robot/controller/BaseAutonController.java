@@ -178,16 +178,16 @@ public class BaseAutonController extends AbstractController {
 
         System.out.println("Speeds: target= " + targetWheelSpeeds+", actual= " + actualSpeeds.toString());
 
-        double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
-        double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
+//        double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
+//        double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
+//
+//        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dT);
+//        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dT);
+//
+//        output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
+//        output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
 
-        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dT);
-        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dT);
-
-        output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
-        output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
-
-        updateDriveTrain(output);
+        updateDriveTrain(new ImmutablePair<>(1.0,1.0));
         mPrevSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
     }
