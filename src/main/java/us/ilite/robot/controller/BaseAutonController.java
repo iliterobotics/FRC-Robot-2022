@@ -121,6 +121,7 @@ public class BaseAutonController extends AbstractController {
         execute();
     }
     private static int EXEC_COUNT = 1;
+    private static boolean HAS_FINISHED = false;
     /**
      * Method to perform the actual traversal. This should run a single step. A step will be defined as
      * a sequence of execution between some delta time from the previous execution. This method is expected to be
@@ -131,6 +132,15 @@ public class BaseAutonController extends AbstractController {
 
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         double curTime = mTimer.get();
+
+        boolean isFinished = isFinished();
+        SmartDashboard.putBoolean("Trajectory is Finished", isFinished);
+
+        if(isFinished && !HAS_FINISHED) {
+            HAS_FINISHED = true;
+            SmartDashboard.putNumber("Trajectory finished time", curTime);
+        }
+
         double dT = curTime - mPrevTime;
         SmartDashboard.putNumber("Delta Time",dt);
 
@@ -234,7 +244,8 @@ public class BaseAutonController extends AbstractController {
      */
     private void updateDriveTrain(Pair<Double,Double> pOutput) {
      //   System.out.println("BaseAutonController: Setting desired voltage= ["+pOutput+"]");
-        SmartDashboard.putString("DriveTrainVoltages",pOutput.toString());
+        SmartDashboard.putNumber("DriveTrainVoltage-Left",pOutput.getLeft());
+        SmartDashboard.putNumber("DriveTrainVoltage-Right",pOutput.getRight());
         db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, pOutput.getLeft());
         db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, pOutput.getRight());
     }
