@@ -210,6 +210,7 @@ public class VioletDriveModule extends Module {
 
     @Override
     public void modeInit(EMatchMode pMode) {
+        mGyro.zeroAll();
         mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
         mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
         mTargetAngleLockPid.setSetpoint(0);
