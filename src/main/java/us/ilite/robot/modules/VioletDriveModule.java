@@ -28,6 +28,8 @@ import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
 import us.ilite.robot.Robot;
 import static us.ilite.robot.Enums.*;
+
+import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.hardware.*;
 
 /**
@@ -226,7 +228,7 @@ public class VioletDriveModule extends Module {
         HardwareUtils.setGains(mRightCtrl, dPID);
 
         System.err.println(" ==== DRIVE MAX ACCEL (RPM): " + (kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4));
-        resetOdometry(new Pose2d());
+        resetOdometry(TrajectoryCommandUtils.getJSONTrajectory().getInitialPose());
         initialXPosition = mOdometry.getPoseMeters().getX();
         initialYPosition = mOdometry.getPoseMeters().getY();
 
