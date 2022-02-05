@@ -23,8 +23,8 @@ public abstract class BaseManualController extends AbstractController {
         double throttle = db.driverinput.get(THROTTLE_AXIS);
         double rotate = db.driverinput.get(TURN_AXIS) * 0.75;
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
-        rotate = Math.abs(rotate) > 0.02 ? rotate : 0.0; //Handling Deadband
-        throttle = Math.abs(throttle) > 0.05 ? throttle : 0.0; //Handling Deadband
+        rotate = Math.abs(rotate) > 0.075 ? rotate : 0.0; //Handling Deadband
+        throttle = Math.abs(throttle) > 0.1 ? throttle : 0.0; //Handling Deadband
 
         SmartDashboard.putNumber("throttle value", throttle);
         SmartDashboard.putNumber("turn value", rotate);
