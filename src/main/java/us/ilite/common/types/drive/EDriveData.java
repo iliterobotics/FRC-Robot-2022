@@ -27,7 +27,7 @@ public enum EDriveData implements CodexOf<Double> {
 
     NEUTRAL_MODE,
     STATE,
-    ACTUAL_HEADING_RADIANS
+
     ;
 
 }
