@@ -156,11 +156,16 @@ public class BaseAutonController extends AbstractController {
         }
 
         Pose2d robotPose = getRobotPose();
-        DifferentialDriveWheelSpeeds targetWheelSpeeds = getTargetWheelSpeeds(curTime, robotPose);
+        Trajectory.State sample = mTrajectory.sample(curTime);
+
+        System.out.println("SAMPLE: "+sample.toString() +", pose= " + robotPose.toString());
+        DifferentialDriveWheelSpeeds targetWheelSpeeds = getTargetWheelSpeeds(sample, robotPose);
 
         MutablePair<Double,Double> output = new MutablePair<>();
 
         DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds();
+
+        System.out.println("Speeds: target= " + targetWheelSpeeds+", actual= " + actualSpeeds.toString());
 
         double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
         double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
@@ -218,16 +223,16 @@ public class BaseAutonController extends AbstractController {
 
     /**
      * Method to get the target wheel speeds
-     * @param pCurTime
-     *  The current time in seconds
+     * @param trajectorySample
+     *  The sample to use in the calculation
      * @param pRobotPose
      *  The current robot pose
      * @return
      *  The robot wheel speeds
      */
-    private DifferentialDriveWheelSpeeds getTargetWheelSpeeds(double pCurTime, Pose2d pRobotPose) {
+    private DifferentialDriveWheelSpeeds getTargetWheelSpeeds(Trajectory.State trajectorySample, Pose2d pRobotPose) {
         return mDriveKinematics.toWheelSpeeds(
-                mFollower.calculate(pRobotPose, mTrajectory.sample(pCurTime)));
+                mFollower.calculate(pRobotPose, trajectorySample));
     }
 
 
