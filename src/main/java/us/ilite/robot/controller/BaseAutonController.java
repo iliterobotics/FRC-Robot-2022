@@ -11,7 +11,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -111,21 +113,26 @@ public class BaseAutonController extends AbstractController {
                                 initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
         mLeftController.reset();
         mRightController.reset();
+
+        SmartDashboard.putNumber("Trajectory Total Time in Seconds",mTrajectory.getTotalTimeSeconds());
     }
     @Override
     protected void updateImpl() {
         execute();
     }
-
+    private static int EXEC_COUNT = 1;
     /**
      * Method to perform the actual traversal. This should run a single step. A step will be defined as
      * a sequence of execution between some delta time from the previous execution. This method is expected to be
      * called multiple times until the robot traverses the entire Trajectory or until autonmous runs out of time.
      */
     private void execute() {
+        SmartDashboard.putNumber("Exec Count",EXEC_COUNT++);
+
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         double curTime = mTimer.get();
         double dT = curTime - mPrevTime;
+        SmartDashboard.putNumber("Delta Time",dt);
 
         if (mPrevTime < 0) {
             updateDriveTrain(new ImmutablePair<Double,Double>(0d,0d));
@@ -227,6 +234,7 @@ public class BaseAutonController extends AbstractController {
      */
     private void updateDriveTrain(Pair<Double,Double> pOutput) {
      //   System.out.println("BaseAutonController: Setting desired voltage= ["+pOutput+"]");
+        SmartDashboard.putString("DriveTrainVoltages",pOutput.toString());
         db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, pOutput.getLeft());
         db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, pOutput.getRight());
     }
