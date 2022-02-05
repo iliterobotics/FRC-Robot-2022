@@ -139,6 +139,10 @@ public class BaseAutonController extends AbstractController {
         if(isFinished && !HAS_FINISHED) {
             HAS_FINISHED = true;
             SmartDashboard.putNumber("Trajectory finished time", curTime);
+            Pose2d finalPose = getRobotPose();
+            SmartDashboard.putNumber("Final Pose X: ", finalPose.getX());
+            SmartDashboard.putNumber("Final Pose Y: ", finalPose.getY());
+            SmartDashboard.putNumber("Final Pose heading: ", finalPose.getRotation().getDegrees());
         }
 
         double dT = curTime - mPrevTime;
