@@ -139,6 +139,11 @@ class DSLogParser():
         return (uint & (0xFFFF >> left_bitshift)) >> right_bitshift
 
     def parse_data_v3(self, data_bytes):
+        #Unpack fomat:
+        #> big endian
+        #B unsigned char
+        #H unsigned short
+        #c char
         raw_values = struct.unpack('>BBHBcBBH', data_bytes)
         status_bits = self.unpack_bits(raw_values[4])
 

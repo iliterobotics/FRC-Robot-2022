@@ -14,7 +14,7 @@ def main(argv):
             print(opt,arg)
 
             if opt == '-h':
-                print('parse_files.py -i <inputfile> -o <outputfile>')
+                print('dsevents_log_2_csv.py -i <inputfile> -o <outputfile>')
             elif opt in ('-i','--ifile'):
                 inputfile = arg
             elif opt in ('-o','--ofile'):
