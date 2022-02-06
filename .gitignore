@@ -167,4 +167,4 @@ bin/
 venv
 
 # Data Files
-.csv
+*.csv
