@@ -26,6 +26,9 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.modules.VioletDriveModule;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -197,20 +200,32 @@ public class BaseAutonController extends AbstractController {
         output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
         output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
 
-        JSONObject speedObj = new JSONObject();
-        speedObj.put("leftSetpoint",leftSetpoint);
-        speedObj.put("rightSetpoint",rightSetpoint);
-        speedObj.put("prevLeftSpeed",mPrevSpeeds.leftMetersPerSecond);
-        speedObj.put("prevRightSpeed",mPrevSpeeds.rightMetersPerSecond);
-        speedObj.put("actualLeftSpeed",actualSpeeds.leftMetersPerSecond);
-        speedObj.put("actualRightSpeed",actualSpeeds.rightMetersPerSecond);
-        speedObj.put("leftFeedFwd", leftFeedforward);
-        speedObj.put("rightFeedFwd",rightFeedforward);
-        speedObj.put("outputLeft",output.left);
-        speedObj.put("outputRight",output.right);
-        speedObj.put("id",mID);
 
-        System.out.println("BaseAutonController::execute " + speedObj.toString());
+        List<Object> data = new ArrayList<>();
+        data.add(mID);
+        data.add(leftSetpoint);
+        data.add(rightSetpoint);
+        data.add(mPrevSpeeds.leftMetersPerSecond);
+        data.add(mPrevSpeeds.rightMetersPerSecond);
+        data.add(actualSpeeds.leftMetersPerSecond);
+        data.add(actualSpeeds.rightMetersPerSecond);
+        data.add(leftFeedforward);
+        data.add(rightFeedforward);
+        data.add(output.left);
+        data.add(output.right);
+
+        StringBuilder dataBuffer = new StringBuilder();
+
+        boolean first = true;
+        for(Object anObj : data) {
+            if(!first) {
+                dataBuffer.append(",");
+            }
+            first = false;
+            dataBuffer.append(anObj.toString());
+        }
+
+        System.out.println("BaseAutonController::execute " + dataBuffer);
 
 
         //        ImmutablePair<Double,Double>constantSpeed = getConstantSpeed();
