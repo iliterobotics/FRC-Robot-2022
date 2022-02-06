@@ -1,6 +1,14 @@
 import csv
+import logging
+import logging.config
+
 import sys, getopt
 from dslogparser import DSEventParser
+
+logging.config.fileConfig(fname='logger.conf', disable_existing_loggers=False)
+
+logger = logging.getLogger(__name__)
+
 
 def main(argv):
     inputfile = None
@@ -8,16 +16,20 @@ def main(argv):
 
     try:
         opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
-        print(opts)
+        logger.debug(f'Opts are: {opts}')
 
         for opt, arg in opts:
-            print(opt,arg)
+            logger.debug(f'Working on option: {opt} val={arg}')
 
             if opt == '-h':
                 print('dsevents_log_2_csv.py -i <inputfile> -o <outputfile>')
+                logger.debug("Help option selected")
+                exit(0)
             elif opt in ('-i','--ifile'):
+                logger.debug(f'input option selected, setting input file to: {arg}')
                 inputfile = arg
             elif opt in ('-o','--ofile'):
+                logger.debug(f'output option selected, setting output file to: {arg}')
                 outputfile = arg
         
         if inputfile and outputfile:
@@ -30,10 +42,10 @@ def main(argv):
                 for r in records:
                     csv_writer.writerow([r['time'],r['message']])
         else:
-            print('need an input and an output')
+            logger.warning(f'One of the values: input={inputfile}, output={outputfile} is None. Unable to continue')
     
     except getopt.GetoptError:
-        print('parse_files -i <input_file> -o <outputfile>')
+        logger.exception('Error parsing the options')
         
         
 
