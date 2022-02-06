@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.JSONObject;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
@@ -24,6 +25,8 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.modules.VioletDriveModule;
+
+import java.util.UUID;
 
 /**
  * Class responsible for executing {@link Trajectory} and moving the
@@ -75,6 +78,12 @@ public class BaseAutonController extends AbstractController {
      * The time, in seconds. This may not reflect realtime.
      */
     private double mPrevTime;
+
+    /**
+     * Unique identifier for this object
+     *
+     */
+    private final UUID mID = UUID.randomUUID();
 
     /**
      * Default constructor. This will instantiate the variables that are not dependent on the init
@@ -178,18 +187,45 @@ public class BaseAutonController extends AbstractController {
 
         System.out.println("Speeds: target= " + targetWheelSpeeds+", actual= " + actualSpeeds.toString());
 
-//        double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
-//        double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
-//
-//        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dT);
-//        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dT);
-//
-//        output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
-//        output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
-        double speed = isFinished() ? 0.0 : 7.0;
-        updateDriveTrain(new ImmutablePair<>(speed, speed));
+        double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
+        double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
+
+        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dT);
+        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dT);
+
+        output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
+        output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
+
+        JSONObject speedObj = new JSONObject();
+        speedObj.put("leftSetpoint",leftSetpoint);
+        speedObj.put("rightSetpoint",rightSetpoint);
+        speedObj.put("prevLeftSpeed",mPrevSpeeds.leftMetersPerSecond);
+        speedObj.put("prevRightSpeed",mPrevSpeeds.rightMetersPerSecond);
+        speedObj.put("actualLeftSpeed",actualSpeeds.leftMetersPerSecond);
+        speedObj.put("actualRightSpeed",actualSpeeds.rightMetersPerSecond);
+        speedObj.put("leftFeedFwd", leftFeedforward);
+        speedObj.put("rightFeedFwd",rightFeedforward);
+        speedObj.put("outputLeft",output.left);
+        speedObj.put("outputRight",output.right);
+        speedObj.put("id",mID)
+
+        System.out.println("BaseAutonController::execute " + speedObj.toString());
+
+
+        //        ImmutablePair<Double,Double>constantSpeed = getConstantSpeed();
+        updateDriveTrain(output);
         mPrevSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
+    }
+
+    /**
+     * Helper method to get constant speed. This will check to see if we are finished with the
+     * trajectory.If it is, it will return 0 speed. Otherwise it will return full speed straight.
+     * @return
+     */
+    private ImmutablePair<Double,Double> getConstantSpeed() {
+        double speed = isFinished() ? 0.0 : 7.0;
+        return new ImmutablePair<>(speed,speed);
     }
 
     /**
