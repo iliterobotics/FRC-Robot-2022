@@ -80,10 +80,10 @@ public class BaseAutonController extends AbstractController {
     private double mPrevTime;
 
     /**
-     * Unique identifier for this object
+     * Unique identifier for this object. This should get reinitialized on each initialize call
      *
      */
-    private final UUID mID = UUID.randomUUID();
+    private UUID mID;
 
     /**
      * Default constructor. This will instantiate the variables that are not dependent on the init
@@ -104,6 +104,7 @@ public class BaseAutonController extends AbstractController {
      * at home).
      */
     public void initialize() {
+        mID = UUID.randomUUID();
         mTimer.reset();
         mTimer.start();
         mLeftController.reset();
