@@ -52,7 +52,7 @@ public class DriveModule extends Module {
 	private final int vSlot = 1;
 	private final int dSlot = 2;
 
-	public static PIDController vPID, dPID, mTargetAngleLockPid;
+	public static PIDController velocityPID, positionPID, mTargetAngleLockPid;
 
 	private static double mLeftHoldPosition = 0;
 	private static double mRightHoldPosition = 0;
@@ -95,19 +95,12 @@ public class DriveModule extends Module {
 		mRightFollower = new TalonFX(Settings.HW.CAN.kDriveRightFollower);
 		mRightFollower.follow(mRightMaster);
 
-		vPID = new PIDController(velocityGains, -kMaxDriveThreshold * kDriveTrainMaxVelocityRPM, 
+		velocityPID = new PIDController(velocityGains, -kMaxDriveThreshold * kDriveTrainMaxVelocityRPM,
 				kMaxDriveThreshold * kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
-		dPID = new PIDController(positionGains, -kMaxDriveThreshold * kDriveTrainMaxVelocityRPM, 
+		positionPID = new PIDController(positionGains, -kMaxDriveThreshold * kDriveTrainMaxVelocityRPM,
 				kMaxDriveThreshold * kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
-		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
-
-		mLeftMaster.config_kP(kVelocitySlot, velocityGains.P);
-		mLeftMaster.config_kI(kVelocitySlot, velocityGains.I);
-		mLeftMaster.config_kD(kVelocitySlot, velocityGains.D);
-
-		mRightMaster.config_kP(kVelocitySlot, velocityGains.P);
-		mRightMaster.config_kI(kVelocitySlot, velocityGains.I);
-		mRightMaster.config_kD(kVelocitySlot, velocityGains.D);
+		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput,
+				Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
 	}
 
 	@Override
@@ -162,9 +155,8 @@ public class DriveModule extends Module {
 				mRightMaster.set(ControlMode.PercentOutput, right);
 				break;
 			case VELOCITY:
-				double leftPIDValue =  vPID.calculate(left*kDriveTrainMaxVelocityRPM, clock.dt());
-				double rightPIDValue =  vPID.calculate(right*kDriveTrainMaxVelocityRPM, clock.dt());
-
+				double leftPIDValue =  velocityPID.calculate(left*kDriveTrainMaxVelocityRPM, clock.dt());
+				double rightPIDValue =  velocityPID.calculate(right*kDriveTrainMaxVelocityRPM, clock.dt());
 				mLeftMaster.set(ControlMode.Velocity,left*kDriveTrainMaxVelocityRPM);
 				mRightMaster.set(ControlMode.Velocity, right*kDriveTrainMaxVelocityRPM);
 				mCyclesHolding = 0;
@@ -195,7 +187,7 @@ public class DriveModule extends Module {
 
 				if (db.drivetrain.get(L_ACTUAL_VEL_FT_s) < 100) {
 					if (Math.abs(deltaLeft) >= 0.1) {
-						mLeftMaster.set(ControlMode.Position, dPID.calculate(mLeftHoldPosition, clock.dt()));
+						mLeftMaster.set(ControlMode.Position, positionPID.calculate(mLeftHoldPosition, clock.dt()));
 					} else {
 						mLeftMaster.set(ControlMode.Velocity, 0);
 					}
@@ -203,7 +195,7 @@ public class DriveModule extends Module {
 
 				if (db.drivetrain.get(R_ACTUAL_VEL_FT_s) < 100) {
 					if (Math.abs(deltaRight) >= 0.1) {
-						mRightMaster.set(ControlMode.Position, dPID.calculate(mRightHoldPosition, clock.dt()));
+						mRightMaster.set(ControlMode.Position, positionPID.calculate(mRightHoldPosition, clock.dt()));
 					} else {
 						mRightMaster.set(ControlMode.Velocity, 0);
 					}
@@ -212,8 +204,8 @@ public class DriveModule extends Module {
 				mCyclesHolding++;
 				break;
 			case SMART_MOTION:
-				mLeftMaster.set(ControlMode.Position, dPID.calculate(db.drivetrain.get(L_DESIRED_POS), clock.dt()));
-				mRightMaster.set(ControlMode.Position, dPID.calculate(db.drivetrain.get(R_DESIRED_POS), clock.dt()));
+				mLeftMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(L_DESIRED_POS), clock.dt()));
+				mRightMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(R_DESIRED_POS), clock.dt()));
 				break;
 			default:
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
