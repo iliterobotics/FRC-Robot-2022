@@ -16,9 +16,7 @@ import static us.ilite.common.types.drive.EDriveData.*;
 public class DriveModule extends Module {
 
 	private TalonFX mLeftMaster, mLeftFollower, mRightMaster, mRightFollower;
-
-
-
+	
 	//TODO change this
 	public static double kGearboxRatio = (10.0 / 40.0) * (14.0 / 40.0);
 
