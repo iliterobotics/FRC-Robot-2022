@@ -3,16 +3,11 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.geometry.Rotation2d;
-import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.EVisionGoal2020;
-import us.ilite.common.types.drive.EDriveData;
-import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Enums.EDriveState;
-import us.ilite.robot.Robot;
 
 import static us.ilite.common.types.EVisionGoal2020.TV;
 import static us.ilite.common.types.EVisionGoal2020.TX;
@@ -21,25 +16,22 @@ import static us.ilite.common.types.drive.EDriveData.*;
 public class DriveModule extends Module {
 
 	private TalonFX mLeftMaster, mLeftFollower, mRightMaster, mRightFollower;
-
-	private final double kMaxFalconVelocity = 6380;
-	private final double kMaxDriveThreshold = 0.5;
-	private final double kDriveRampRate = 0.5;
-
+	
+	//TODO change this
 	public static double kGearboxRatio = (10.0 / 40.0) * (14.0 / 40.0);
-	// As of 2/9this is for omni wheels on a solid floor
+
 	//public static double kWheelDiameterInches = 6.125;
+	//TODO change these
 	public static double kWheelDiameterInches = 5.875;
-	public static double kWheelCircumferenceFeet = kWheelDiameterInches*Math.PI/12.0;
+	public static double kWheelCircumferenceFeet = kWheelDiameterInches * Math.PI/12.0;
 	// For position, getPosition() returns raw rotations - so convert that to feet
-	public static double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
-	public static double kDriveNEOVelocityFactor = kDriveNEOPositionFactor / 60.0;
+	public static double kDriveFalconPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
+	public static double kDriveFalconVelocityFactor = kDriveFalconPositionFactor / 60.0;
 
 	// Actual measured was 5514 with a resting battery voltage of 12.75V
-	public static double kDriveTrainMaxVelocityRPM = 5500.0;
-	public static Distance kDriveMaxVelocity_measured = Distance.fromFeet(kDriveTrainMaxVelocityRPM*kDriveNEOVelocityFactor);
-	//	public static Distance kDriveMaxAccel_measured = Distance.fromFeet()
-	public static Distance kDriveMaxAccel_simulated = Distance.fromFeet(28.5);
+	public static double kDriveTrainMaxVelocityRPM = 6380.0;
+	public static double kMaxDriveThreshold = 0.5;
+	public static double kDriveRampRate = 0.5;
 
 	// This is approx 290 Degrees per second, measured with a Pigeon
 	// Actual measured was 825 Degrees per second, with a resting battery voltage of 12.57V
@@ -52,14 +44,13 @@ public class DriveModule extends Module {
 	public static double kInchesPerCurvatureDegree = kCurvatureCircumference / 360.0;
 	public static double kWheelTurnsPerCurvatureDegree = kInchesPerCurvatureDegree / kWheelDiameterInches;
 
-	private final double kPositionConversion = 1;
 	private final double kWheelDiameter = 4;
 	private final double kWheelCircumference = kWheelDiameter * Math.PI;
 
 	private final int vSlot = 1;
 	private final int dSlot = 2;
 
-	public static PIDController vPID, dPID, mTargetAngleLockPid;
+	public static PIDController velocityPID, positionPID, mTargetAngleLockPid;
 
 	private static double mLeftHoldPosition = 0;
 	private static double mRightHoldPosition = 0;
@@ -71,26 +62,27 @@ public class DriveModule extends Module {
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kYawGains = new ProfileGains().p(0.1);
 
+	private final int kVelocitySlot = 0;
+	private final int kPositionSlot = 1;
 
-
-	private final ProfileGains vGains = new ProfileGains()
+	private final ProfileGains velocityGains = new ProfileGains()
 			.p(0.0001)
 			.i(0.0)
 			.d(0.0)
-			.maxVelocity(kMaxFalconVelocity*kMaxDriveThreshold)
+			.maxVelocity(kDriveTrainMaxVelocityRPM*kMaxDriveThreshold)
 			.f(0.0)
 			.velocityConversion(1)
 			.maxAccel(kDriveRampRate)
 			.slot(vSlot);
-	private final ProfileGains dGains = new ProfileGains()
+	private final ProfileGains positionGains = new ProfileGains()
 			.p(0.0001)
 			.i(0.0)
 			.d(0.0)
-			.maxVelocity(kMaxFalconVelocity*kMaxDriveThreshold)
+			.maxVelocity(kDriveTrainMaxVelocityRPM*kMaxDriveThreshold)
 			.f(0.0)
 			.positionConversion(1)
 			.maxAccel(kDriveRampRate)
-			.slot(vSlot);
+			.slot(dSlot);
 
 	public DriveModule() {
 		mLeftMaster = new TalonFX(Settings.HW.CAN.kDriveLeftMaster);
@@ -101,9 +93,12 @@ public class DriveModule extends Module {
 		mRightFollower = new TalonFX(Settings.HW.CAN.kDriveRightFollower);
 		mRightFollower.follow(mRightMaster);
 
-		vPID = new PIDController(vGains, -kMaxDriveThreshold*kMaxFalconVelocity, kMaxDriveThreshold*kMaxFalconVelocity, Settings.kControlLoopPeriod);
-		dPID = new PIDController(dGains, -kMaxDriveThreshold*kMaxFalconVelocity, kMaxDriveThreshold*kMaxFalconVelocity, Settings.kControlLoopPeriod);
-		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput, Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
+		velocityPID = new PIDController(velocityGains, -kMaxDriveThreshold * kDriveTrainMaxVelocityRPM,
+				kMaxDriveThreshold * kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
+		positionPID = new PIDController(positionGains, -kMaxDriveThreshold * kDriveTrainMaxVelocityRPM,
+				kMaxDriveThreshold * kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
+		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput,
+				Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
 	}
 
 	@Override
@@ -111,13 +106,14 @@ public class DriveModule extends Module {
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 		mTargetAngleLockPid.setSetpoint(0);
 		mTargetAngleLockPid.reset();
+		reset();
 	}
 
 	@Override
 	public void readInputs() {
 		double rawLeftVelocity = mLeftMaster.getSelectedSensorVelocity();
 		double rpsLeft = (rawLeftVelocity / 2048) / 1000;
-		double feetPerSecondLeft = rpsLeft / kWheelCircumference;
+		double feetPerSecondLeft = rpsLeft / kWheelCircumferenceFeet;
 
 		double rawRightVelocity = mRightMaster.getSelectedSensorVelocity();
 		double rpsRight = (rawRightVelocity / 2048) / 1000;
@@ -125,11 +121,11 @@ public class DriveModule extends Module {
 
 		double rawPositionLeft = mLeftMaster.getSelectedSensorPosition();
 		double rotLeft = (rawPositionLeft) / 2048;
-		double feetLeft = rotLeft / kWheelCircumference;
+		double feetLeft = rotLeft / kWheelCircumferenceFeet;
 
 		double rawPositionRight = mRightMaster.getSelectedSensorPosition();
 		double rotRight = (rawPositionRight) / 2048;
-		double feetRight = rotRight / kWheelCircumference;
+		double feetRight = rotRight / kWheelCircumferenceFeet;
 
 		db.drivetrain.set(L_ACTUAL_POS_FT, feetLeft);
 		db.drivetrain.set(R_ACTUAL_POS_FT, feetRight);
@@ -146,7 +142,7 @@ public class DriveModule extends Module {
 		double left = throttle + turn;
 		double right = throttle - turn;
 
-		if(state == null) return;
+		if (state == null) return;
 
 		switch(state) {
 			case RESET:
@@ -157,8 +153,10 @@ public class DriveModule extends Module {
 				mRightMaster.set(ControlMode.PercentOutput, right);
 				break;
 			case VELOCITY:
-				mLeftMaster.set(ControlMode.Velocity, vPID.calculate(left*kDriveTrainMaxVelocityRPM, clock.dt()));
-				mRightMaster.set(ControlMode.Velocity, vPID.calculate(right*kDriveTrainMaxVelocityRPM, clock.dt()));
+				double leftPIDValue =  velocityPID.calculate(left*kDriveTrainMaxVelocityRPM, clock.dt());
+				double rightPIDValue =  velocityPID.calculate(right*kDriveTrainMaxVelocityRPM, clock.dt());
+				mLeftMaster.set(ControlMode.Velocity,left*kDriveTrainMaxVelocityRPM);
+				mRightMaster.set(ControlMode.Velocity, right*kDriveTrainMaxVelocityRPM);
 				mCyclesHolding = 0;
 				break;
 			case TARGET_ANGLE_LOCK:
@@ -187,7 +185,7 @@ public class DriveModule extends Module {
 
 				if (db.drivetrain.get(L_ACTUAL_VEL_FT_s) < 100) {
 					if (Math.abs(deltaLeft) >= 0.1) {
-						mLeftMaster.set(ControlMode.Position, dPID.calculate(mLeftHoldPosition, clock.dt()));
+						mLeftMaster.set(ControlMode.Position, positionPID.calculate(mLeftHoldPosition, clock.dt()));
 					} else {
 						mLeftMaster.set(ControlMode.Velocity, 0);
 					}
@@ -195,7 +193,7 @@ public class DriveModule extends Module {
 
 				if (db.drivetrain.get(R_ACTUAL_VEL_FT_s) < 100) {
 					if (Math.abs(deltaRight) >= 0.1) {
-						mRightMaster.set(ControlMode.Position, dPID.calculate(mRightHoldPosition, clock.dt()));
+						mRightMaster.set(ControlMode.Position, positionPID.calculate(mRightHoldPosition, clock.dt()));
 					} else {
 						mRightMaster.set(ControlMode.Velocity, 0);
 					}
@@ -204,16 +202,16 @@ public class DriveModule extends Module {
 				mCyclesHolding++;
 				break;
 			case SMART_MOTION:
-				mLeftMaster.set(ControlMode.Position, dPID.calculate(db.drivetrain.get(L_DESIRED_POS), clock.dt()));
-				mRightMaster.set(ControlMode.Position, dPID.calculate(db.drivetrain.get(R_DESIRED_POS), clock.dt()));
+				mLeftMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(L_DESIRED_POS), clock.dt()));
+				mRightMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(R_DESIRED_POS), clock.dt()));
 				break;
 			default:
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
 		}
 	}
-
 	private void reset() {
-
+		mLeftMaster.set(ControlMode.Position, 0.0);
+		mRightMaster.set(ControlMode.Position, 0.0);
 	}
 }
