@@ -32,6 +32,9 @@ public class ProfileGains {
         return new TrapezoidProfile.Constraints(MAX_VELOCITY,MAX_ACCEL);
     }
 
+    /**
+     * Constructs ProfiledPIDController
+     */
     public ProfiledPIDController generateController() {
         ProfiledPIDController controller = new ProfiledPIDController(P, I, D, generateConstraints(), Settings.kControlLoopPeriod);
         controller.setTolerance(TOLERANCE);
