@@ -42,6 +42,24 @@ public class ProfileGains {
     }
 
     /**
+     * Constructs ILITE PID Controller
+     */
+    public PIDController generateILITEPIDController() {
+        PIDController controller = new PIDController(this, -MAX_VELOCITY, MAX_VELOCITY, Settings.kControlLoopPeriod);
+        return controller;
+    }
+
+    /**
+     * Constructs WPI PID Controller
+     */
+    public edu.wpi.first.math.controller.PIDController generateWPIPIDController() {
+        edu.wpi.first.math.controller.PIDController controller = new edu.wpi.first.math.controller.PIDController(P, I, D);
+        controller.setSetpoint(MAX_VELOCITY);
+        controller.setTolerance(TOLERANCE);
+        return controller;
+    }
+
+    /**
      * Builder-pattern helper for constructing
      * @param gain
      * @return
