@@ -3,18 +3,18 @@ package us.ilite.common.lib.control;
 import us.ilite.common.lib.util.Utils;
 import us.ilite.robot.hardware.Clock;
 
-public class ILITEPIDController {
-    private boolean mContinuous = false;
+import static java.lang.Math.*;
 
+public class ILITEPIDController {
     private double mPreviousTime;
     private double mCurrentTime;
-
-    private ProfileGains mProfileGains;
 
     private double mMaximumOutput = 1.0;
     private double mMinimumOutput = -1.0;
     private double mMaximumInput = 0.0;
     private double mMinimumInput = 0.0;
+
+    private double MAX_ACCEL = 0;
 
     private double mPrevError = 0.0;
     private double mTotalError = 0.0;
@@ -43,6 +43,17 @@ public class ILITEPIDController {
         mPIDType = pPIDType;
         mGains = pGains;
         mClock = pClock;
+
+        kP = pGains.P;
+        kI = pGains.I;
+        kD = pGains.D;
+        kF = pGains.F;
+
+        MAX_ACCEL = mGains.MAX_ACCEL;
+    }
+
+    public void setDeadband(double pDeadband) {
+        mDeadband = pDeadband;
     }
 
     public void setInputRange(double pMinInput, double pMaxInput) {
@@ -56,19 +67,27 @@ public class ILITEPIDController {
     }
 
     public double calculate(double measurement, double setpoint) {
+        setpoint = min(max(setpoint, mMinimumInput), mMaximumInput);
+
         mCurrentTime = mClock.getCurrentTimeInMillis();
         mError = setpoint - measurement;
 
         double dT = mCurrentTime - mPreviousTime;
-        double dX = mError - mPrevError;
+        double dX = Utils.clamp(mError - mPrevError, MAX_ACCEL);
 
-        if ( ( mError * mProfileGains.P < mMaximumOutput ) && ( mError * mProfileGains.P > mMinimumOutput ) ) {
+        if (max(min(mMaximumOutput, mError*kP), mMinimumOutput) == mError*kP) {
             mTotalError += mError * mClock.dt();
         } else {
             mTotalError = 0;
         }
 
-        double proportionalError = Math.abs( mError ) < mDeadband ? 0 : mError;
+//        if ( ( mError * mProfileGains.P < mMaximumOutput ) && ( mError * mProfileGains.P > mMinimumOutput ) ) {
+//            mTotalError += mError * mClock.dt();
+//        } else {
+//            mTotalError = 0;
+//        }
+
+        double proportionalError = abs( mError ) < mDeadband ? 0 : mError;
 
         double proportion = mGains.P * proportionalError;
         double integral = mGains.I * mTotalError;
