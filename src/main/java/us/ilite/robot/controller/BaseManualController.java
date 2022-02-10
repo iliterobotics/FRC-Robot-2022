@@ -1,5 +1,6 @@
 package us.ilite.robot.controller;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.robot.modules.DriveMessage;
@@ -16,19 +17,34 @@ public abstract class BaseManualController extends AbstractController {
 
     protected static final double DRIVER_SUB_WARP_AXIS_THRESHOLD = 0.5;
 
+    private int mCyclesHolding = 0;
+
     void updateDrivetrain() {
         double throttle = db.driverinput.get(THROTTLE_AXIS);
         double rotate = db.driverinput.get(TURN_AXIS) * 0.75;
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
-        rotate = Math.abs(rotate) > 0.02 ? rotate : 0.0; //Handling Deadband
-        throttle = Math.abs(throttle) > 0.02 ? throttle : 0.0; //Handling Deadband
+        rotate = Math.abs(rotate) > 0.075 ? rotate : 0.0; //Handling Deadband
+        throttle = Math.abs(throttle) > 0.1 ? throttle : 0.0; //Handling Deadband
+
+        SmartDashboard.putNumber("throttle value", throttle);
+        SmartDashboard.putNumber("turn value", rotate);
+
+        if (rotate == 0d && throttle == 0d) {
+            mCyclesHolding++;
+        } else {
+            mCyclesHolding = 0;
+        }
 
         if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
             db.drivetrain.set(STATE, EDriveState.TARGET_ANGLE_LOCK);
-        } else if(throttle == 0.0 && rotate == 0.0) {
+        } else if (db.driverinput.isSet(HOME_TO_DRIVER_STATION)) {
+            db.drivetrain.set(STATE, EDriveState.HOME);
+            throttle = 0;
+            rotate = 0;
+        } else if(mCyclesHolding > 60) {
             db.drivetrain.set(STATE, EDriveState.HOLD);
-            db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
-            db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
+            db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
+            db.drivetrain.set(DESIRED_TURN_PCT, rotate);
         } else {
             db.drivetrain.set(STATE, EDriveState.VELOCITY);
             if (throttle == 0.0 && rotate != 0.0) {

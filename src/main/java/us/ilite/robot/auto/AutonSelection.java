@@ -1,4 +1,4 @@
-package us.ilite.robot.auto.paths;
+package us.ilite.robot.auto;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -16,11 +16,7 @@ public class AutonSelection {
      * Update these Auton Controllers whenever new ones are added
      */
     private Class<?>[] mAutonControllers = {
-            LineAutonController.class,
-            ShootIntakeController.class,
-            YoinkController.class,
-            OurTrenchController.class,
-            SitAndShootController.class
+
     };
 
     public AutonSelection() {
@@ -31,7 +27,7 @@ public class AutonSelection {
                .getDouble(0.0)))
                .intValue();
 
-        mSendableAutonControllers.setDefaultOption("Default - Auton Calibration", AutonCalibration.class);
+        mSendableAutonControllers.setDefaultOption("Default - BaseAuton", BaseAutonController.class);
         for (Class<?> c : mAutonControllers) {
             mSendableAutonControllers.addOption(c.getSimpleName(), c);
         }

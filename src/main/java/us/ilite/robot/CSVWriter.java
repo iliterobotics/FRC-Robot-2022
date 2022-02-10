@@ -24,7 +24,7 @@ public class CSVWriter {
     //public static final String USB_DIR = "/u";
     //public static final String USER_DIR = System.getProperty("user.home");
     private static final String LOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
-    private static String eventName = DriverStation.getInstance().getEventName();
+    private static String eventName = DriverStation.getEventName();
     private Optional<BufferedWriter> bw;
 
     private final ILog mLog = Logger.createLog(CSVWriter.class);
@@ -140,23 +140,23 @@ public class CSVWriter {
                 file = new File(String.format(dir + LOG_PATH_FORMAT,
                         eventName,
                         "DriverInput",
-                        DriverStation.getInstance().getMatchType().name(),
-                        DriverStation.getInstance().getMatchNumber()
+                        DriverStation.getMatchType().name(),
+                        DriverStation.getMatchNumber()
                 ));
             } else {
                 file = new File(String.format(dir + LOG_PATH_FORMAT,
                         eventName,
                         "OperatorInput",
-                        DriverStation.getInstance().getMatchType().name(),
-                        DriverStation.getInstance().getMatchNumber()
+                        DriverStation.getMatchType().name(),
+                        DriverStation.getMatchNumber()
                 ));
             }
         } else {
             file = new File(String.format(dir + LOG_PATH_FORMAT,
                     eventName,
                     mCodex.meta().getEnum().getSimpleName(),
-                    DriverStation.getInstance().getMatchType().name(),
-                    DriverStation.getInstance().getMatchNumber()
+                    DriverStation.getMatchType().name(),
+                    DriverStation.getMatchNumber()
             ));
         }
         mLog.error("Creating log file at ", file.toPath());
