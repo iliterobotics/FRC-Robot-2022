@@ -7,7 +7,7 @@ import static java.lang.Math.*;
 
 public class ILITEPIDController {
 
-    private final EPIDControlType mPIDType;
+    private EPIDControlType mPIDType;
     private final ProfileGains mGains;
     private final Clock mClock;
 
@@ -79,6 +79,47 @@ public class ILITEPIDController {
      * @param setpoint the desired velocity or position
      */
     public double calculate(double measurement, double setpoint) {
+        setpoint = min(max(setpoint, mMinimumInput), mMaximumInput);
+        double mError = setpoint - measurement;
+
+        double mCurrentTime = mClock.getCurrentTimeInMillis();
+        double dT = mCurrentTime - mPreviousTime;
+        double dX = Utils.clamp(mError - mPrevError, MAX_ACCEL);
+
+        if (max(min(mMaximumOutput, mError *kP), mMinimumOutput) == mError *kP) {
+            mTotalError += mError * mClock.dt();
+        } else {
+            mTotalError = 0;
+        }
+
+        double proportion = kP * mError;
+        double integral = kI * mTotalError;
+        double derivative = kD * dX/dT;
+        double feedforward = kF * setpoint;
+
+        switch(mPIDType) {
+            case VELOCITY:
+                desiredOutput = proportion + integral + derivative + feedforward;
+            case POSITION:
+                desiredOutput = proportion + integral + derivative;
+        }
+
+        desiredOutput = Utils.clamp( desiredOutput, mMinimumOutput, mMaximumOutput );
+
+        mPreviousTime = mCurrentTime;
+        mPrevError = mError;
+
+        return desiredOutput;
+    }
+
+    /**
+     * Calculates the desired output within the output boundaries
+     * @param measurement the current velocity or position
+     * @param setpoint the desired velocity or position
+     * @param pPIDType the desired output type
+     */
+    public double calculate(double measurement, double setpoint, EPIDControlType pPIDType) {
+        mPIDType = pPIDType;
         setpoint = min(max(setpoint, mMinimumInput), mMaximumInput);
         double mError = setpoint - measurement;
 
