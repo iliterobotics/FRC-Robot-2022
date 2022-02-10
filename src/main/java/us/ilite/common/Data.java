@@ -13,6 +13,7 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
+import us.ilite.robot.Enums;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +50,6 @@ public class Data {
     public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
     public final RobotCodex<EVisionGoal2020> limelight = new RobotCodex(NULL_CODEX_VALUE , EVisionGoal2020.class);
     public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
-    public final RobotCodex<EIntakeData> intake = new RobotCodex<EIntakeData>(NULL_CODEX_VALUE, EIntakeData.class);
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
             imu,
             drivetrain,
