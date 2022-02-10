@@ -54,7 +54,7 @@ public class TestController extends BaseManualController {
         double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
         mMaxSpeed = Math.max(mMaxSpeed, spd);
         SmartDashboard.putNumber("Max Robot Speed (ft/s)", mMaxSpeed);
-//        SmartDashboard.putNumber("Max Drive RPM", mMaxSpeed / kDriveNEOVelocityFactor);
+//        SmartDashboard.putNumber("Max Drive RPM", mMaxSpeed / kDriveFalconVelocityFactor);
 
         mMaxYaw = Math.max(mMaxYaw, db.imu.get(EGyro.YAW_OMEGA_DEGREES));
         SmartDashboard.putNumber("Max Robot Omega (deg/s)", mMaxYaw);

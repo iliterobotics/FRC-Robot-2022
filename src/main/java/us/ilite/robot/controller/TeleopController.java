@@ -34,17 +34,17 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // ========================================
         //updateLimelightTargetLock(); //waiting for merge to master
         super.updateDrivetrain();
-        updateHanger(); //not integrated yet
+//        updateHanger(); //not integrated yet
     }
 
-    private void updateHanger() {
-        if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
-            db.hanger.set(EHangerModuleData.SET_pct, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS)));
-        }else{
-            db.hanger.set(EHangerModuleData.SET_pct, 0.0);
-        }
-
-    }
+//    private void updateHanger() {
+//        if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
+//            db.hanger.set(EHangerModuleData.SET_pct, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS)));
+//        }else{
+//            db.hanger.set(EHangerModuleData.SET_pct, 0.0);
+//        }
+//
+//    }
 
 //    public void updateLimelightTargetLock() {
 //        if (DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
