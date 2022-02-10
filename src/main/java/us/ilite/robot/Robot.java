@@ -212,9 +212,9 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
 //        mRunningModules.addModule(mLEDControl);
-        if(IS_SIMULATED) {
-            mRunningModules.addModule(mSimulation);
-        }
+//        if(IS_SIMULATED) {
+//            mRunningModules.addModule(mSimulation);
+//        }
         mRunningModules.modeInit(TEST);
         mRunningModules.checkModule();
     }
