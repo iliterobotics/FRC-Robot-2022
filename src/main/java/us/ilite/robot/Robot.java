@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import us.ilite.common.Data;
 import us.ilite.common.Field2020;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
@@ -42,15 +41,13 @@ public class Robot extends TimedRobot {
     private Timer initTimer = new Timer();
     public static Field2d mField = new Field2d();
 
-    private VioletDriveModule mDrive;
+    private DriveModule mDrive;
     private Limelight mLimelight;
     private RawLimelight mRawLimelight;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
-    private TrajectoryCommandUtils mContainer;
-    private Command practice;
-
+    private VioletDriveModule mViolet;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -80,6 +77,8 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
+        mDrive = new DriveModule();
+        mViolet = new VioletDriveModule();
         mShooter = new FlywheelModule();
         mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
@@ -164,9 +163,9 @@ public class Robot extends TimedRobot {
         }
 
         mRunningModules.clearModules();
-//        mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mViolet);
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mLimelight);
@@ -217,17 +216,17 @@ public class Robot extends TimedRobot {
         mActiveController.setEnabled(true);
 
         mRunningModules.clearModules();
-//        mRunningModules.addModule(mOI);
+        mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mViolet);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDJSpinnerModule);
 //        mRunningModules.addModule(mLEDControl);
-        if(IS_SIMULATED) {
-            mRunningModules.addModule(mSimulation);
-        }
+//        if(IS_SIMULATED) {
+//            mRunningModules.addModule(mSimulation);
+//        }
         mRunningModules.modeInit(TEST);
         mRunningModules.checkModule();
     }

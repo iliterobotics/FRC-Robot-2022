@@ -59,7 +59,10 @@ public class Enums {
         HOLD,
         VELOCITY,
         PERCENT_OUTPUT,
-        SMART_MOTION
+        SMART_MOTION,
+        TURN_TO,
+        TURN_FOR,
+        HOME
     }
 
 

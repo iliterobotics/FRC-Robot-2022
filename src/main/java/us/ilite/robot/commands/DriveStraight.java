@@ -38,7 +38,7 @@ public class DriveStraight implements ICommand {
     private PIDController mHeadingController = new PIDController(
             DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
 
-    private ProfiledPIDController mDistanceController = DriveModule.dPID.getPIDGains().generateController();
+    private ProfiledPIDController mDistanceController = DriveModule.positionPID.getPIDGains().generateController();
 
     public DriveStraight(EDriveControlMode pDriveControlMode, Distance pDistanceToDrive) {
         mDistanceToDrive = pDistanceToDrive;

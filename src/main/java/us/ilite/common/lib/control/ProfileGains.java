@@ -17,6 +17,7 @@ public class ProfileGains {
     public double F = 0;
     public double kV = 0;
     public double kA = 0;
+    public double kS = 0;
 
     public double MAX_ACCEL = 0d;
     public double MAX_VELOCITY = 0d;
@@ -31,8 +32,29 @@ public class ProfileGains {
         return new TrapezoidProfile.Constraints(MAX_VELOCITY,MAX_ACCEL);
     }
 
+    /**
+     * Constructs ProfiledPIDController
+     */
     public ProfiledPIDController generateController() {
         ProfiledPIDController controller = new ProfiledPIDController(P, I, D, generateConstraints(), Settings.kControlLoopPeriod);
+        controller.setTolerance(TOLERANCE);
+        return controller;
+    }
+
+    /**
+     * Constructs ILITE PID Controller
+     */
+    public PIDController generateILITEPIDController() {
+        PIDController controller = new PIDController(this, -MAX_VELOCITY, MAX_VELOCITY, Settings.kControlLoopPeriod);
+        return controller;
+    }
+
+    /**
+     * Constructs WPI PID Controller
+     */
+    public edu.wpi.first.math.controller.PIDController generateWPIPIDController() {
+        edu.wpi.first.math.controller.PIDController controller = new edu.wpi.first.math.controller.PIDController(P, I, D);
+        controller.setSetpoint(MAX_VELOCITY);
         controller.setTolerance(TOLERANCE);
         return controller;
     }
@@ -44,6 +66,16 @@ public class ProfileGains {
      */
     public ProfileGains p(double gain) {
         P = gain;
+        return this;
+    }
+
+    /**
+     * Builder-pattern helper for constructing
+     * @param gain
+     * @return
+     */
+    public ProfileGains kS(double gain) {
+        kS = gain;
         return this;
     }
 

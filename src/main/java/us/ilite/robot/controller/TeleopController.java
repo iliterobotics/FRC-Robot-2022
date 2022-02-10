@@ -2,16 +2,13 @@ package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import us.ilite.common.Field2020;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
-import us.ilite.robot.modules.Limelight;
+import static us.ilite.common.types.EIntakeData.*;
 
-import static us.ilite.common.types.EPowerCellData.*;
 
 public class TeleopController extends BaseManualController { //copied from TestController, needs editing
 
@@ -39,17 +36,17 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // ========================================
         //updateLimelightTargetLock(); //waiting for merge to master
         super.updateDrivetrain();
-        updateHanger(); //not integrated yet
+//        updateHanger(); //not integrated yet
     }
 
-    private void updateHanger() {
-        if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
-            db.hanger.set(EHangerModuleData.SET_pct, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS)));
-        }else{
-            db.hanger.set(EHangerModuleData.SET_pct, 0.0);
-        }
-
-    }
+//    private void updateHanger() {
+//        if (db.operatorinput.get(InputMap.OPERATOR.BEGIN_HANG) >= 0.5 && db.driverinput.isSet(InputMap.DRIVER.HANGER_LOCK)) {
+//            db.hanger.set(EHangerModuleData.SET_pct, (db.operatorinput.get(ELogitech310.LEFT_Y_AXIS)));
+//        }else{
+//            db.hanger.set(EHangerModuleData.SET_pct, 0.0);
+//        }
+//
+//    }
 
 //    public void updateLimelightTargetLock() {
 //        if (DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {

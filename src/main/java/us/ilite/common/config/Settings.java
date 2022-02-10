@@ -1,6 +1,5 @@
 package us.ilite.common.config;
 
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import us.ilite.common.lib.control.ProfileGains;
 
 /**
@@ -89,7 +88,7 @@ public class Settings {
         // These are applied AFTER the normal throttle reduction
         public static double kSnailModePercentThrottleReduction = 0.5;
         public static double kSnailModePercentRotateReduction = 0.4;
-        public static double kMaxAllowedVelocityMultiplier = 0.5;
+        public static double kMaxAllowedVelocityMultiplier = 0.75;
 
         // Applied after any scaling
         public static double kDriverInputTurnMaxMagnitude = 0.5;
