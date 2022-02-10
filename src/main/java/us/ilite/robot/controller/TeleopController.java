@@ -7,6 +7,8 @@ import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
+import static us.ilite.common.types.EIntakeData.*;
+
 
 public class TeleopController extends BaseManualController { //copied from TestController, needs editing
 
