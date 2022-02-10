@@ -6,34 +6,33 @@ import us.ilite.robot.hardware.Clock;
 import static java.lang.Math.*;
 
 public class ILITEPIDController {
-    private double mPreviousTime;
-    private double mCurrentTime;
 
-    private double mMaximumOutput = 1.0;
-    private double mMinimumOutput = -1.0;
+    private final EPIDControlType mPIDType;
+    private final ProfileGains mGains;
+    private final Clock mClock;
+
+    // Configurations
+    private double mMaximumOutput;
+    private double mMinimumOutput;
     private double mMaximumInput = 0.0;
     private double mMinimumInput = 0.0;
 
-    private double MAX_ACCEL = 0;
+    // Gains
+    private final double MAX_ACCEL;
+    private final double kP;
+    private final double kI;
+    private final double kD;
+    private final double kF;
 
+    // Calculations
+    private double mPreviousTime;
     private double mPrevError = 0.0;
     private double mTotalError = 0.0;
-    private double mError = 100.0;
-    private double mDeadband = 0.0;
-    private double mSlot = 0;
-
-    private double kP = 0;
-    private double kI = 0;
-    private double kD = 0;
-    private double kF = 0;
-
     private double desiredOutput = 0;
 
-    private Clock mClock;
-
-    private EPIDControlType mPIDType;
-    private ProfileGains mGains;
-
+    /**
+     * Determines whether the output is in velocity mode or position mode
+     */
     public enum EPIDControlType {
         VELOCITY,
         POSITION
@@ -50,49 +49,53 @@ public class ILITEPIDController {
         kF = pGains.F;
 
         MAX_ACCEL = mGains.MAX_ACCEL;
+        mMaximumOutput = mGains.MAX_VELOCITY;
+        mMinimumOutput = -mGains.MAX_VELOCITY;
     }
 
-    public void setDeadband(double pDeadband) {
-        mDeadband = pDeadband;
-    }
-
+    /**
+     * Sets the minimum and maximum allowed input
+     * @param pMinInput the minimum input value accepted
+     * @param pMaxInput the maximum input value accepted
+     */
     public void setInputRange(double pMinInput, double pMaxInput) {
         mMinimumInput = pMinInput;
         mMaximumInput = pMaxInput;
     }
 
+    /**
+     * Sets the minimum and maximum allowed output
+     * @param pMinOutput the minimum output value accepted
+     * @param pMaxOutput the maximum output value accepted
+     */
     public void setOutputRange(double pMinOutput, double pMaxOutput) {
         mMinimumOutput = pMinOutput;
         mMaximumOutput = pMaxOutput;
     }
 
+    /**
+     * Calculates the desired output within the output boundaries
+     * @param measurement the current velocity or position
+     * @param setpoint the desired velocity or position
+     */
     public double calculate(double measurement, double setpoint) {
         setpoint = min(max(setpoint, mMinimumInput), mMaximumInput);
+        double mError = setpoint - measurement;
 
-        mCurrentTime = mClock.getCurrentTimeInMillis();
-        mError = setpoint - measurement;
-
+        double mCurrentTime = mClock.getCurrentTimeInMillis();
         double dT = mCurrentTime - mPreviousTime;
         double dX = Utils.clamp(mError - mPrevError, MAX_ACCEL);
 
-        if (max(min(mMaximumOutput, mError*kP), mMinimumOutput) == mError*kP) {
+        if (max(min(mMaximumOutput, mError *kP), mMinimumOutput) == mError *kP) {
             mTotalError += mError * mClock.dt();
         } else {
             mTotalError = 0;
         }
 
-//        if ( ( mError * mProfileGains.P < mMaximumOutput ) && ( mError * mProfileGains.P > mMinimumOutput ) ) {
-//            mTotalError += mError * mClock.dt();
-//        } else {
-//            mTotalError = 0;
-//        }
-
-        double proportionalError = abs( mError ) < mDeadband ? 0 : mError;
-
-        double proportion = mGains.P * proportionalError;
-        double integral = mGains.I * mTotalError;
-        double derivative = mGains.D * dX/dT;
-        double feedforward = mGains.F * setpoint;
+        double proportion = kP * mError;
+        double integral = kI * mTotalError;
+        double derivative = kD * dX/dT;
+        double feedforward = kF * setpoint;
 
         switch(mPIDType) {
             case VELOCITY:
