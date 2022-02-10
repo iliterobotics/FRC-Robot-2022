@@ -95,7 +95,7 @@ public class VioletDriveModule extends Module {
             .velocityConversion(kDriveNEOPositionFactor);
     public static ProfileGains vPID = new ProfileGains()
             .f(0.00015)
-            .p(0.0001)
+            .p(Settings.kP)
             // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
             .maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
             // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
@@ -257,6 +257,7 @@ public class VioletDriveModule extends Module {
 
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
+        db.drivetrain.set(ACTUAL_HEADING_RADIANS, mGyro.getHeading().getRadians());
         db.drivetrain.set(IS_CURRENT_LIMITING, EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots));
         db.imu.set(EGyro.HEADING_DEGREES, -mGyro.getHeading().getDegrees());
         db.imu.set(EGyro.YAW_OMEGA_DEGREES, mGyro.getYawRate().getDegrees());
@@ -266,6 +267,12 @@ public class VioletDriveModule extends Module {
                 Units.feetToMeters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
 
         Robot.mField.setRobotPose(mOdometry.getPoseMeters());
+        if (db.drivetrain.get(ACTUAL_HEADING_RADIANS) != 0) {
+            db.drivetrain.set(ACTUAL_HEADING_RADIANS, 0);
+        }
+        if (db.drivetrain.get(GET_X_OFFSET_METERS) != 0) {
+            db.drivetrain.set(GET_X_OFFSET_METERS, 0);
+        }
     }
 
     @Override

@@ -128,7 +128,7 @@ public class BaseAutonController extends AbstractController {
         mLeftController.reset();
         mRightController.reset();
 
-        SmartDashboard.putNumber("Trajectory Total Time in Seconds",mTrajectory.getTotalTimeSeconds());
+        SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
     }
     @Override
     protected void updateImpl() {
@@ -142,7 +142,7 @@ public class BaseAutonController extends AbstractController {
      * called multiple times until the robot traverses the entire Trajectory or until autonmous runs out of time.
      */
     private void execute() {
-        SmartDashboard.putNumber("Exec Count",EXEC_COUNT++);
+        SmartDashboard.putNumber("Exec Count", EXEC_COUNT++);
 
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         double curTime = mTimer.get();
@@ -305,8 +305,7 @@ public class BaseAutonController extends AbstractController {
      *  The robot pose represented as {@link Pose2d}
      */
     private Pose2d getRobotPose() {
-//        Rotation2d r2d = new Rotation2d(db.drivetrain.get(EDriveData.ACTUAL_HEADING_RADIANS));
-        Rotation2d r2d = new Rotation2d(0d);
+        Rotation2d r2d = new Rotation2d(db.drivetrain.get(EDriveData.ACTUAL_HEADING_RADIANS));
         Pose2d robotPose = new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET_METERS), db.drivetrain.get(EDriveData.GET_Y_OFFSET_METERS), r2d);
         return robotPose;
     }
