@@ -9,7 +9,7 @@ import org.junit.experimental.categories.Category;
 import us.ilite.CriticalTest;
 import us.ilite.common.Angle;
 import us.ilite.common.Distance;
-import us.ilite.common.Field2020;
+import us.ilite.common.Field2022;
 import us.ilite.common.lib.util.Utils;
 import us.ilite.robot.vision.CameraConfig;
 import us.ilite.robot.vision.Ilite3DSolver;
@@ -33,7 +33,7 @@ public class Ilite3DSovlerTest extends BaseTest{
         for(int i =0 ; i < a.length; i++) {
             Angle thetaT = Angle.fromDegrees(a[i]);
             Angle o = Utils.calculateAngleOffsetY(thetaT, d, offset);
-            boolean inner = Field2020.canHitInnerGoal(thetaT.subtract(o), d);
+            boolean inner = false;//Field2022.canHitInnerGoal(thetaT.subtract(o), d);
             String msg = (inner ? "INNER " : "OUTER ") + "Distance " + nf.format(d.inches()) + " @ " + a[i] + ", Offset = " + nf.format(o.degrees());
             assertEquals("Incorrect Offset Angle: " + msg, nf.format(o.degrees()), nf.format(expected[i]));
             assertEquals("Incorrect Boundary Test: " + msg, inner, goal[i]);
@@ -107,7 +107,7 @@ public class Ilite3DSovlerTest extends BaseTest{
                         result = solve(solver, x1, (flip ?y2:y1), x2, (flip?y1:y2));
                         if(abs(solver.range().inches()) < 12*27) {
                             double inneraz = abs(solver.azimuth().degrees()) - abs(solver.offsetAzimuth().degrees());
-                            String goal = Field2020.canHitInnerGoal(Angle.fromDegrees(inneraz), solver.range()) ? "INNER" : "OUTER";
+                            String goal = "OUTER";//Field2022.canHitInnerGoal(Angle.fromDegrees(inneraz), solver.range()) ? "INNER" : "OUTER";
                             System.out.println(String.format("{e:%.0f,w:%.0f,h:%.0f / (%.0f,%.0f),(%.0f,%.0f)-->\t%s ==> %s}", elevation,targetwidth,targetheight,x1,y1,x2,y2,result,goal));
                         }
                     }
