@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
+import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
