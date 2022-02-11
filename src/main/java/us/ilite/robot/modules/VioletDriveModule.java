@@ -300,12 +300,6 @@ public class VioletDriveModule extends Module {
                 Units.feetToMeters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
 
         Robot.mField.setRobotPose(mOdometry.getPoseMeters());
-        if (db.drivetrain.get(ACTUAL_HEADING_RADIANS) != 0) {
-            db.drivetrain.set(ACTUAL_HEADING_RADIANS, 0);
-        }
-        if (db.drivetrain.get(GET_X_OFFSET_METERS) != 0) {
-            db.drivetrain.set(GET_X_OFFSET_METERS, 0);
-        }
     }
 
     @Override
