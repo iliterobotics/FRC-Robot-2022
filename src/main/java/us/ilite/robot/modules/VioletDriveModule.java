@@ -408,14 +408,6 @@ public class VioletDriveModule extends Module {
     public static Pose2d getPose() {
         return mOdometry.getPoseMeters();
     }
-            case TURN_FOR:
-                double arcLengthFor = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * db.drivetrain.get(DESIRED_TURN_ANGLE_deg) / 360.0;
-
-                mLeftPositionPID.setSetpoint(arcLengthFor);
-                mRightPositionPID.setSetpoint(-arcLengthFor);
-
-                double leftOutputFor = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-                double rightOutputFor = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
 
     /**
      * Resets the odometry to the specified pose.
