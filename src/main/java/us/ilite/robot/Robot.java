@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
+    private BaseAutonController mBaseAutonController;
 
 
     @Override

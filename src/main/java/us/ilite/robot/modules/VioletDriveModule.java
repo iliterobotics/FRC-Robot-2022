@@ -5,6 +5,9 @@ import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
@@ -27,8 +30,6 @@ import us.ilite.robot.hardware.*;
 /**
  * Class for running all drivetrain train control operations from both autonomous and
  * driver-control.
- * TODO Support for rotation trajectories
- * TODO Turn-to-heading with Motion Magic
  */
 public class VioletDriveModule extends Module {
     private final ILog mLogger = Logger.createLog(DriveModule.class);
@@ -77,11 +78,10 @@ public class VioletDriveModule extends Module {
     private static final int SMART_MOTION_PID_SLOT = 3;
 
     private int mStartAngleDeg = 0;
+    private static DifferentialDriveOdometry mOdometry;
+    private static DifferentialDrive mDrive;
 
     public static ProfileGains kPositionGains = new ProfileGains()
-//			.p(5.0e-4)
-//            .maxAccel(5676d)
-
             .f(0.00015)
             .p(0.00000025)
             .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
@@ -96,24 +96,6 @@ public class VioletDriveModule extends Module {
             .maxAccel(1000d)
             .slot(SMART_MOTION_PID_SLOT)
             .velocityConversion(kDriveNEOPositionFactor);
-    public static ProfileGains vPID = new ProfileGains()
-            .f(0.00015)
-            .p(Settings.kP)
-            // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
-            .maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
-            // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
-//			.maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
-            .slot(VELOCITY_PID_SLOT)
-            .velocityConversion(kDriveNEOVelocityFactor)
-            .positionConversion(1d);
-
-//    public static ProfileGains kSmartMotionGains = new ProfileGains()
-//            .p(.00025)
-//            .f(0.00015)
-//            .maxVelocity(kDriveTrainMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
-//            .maxAccel(1000d)
-//            .slot(SMART_MOTION_PID_SLOT)
-//            .velocityConversion(kDriveNEOPositionFactor);
 
     public static ProfileGains kVelocityGains = new ProfileGains()
         .f(0.00015)
@@ -124,14 +106,6 @@ public class VioletDriveModule extends Module {
         .maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
         .slot(VELOCITY_PID_SLOT)
         .velocityConversion(1d);
-    public static  ProfileGains  kPracticeGains = new ProfileGains()
-            .p(Settings.kP)
-            .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
-            .slot(VELOCITY_PID_SLOT)
-            .kS(Settings.kS)
-            .kA(Settings.kA)
-            .kV(Settings.kV);
-
 
     public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 
@@ -235,6 +209,7 @@ public class VioletDriveModule extends Module {
         mRightMaster.burnFlash();
         mRightFollower.burnFlash();
         mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
+        mDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
 
 //		mYawPid = new PIDController(kYawGains,kYawGains.P,
 //				kYawGains.I,
@@ -418,20 +393,6 @@ public class VioletDriveModule extends Module {
         mLeftEncoder.setPosition(0);
         mRightEncoder.setPosition(0);
         mOdometry.resetPosition(pose, mGyro.getHeading());
-                mLeftMaster.set(leftOutputFor);
-                mRightMaster.set(rightOutputFor);
-                break;
-            case TURN_TO:
-                double arcLengthTo = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * (db.drivetrain.get(DESIRED_TURN_ANGLE_deg) - mStartAngleDeg) / 360.0;
-
-                mLeftPositionPID.setSetpoint(arcLengthTo);
-                mRightPositionPID.setSetpoint(-arcLengthTo);
-
-                double leftOutputTo = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-                double rightOutputTo = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-
-                mLeftMaster.set(leftOutputTo);
-                mRightMaster.set(rightOutputTo);
     }
 
     private void reset() {
