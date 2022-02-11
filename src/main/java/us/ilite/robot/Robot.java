@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
-import us.ilite.common.Field2020;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
@@ -71,16 +70,15 @@ public class Robot extends TimedRobot {
 
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
-        mDrive = new VioletDriveModule();
+        mViolet = new VioletDriveModule();
         //practice = TrajectoryCommandUtils.buildTrajectoryCommand(mDrive, PracticeTrajectory.runStraight());
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-        mViolet = new VioletDriveModule();
         mShooter = new FlywheelModule();
-        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
+      //  mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
         mLEDControl = new LEDControl();
         if(IS_SIMULATED) {

@@ -37,7 +37,7 @@ public class LimelightTargetLock extends TargetLock {
     public void shutdown(double pNow) {
         super.shutdown(pNow);
         mLog.warn("SHUT DOWN LIMELIGHT TARGET LOCK");
-        Robot.DATA.goaltracking.set(EVisionGoal2020.TARGET_ID , (double)Limelight.NONE.id());
+       // Robot.DATA.goaltracking.set(EVisionGoal2020.TARGET_ID , (double)Limelight.NONE.id());
     }
 
 }
