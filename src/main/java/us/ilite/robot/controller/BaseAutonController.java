@@ -141,7 +141,7 @@ public class BaseAutonController extends AbstractController {
      * a sequence of execution between some delta time from the previous execution. This method is expected to be
      * called multiple times until the robot traverses the entire Trajectory or until autonmous runs out of time.
      */
-    private void execute() {
+    public void execute() {
         SmartDashboard.putNumber("Exec Count", EXEC_COUNT++);
 
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
