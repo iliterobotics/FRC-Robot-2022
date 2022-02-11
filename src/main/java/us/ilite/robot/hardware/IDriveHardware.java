@@ -1,10 +1,7 @@
 package us.ilite.robot.hardware;
 
-import us.ilite.robot.modules.DriveMessage;
-
 public interface IDriveHardware extends IHardware {
 
-    void set(DriveMessage pDriveMessage);
     void configureMode(ECommonControlMode pControlMode);
 
     void setImu(IMU pImu);

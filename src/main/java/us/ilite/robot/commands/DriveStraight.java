@@ -12,10 +12,8 @@ import static us.ilite.common.types.sensor.EGyro.HEADING_DEGREES;
 
 import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.robot.Robot;
-import us.ilite.robot.hardware.ECommonControlMode;
 import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.modules.DriveModule;
-import us.ilite.robot.modules.DriveMessage;
 
 
 /**
@@ -23,6 +21,7 @@ import us.ilite.robot.modules.DriveMessage;
  * Acceleration/deceleration can be controlled using either a custom implementation relying on
  * % output or the Talon's motion magic control mode.
  */
+@Deprecated
 public class DriveStraight implements ICommand {
 
     private final EDriveControlMode mDriveControlMode;
@@ -39,7 +38,7 @@ public class DriveStraight implements ICommand {
     private PIDController mHeadingController = new PIDController(
             DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
 
-    private ProfiledPIDController mDistanceController = DriveModule.dPID.generateController();
+    private ProfiledPIDController mDistanceController = DriveModule.positionPID.getPIDGains().generateController();
 
     public DriveStraight(EDriveControlMode pDriveControlMode, Distance pDistanceToDrive) {
         mDistanceToDrive = pDistanceToDrive;
@@ -85,10 +84,7 @@ public class DriveStraight implements ICommand {
         if(mDistanceController.atSetpoint()) {
             return true;
         } else {
-            DriveMessage d = new DriveMessage().throttle(throttle).turn(turn).normalize();
             Robot.DATA.drivetrain.set(NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
-            Robot.DATA.drivetrain.set(DESIRED_THROTTLE_PCT, d.getThrottle());
-            Robot.DATA.drivetrain.set(DESIRED_TURN_PCT, d.getTurn());
             mLastTime = pNow;
             return false;
         }

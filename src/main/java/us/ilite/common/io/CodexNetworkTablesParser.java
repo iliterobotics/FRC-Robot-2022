@@ -105,14 +105,14 @@ public class CodexNetworkTablesParser<E extends Enum<E> & CodexOf<Double>> {
             dir = ROBOT_DIR;
         }
 
-        String eventName = DriverStation.getInstance().getEventName();
+        String eventName = DriverStation.getEventName();
         if ( eventName.length() <= 0 ) {
             eventName = "Default-Event";
         }
         return new File(String.format( dir + LOG_PATH_FORMAT,
                 eventName,
-                DriverStation.getInstance().getMatchType().name(),
-                Integer.toString(DriverStation.getInstance().getMatchNumber()),
+                DriverStation.getMatchType().name(),
+                Integer.toString(DriverStation.getMatchNumber()),
                 mCodex.meta().getEnum().getSimpleName()
         ));
     }
