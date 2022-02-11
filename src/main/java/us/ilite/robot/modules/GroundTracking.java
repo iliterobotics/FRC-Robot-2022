@@ -43,10 +43,10 @@ public class GroundTracking extends Module {
                 }
             }
 
-            Robot.DATA.groundTracking.set(EVisionGoal2020.TX, Robot.DATA.rawLimelight.get(getEnumFromString("TX_" + mSelectedTarget)) * (Limelight.llFOVHorizontal / 2));
-            Robot.DATA.groundTracking.set(EVisionGoal2020.TY, Robot.DATA.rawLimelight.get(getEnumFromString("TY_" + mSelectedTarget)) * (Limelight.llFOVVertical / 2));
-            Robot.DATA.groundTracking.set(EVisionGoal2020.TS, Robot.DATA.rawLimelight.get(getEnumFromString("TS_" + mSelectedTarget)));
-            Robot.DATA.groundTracking.set(EVisionGoal2020.TL, Robot.DATA.rawLimelight.get(TL));
+//            Robot.DATA.groundTracking.set(EVisionGoal2020.TX, Robot.DATA.rawLimelight.get(getEnumFromString("TX_" + mSelectedTarget)) * (Limelight.llFOVHorizontal / 2));
+//            Robot.DATA.groundTracking.set(EVisionGoal2020.TY, Robot.DATA.rawLimelight.get(getEnumFromString("TY_" + mSelectedTarget)) * (Limelight.llFOVVertical / 2));
+//            Robot.DATA.groundTracking.set(EVisionGoal2020.TS, Robot.DATA.rawLimelight.get(getEnumFromString("TS_" + mSelectedTarget)));
+//            Robot.DATA.groundTracking.set(EVisionGoal2020.TL, Robot.DATA.rawLimelight.get(TL));
             if (abs(mLastXPosition - Robot.DATA.groundTracking.get(EVisionGoal2020.TX)) > mAcceptableXError || abs(mLastYPosition - Robot.DATA.groundTracking.get(EVisionGoal2020.TY)) > mAcceptableYError) {
                 mIsTracking = false;
             }
