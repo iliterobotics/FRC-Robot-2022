@@ -3,6 +3,7 @@ package us.ilite.robot.controller;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.modules.DriveMessage;
 import static us.ilite.robot.Enums.*;
 
@@ -22,17 +23,33 @@ public abstract class BaseManualController extends AbstractController {
     void updateDrivetrain() {
         double throttle = db.driverinput.get(THROTTLE_AXIS);
         double rotate = db.driverinput.get(TURN_AXIS) * 0.75;
+
+        double left = db.driverinput.get(ELogitech310.LEFT_Y_AXIS);
+        double right = db.driverinput.get(ELogitech310.RIGHT_Y_AXIS);
+
         rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
-        rotate = Math.abs(rotate) > 0.075 ? rotate : 0.0; //Handling Deadband
+        rotate = Math.abs(rotate) > 0.05 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.1 ? throttle : 0.0; //Handling Deadband
 
-        SmartDashboard.putNumber("throttle value", throttle);
-        SmartDashboard.putNumber("turn value", rotate);
+        left = Math.abs(left) > 0.005 ? left : 0.0;
+        right = Math.abs(right) > 0.005 ? right : 0.0;
 
         if (rotate == 0d && throttle == 0d) {
             mCyclesHolding++;
         } else {
             mCyclesHolding = 0;
+        }
+
+        if (left == 0 && right == 0) {
+            mCyclesHolding++;
+        } else {
+            mCyclesHolding = 0;
+        }
+
+        if (mCyclesHolding > 60) {
+            db.drivetrain.set(STATE, EDriveState.HOLD);
+            db.drivetrain.set(DESIRED_LEFT_PCT, left);
+            db.drivetrain.set(DESIRED_RIGHT_PCT, right);
         }
 
         if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
