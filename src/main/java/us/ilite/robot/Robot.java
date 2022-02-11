@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger;
-   // private HangerModule mHanger;
+    private ClimberModule mHanger;
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;

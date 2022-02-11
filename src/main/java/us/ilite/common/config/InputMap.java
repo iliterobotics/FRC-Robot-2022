@@ -15,7 +15,8 @@ public class InputMap {
      * Snail mode - R trigger
      * Hanger lock - start
      * Ground track - A
-     * Fire power cells - L trigger
+     * Hanger move forwards - R button
+     * Hanger move reverse - L button
      *
      *
      * Operator
@@ -39,7 +40,9 @@ public class InputMap {
         THROTTLE_AXIS = ELogitech310.LEFT_Y_AXIS,
         SNAIL_MODE = ELogitech310.RIGHT_TRIGGER_AXIS,
         HOME_TO_DRIVER_STATION = ELogitech310.Y_BTN,
-        DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.B_BTN;
+        DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.B_BTN,
+        HANGER_MOVE_FORWARDS = ELogitech310.R_BTN,
+        HANGER_MOVE_REVERSE = ELogitech310.L_BTN;
 
 //        HANGER_LOCK = ELogitech310.START,
 //        GROUND_TRACK = ELogitech310.A_BTN,

@@ -1,34 +1,40 @@
 package us.ilite.robot.modules;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.revrobotics.*;
 import edu.wpi.first.math.controller.PIDController;
+import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EHangerModuleData;
+import us.ilite.robot.hardware.Clock;
 import us.ilite.robot.hardware.SparkMaxFactory;
+import us.ilite.robot.hardware.TalonSRXFactory;
 
 import java.io.IOException;
 
 public class ClimberModule extends Module{
-
-    private CANSparkMax mSparkMaxOne;
+    private TalonFX mLeftFalcon;
+    private TalonFX mRightFalcon;
     private RelativeEncoder mEncoderSparkMaxOne;
-    private PIDController mHangerPid;
+    private ILITEPIDController mPidController;
     private ProfileGains kHangerProfile;
-    private double maxVelocity;
-    private double minVelocity;
+    private Clock mClock = new Clock();
     private final RobotCodex<EHangerModuleData>mHangerModule;
 
     public ClimberModule() {
-        mSparkMaxOne = SparkMaxFactory.createDefaultSparkMax(9, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mEncoderSparkMaxOne = mSparkMaxOne.getEncoder();
-        kHangerProfile = new ProfileGains().p(.001).i(0).d(0);
-        //mHangerPid = new PIDController(kHangerProfile, -maxVelocity, minVelocity, clock.dt());
+        kHangerProfile = new ProfileGains().p(.0001).i(0).d(0);
+        mPidController = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kHangerProfile, mClock);
+        mPidController.setOutputRange(-6380, 6380);
+        mPidController.setInputRange(-100, 100);
+        mLeftFalcon = new TalonFX(16);
+        mRightFalcon = new TalonFX(17);
         mHangerModule = db.hanger;
     }
 
-    ClimberModule(CANSparkMax pSparkMaxOne, RobotCodex<EHangerModuleData>hangerModule, RelativeEncoder pEncoderSparkMaxOne) {
-        mSparkMaxOne = pSparkMaxOne;
+    ClimberModule(TalonFX pFalconOne, RobotCodex<EHangerModuleData>hangerModule, RelativeEncoder pEncoderSparkMaxOne) {
+        mLeftFalcon = pFalconOne;
         mHangerModule = hangerModule;
         mEncoderSparkMaxOne = pEncoderSparkMaxOne;
 
@@ -40,11 +46,13 @@ public class ClimberModule extends Module{
         } catch(Exception e) {
             e.printStackTrace();
         }
+        db.hanger.set(EHangerModuleData.L_VEL_rpm, mLeftFalcon.getSelectedSensorPosition());
+        db.hanger.set(EHangerModuleData.R_VEL_rpm, mRightFalcon.getSelectedSensorPosition());
     }
 
     @Override
     public void setOutputs() {
-        mSparkMaxOne.set(mHangerModule.get(EHangerModuleData.SET_pct));
-        //double desiredVelocity = mHangerPid.
+        mLeftFalcon.set(ControlMode.Velocity, mPidController.calculate(db.hanger.get(EHangerModuleData.L_VEL_rpm), db.hanger.get(EHangerModuleData.L_DESIRED_VEL)));
+        mRightFalcon.set(ControlMode.Velocity, mPidController.calculate(db.hanger.get(EHangerModuleData.R_VEL_rpm), db.hanger.get(EHangerModuleData.R_DESIRED_VEL)));
     }
 }

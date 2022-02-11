@@ -1,5 +1,6 @@
 package us.ilite.robot.modules;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -15,16 +16,16 @@ import static org.mockito.Mockito.*;
 public class ClimberModuleTest {
 
     private ClimberModule mClimber;
-    private CANSparkMax mMockedCANSparkMax;
+    private TalonFX mMockedTalonFX;
     private RobotCodex<EHangerModuleData> mHangerModule;
     private RelativeEncoder mMockedRelativeEncoder;
 
     @Before
     public void setup() {
-        mMockedCANSparkMax = mock(CANSparkMax.class);
+        mMockedTalonFX = mock(TalonFX.class);
         mHangerModule = mock(RobotCodex.class);
         mMockedRelativeEncoder = mock(RelativeEncoder.class);
-        mClimber = new ClimberModule(mMockedCANSparkMax, mHangerModule, mMockedRelativeEncoder);
+        mClimber = new ClimberModule(mMockedTalonFX, mHangerModule, mMockedRelativeEncoder);
     }
 
     @Test
