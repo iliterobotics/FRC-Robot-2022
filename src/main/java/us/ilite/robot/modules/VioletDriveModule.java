@@ -266,9 +266,8 @@ public class VioletDriveModule extends Module {
         reset();
         System.err.println(" ==== DRIVE MAX ACCEL (RPM): " + (kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4));
         resetOdometry(TrajectoryCommandUtils.getJSONTrajectory().getInitialPose());
-        initialXPosition = mOdometry.getPoseMeters().getX();
-        initialYPosition = mOdometry.getPoseMeters().getY();
-
+        SmartDashboard.putNumber("Odometry init posX", mOdometry.getPoseMeters().getX());
+        SmartDashboard.putNumber("Odometry init posY", mOdometry.getPoseMeters().getY());
     }
 
     @Override
@@ -285,8 +284,13 @@ public class VioletDriveModule extends Module {
         db.drivetrain.set(R_ACTUAL_VEL_RPM, mRightEncoder.getVelocity() * kGearboxRatio);
         db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getOutputCurrent());
         db.drivetrain.set(RIGHT_CURRENT, mRightMaster.getOutputCurrent());
-        db.drivetrain.set(GET_X_OFFSET_METERS, mOdometry.getPoseMeters().getX() - initialXPosition);
-        db.drivetrain.set(GET_Y_OFFSET_METERS, mOdometry.getPoseMeters().getY() - initialYPosition);
+        double odoX = mOdometry.getPoseMeters().getX();
+        double odoY = mOdometry.getPoseMeters().getY();
+        db.drivetrain.set(GET_X_OFFSET_METERS, odoX);
+        db.drivetrain.set(GET_Y_OFFSET_METERS, odoY);
+        SmartDashboard.putNumber("Odometry posX", odoX);
+        SmartDashboard.putNumber("Odometry posY", odoY);
+
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(ACTUAL_HEADING_RADIANS, mGyro.getHeading().getRadians());
