@@ -185,6 +185,12 @@ public class VioletDriveModule extends Module {
     }
 
     public VioletDriveModule() {
+        SmartDashboard.putNumber("Odometry posX", -1);
+        SmartDashboard.putNumber("Odometry posY", -1);
+        SmartDashboard.putNumber("Odometry init posX", -1);
+        SmartDashboard.putNumber("Odometry init posY", -1);
+
+
         mLeftMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveLeftMaster, kDriveConfig);
         mLeftFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveLeftFollower, kDriveConfig);
         mLeftFollower.follow(mLeftMaster);
