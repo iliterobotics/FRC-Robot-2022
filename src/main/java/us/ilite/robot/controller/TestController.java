@@ -49,7 +49,7 @@ public class TestController extends BaseManualController {
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        clock.report("updateDrivetrain", t -> updateDrivetrain());
+        clock.report("updateDrivetrain", t -> updateDrivetrain(true));
 
         double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
         mMaxSpeed = Math.max(mMaxSpeed, spd);

@@ -100,12 +100,21 @@ public class VioletDriveModule extends Module {
     public static ProfileGains kVelocityGains = new ProfileGains()
         .f(0.00015)
         .p(0.00000025)
-        // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
+        .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier);
+
+    public static ProfileGains vGains = new ProfileGains()
+        .p(0.0001)
+        .f(0.0001)
         .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
-        // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
-        .maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
-        .slot(VELOCITY_PID_SLOT)
-        .velocityConversion(1d);
+        .maxAccel(1000);
+        ;
+
+    public static ProfileGains kTankGains = new ProfileGains()
+        .p(0.00000025)
+        .f(0.00015)
+        .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
+        ;
+
 
     public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 
@@ -147,6 +156,10 @@ public class VioletDriveModule extends Module {
     private PIDController mLeftPositionPID;
     private PIDController mRightPositionPID;
 
+    private PIDController mLeftTankPID;
+    private PIDController mRightTankPID;
+
+    private ILITEPIDController mVelocityPID;
 
     private double mLeftHoldSetpoint;
     private double mRightHoldSetpoint;
@@ -199,6 +212,11 @@ public class VioletDriveModule extends Module {
         mLeftPositionPID = new PIDController( kPositionGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
         mRightPositionPID = new PIDController( kPositionGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
 
+        mLeftTankPID = new PIDController(kTankGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
+        mRightTankPID = new PIDController(kTankGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
+
+        mVelocityPID = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, vGains, clock);
+
         //TODO - we want to do use our conversion factor calculated above, but that requires re-turning of F & P
         mLeftEncoder.setPositionConversionFactor(1d);
         mLeftEncoder.setVelocityConversionFactor(1d);
@@ -246,6 +264,9 @@ public class VioletDriveModule extends Module {
         mRightPositionPID.setSetpoint(0);
         mRightPositionPID.reset();
         mRightPositionPID.setDeadband(Settings.Input.kInputDeadbandF310Joystick);
+
+        mVelocityPID.setInputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
+        mVelocityPID.setOutputRange(-Settings.Input.kMaxAllowedVelocityMultiplier, Settings.Input.kMaxAllowedVelocityMultiplier);
 
         mStartHoldingPosition = false;
 
@@ -354,6 +375,11 @@ public class VioletDriveModule extends Module {
                 double vLeft = mLeftVelocityPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
                 double vRight = mRightVelocityPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
 
+//                double vLeft = mLeftVelocityPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM),
+//                                                            (throttle+turn) * kDriveTrainMaxVelocityRPM* Settings.Input.kMaxAllowedVelocityMultiplier);
+//                double vRight = mLeftVelocityPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM),
+//                        (throttle-turn) * kDriveTrainMaxVelocityRPM* Settings.Input.kMaxAllowedVelocityMultiplier);
+
                 mLeftMaster.set(vLeft);
                 mRightMaster.set(vRight);
                 break;
@@ -412,11 +438,11 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set(rightOutputHome);
                 break;
             case TANK:
-                mLeftVelocityPID.setSetpoint((left)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
-                mRightVelocityPID.setSetpoint((right)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
+                mLeftTankPID.setSetpoint((left)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
+                mRightTankPID.setSetpoint((right)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
 
-                double vLeftTank = mLeftVelocityPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
-                double vRightTank = mRightVelocityPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
+                double vLeftTank = mLeftTankPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
+                double vRightTank = mRightTankPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
 
                 mLeftMaster.set(vLeftTank);
                 mRightMaster.set(vRightTank);

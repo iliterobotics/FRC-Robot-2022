@@ -35,7 +35,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
         //updateLimelightTargetLock(); //waiting for merge to master
-        super.updateDrivetrain();
+        super.updateDrivetrain(false);
 //        updateHanger(); //not integrated yet
     }
 
