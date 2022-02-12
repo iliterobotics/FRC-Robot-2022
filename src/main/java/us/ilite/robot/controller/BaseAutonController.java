@@ -171,6 +171,29 @@ public class BaseAutonController extends AbstractController {
         double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dT);
         double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dT);
 
+        List<Object>data = new ArrayList<>();
+        data.add(sample.poseMeters.getX());
+        data.add(sample.poseMeters.getY());
+        data.add(sample.poseMeters.getRotation().getDegrees());
+        data.add(robotPose.getX());
+        data.add(robotPose.getY());
+        data.add(robotPose.getRotation().getDegrees());
+        data.add(targetWheelSpeeds.leftMetersPerSecond);
+        data.add(targetWheelSpeeds.rightMetersPerSecond);
+
+        StringBuilder str = new StringBuilder("BaseAutonController::start: ");
+        boolean first = true;
+        for(Object anObj : data) {
+            if(!first) {
+                str.append(",");
+            }
+            first = false;
+            str.append(anObj);
+        }
+        str.append(",end");
+
+        System.out.println(str.toString());
+
         output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
         output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
 
