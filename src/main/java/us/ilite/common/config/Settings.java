@@ -40,28 +40,33 @@ public class Settings {
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
-            public static final int kDriveRightMaster = 1;
-            public static final int kDriveRightFollower = 2;
-            public static final int kDriveLeftMaster = 3;
-            public static final int kDriveLeftFollower = 4;
-            // TODO - double check that this is correct when the robot is right-side-up.
-            public static final int kMAXHanger1_left = 5;
-            public static final int kMAXHanger2_right = 6;
-            public static final int kMAXIntakeRollerId = 7;
-            public static final int kMAXIntakeArm = 8;
-            public static final int kSRXTurretId = 9;
-            public static final int kMAXFeederId = 10;
-            public static final int kTalonPowerCellSerializer = 11;
-            public static final int kTalonVerticalID = 12;
-            public static final int kFalconMasterId = 13;
-            public static final int kFalconFollowerId = 14;
-            public static final int kDJSpinnerVictorID = 15;
+            // Drivetrain
+            public static final int kDTMR2 = 2;
+            public static final int kDTR4 = 4;
+            public static final int kDTML1 = 1;
+            public static final int kDTL3 = 3;
+            public static final int kPigeon = 30;
+            public static final int kEDTML1 = 4; // RoboRIO port 4
+            public static final int kEDTMR2 = 1; // RoboRIO port 1
 
-            public static final int kPDP = 20;
-            public static final int kPigeon = 21;
+            // Intake
+            public static final int kINRoller = 9;
+            public static final int kINEntryBeam = 9;
 
+
+            // Feeder
+            public static final int kINFeeder = 10;
+            public static final int kINExitBeam = 10;
+
+            // Climber
+            public static final int kCLM1 = 11;
+            public static final int kCL2 = 12;
+
+
+            // LED
             public static int kLEDControlCanifier = 40;
         }
+
 
         public static class Analog {
         }
@@ -77,7 +82,12 @@ public class Settings {
             public static final int kHoodServoId = 9;
         }
 
-        public static class PCM {
+        public static class PCH {
+            public static final int kINPNIntake1 = 1; // TODO Maybe find better name for the 2 ports of the same solenoid
+            public static final int kINPNIntake2 = 2;
+            public static final int kINPNFeeder = 3;
+            public static final int kCLPNClimb1 = 4;
+            public static final int kCLPNClimb2 = 5;
         }
 
     }

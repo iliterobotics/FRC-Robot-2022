@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
@@ -166,13 +165,13 @@ public class VioletDriveModule extends Module {
     }
 
     public VioletDriveModule() {
-        mLeftMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveLeftMaster, kDriveConfig);
-        mLeftFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveLeftFollower, kDriveConfig);
+        mLeftMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDTML1, kDriveConfig);
+        mLeftFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDTL3, kDriveConfig);
         mLeftFollower.follow(mLeftMaster);
         mLeftEncoder = mLeftMaster.getEncoder();
 
-        mRightMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveRightMaster, kDriveConfig);
-        mRightFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveRightFollower, kDriveConfig);
+        mRightMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDTMR2, kDriveConfig);
+        mRightFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDTR4, kDriveConfig);
         mRightFollower.follow(mRightMaster);
         mRightEncoder = mRightMaster.getEncoder();
         mRightMaster.setInverted(true);
