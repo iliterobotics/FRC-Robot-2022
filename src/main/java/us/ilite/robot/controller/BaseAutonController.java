@@ -149,10 +149,10 @@ public class BaseAutonController extends AbstractController {
         }
 
         double target_speed_meters_per_second = 20;
-        if(!isFinished()) {
+//        if(!isFinished()) {
             DifferentialDriveWheelSpeeds targetWheelSpeeds = new DifferentialDriveWheelSpeeds(target_speed_meters_per_second,target_speed_meters_per_second);
             perform_execute(curTime,dT,calculateActualSpeeds(),targetWheelSpeeds);
-        }
+//        }
     }
     /**
      * Method to perform the actual traversal. This should run a single step. A step will be defined as
