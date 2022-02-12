@@ -26,7 +26,7 @@ public class TrajectoryCommandUtils {
 
 
     public static Trajectory getJSONTrajectory() {
-        String trajectoryJSON = "paths/StraightRun.wpilib.json";
+        String trajectoryJSON = "paths/Unnamed.wpilib.json";
         Trajectory trajectory = new Trajectory();
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
