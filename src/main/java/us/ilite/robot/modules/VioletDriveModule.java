@@ -100,7 +100,8 @@ public class VioletDriveModule extends Module {
     public static ProfileGains kVelocityGains = new ProfileGains()
         .f(0.00015)
         .p(0.00000025)
-        .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier);
+        .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
+        .maxAccel(0.0005);
 
     public static ProfileGains vGains = new ProfileGains()
         .p(0.0001)
@@ -272,6 +273,12 @@ public class VioletDriveModule extends Module {
 
         reset();
         System.err.println(" ==== DRIVE MAX ACCEL (RPM): " + (kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4));
+
+        mLeftMaster.setClosedLoopRampRate(0.2);
+        mLeftFollower.setClosedLoopRampRate(0.2);
+
+        mRightMaster.setClosedLoopRampRate(0.2);
+        mRightFollower.setClosedLoopRampRate(0.2);
     }
 
     @Override
