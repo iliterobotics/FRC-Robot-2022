@@ -130,11 +130,6 @@ public class BaseAutonController extends AbstractController {
     }
     @Override
     protected void updateImpl() {
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
         execute();
     }
     private static int EXEC_COUNT = 1;
@@ -195,15 +190,12 @@ public class BaseAutonController extends AbstractController {
         data.add(actualSpeeds.leftMetersPerSecond);
         data.add(actualSpeeds.rightMetersPerSecond);
 
-<<<<<<< Updated upstream
-=======
         double estAccelLeft = (actualSpeeds.leftMetersPerSecond - mPrevSpeeds.leftMetersPerSecond)/dT;
         double estAccelRight = (actualSpeeds.rightMetersPerSecond - mPrevSpeeds.rightMetersPerSecond)/dT;
 
         data.add(estAccelLeft);
         data.add(estAccelRight);
 
->>>>>>> Stashed changes
         CSVToLogFile.getInstance().logCSVData(data,this.getClass());
 
         perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds);
@@ -352,11 +344,7 @@ public class BaseAutonController extends AbstractController {
     public boolean isFinished() {
         return mTimer.hasElapsed(mTrajectory.getTotalTimeSeconds());
     }
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
-
+    
     /**
      * Method to stop
      * @param interrupted
