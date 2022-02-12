@@ -322,11 +322,7 @@ public class VioletDriveModule extends Module {
         if(mode == null) return;
         double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
         double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
-
-        if(db.drivetrain.get(L_ACTUAL_VEL_FT_s) < 9) {
-            mLeftMaster.set(1.0d);
-            mRightMaster.set(1.0d);
-        }
+        
         switch (mode) {
             case RESET:
                 reset();
