@@ -121,12 +121,7 @@ public class BaseAutonController extends AbstractController {
 //        mTrajectory = trajectory.transformBy(transform);
         System.out.println(mTrajectory.getInitialPose());
         initialState = mTrajectory.sample(0);
-        mPrevSpeeds =
-                mDriveKinematics.toWheelSpeeds(
-                        new ChassisSpeeds(
-                                initialState.velocityMetersPerSecond,
-                                0,
-                                initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
+        mPrevSpeeds = new DifferentialDriveWheelSpeeds(0,0);
         mLeftController.reset();
         mRightController.reset();
 
