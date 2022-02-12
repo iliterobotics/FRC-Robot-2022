@@ -7,6 +7,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -87,6 +88,7 @@ public class BaseAutonController extends AbstractController {
      *
      */
     private UUID mID;
+    private Trajectory.State initialState;
 
     /**
      * Default constructor. This will instantiate the variables that are not dependent on the init
@@ -118,7 +120,7 @@ public class BaseAutonController extends AbstractController {
 //        Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
 //        mTrajectory = trajectory.transformBy(transform);
         System.out.println(mTrajectory.getInitialPose());
-        var initialState = mTrajectory.sample(0);
+        initialState = mTrajectory.sample(0);
         mPrevSpeeds =
                 mDriveKinematics.toWheelSpeeds(
                         new ChassisSpeeds(
@@ -299,9 +301,11 @@ public class BaseAutonController extends AbstractController {
      *  The robot pose represented as {@link Pose2d}
      */
     private Pose2d getRobotPose() {
+
+        double absX = initialState.poseMeters.getX() + db.drivetrain.get(EDriveData.GET_X_OFFSET_METERS);
+        double absY = initialState.poseMeters.getY() + db.drivetrain.get(EDriveData.GET_Y_OFFSET_METERS);
         Rotation2d r2d = new Rotation2d(db.drivetrain.get(EDriveData.ACTUAL_HEADING_RADIANS));
-        Pose2d robotPose =
-                new Pose2d(db.drivetrain.get(EDriveData.GET_X_OFFSET_METERS), db.drivetrain.get(EDriveData.GET_Y_OFFSET_METERS), r2d);
+        Pose2d robotPose = new Pose2d(new Translation2d(absX,absY),r2d);
 
         return robotPose;
     }
