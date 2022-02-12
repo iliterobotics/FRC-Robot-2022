@@ -182,6 +182,8 @@ public class BaseAutonController extends AbstractController {
         data.add(robotPose.getRotation().getDegrees());
         data.add(targetWheelSpeeds.leftMetersPerSecond);
         data.add(targetWheelSpeeds.rightMetersPerSecond);
+        data.add(actualSpeeds.leftMetersPerSecond);
+        data.add(actualSpeeds.rightMetersPerSecond);
 
         StringBuilder str = new StringBuilder("BaseAutonController::start: ");
         boolean first = true;
