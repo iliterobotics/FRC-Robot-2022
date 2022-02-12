@@ -101,6 +101,7 @@ public class BaseAutonController extends AbstractController {
         mLeftController = new PIDController(Settings.kP, 0, 0);
         mTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
+        SmartDashboard.putNumber("trajectory-seconds",-1);
     }
 
     /**
@@ -135,6 +136,7 @@ public class BaseAutonController extends AbstractController {
     private static boolean HAS_FINISHED = false;
 
     public void execute_simple_deadreckon() {
+        SmartDashboard.putNumber("trajectory-seconds",mTrajectory.getTotalTimeSeconds());
         double curTime = mTimer.get();
         double dT = curTime - mPrevTime;
 
