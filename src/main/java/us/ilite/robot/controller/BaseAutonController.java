@@ -146,7 +146,7 @@ public class BaseAutonController extends AbstractController {
             return;
         }
 
-        double target_speed_meters_per_second = 3;
+        double target_speed_meters_per_second = 20;
         if(!isFinished()) {
             DifferentialDriveWheelSpeeds targetWheelSpeeds = new DifferentialDriveWheelSpeeds(target_speed_meters_per_second,target_speed_meters_per_second);
             perform_execute(curTime,dT,calculateActualSpeeds(),targetWheelSpeeds);
