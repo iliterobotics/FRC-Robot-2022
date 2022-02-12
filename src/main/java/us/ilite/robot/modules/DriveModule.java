@@ -111,6 +111,7 @@ public class DriveModule extends Module {
 
 	@Override
 	public void readInputs() {
+		//convert from raw sensor velocity inputs to feet per second
 		double rawLeftVelocity = mLeftMaster.getSelectedSensorVelocity();
 		double rpsLeft = (rawLeftVelocity / 2048) / 1000;
 		double feetPerSecondLeft = rpsLeft / kWheelCircumferenceFeet;

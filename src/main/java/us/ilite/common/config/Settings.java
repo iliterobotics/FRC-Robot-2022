@@ -56,8 +56,6 @@ public class Settings {
             public static final int kFalconMasterId = 13;
             public static final int kFalconFollowerId = 14;
             public static final int kDJSpinnerVictorID = 15;
-            public static final int kClimberLeft = 16;
-            public static final int kClimberRight = 17;
 
             public static final int kPDP = 20;
             public static final int kPigeon = 21;
@@ -73,8 +71,6 @@ public class Settings {
             public static final int kSecondaryBeamChannel = 8; // Change later
             public static final int kExitBeamChannel = 7; // Change later
             public static final int kAnglerID = 8; // BunnyBot Catapult
-
-            public static final int kHangerBeamChanne = 10; //change later
         }
 
         public static class PWM {

@@ -41,8 +41,7 @@ public class InputMap {
         SNAIL_MODE = ELogitech310.RIGHT_TRIGGER_AXIS,
         HOME_TO_DRIVER_STATION = ELogitech310.Y_BTN,
         DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.B_BTN,
-        HANGER_MOVE_FORWARDS = ELogitech310.R_BTN,
-        HANGER_MOVE_REVERSE = ELogitech310.L_BTN;
+        HANGER_EXECUTE = ELogitech310.R_BTN;
 
 //        HANGER_LOCK = ELogitech310.START,
 //        GROUND_TRACK = ELogitech310.A_BTN,
