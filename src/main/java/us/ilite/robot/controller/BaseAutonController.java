@@ -133,6 +133,23 @@ public class BaseAutonController extends AbstractController {
     }
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;
+
+    public void execute_simple_deadreckon() {
+        double curTime = mTimer.get();
+        double dT = curTime - mPrevTime;
+
+        if (mPrevTime < 0) {
+            updateDriveTrain(new ImmutablePair<Double,Double>(0d,0d));
+            mPrevTime = curTime;
+            return;
+        }
+
+        double target_speed_meters_per_second = 3;
+        if(!isFinished()) {
+            DifferentialDriveWheelSpeeds targetWheelSpeeds = new DifferentialDriveWheelSpeeds(target_speed_meters_per_second,target_speed_meters_per_second);
+            perform_execute(curTime,dT,calculateActualSpeeds(),targetWheelSpeeds);
+        }
+    }
     /**
      * Method to perform the actual traversal. This should run a single step. A step will be defined as
      * a sequence of execution between some delta time from the previous execution. This method is expected to be
@@ -140,7 +157,12 @@ public class BaseAutonController extends AbstractController {
      */
     public void execute() {
 
-        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
+        if(true) {
+            execute_simple_deadreckon();
+            return;
+        }
+
+
         double curTime = mTimer.get();
         double dT = curTime - mPrevTime;
 
@@ -155,57 +177,23 @@ public class BaseAutonController extends AbstractController {
         Trajectory.State sample = mTrajectory.sample(curTime);
 
         DifferentialDriveWheelSpeeds targetWheelSpeeds = getTargetWheelSpeeds(sample, robotPose);
-
-        MutablePair<Double,Double> output = new MutablePair<>();
-
         DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds();
-
         logDataToSmartDashboard(dt, sample, targetWheelSpeeds, actualSpeeds);
+
+        perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds);
+    }
+
+    private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds, DifferentialDriveWheelSpeeds targetWheelSpeeds) {
+        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
+        MutablePair<Double,Double> output = new MutablePair<>();
 
         double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
         double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
-
-//        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dT);
-//        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dT);
-
-        double leftFeedforward = 0;
-        double rightFeedforward = 0;
+        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dT);
+        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dT);
 
         output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
         output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
-
-        List<Object>data = new ArrayList<>();
-        data.add(curTime);
-        data.add(sample.poseMeters.getX());
-        data.add(sample.poseMeters.getY());
-        data.add(sample.poseMeters.getRotation().getDegrees());
-        data.add(robotPose.getX());
-        data.add(robotPose.getY());
-        data.add(robotPose.getRotation().getDegrees());
-        data.add(targetWheelSpeeds.leftMetersPerSecond);
-        data.add(targetWheelSpeeds.rightMetersPerSecond);
-        data.add(actualSpeeds.leftMetersPerSecond);
-        data.add(actualSpeeds.rightMetersPerSecond);
-        data.add(leftFeedforward);
-        data.add(rightFeedforward);
-        data.add(output.left);
-        data.add(output.right);
-
-        StringBuilder str = new StringBuilder("BaseAutonController::start: ");
-        boolean first = true;
-        for(Object anObj : data) {
-            if(!first) {
-                str.append(",");
-            }
-            first = false;
-            str.append(anObj);
-        }
-        str.append(",end");
-
-        System.out.println(str.toString());
-
-
-
         updateDriveTrain(output);
         mPrevSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
