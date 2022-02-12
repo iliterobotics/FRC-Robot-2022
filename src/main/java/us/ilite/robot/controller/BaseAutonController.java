@@ -151,7 +151,7 @@ public class BaseAutonController extends AbstractController {
         double target_speed_meters_per_second = 20;
 //        if(!isFinished()) {
             DifferentialDriveWheelSpeeds targetWheelSpeeds = new DifferentialDriveWheelSpeeds(target_speed_meters_per_second,target_speed_meters_per_second);
-            perform_execute(curTime,dT,calculateActualSpeeds(),targetWheelSpeeds);
+            perform_execute(curTime,dT,calculateActualSpeeds(),targetWheelSpeeds, null);
 //        }
     }
     /**
@@ -216,10 +216,11 @@ public class BaseAutonController extends AbstractController {
         output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
         output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
 
-        data.add(output.left);
-        data.add(output.right);
-
-        CSVToLogFile.getInstance().logCSVData(data,this.getClass());
+        if(data != null) {
+            data.add(output.left);
+            data.add(output.right);
+            CSVToLogFile.getInstance().logCSVData(data, this.getClass());
+        }
 
 
         updateDriveTrain(output);
