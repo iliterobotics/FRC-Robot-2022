@@ -200,12 +200,11 @@ public class BaseAutonController extends AbstractController {
         data.add(estAccelLeft);
         data.add(estAccelRight);
 
-        CSVToLogFile.getInstance().logCSVData(data,this.getClass());
+        perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds,data);
 
-        perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds);
     }
 
-    private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds, DifferentialDriveWheelSpeeds targetWheelSpeeds) {
+    private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds, DifferentialDriveWheelSpeeds targetWheelSpeeds,List<Object>data) {
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         MutablePair<Double,Double> output = new MutablePair<>();
 
@@ -216,6 +215,13 @@ public class BaseAutonController extends AbstractController {
 
         output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
         output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
+
+        data.add(output.left);
+        data.add(output.right);
+
+        CSVToLogFile.getInstance().logCSVData(data,this.getClass());
+
+
         updateDriveTrain(output);
         mPrevSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
