@@ -78,6 +78,7 @@ public class BaseAutonController extends AbstractController {
      * A history of the speeds of the wheels this module has calculated for the trajectory
      */
     private DifferentialDriveWheelSpeeds mPrevSpeeds;
+    private DifferentialDriveWheelSpeeds mPrev;
     /**
      * The time, in seconds. This may not reflect realtime.
      */
@@ -123,6 +124,7 @@ public class BaseAutonController extends AbstractController {
         System.out.println(mTrajectory.getInitialPose());
         initialState = mTrajectory.sample(0);
         mPrevSpeeds = new DifferentialDriveWheelSpeeds(0,0);
+        mPrev = new DifferentialDriveWheelSpeeds(0,0);
         mLeftController.reset();
         mRightController.reset();
 
@@ -190,8 +192,10 @@ public class BaseAutonController extends AbstractController {
         data.add(actualSpeeds.leftMetersPerSecond);
         data.add(actualSpeeds.rightMetersPerSecond);
 
-        double estAccelLeft = (actualSpeeds.leftMetersPerSecond - mPrevSpeeds.leftMetersPerSecond)/dT;
-        double estAccelRight = (actualSpeeds.rightMetersPerSecond - mPrevSpeeds.rightMetersPerSecond)/dT;
+        double estAccelLeft = (actualSpeeds.leftMetersPerSecond - mPrev.leftMetersPerSecond)/dT;
+        double estAccelRight = (actualSpeeds.rightMetersPerSecond - mPrev.rightMetersPerSecond)/dT;
+
+        mPrev = new DifferentialDriveWheelSpeeds(actualSpeeds.leftMetersPerSecond, actualSpeeds.rightMetersPerSecond);
 
         data.add(estAccelLeft);
         data.add(estAccelRight);
