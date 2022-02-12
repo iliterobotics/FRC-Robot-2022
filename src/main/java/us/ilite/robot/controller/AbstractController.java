@@ -1,17 +1,17 @@
 package us.ilite.robot.controller;
 
 import com.flybotix.hfr.codex.RobotCodex;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.*;
-
-
-import static us.ilite.common.types.drive.EDriveData.*;
 
 
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Clock;
 
 import static us.ilite.robot.Enums.*;
+import static us.ilite.common.types.drive.EDriveData.*;
+import static us.ilite.common.types.EVisionGoal2020.*;
+
+
 
 import java.util.List;
 
@@ -22,6 +22,9 @@ public abstract class AbstractController {
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
     protected double dt = 1d;
+
+    private double mStartAngle;
+
 
     protected int mNumBalls = 0;
 
@@ -41,6 +44,20 @@ public abstract class AbstractController {
         mLastTime = clock.now();
     }
 
+    protected void targetAngleLock() {
+        if (mStartAngle == 0) {
+            mStartAngle = db.drivetrain.get(ACTUAL_TURN_ANGLE_deg);
+        }
+
+        double desiredAngle = Math.abs(mStartAngle) <= 90 ? 0 : 180;
+
+        if (db.limelight.isSet(TV)) {
+            db.drivetrain.set(STATE, EDriveState.TARGET_ANGLE_LOCK);
+        } else {
+            db.drivetrain.set(STATE, EDriveState.TURN_TO);
+            db.drivetrain.set(DESIRED_TURN_ANGLE_deg, desiredAngle);
+        }
+    }
 
     /**
      * Enables / Disables this controller.
@@ -86,4 +103,6 @@ public abstract class AbstractController {
         }
         return unused;
     }
+
+
 }
