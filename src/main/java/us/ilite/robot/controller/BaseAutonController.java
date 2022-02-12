@@ -178,9 +178,19 @@ public class BaseAutonController extends AbstractController {
         Pose2d robotPose = getRobotPose();
         Trajectory.State sample = mTrajectory.sample(curTime);
 
+        List<Object>data = new ArrayList<>();
+        data.add(curTime);
+        data.add(sample.accelerationMetersPerSecondSq);
+
+
         DifferentialDriveWheelSpeeds targetWheelSpeeds = getTargetWheelSpeeds(sample, robotPose);
         DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds();
         logDataToSmartDashboard(dt, sample, targetWheelSpeeds, actualSpeeds);
+
+        data.add(actualSpeeds.leftMetersPerSecond);
+        data.add(actualSpeeds.rightMetersPerSecond);
+
+        CSVToLogFile.getInstance().logCSVData(data,this.getClass());
 
         perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds);
     }
