@@ -159,7 +159,7 @@ public class BaseAutonController extends AbstractController {
      */
     public void execute() {
 
-        if(true) {
+        if(false) {
             execute_simple_deadreckon();
             return;
         }
