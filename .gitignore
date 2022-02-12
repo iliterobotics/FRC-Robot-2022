@@ -162,3 +162,6 @@ bin/
 
 #intellij files
 .idea
+**/venv/**
+**/*.csv
+**/__pycache__/**
