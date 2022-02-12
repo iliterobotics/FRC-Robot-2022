@@ -165,3 +165,4 @@ bin/
 **/venv/**
 **/*.csv
 **/__pycache__/**
+**/logs/**
