@@ -103,7 +103,7 @@ public abstract class BaseManualController extends AbstractController {
                 mCyclesHolding = 0;
             }
 
-            if (mCyclesHolding > 60) {
+            if (mCyclesHolding > 60 && db.drivetrain.get(L_ACTUAL_VEL_FT_s) <= 0.5 && db.drivetrain.get(R_ACTUAL_VEL_FT_s) <= 0.5) {
                 db.drivetrain.set(STATE, EDriveState.HOLD);
                 db.drivetrain.set(DESIRED_LEFT_PCT, left);
                 db.drivetrain.set(DESIRED_RIGHT_PCT, right);
@@ -144,7 +144,7 @@ public abstract class BaseManualController extends AbstractController {
                 db.drivetrain.set(STATE, EDriveState.HOME);
                 throttle = 0;
                 rotate = 0;
-            } else if(mCyclesHolding > 60) {
+            } else if(mCyclesHolding > 60 && db.drivetrain.get(L_ACTUAL_VEL_FT_s) <= 0.5 && db.drivetrain.get(R_ACTUAL_VEL_FT_s) <= 0.5) {
                 db.drivetrain.set(STATE, EDriveState.HOLD);
                 db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
                 db.drivetrain.set(DESIRED_TURN_PCT, rotate);
