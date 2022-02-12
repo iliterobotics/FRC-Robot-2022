@@ -12,7 +12,7 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.modules.LEDControl;
 
 import static us.ilite.robot.Enums.*;
-import static us.ilite.common.types.EShooterSystemData.*;
+import static us.ilite.common.types.EFeederData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 

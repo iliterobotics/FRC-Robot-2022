@@ -6,70 +6,70 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import us.ilite.common.config.Settings;
+import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.types.EIntakeData;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.hardware.DigitalBeamSensor;
 
 import static us.ilite.common.types.EIntakeData.*;
 
 public class IntakeModule extends Module{
 
+    //Motors
     private TalonFX mIntakeRoller;
-    private TalonFX mIntakeConveyor;
 
-    private Solenoid mArmSolenoidLeft;
-    private Solenoid mArmSolenoidRight;
+    //Solenoids
+    private Solenoid mArmSolenoid;
 
-    private PIDController mIntakePID;
-
-    private final int kMaxNeoVelocity = 5676;//change to falcon
-    private final double kWheelCircumference = 1.5;
-    private final double kVelocityConversion = 2048 * 1000 * kWheelCircumference;
-
+    //PID Controller and Gains
+    private ILITEPIDController mRollerPID;
     private ProfileGains kIntakeGains = new ProfileGains().p(0.001).i(0).d(0);
 
+    //Constants
+    private final double kWheelCircumference = 4 * Math.PI;
+    private final double kMaxFalconSpeed = 6380;
+    private final double kVelocityConversion = 2048 * 1000 * kWheelCircumference;
+
     public IntakeModule() {
+        //TODO - add ids to below things
+        //initialize motors and such
         mIntakeRoller = new TalonFX(Settings.HW.CAN.kMAXIntakeRollerId);
-        mIntakeConveyor = new TalonFX(Settings.HW.CAN.kMAXFeederId);
+        mArmSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,-1);
 
-        mArmSolenoidLeft = new Solenoid(PneumaticsModuleType.CTREPCM,-1);
-        mArmSolenoidRight = new Solenoid(PneumaticsModuleType.CTREPCM, -1);
-
-        mIntakePID = new PIDController(kIntakeGains, -kMaxNeoVelocity, kMaxNeoVelocity, clock.dt()); //clock.dt may not be correct time value
+        //create pid values, set min/max input/outputs
+        mRollerPID = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kIntakeGains, clock);
+        mRollerPID.setInputRange(-kMaxFalconSpeed, kMaxFalconSpeed);
+        mRollerPID.setOutputRange(-kMaxFalconSpeed, kMaxFalconSpeed);
     }
 
-    //sends the information to db that updates frequently
     @Override
     public void readInputs() {
-        //need conversion
-        db.intake.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kVelocityConversion); //send data to db constantly
-        db.intake.set(ROLLER_VEL_ft_s, mIntakeConveyor.getSelectedSensorVelocity()* kVelocityConversion);
-
-        db.intake.set(LEFT_PNEUMATIC_STATE, mArmSolenoidLeft.get());
-        db.intake.set(RIGHT_PNEUMATIC_STATE, mArmSolenoidRight.get());
+        db.cargo.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kVelocityConversion);
+        db.cargo.set(PNEUMATIC_STATE, mArmSolenoid.get());
     }
 
-    //sets the outputs for things in this module, what this module will do on robot
     @Override
     public void setOutputs() {
-        double desiredVelocity = mIntakePID.getOutput();
-        //setting the motors to the variable given
-        mIntakeRoller.set(TalonFXControlMode.Velocity, db.intake.get(SET_ROLLER_VEL_ft_s));
-        mIntakeConveyor.set(TalonFXControlMode.PercentOutput, db.intake.get(SET_CONVEYOR_pct));
+        //calculate pid velocity
+        double desiredVelocity = mRollerPID.calculate(db.cargo.get(ROLLER_VEL_ft_s), db.cargo.get(SET_ROLLER_VEL_ft_s));
 
+        //set pid value to motor
+        mIntakeRoller.set(TalonFXControlMode.Velocity, desiredVelocity);
 
+        //turning the solenoids on or off
         setPneumaticIntake();
     }
 
+    //if pneumatic state is 1/on, set solenoids on
     public void setPneumaticIntake() {
-        //convert the double values of the pneumatic states to booleans
-        if (db.intake.get(LEFT_PNEUMATIC_STATE) == 1.0) {
-            mArmSolenoidLeft.set(true);
+        if (db.cargo.get(PNEUMATIC_STATE) == 1.0) {
+            mArmSolenoid.set(true);
         }
-        mArmSolenoidLeft.set(false);
 
-        if (db.intake.get(RIGHT_PNEUMATIC_STATE) == 1.0) {
-            mArmSolenoidRight.set(true);
+        if (db.cargo.get(PNEUMATIC_STATE) == 0.0) {
+            mArmSolenoid.set(false);
         }
-        mArmSolenoidRight.set(false);
     }
 }

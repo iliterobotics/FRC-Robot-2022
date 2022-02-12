@@ -4,9 +4,14 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.lib.util.XorLatch;
+import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EHangerModuleData;
+import us.ilite.common.types.EIntakeData;
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
+import us.ilite.robot.hardware.DigitalBeamSensor;
+
 import static us.ilite.common.types.EIntakeData.*;
 
 
@@ -16,6 +21,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
     private static TeleopController INSTANCE;
     private Enums.FlywheelSpeeds currentState = Enums.FlywheelSpeeds.CLOSE;
     private XorLatch mTurretReverseHome = new XorLatch();
+    boolean isBallAdded, isBallOut;
 
     public static TeleopController getInstance() {
         if(INSTANCE == null) {
@@ -80,5 +86,66 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //        mLastTrackingType = DATA.limelight.get(ELimelightData.TARGET_ID.ordinal());
 //    }
 
+    private void updateCargo() {
+        isBallAdded = false;
+        //If not max balls and button down, bring arm down and start intaking
+        if(db.feeder.get(EFeederData.NUM_BALLS) < 2) {
+            if (db.driverinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) { //left trigger
+                db.cargo.set(PNEUMATIC_STATE, 1.0);
+                db.cargo.set(SET_ROLLER_VEL_ft_s, Math.max(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s), db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)) + 2);
+                //If beam breaker is broken, add one ball
+                if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d && !isBallAdded) {
+                    db.feeder.set(EFeederData.NUM_BALLS, db.feeder.get(EFeederData.NUM_BALLS) + 1);
+                    isBallAdded = true;
+                } else if (isBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
+                    isBallAdded = false;
+                }
+                //TODO need to add indexing
+            }
+        }
 
+        //Reverse intake
+        if(db.driverinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
+            switch ((int) db.feeder.get(EFeederData.NUM_BALLS)) {
+                case 0:
+                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0);
+                    break;
+                default:
+                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, -0.2);
+            }
+        }
+
+    }
+
+    private void shooterSequence() {
+        isBallOut = false;
+        //Shoot balls based off how many balls are in robot
+        if(db.driverinput.isSet(InputMap.FLYWHEEL.FEEDER_SPINUP_TEST)) { // y button
+            switch((int) db.feeder.get(EFeederData.NUM_BALLS)) {
+                case 1:
+                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
+                    if(db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
+                        isBallOut = true;
+                    }
+                    else if (db.feeder.get(EFeederData.EXIT_BEAM) == 0d && isBallOut) {
+                        db.feeder.set(EFeederData.NUM_BALLS, 0);
+                        isBallOut = false;
+                    }
+                    break;
+                case 2:
+                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
+                    if(db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
+                        isBallOut = true;
+                    }
+                    else if (db.feeder.get(EFeederData.EXIT_BEAM) == 0d && isBallOut) {
+                        db.feeder.set(EFeederData.NUM_BALLS, 1);
+                        isBallOut = false;
+                    }
+                    break;
+                case 0:
+                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0);
+                    break;
+            }
+        }
+    }
 }

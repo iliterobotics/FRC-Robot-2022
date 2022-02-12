@@ -5,10 +5,11 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import us.ilite.CriticalTest;
 import us.ilite.robot.BaseTest;
+import us.ilite.robot.modules.IntakeModule;
 
 @Category(CriticalTest.class)
 public class DriveTrainUnitTest extends BaseTest {
-    private PowerCellModule mIntake;
+    private IntakeModule mIntake;
 
     @Test
     @Category(CriticalTest.class)
