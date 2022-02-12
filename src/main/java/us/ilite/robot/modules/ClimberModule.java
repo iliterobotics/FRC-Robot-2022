@@ -30,6 +30,7 @@ public class ClimberModule extends Module{
     public ClimberModule() {
         kHangerProfile = new ProfileGains().p(.00001).i(0).d(0);
         mPidController = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kHangerProfile, mClock);
+        //verify these:
         mPidController.setOutputRange(-6380, 6380);
         mPidController.setInputRange(-100, 100);
 

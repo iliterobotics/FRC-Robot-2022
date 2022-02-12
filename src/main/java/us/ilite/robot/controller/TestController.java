@@ -69,8 +69,14 @@ public class TestController extends BaseManualController {
     public void updateClimber() {
         db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.POSITION);
         if (db.driverinput.isSet(InputMap.DRIVER.HANGER_EXECUTE)) {
-            db.hanger.set(EHangerModuleData.L_DESIRED_POSITION_rot, 1);
-            db.hanger.set(EHangerModuleData.R_DESIRED_POSITION_rot, 1);
+            if (db.hanger.get(EHangerModuleData.BAR_BEAM) == 1) {
+                db.hanger.set(EHangerModuleData.L_DESIRED_POSITION_rot, -1);
+                db.hanger.set(EHangerModuleData.R_DESIRED_POSITION_rot, -1);
+            }
+            else {
+                db.hanger.set(EHangerModuleData.L_DESIRED_POSITION_rot, 1);
+                db.hanger.set(EHangerModuleData.R_DESIRED_POSITION_rot, 1);
+            }
         }
         else {
             db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.VELOCITY);
