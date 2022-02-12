@@ -6,5 +6,6 @@ public enum EHangerModuleData {
     L_POSITION_rot,R_POSITION_rot,
     L_OUTPUT_CURRENT,R_OUTPUT_CURRENT,
     SET_pct,
-
+    HANGER_STATE,
+    CURRENT_ARM_ANGLE
     }

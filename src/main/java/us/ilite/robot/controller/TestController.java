@@ -7,6 +7,8 @@ import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
+import us.ilite.robot.Enums;
+
 import static us.ilite.robot.Enums.*;
 import static us.ilite.common.types.EShooterSystemData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
@@ -62,6 +64,7 @@ public class TestController extends BaseManualController {
     }
 
     public void updateClimber() {
+        db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.POSITION);
         if (db.operatorinput.isSet(InputMap.DRIVER.HANGER_MOVE_FORWARDS)) {
             db.hanger.set(EHangerModuleData.L_DESIRED_VEL, 0.3);
             db.hanger.set(EHangerModuleData.R_DESIRED_VEL, 0.3);
@@ -89,4 +92,3 @@ public class TestController extends BaseManualController {
 //    }
 
 }
-

@@ -73,6 +73,8 @@ public class Settings {
             public static final int kSecondaryBeamChannel = 8; // Change later
             public static final int kExitBeamChannel = 7; // Change later
             public static final int kAnglerID = 8; // BunnyBot Catapult
+
+            public static final int kHangerBeamChanne = 10; //change later
         }
 
         public static class PWM {

@@ -5,6 +5,12 @@ import com.revrobotics.ColorMatchResult;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class Enums {
+    public enum EHangerMode {
+        VELOCITY,
+        POSITION,
+        DEFAULT
+    }
+
     // =============================================================================
     // Limelight States
     // =============================================================================
