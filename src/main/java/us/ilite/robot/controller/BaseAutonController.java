@@ -56,14 +56,8 @@ public class BaseAutonController extends AbstractController {
      * The kinematics of the motors based on the distance between the wheels (left and right).
      */
     private final DifferentialDriveKinematics mDriveKinematics;
-    /**
-     * Left Motor PID Controller
-     */
-    private final PIDController mLeftController;
-    /**
-     * Right Motor PID Controller
-     */
-    private final PIDController mRightController;
+
+    private final PIDController mMotorPidController;
     /**
      * The trajectory to execute. At this time this class reaches out and gets the trajectory. Since
      * the trajectory needs to be restarted every time, this is not final and is reloaded in the init method.
@@ -96,8 +90,8 @@ public class BaseAutonController extends AbstractController {
     public BaseAutonController() {
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
-        mRightController = new PIDController(3.5,0, 0);
-        mLeftController = new PIDController(3.5, 0, 0);
+
+        mMotorPidController = new PIDController(3.25,0,0);
         mTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
         SmartDashboard.putNumber("trajectory-seconds",-1);
@@ -112,8 +106,7 @@ public class BaseAutonController extends AbstractController {
         mID = UUID.randomUUID();
         mTimer.reset();
         mTimer.start();
-        mLeftController.reset();
-        mRightController.reset();
+        mMotorPidController.reset();
         mPrevTime = -1;
         mTrajectory = TrajectoryCommandUtils.getJSONTrajectory();
 //        Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
@@ -212,8 +205,8 @@ public class BaseAutonController extends AbstractController {
         double rightFeedforward =
                 calculateFeedsForward(rightSetpoint, mPrevTargetWheelSpeeds.rightMetersPerSecond, dT);
 
-        output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond,data);
-        output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond,data);
+        output.left = calculateOutputFromFeedForward(leftFeedforward, mMotorPidController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond,data);
+        output.right = calculateOutputFromFeedForward(rightFeedforward, mMotorPidController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond,data);
 
         if(data != null) {
             //pid calculate left
