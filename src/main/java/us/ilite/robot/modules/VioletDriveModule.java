@@ -82,8 +82,7 @@ public class VioletDriveModule extends Module {
     private static DifferentialDrive mDrive;
 
     public static ProfileGains kPositionGains = new ProfileGains()
-            .f(0.00015)
-            .p(0.00000025)
+            .p(0.000025)
             .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
             // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
             .maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
@@ -395,11 +394,11 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set((throttle-turn)*Settings.Input.kMaxAllowedVelocityMultiplier);
                 break;
             case PATH_FOLLOWING_BASIC:
-                mLeftPositionPID.setSetpoint(db.drivetrain.get(L_PATH_FT_s));
-                mRightPositionPID.setSetpoint(db.drivetrain.get(R_PATH_FT_s));
+                mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS));
+                mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS));
 
-                double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), clock.getCurrentTimeInMillis());
-                double posRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s), clock.getCurrentTimeInMillis());
+                double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+                double posRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
 
                 mLeftMaster.set(posLeft);
                 mRightMaster.set(posRight);
