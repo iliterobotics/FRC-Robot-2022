@@ -98,8 +98,8 @@ public class BaseAutonController extends AbstractController {
     public BaseAutonController() {
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
-        mRightController = new PIDController(1,0, 0.005);
-        mLeftController = new PIDController(1, 0, 0.005);
+        mRightController = new PIDController(0.1139,0, -0.005);
+        mLeftController = new PIDController(0.1139, 0, -0.005);
         mTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
         SmartDashboard.putNumber("trajectory-seconds",-1);
@@ -160,12 +160,6 @@ public class BaseAutonController extends AbstractController {
      * called multiple times until the robot traverses the entire Trajectory or until autonmous runs out of time.
      */
     public void execute() {
-
-        if(false) {
-            execute_simple_deadreckon();
-            return;
-        }
-
 
         double curTime = mTimer.get();
         double dT = curTime - mPrevTime;
