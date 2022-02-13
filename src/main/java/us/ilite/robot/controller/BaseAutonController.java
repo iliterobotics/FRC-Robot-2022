@@ -171,6 +171,8 @@ public class BaseAutonController extends AbstractController {
         List<Object>data = new ArrayList<>();
         data.add(curTime);
         data.add(getRobotPose().getX());
+        data.add(Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_POS_FT)));
+        data.add(Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_POS_FT)));
         data.add(sample.velocityMetersPerSecond);
         data.add(sample.accelerationMetersPerSecondSq);
 
