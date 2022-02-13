@@ -6,29 +6,22 @@ import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.JSONObject;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
-import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
-import us.ilite.robot.modules.VioletDriveModule;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,7 +71,7 @@ public class BaseAutonController extends AbstractController {
      * A history of the speeds of the wheels this module has calculated for the trajectory
      */
     private DifferentialDriveWheelSpeeds mPrevSpeeds;
-    private DifferentialDriveWheelSpeeds mPrev;
+    private DifferentialDriveWheelSpeeds mPrevActualSpeed;
     /**
      * The time, in seconds. This may not reflect realtime.
      */
@@ -124,7 +117,7 @@ public class BaseAutonController extends AbstractController {
         System.out.println(mTrajectory.getInitialPose());
         initialState = mTrajectory.sample(0);
         mPrevSpeeds = new DifferentialDriveWheelSpeeds(0,0);
-        mPrev = new DifferentialDriveWheelSpeeds(0,0);
+        mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0,0);
         mLeftController.reset();
         mRightController.reset();
 
@@ -187,10 +180,10 @@ public class BaseAutonController extends AbstractController {
         data.add(actualSpeeds.leftMetersPerSecond);
         data.add(actualSpeeds.rightMetersPerSecond);
 
-        double estAccelLeft = (actualSpeeds.leftMetersPerSecond - mPrev.leftMetersPerSecond)/dT;
-        double estAccelRight = (actualSpeeds.rightMetersPerSecond - mPrev.rightMetersPerSecond)/dT;
+        double estAccelLeft = (actualSpeeds.leftMetersPerSecond - mPrevActualSpeed.leftMetersPerSecond)/dT;
+        double estAccelRight = (actualSpeeds.rightMetersPerSecond - mPrevActualSpeed.rightMetersPerSecond)/dT;
 
-        mPrev = new DifferentialDriveWheelSpeeds(actualSpeeds.leftMetersPerSecond, actualSpeeds.rightMetersPerSecond);
+        mPrevActualSpeed = new DifferentialDriveWheelSpeeds(actualSpeeds.leftMetersPerSecond, actualSpeeds.rightMetersPerSecond);
 
         data.add(estAccelLeft);
         data.add(estAccelRight);
@@ -205,8 +198,8 @@ public class BaseAutonController extends AbstractController {
 
         double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
         double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
-        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevSpeeds.leftMetersPerSecond, dT);
-        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevSpeeds.rightMetersPerSecond, dT);
+        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevActualSpeed.leftMetersPerSecond, dT);
+        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevActualSpeed.rightMetersPerSecond, dT);
 
         output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
         output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
