@@ -17,7 +17,8 @@ public class ClimberModule extends Module{
     private TalonFX mCLMR0;
     private DigitalBeamSensor mCLBeamCheck;
 
-    private ILITEPIDController mPidController;
+    private ILITEPIDController mPidVelocityController;
+    private ILITEPIDController mPidPositionController;
     private ProfileGains kHangerProfile;
     private Clock mClock = new Clock();
     private final RobotCodex<EHangerModuleData>mHangerModule;
@@ -29,10 +30,14 @@ public class ClimberModule extends Module{
 
     public ClimberModule() {
         kHangerProfile = new ProfileGains().p(.00001).i(0).d(0);
-        mPidController = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kHangerProfile, mClock);
+        mPidVelocityController = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kHangerProfile, mClock);
+        mPidPositionController = new ILITEPIDController(ILITEPIDController.EPIDControlType.POSITION, kHangerProfile, mClock);
+
         //verify these:
-        mPidController.setOutputRange(-6380, 6380);
-        mPidController.setInputRange(-100, 100);
+        mPidVelocityController.setOutputRange(-6380, 6380);
+        mPidVelocityController.setInputRange(-100, 100);
+        mPidPositionController.setOutputRange(-6380, 6380);
+        mPidPositionController.setInputRange(-100, 100);
 
         //CHANGE THESE IDS:
         mCLBeamCheck = new DigitalBeamSensor(-1);
@@ -95,16 +100,16 @@ public class ClimberModule extends Module{
 
         switch(mode) {
             case VELOCITY:
-                mCLL0.set(ControlMode.Velocity, mPidController.calculate(db.hanger.get(EHangerModuleData.L_VEL_rpm), db.hanger.get(EHangerModuleData.L_DESIRED_VEL_rpm)));
-                mCLMR0.set(ControlMode.Velocity, mPidController.calculate(db.hanger.get(EHangerModuleData.R_VEL_rpm), db.hanger.get(EHangerModuleData.R_DESIRED_VEL_rpm)));
+                mCLL0.set(ControlMode.Velocity, mPidVelocityController.calculate(db.hanger.get(EHangerModuleData.L_VEL_rpm), db.hanger.get(EHangerModuleData.L_DESIRED_VEL_rpm)));
+                mCLMR0.set(ControlMode.Velocity, mPidVelocityController.calculate(db.hanger.get(EHangerModuleData.R_VEL_rpm), db.hanger.get(EHangerModuleData.R_DESIRED_VEL_rpm)));
                 break;
             case DEFAULT:
                 mCLL0.set(ControlMode.Velocity, 0);
                 mCLMR0.set(ControlMode.Velocity, 0);
                 break;
             case POSITION:
-                mCLL0.set(ControlMode.Position, mPidController.calculate(db.hanger.get(EHangerModuleData.L_POSITION_rot), db.hanger.get(EHangerModuleData.L_DESIRED_POSITION_rot)));
-                mCLMR0.set(ControlMode.Position, mPidController.calculate(db.hanger.get(EHangerModuleData.R_POSITION_rot), db.hanger.get(EHangerModuleData.R_DESIRED_POSITION_rot)));
+                mCLL0.set(ControlMode.Position, mPidPositionController.calculate(db.hanger.get(EHangerModuleData.L_POSITION_rot), db.hanger.get(EHangerModuleData.L_DESIRED_POSITION_rot)));
+                mCLMR0.set(ControlMode.Position, mPidPositionController.calculate(db.hanger.get(EHangerModuleData.R_POSITION_rot), db.hanger.get(EHangerModuleData.R_DESIRED_POSITION_rot)));
                 break;
         }
     }
