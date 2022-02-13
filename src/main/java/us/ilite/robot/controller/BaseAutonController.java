@@ -325,7 +325,9 @@ public class BaseAutonController extends AbstractController {
      */
     private DifferentialDriveWheelSpeeds getTargetWheelSpeeds(Trajectory.State trajectorySample, Pose2d pRobotPose, List<Object>data) {
         ChassisSpeeds calculate = mFollower.calculate(pRobotPose, trajectorySample);
-        data.add(calculate);
+        data.add(calculate.vxMetersPerSecond);
+        data.add(calculate.vyMetersPerSecond);
+        data.add(calculate.omegaRadiansPerSecond);
 
         DifferentialDriveWheelSpeeds differentialDriveWheelSpeeds = mDriveKinematics.toWheelSpeeds(calculate);
         data.add(differentialDriveWheelSpeeds.leftMetersPerSecond);
