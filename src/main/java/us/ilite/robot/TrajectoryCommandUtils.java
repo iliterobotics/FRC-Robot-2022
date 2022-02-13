@@ -82,7 +82,7 @@ public class TrajectoryCommandUtils {
 
 
     public static Trajectory getJSONTrajectory() {
-        String trajectoryJSON = "paths/Unnamed.wpilib.json";
+        String trajectoryJSON = "paths/StraightPush.wpilib.json";
         Trajectory trajectory = new Trajectory();
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
