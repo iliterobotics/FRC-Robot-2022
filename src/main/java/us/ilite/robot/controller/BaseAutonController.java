@@ -171,6 +171,7 @@ public class BaseAutonController extends AbstractController {
         List<Object>data = new ArrayList<>();
         data.add(curTime);
         data.add(getRobotPose().getX());
+        data.add(sample.velocityMetersPerSecond);
         data.add(sample.accelerationMetersPerSecondSq);
 
 
