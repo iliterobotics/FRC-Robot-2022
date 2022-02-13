@@ -157,6 +157,7 @@ public class BaseAutonController extends AbstractController {
      */
     public void execute() {
 
+
         double curTime = mTimer.get();
         double dT = curTime - mPrevTime;
 
@@ -199,7 +200,7 @@ public class BaseAutonController extends AbstractController {
     }
 
     private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds, DifferentialDriveWheelSpeeds targetWheelSpeeds,List<Object>data) {
-        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
+        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         MutablePair<Double,Double> output = new MutablePair<>();
 
         double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
@@ -361,11 +362,8 @@ public class BaseAutonController extends AbstractController {
         double leftFeet = Units.meters_to_feet(pOutput.getLeft());
         double rightFeet = Units.meters_to_feet(pOutput.getRight());
 
-        double leftRPM = leftFeet/ VioletDriveModule.kDriveNEOVelocityFactor;
-        double rightRPM = rightFeet / VioletDriveModule.kDriveNEOVelocityFactor;
-
-        db.drivetrain.set(EDriveData.L_DESIRED_VEL_RPM, leftRPM);
-        db.drivetrain.set(EDriveData.R_DESIRED_VEL_RPM, rightRPM);
+        db.drivetrain.set(EDriveData.L_DESIRED_DRIVE_FT_SEC,leftFeet);
+        db.drivetrain.set(EDriveData.R_DESIRED_DRIVE_FT_SEC, rightFeet);
     }
 
     /**

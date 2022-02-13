@@ -33,7 +33,8 @@ public enum EDriveData implements CodexOf<Double> {
 
     NEUTRAL_MODE,
     STATE,
-
+    L_DESIRED_DRIVE_FT_SEC,
+    R_DESIRED_DRIVE_FT_SEC
     ;
 
 }

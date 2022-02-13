@@ -394,9 +394,13 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set(posRight);
                 break;
             case PATH_FOLLOWING_RAMSETE:
-                mLeftMaster.setVoltage(db.drivetrain.get(DESIRED_LEFT_VOLTAGE));
-                mRightMaster.setVoltage(db.drivetrain.get(DESIRED_RIGHT_VOLTAGE));
+//                mLeftMaster.setVoltage(db.drivetrain.get(DESIRED_LEFT_VOLTAGE));
+//                mRightMaster.setVoltage(db.drivetrain.get(DESIRED_RIGHT_VOLTAGE));
+//                mDrive.feed();
+                mLeftMaster.set(db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC)/24);
+                mRightMaster.set(db.drivetrain.get(R_DESIRED_DRIVE_FT_SEC)/24);
                 mDrive.feed();
+                break;
         }
     }
     /**
