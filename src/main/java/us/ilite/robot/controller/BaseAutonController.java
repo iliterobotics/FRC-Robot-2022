@@ -124,18 +124,9 @@ public class BaseAutonController extends AbstractController {
 
         SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
     }
-    boolean isExec = false;
     @Override
     protected void updateImpl() {
-//        execute();
-        if(!isExec) {
-            isExec = true;
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.SMART_MOTION);
-            db.drivetrain.set(EDriveData.L_DESIRED_POS, 5);
-            db.drivetrain.set(EDriveData.R_DESIRED_POS, 5);
-        }
-
-
+        execute();
     }
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;
