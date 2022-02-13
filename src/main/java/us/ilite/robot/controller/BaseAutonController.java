@@ -70,7 +70,10 @@ public class BaseAutonController extends AbstractController {
     /**
      * A history of the speeds of the wheels this module has calculated for the trajectory
      */
-    private DifferentialDriveWheelSpeeds mPrevSpeeds;
+    private DifferentialDriveWheelSpeeds mPrevTargetWheelSpeeds;
+    /**
+     * A history of the speeds of the actual speeds the robot moved
+     */
     private DifferentialDriveWheelSpeeds mPrevActualSpeed;
     /**
      * The time, in seconds. This may not reflect realtime.
@@ -116,10 +119,8 @@ public class BaseAutonController extends AbstractController {
 //        mTrajectory = trajectory.transformBy(transform);
         System.out.println(mTrajectory.getInitialPose());
         initialState = mTrajectory.sample(0);
-        mPrevSpeeds = new DifferentialDriveWheelSpeeds(0,0);
+        mPrevTargetWheelSpeeds = new DifferentialDriveWheelSpeeds(0,0);
         mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0,0);
-        mLeftController.reset();
-        mRightController.reset();
 
         SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
     }
@@ -189,13 +190,13 @@ public class BaseAutonController extends AbstractController {
         data.add(actualSpeeds.leftMetersPerSecond);
         data.add(actualSpeeds.rightMetersPerSecond);
 
-        double estAccelLeft = (actualSpeeds.leftMetersPerSecond - mPrevActualSpeed.leftMetersPerSecond)/dT;
-        double estAccelRight = (actualSpeeds.rightMetersPerSecond - mPrevActualSpeed.rightMetersPerSecond)/dT;
+        double instActualAccelLeft = (actualSpeeds.leftMetersPerSecond - mPrevActualSpeed.leftMetersPerSecond)/dT;
+        double instActualAccelRight = (actualSpeeds.rightMetersPerSecond - mPrevActualSpeed.rightMetersPerSecond)/dT;
 
         mPrevActualSpeed = new DifferentialDriveWheelSpeeds(actualSpeeds.leftMetersPerSecond, actualSpeeds.rightMetersPerSecond);
 
-        data.add(estAccelLeft);
-        data.add(estAccelRight);
+        data.add(instActualAccelLeft);
+        data.add(instActualAccelRight);
 
         perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds,data);
 
@@ -207,13 +208,25 @@ public class BaseAutonController extends AbstractController {
 
         double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
         double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
-        double leftFeedforward = calculateFeedsForward(leftSetpoint, mPrevActualSpeed.leftMetersPerSecond, dT);
-        double rightFeedforward = calculateFeedsForward(rightSetpoint, mPrevActualSpeed.rightMetersPerSecond, dT);
 
-        output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond);
-        output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond);
+
+        double leftFeedforward =
+                calculateFeedsForward(leftSetpoint, mPrevTargetWheelSpeeds.leftMetersPerSecond, dT);
+        double rightFeedforward =
+                calculateFeedsForward(rightSetpoint, mPrevTargetWheelSpeeds.rightMetersPerSecond, dT);
+
+        output.left = calculateOutputFromFeedForward(leftFeedforward, mLeftController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond,data);
+        output.right = calculateOutputFromFeedForward(rightFeedforward, mRightController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond,data);
 
         if(data != null) {
+            //pid calculate left
+            //pid calculate right
+            data.add(leftSetpoint);
+            data.add(rightSetpoint);
+            data.add(leftFeedforward);
+            data.add(rightFeedforward);
+            data.add(mPrevTargetWheelSpeeds.leftMetersPerSecond);
+            data.add(mPrevTargetWheelSpeeds.rightMetersPerSecond);
             data.add(output.left);
             data.add(output.right);
             CSVToLogFile.getInstance().logCSVData(data, this.getClass());
@@ -221,7 +234,7 @@ public class BaseAutonController extends AbstractController {
 
 
         updateDriveTrain(output);
-        mPrevSpeeds = targetWheelSpeeds;
+        mPrevTargetWheelSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
     }
 
@@ -286,8 +299,13 @@ public class BaseAutonController extends AbstractController {
      * @return
      *  The feed forward + the output from the pid controller given the actual speed and setpoints
      */
-    private double calculateOutputFromFeedForward(double pFeedForward, PIDController pPidController, double pActualSpeeds, double pSetPoint) {
-        return pFeedForward + pPidController.calculate(pActualSpeeds, pSetPoint);
+    private double calculateOutputFromFeedForward(double pFeedForward, PIDController pPidController, double pActualSpeeds, double pSetPoint, List<Object>data) {
+        double pidCalc = pPidController.calculate(pActualSpeeds, pSetPoint);
+        if(data != null) {
+            data.add(pidCalc);
+        }
+
+        return pFeedForward + pidCalc;
     }
 
     /**
