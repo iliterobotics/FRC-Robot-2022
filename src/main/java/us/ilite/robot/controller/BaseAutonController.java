@@ -21,6 +21,7 @@ import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.TrajectoryCommandUtils;
+import us.ilite.robot.modules.VioletDriveModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,7 +199,7 @@ public class BaseAutonController extends AbstractController {
     }
 
     private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds, DifferentialDriveWheelSpeeds targetWheelSpeeds,List<Object>data) {
-        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
+        db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
         MutablePair<Double,Double> output = new MutablePair<>();
 
         double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
@@ -357,11 +358,14 @@ public class BaseAutonController extends AbstractController {
      *  The voltage values to set the motors
      */
     private void updateDriveTrain(Pair<Double,Double> pOutput) {
-     //   System.out.println("BaseAutonController: Setting desired voltage= ["+pOutput+"]");
-        SmartDashboard.putNumber("DriveTrainVoltage-Left",pOutput.getLeft());
-        SmartDashboard.putNumber("DriveTrainVoltage-Right",pOutput.getRight());
-        db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, pOutput.getLeft());
-        db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, pOutput.getRight());
+        double leftFeet = Units.meters_to_feet(pOutput.getLeft());
+        double rightFeet = Units.meters_to_feet(pOutput.getRight());
+
+        double leftRPM = leftFeet/ VioletDriveModule.kDriveNEOVelocityFactor;
+        double rightRPM = rightFeet / VioletDriveModule.kDriveNEOVelocityFactor;
+
+        db.drivetrain.set(EDriveData.L_DESIRED_VEL_RPM, leftRPM);
+        db.drivetrain.set(EDriveData.R_DESIRED_VEL_RPM, rightRPM);
     }
 
     /**
