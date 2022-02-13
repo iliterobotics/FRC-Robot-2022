@@ -7,6 +7,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -177,7 +178,7 @@ public class BaseAutonController extends AbstractController {
         data.add(sample.accelerationMetersPerSecondSq);
 
 
-        DifferentialDriveWheelSpeeds targetWheelSpeeds = getTargetWheelSpeeds(sample, robotPose);
+        DifferentialDriveWheelSpeeds targetWheelSpeeds = getTargetWheelSpeeds(sample, robotPose, data);
         DifferentialDriveWheelSpeeds actualSpeeds = calculateActualSpeeds();
         logDataToSmartDashboard(dt, sample, targetWheelSpeeds, actualSpeeds);
 
@@ -322,9 +323,14 @@ public class BaseAutonController extends AbstractController {
      * @return
      *  The robot wheel speeds
      */
-    private DifferentialDriveWheelSpeeds getTargetWheelSpeeds(Trajectory.State trajectorySample, Pose2d pRobotPose) {
-        return mDriveKinematics.toWheelSpeeds(
-                mFollower.calculate(pRobotPose, trajectorySample));
+    private DifferentialDriveWheelSpeeds getTargetWheelSpeeds(Trajectory.State trajectorySample, Pose2d pRobotPose, List<Object>data) {
+        ChassisSpeeds calculate = mFollower.calculate(pRobotPose, trajectorySample);
+        data.add(calculate);
+
+        DifferentialDriveWheelSpeeds differentialDriveWheelSpeeds = mDriveKinematics.toWheelSpeeds(calculate);
+        data.add(differentialDriveWheelSpeeds.leftMetersPerSecond);
+        data.add(differentialDriveWheelSpeeds.rightMetersPerSecond);
+        return differentialDriveWheelSpeeds;
     }
 
 
