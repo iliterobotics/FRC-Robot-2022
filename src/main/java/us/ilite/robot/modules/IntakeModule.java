@@ -28,7 +28,7 @@ public class IntakeModule extends Module{
     private ProfileGains kIntakeGains = new ProfileGains().p(0.001).i(0).d(0);
 
     public IntakeModule() {
-        mIntakeRoller = new TalonFX(Settings.HW.CAN.kMAXIntakeRollerId);
+        mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
         mIntakeConveyor = new TalonFX(Settings.HW.CAN.kMAXFeederId);
 
         mArmSolenoidLeft = new Solenoid(PneumaticsModuleType.CTREPCM,-1);
