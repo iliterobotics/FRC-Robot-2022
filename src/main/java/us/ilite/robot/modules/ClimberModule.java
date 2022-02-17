@@ -21,7 +21,6 @@ public class ClimberModule extends Module{
     private ILITEPIDController mPidPositionController;
     private ProfileGains kHangerProfile;
     private Clock mClock = new Clock();
-    private final RobotCodex<EHangerModuleData>mHangerModule;
     private double kGearboxRatio = 268.8;
 
     //verify these:
@@ -35,32 +34,23 @@ public class ClimberModule extends Module{
 
         //verify these:
         mPidVelocityController.setOutputRange(-6380, 6380);
-        mPidVelocityController.setInputRange(-100, 100);
+        mPidVelocityController.setInputRange(6380, -6380);
         mPidPositionController.setOutputRange(-6380, 6380);
-        mPidPositionController.setInputRange(-100, 100);
+        mPidPositionController.setInputRange(6380, -6380);
 
-        //CHANGE THESE IDS:
+        //change these ids:
         mCLBeamCheck = new DigitalBeamSensor(-1);
         mCLL0 = new TalonFX(-1);
         mCLMR0 = new TalonFX(-1);
 
-        mHangerModule = db.hanger;
         mCLL0.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         mCLMR0.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     }
 
-    ClimberModule(TalonFX pFalconOne, RobotCodex<EHangerModuleData>hangerModule, RelativeEncoder pEncoderSparkMaxOne) {
-        mCLL0 = pFalconOne;
-        mHangerModule = hangerModule;
-    }
+
 
     @Override
     public void readInputs() {
-        try {
-            mHangerModule.set(EHangerModuleData.L_VEL_rpm, mCLMR0.getSelectedSensorVelocity());
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
         //convert from raw sensor velocity inputs to feet per second
         double leftRawSensorVelocity = mCLL0.getSelectedSensorVelocity();
         double leftRotationsPerSecond = (leftRawSensorVelocity / 2048) / 1000;
@@ -83,12 +73,7 @@ public class ClimberModule extends Module{
         db.hanger.set(EHangerModuleData.R_VEL_rpm, rightFeetPerSecond);
         db.hanger.set(EHangerModuleData.L_POSITION_rot, leftFeet);
         db.hanger.set(EHangerModuleData.R_POSITION_rot, rightFeet);
-        if (mCLBeamCheck.isBroken()) {
-            db.hanger.set(EHangerModuleData.BAR_BEAM, 1);
-        }
-        else {
-            db.hanger.set(EHangerModuleData.BAR_BEAM, 0);
-        }
+
     }
 
     @Override
@@ -97,7 +82,6 @@ public class ClimberModule extends Module{
         if (mode == null) {
             mode = Enums.EHangerMode.DEFAULT;
         }
-
         switch(mode) {
             case VELOCITY:
                 mCLL0.set(ControlMode.Velocity, mPidVelocityController.calculate(db.hanger.get(EHangerModuleData.L_VEL_rpm), db.hanger.get(EHangerModuleData.L_DESIRED_VEL_rpm)));

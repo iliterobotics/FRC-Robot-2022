@@ -8,5 +8,4 @@ public enum EHangerModuleData {
     L_OUTPUT_CURRENT,R_OUTPUT_CURRENT,
     SET_pct,
     HANGER_STATE,
-    BAR_BEAM
     }
