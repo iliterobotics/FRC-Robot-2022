@@ -47,6 +47,7 @@ public class Robot extends TimedRobot {
     private SimulationModule mSimulation;
     private FlywheelModule mShooter;
     private VioletDriveModule mViolet;
+    private VioletIntakeModule mIntake;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -76,6 +77,7 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
+        mIntake = new VioletIntakeModule();
         mDrive = new DriveModule();
         mShooter = new FlywheelModule();
       //  mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
@@ -141,7 +143,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mShooter);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mViolet);
        // practice.initialize();
 
@@ -164,7 +166,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mShooter);
         mRunningModules.addModule(mViolet);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mLimelight);
         MODE=TELEOPERATED;

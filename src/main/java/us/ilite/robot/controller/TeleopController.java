@@ -36,6 +36,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // ========================================
         //updateLimelightTargetLock(); //waiting for merge to master
         super.updateDrivetrain();
+        updatePowerCells();
 //        updateHanger(); //not integrated yet
     }
 
@@ -48,6 +49,21 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //
 //    }
 
+    private void updatePowerCells() {
+        if(db.driverinput.isSet(ELogitech310.BACK)) {
+            resetSerializerState();
+        }
+
+        if (db.driverinput.isSet(ELogitech310.R_BTN)) {
+            setIntakeArmEnabled(true);
+            activateSerializer();
+        } else if (db.driverinput.isSet(ELogitech310.L_BTN)) {
+            db.powercell.set(INTAKE_STATE, Enums.EArmState.STOW);
+            reverseSerializer();
+        } else {
+            setIntakeArmEnabled(false);
+        }
+    }
 //    public void updateLimelightTargetLock() {
 //        if (DATA.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
 //            if (DATA.selectedTarget.isSet(ELimelightData.TY)) {

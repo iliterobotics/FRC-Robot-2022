@@ -149,5 +149,16 @@ public class Enums {
             return this.broken;
         }
     }
+    public enum EArmState {
+        NONE (0, 0),
+        OUT (90, 1),
+        STOW (0, 1),
+        HOLD (0, 1);
+        public double angle;
+        public int slot;
+        EArmState (double angle, int slot) {
+            this.angle = angle;
+        }
+    }
 
 }

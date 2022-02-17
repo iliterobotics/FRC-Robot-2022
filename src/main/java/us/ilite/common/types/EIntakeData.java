@@ -19,5 +19,11 @@ public enum EIntakeData implements CodexOf<Double> {
 
     ROLLER_VEL_ft_s,
     SET_ROLLER_VEL_ft_s,
+    INTAKE_STATE,
+    ARM_ANGLE_deg,
+    INTAKE_VEL_ft_s,
+    SET_INTAKE_VEL_ft_s,
+    SET_V_pct,
+    SET_H_pct;
 
 }
