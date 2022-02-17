@@ -91,7 +91,7 @@ public class BaseAutonController extends AbstractController {
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
 
-        mMotorPidController = new PIDController(3.1,0,-0.00005);
+        mMotorPidController = new PIDController(3.025,0,-0.000075001);
         mTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
         SmartDashboard.putNumber("trajectory-seconds",-1);

@@ -7,10 +7,8 @@ import us.ilite.robot.TrajectoryCommandUtils;
 
 public class ShootIntakeMoveController extends BaseAutonController {
     private boolean mHasShotPreload;
-    private Trajectory mTarmacToFirstBall;
     public ShootIntakeMoveController() {
         mHasShotPreload = false;
-        mTarmacToFirstBall = TrajectoryCommandUtils.getJSONTrajectory();
     }
     public void updateImpl() {
         if (!mHasShotPreload) {
