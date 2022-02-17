@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
+import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
@@ -227,14 +228,6 @@ public class VioletDriveModule extends Module {
         mRightFollower.burnFlash();
         mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
         mDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
-
-//		mYawPid = new PIDController(kYawGains,kYawGains.P,
-//				kYawGains.I,
-//				kYawGains.D,
-//				-kMaxDegreesPerSecond,
-//				kMaxDegreesPerSecond,
-//				Settings.kControlLoopPeriod);
-//		mYawPid.setOutputRange(-1, 1);
     }
 
     @Override
