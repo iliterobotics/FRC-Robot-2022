@@ -177,7 +177,7 @@ public class VioletDriveModule extends Module {
         mRightMaster.setInverted(true);
         mRightFollower.setInverted(true);
 
-        mGyro = new Pigeon(clock, Settings.HW.CAN.kPigeon);
+        mGyro = new Pigeon(clock, 21);
 
         double ramprate = 0.20;
         mLeftMaster.setClosedLoopRampRate(ramprate);

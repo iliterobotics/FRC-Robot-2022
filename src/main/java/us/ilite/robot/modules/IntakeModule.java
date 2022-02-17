@@ -29,7 +29,7 @@ public class IntakeModule extends Module{
 
     public IntakeModule() {
         mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
-        mIntakeConveyor = new TalonFX(Settings.HW.CAN.kMAXFeederId);
+        mIntakeConveyor = new TalonFX(Settings.HW.CAN.kINFeeder);
 
         mArmSolenoidLeft = new Solenoid(PneumaticsModuleType.CTREPCM,-1);
         mArmSolenoidRight = new Solenoid(PneumaticsModuleType.CTREPCM, -1);

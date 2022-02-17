@@ -4,16 +4,9 @@ import com.ctre.phoenix.CANifier;
 import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.config.Settings;
 
-import us.ilite.common.types.EColorData;
 import static us.ilite.robot.Enums.*;
 import us.ilite.common.types.ELEDControlData;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.drive.EDriveData;
-import us.ilite.robot.Enums;
-import us.ilite.robot.Robot;
-import us.ilite.robot.modules.LEDControlUtils.*;
-
-import java.awt.*;
 
 
 public class LEDControl extends Module {
@@ -75,7 +68,7 @@ public class LEDControl extends Module {
     public LEDControl() {
         this.mBlinkTimer = new Timer();
         this.mBlinkTimer.reset();
-        mLEDCan = new CANifier(Settings.HW.CAN.kLEDControlCanifier);
+        mLEDCan = new CANifier(Settings.HW.CAN.kLEDCanifier);
     }
 
 //    public void defaultLED() {
