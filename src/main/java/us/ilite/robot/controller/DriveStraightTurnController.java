@@ -24,10 +24,10 @@ public class DriveStraightTurnController extends BaseAutonController {
             mCyclesPastDistance++;
         }
 
-
         if (mCyclesPastDistance >= 50) {
-            db.drivetrain.set(STATE, TURN_FOR);
-            db.drivetrain.set(DESIRED_TURN_ANGLE_deg, 45);
+            System.out.println("Desired distance reached, and it is currently " + mCyclesPastDistance + " cycles past the setpoint");
+//            db.drivetrain.set(STATE, TURN_FOR);
+//            db.drivetrain.set(DESIRED_TURN_ANGLE_deg, 45);
         }
     }
 

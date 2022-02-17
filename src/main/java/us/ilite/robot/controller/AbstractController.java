@@ -41,6 +41,9 @@ public abstract class AbstractController {
         mLastTime = clock.now();
     }
 
+    public void indexBalls() {
+        // WHATEVER
+    }
 
     /**
      * Enables / Disables this controller.

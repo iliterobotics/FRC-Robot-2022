@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
+    private BaseAutonController mBaseAutonController;
 
 
     @Override
@@ -65,15 +66,17 @@ public class Robot extends TimedRobot {
 //        initTimer.reset();
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
+        mBaseAutonController = new BaseAutonController();
+        mViolet = new VioletDriveModule();
+        //practice = TrajectoryCommandUtils.buildTrajectoryCommand(mDrive, PracticeTrajectory.runStraight());
         mDrive = new DriveModule();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-        mViolet = new VioletDriveModule();
         mShooter = new FlywheelModule();
-        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
+      //  mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
         mLEDControl = new LEDControl();
         if(IS_SIMULATED) {

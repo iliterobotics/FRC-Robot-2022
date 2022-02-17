@@ -92,9 +92,9 @@ public class ILITEPIDController {
             mTotalError = 0;
         }
 
-        double proportion = kP * mError;
-        double integral = kI * mTotalError;
-        double derivative = kD * dX/dT;
+        double proportion = -kP * mError;
+        double integral = -kI * mTotalError;
+        double derivative = -kD * dX/dT;
         double feedforward = kF * setpoint;
 
         switch(mPIDType) {
