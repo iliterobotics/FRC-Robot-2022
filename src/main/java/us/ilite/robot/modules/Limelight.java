@@ -12,8 +12,8 @@ import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.IFieldComponent;
 
-import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_LOWER_CORNERS;
-import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_UPPER_CORNERS;
+//import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_LOWER_CORNERS;
+//import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_UPPER_CORNERS;
 import static us.ilite.common.types.EVisionGoal2020.T3D_TOP_Y_in;
 import static us.ilite.robot.Enums.*;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
@@ -56,24 +56,21 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     public Limelight(String pNetworkTableName) {
         mLimelight = LIMELIGHT_V2_LOW_RES.setAddress(pNetworkTableName).setLensHeight(kHeightIn);
+
+        //TODO setup correctly this lower and upper corner solver
         mUpperCornerSolver = new Ilite3DSolver(
                 mLimelight,
-                Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.height()),
-                Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.width()),
+                Distance.fromInches(0),
+                Distance.fromInches(0),
                 Field2022.Distances.TARGETTING_OFFSET.mDistance
         );
         mLowerCornerSolver = new Ilite3DSolver(
                 mLimelight,
-                Distance.fromInches(OUTER_GOAL_LOWER_CORNERS.height()),
-                Distance.fromInches(OUTER_GOAL_LOWER_CORNERS.width()),
+                Distance.fromInches(0),
+                Distance.fromInches(0),
                 Field2022.Distances.TARGETTING_OFFSET.mDistance
         );
         mTable = NetworkTableInstance.getDefault().getTable(pNetworkTableName);
-    }
-
-    @Override
-    public void modeInit(EMatchMode pMode) {
-        db.goaltracking.set(TARGET_ID, NONE.id());
     }
 
     @Override
@@ -144,16 +141,16 @@ public class Limelight extends Module implements ITargetDataProvider {
      * Utility method
      */
     private void setNetworkTableValue(String pEntry, EVisionGoal2020 pEnum) {
-        if(db.goaltracking.isSet(pEnum)) {
-            mTable.getEntry(pEntry).setNumber(db.goaltracking.get(pEnum));
-        }
+//        if(db.goaltracking.isSet(pEnum)) {
+//            mTable.getEntry(pEntry).setNumber(db.goaltracking.get(pEnum));
+//        }
     }
 
     @Override
     public void shutdown() {
-        db.goaltracking.set(EVisionGoal2020.PIPELINE, Limelight.NONE.id());
-        // Force LED off
-        mTable.getEntry("ledMode").setNumber(LimelightLedMode.LED_OFF.ordinal());
+//        db.goaltracking.set(EVisionGoal2020.PIPELINE, Limelight.NONE.id());
+//        // Force LED off
+//        mTable.getEntry("ledMode").setNumber(LimelightLedMode.LED_OFF.ordinal());
     }
 
     public String toString() {
@@ -162,22 +159,23 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     @Override
     public RobotCodex<EVisionGoal2020> getTargetingData() {
-        return db.goaltracking;
+        return null;
     }
 
     @Override
     public double getCameraHeightIn() {
-        return kHeightIn;
+        return 0;
     }
 
     @Override
     public double getCameraAngleDeg() {
-        return mLimelight.elevation_deg();
+//        return mLimelight.elevation_deg();
+        return 0;
     }
 
     @Override
     public double getCameraToBumperIn() {
-        return 0d;
+        return 0;
     }
 
     @Override

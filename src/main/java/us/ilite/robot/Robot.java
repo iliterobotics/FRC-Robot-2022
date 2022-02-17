@@ -40,10 +40,8 @@ public class Robot extends TimedRobot {
 
     private DriveModule mDrive;
     private Limelight mLimelight;
-    private RawLimelight mRawLimelight;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
-    private FlywheelModule mShooter;
     private VioletDriveModule mViolet;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
@@ -52,7 +50,7 @@ public class Robot extends TimedRobot {
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
-//    private final AbstractController mBaseAutonController = new BaseAutonController();
+    private AbstractController mBaseAutonController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
@@ -65,15 +63,15 @@ public class Robot extends TimedRobot {
 //        initTimer.reset();
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
+        mBaseAutonController = new BaseAutonController();
+        mViolet = new VioletDriveModule();
         mDrive = new DriveModule();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-        mViolet = new VioletDriveModule();
-        mShooter = new FlywheelModule();
-        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
+      //  mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
         mLEDControl = new LEDControl();
         if(IS_SIMULATED) {
@@ -186,7 +184,6 @@ public class Robot extends TimedRobot {
     public void disabledPeriodic() {
         mOI.readInputs();
         mDrive.readInputs();
-        mShooter.readInputs();
         Shuffleboard.update();
     }
 
@@ -210,7 +207,6 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
-//        mRunningModules.addModule(mDJSpinnerModule);
         mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
@@ -218,7 +214,6 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mViolet);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
-//        mRunningModules.addModule(mDJSpinnerModule);
 //        mRunningModules.addModule(mLEDControl);
 //        if(IS_SIMULATED) {
 //            mRunningModules.addModule(mSimulation);
