@@ -96,7 +96,7 @@ public class BaseAutonController extends AbstractController {
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
 
       //  mMotorPidController = new PIDController(3.025,0,-0.000075001);
-        mMotorPidController = new PIDController(0.75,0,0);
+        mMotorPidController = new PIDController(1,0,0);
         mTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
         SmartDashboard.putNumber("trajectory-seconds",-1);
@@ -107,40 +107,27 @@ public class BaseAutonController extends AbstractController {
      * state can be restarted, should the autonomous be run multiple times. (Something that only really happens
      * at home).
      */
-    public void initialize(Trajectory pTrajectory) {
-        try {
+    public void initialize() {
+
             mID = UUID.randomUUID();
             mTimer.reset();
             mTimer.start();
             mMotorPidController.reset();
             mPrevTime = -1;
-            mTrajectory = pTrajectory;
+            mTrajectory = TrajectoryCommandUtils.getJSONTrajectory();
 //        Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
 //        Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
 //        mTrajectory = trajectory.transformBy(transform);
             initialState = mTrajectory.sample(0);
             mPrevTargetWheelSpeeds = new DifferentialDriveWheelSpeeds(0,0);
             mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0,0);
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("didn't work");
-        }
 
 
         SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
     }
     @Override
     protected void updateImpl() {
-        if (mInitialCycleCount != 200) {
-            execute();
-            mInitialCycleCount++;
-        }
-        else {
-            if (!kISEXECUTED) {
-                initialize(TrajectoryCommandUtils.getOtherJSONTrajectory());
-            }
-            execute();
-            kISEXECUTED = true;
-        }
+        execute();
     }
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;

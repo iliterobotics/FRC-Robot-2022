@@ -137,7 +137,7 @@ public class Robot extends TimedRobot {
         }
 
         MODE=AUTONOMOUS;
-        mBaseAutonController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        mBaseAutonController.initialize();
         mBaseAutonController.setEnabled(true);
         mActiveController = mBaseAutonController;
       //  mActiveController.setEnabled(true);
