@@ -5,6 +5,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 
 import java.io.BufferedWriter;
@@ -34,6 +35,7 @@ public class CSVWriter {
     private RobotCodex<?> mCodex;
 
     public CSVWriter(RobotCodex<?> pCodex) {
+        SmartDashboard.putString("CSVWritter","UNKNOWN");
 
         mCodex = pCodex;
 
@@ -66,7 +68,9 @@ public class CSVWriter {
         if(!pFile.exists()) {
             try {
                 pFile.createNewFile();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                mLog.exception(e);
+            }
         }
     }
 
@@ -130,6 +134,7 @@ public class CSVWriter {
                 break;
             }
         }
+        SmartDashboard.putString("CSVWritter",dir);
 
         //String dir = USB_DIR;
 
