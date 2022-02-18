@@ -2,7 +2,9 @@ package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.InputMap;
+import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EHangerModuleData;
@@ -19,9 +21,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     private ILog mLog = Logger.createLog(TeleopController.class);
     private static TeleopController INSTANCE;
-    private Enums.FlywheelSpeeds currentState = Enums.FlywheelSpeeds.CLOSE;
     private XorLatch mTurretReverseHome = new XorLatch();
-    boolean isBallAdded, isBallOut;
+    private boolean isBallAdded = false;
+    private boolean isBallOut = false;
+    private int numBalls = 0;
 
     public static TeleopController getInstance() {
         if(INSTANCE == null) {
@@ -43,6 +46,8 @@ public class TeleopController extends BaseManualController { //copied from TestC
         //updateLimelightTargetLock(); //waiting for merge to master
         super.updateDrivetrain();
 //        updateHanger(); //not integrated yet
+        clock.report("updateCargo", t->updateCargo());
+        clock.report("updateCargo", t->updateFeeder());
     }
 
 //    private void updateHanger() {
@@ -87,65 +92,64 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //    }
 
     private void updateCargo() {
-        isBallAdded = false;
         //If not max balls and button down, bring arm down and start intaking
-        if(db.feeder.get(EFeederData.NUM_BALLS) < 2) {
-            if (db.driverinput.isSet(InputMap.OPERATOR.INTAKE_ACTIVATE)) { //left trigger
-                db.cargo.set(PNEUMATIC_STATE, 1.0);
-                db.cargo.set(SET_ROLLER_VEL_ft_s, Math.max(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s), db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)) + 2);
+//        if(db.feeder.get(EFeederData.NUM_BALLS) < 2) {
+        SmartDashboard.putBoolean("Button pressed: ", db.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS));
+        SmartDashboard.putBoolean("isballadded: ", isBallAdded);
+            if (db.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS)) { //left trigger
+//                db.cargo.set(REV_PNEUMATIC_STATE, 0d);
+//                db.cargo.set(FWD_PNEUMATIC_STATE, 1d);
+                db.cargo.set(SET_ROLLER_VEL_ft_s, Math.max(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s), db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)) + 1000);
                 //If beam breaker is broken, add one ball
                 if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d && !isBallAdded) {
-                    db.feeder.set(EFeederData.NUM_BALLS, db.feeder.get(EFeederData.NUM_BALLS) + 1);
+//                    db.feeder.set(EFeederData.NUM_BALLS, (db.feeder.get(EFeederData.NUM_BALLS) + 1d));
+                    numBalls++;
                     isBallAdded = true;
                 } else if (isBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
                     isBallAdded = false;
                 }
                 //TODO need to add indexing
             }
-        }
+            else {
+//                db.cargo.set(FWD_PNEUMATIC_STATE, 0d);
+//                db.cargo.set(REV_PNEUMATIC_STATE, 1d);
+                db.cargo.set(SET_ROLLER_VEL_ft_s, 0);
+            }
+            db.feeder.set(EFeederData.NUM_BALLS, numBalls);
+//        }
 
         //Reverse intake
-        if(db.driverinput.isSet(InputMap.OPERATOR.INTAKE_REVERSE)) {
-            switch ((int) db.feeder.get(EFeederData.NUM_BALLS)) {
-                case 0:
-                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0);
-                    break;
-                default:
-                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, -0.2);
+        if(db.driverinput.isSet(ELogitech310.R_BTN)) { //r button
+            if(db.feeder.get(EFeederData.NUM_BALLS) == 0d) {
+                db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0);
             }
+            else {
+                db.feeder.set(EFeederData.SET_CONVEYOR_pct, -0.2);
+            }
+        }
+        else {
+            db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0);
         }
 
     }
 
-    private void shooterSequence() {
-        isBallOut = false;
+    private void updateFeeder() {
         //Shoot balls based off how many balls are in robot
-        if(db.driverinput.isSet(InputMap.FLYWHEEL.FEEDER_SPINUP_TEST)) { // y button
-            switch((int) db.feeder.get(EFeederData.NUM_BALLS)) {
-                case 1:
-                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
-                    if(db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
-                        isBallOut = true;
-                    }
-                    else if (db.feeder.get(EFeederData.EXIT_BEAM) == 0d && isBallOut) {
-                        db.feeder.set(EFeederData.NUM_BALLS, 0);
-                        isBallOut = false;
-                    }
-                    break;
-                case 2:
-                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
-                    if(db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
-                        isBallOut = true;
-                    }
-                    else if (db.feeder.get(EFeederData.EXIT_BEAM) == 0d && isBallOut) {
-                        db.feeder.set(EFeederData.NUM_BALLS, 1);
-                        isBallOut = false;
-                    }
-                    break;
-                case 0:
-                    db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0);
-                    break;
+        if(db.driverinput.isSet(ELogitech310.Y_BTN)) { // y button
+            if(db.feeder.get(EFeederData.NUM_BALLS) >= 1d) {
+                db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
+                if(db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
+                    isBallOut = true;
+                }
+                else if (db.feeder.get(EFeederData.EXIT_BEAM) == 0d && isBallOut) {
+                    numBalls--;
+                    isBallOut = false;
+                }
+            }
+            else {
+                db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0);
             }
         }
+        db.feeder.set(EFeederData.NUM_BALLS, numBalls);
     }
 }

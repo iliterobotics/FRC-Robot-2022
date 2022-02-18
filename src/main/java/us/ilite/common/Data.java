@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.util.Color;
+import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;

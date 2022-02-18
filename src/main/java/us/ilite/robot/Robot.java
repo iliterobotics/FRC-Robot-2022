@@ -43,8 +43,9 @@ public class Robot extends TimedRobot {
     private RawLimelight mRawLimelight;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
-    private FlywheelModule mShooter;
+    private FeederModule mFeeder;
     private VioletDriveModule mViolet;
+    private IntakeModule mIntake;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -72,7 +73,8 @@ public class Robot extends TimedRobot {
         mOI = new OperatorInput();
         mDrive = new DriveModule();
         mViolet = new VioletDriveModule();
-        mShooter = new FlywheelModule();
+        mFeeder = new FeederModule();
+        mIntake = new IntakeModule();
         mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
 //        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
         mLEDControl = new LEDControl();
@@ -132,10 +134,10 @@ public class Robot extends TimedRobot {
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
 //        mRunningModules.addModule(mLimelight);
-//        mRunningModules.addModule(mShooter);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mFeeder);
+        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mDrive);
-        mRunningModules.addModule(mViolet);
+//        mRunningModules.addModule(mViolet);
 //        mRunningModules.modeInit(AUTONOMOUS);
     }
 
@@ -152,9 +154,9 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-//        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mViolet);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mFeeder);
+//        mRunningModules.addModule(mViolet);
+        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mLimelight);
         MODE=TELEOPERATED;
@@ -186,7 +188,7 @@ public class Robot extends TimedRobot {
     public void disabledPeriodic() {
         mOI.readInputs();
         mDrive.readInputs();
-        mShooter.readInputs();
+        mFeeder.readInputs();
         Shuffleboard.update();
     }
 
@@ -206,7 +208,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
-//        mRunningModules.addModule(mShooter);
+//        mRunningModules.addModule(mFeeder);
 //        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
