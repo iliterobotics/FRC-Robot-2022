@@ -60,6 +60,7 @@ public class Robot extends TimedRobot {
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
+    private ShootIntakeMoveController mAutonController;
 
 
     @Override
@@ -136,7 +137,7 @@ public class Robot extends TimedRobot {
         }
 
         MODE=AUTONOMOUS;
-        mBaseAutonController.initialize();
+        mBaseAutonController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mBaseAutonController.setEnabled(true);
         mActiveController = mBaseAutonController;
       //  mActiveController.setEnabled(true);

@@ -82,7 +82,21 @@ public class TrajectoryCommandUtils {
 
 
     public static Trajectory getJSONTrajectory() {
-        String trajectoryJSON = "paths/test.wpilib.json";
+        String trajectoryJSON = "paths/FirstBall.wpilib.json";
+        Trajectory trajectory = new Trajectory();
+        try {
+            Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+            trajectory = new TrajectoryWrapper(TrajectoryUtil.fromPathweaverJson(trajectoryPath));
+            System.out.println("Successful");
+        } catch (IOException ex) {
+            System.out.println("Unable to open " + trajectoryJSON + " " + Arrays.toString(ex.getStackTrace()));
+        }
+        System.out.println("DONE");
+        return trajectory;
+    }
+
+    public static Trajectory getOtherJSONTrajectory() {
+        String trajectoryJSON = "paths/SecondBall.wpilib.json";
         Trajectory trajectory = new Trajectory();
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);

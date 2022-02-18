@@ -165,6 +165,8 @@ public class VioletDriveModule extends Module {
     private boolean mStartHoldingPosition;
     private double initialXPosition;
     private double initialYPosition;
+    private double mStartAngleDeg = 0;
+
 
     private final CANSparkMax mLeftMaster;
     private final CANSparkMax mLeftFollower;
@@ -400,6 +402,42 @@ public class VioletDriveModule extends Module {
                 mLeftMaster.set(db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC)/24);
                 mRightMaster.set(db.drivetrain.get(R_DESIRED_DRIVE_FT_SEC)/24);
                 mDrive.feed();
+                break;
+            case TURN_FOR:
+                double arcLengthFor = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * db.drivetrain.get(DESIRED_TURN_ANGLE_deg) / 360.0;
+
+                mLeftPositionPID.setSetpoint(arcLengthFor);
+                mRightPositionPID.setSetpoint(-arcLengthFor);
+
+                double leftOutputFor = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+                double rightOutputFor = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+
+                mLeftMaster.set(leftOutputFor);
+                mRightMaster.set(rightOutputFor);
+                break;
+            case TURN_TO:
+                double arcLengthTo = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * (db.drivetrain.get(DESIRED_TURN_ANGLE_deg) - mStartAngleDeg) / 360.0;
+
+                mLeftPositionPID.setSetpoint(arcLengthTo);
+                mRightPositionPID.setSetpoint(-arcLengthTo);
+
+                double leftOutputTo = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+                double rightOutputTo = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+
+                mLeftMaster.set(leftOutputTo);
+                mRightMaster.set(rightOutputTo);
+                break;
+            case HOME:
+                double arcLengthHome = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * -mStartAngleDeg / 360.0;
+
+                mLeftPositionPID.setSetpoint(arcLengthHome);
+                mLeftPositionPID.setSetpoint(-arcLengthHome);
+
+                double leftOutputHome = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+                double rightOutputHome = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+
+                mLeftMaster.set(leftOutputHome);
+                mRightMaster.set(rightOutputHome);
                 break;
         }
     }

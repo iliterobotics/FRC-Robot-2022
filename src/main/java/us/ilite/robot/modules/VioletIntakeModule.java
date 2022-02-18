@@ -137,7 +137,7 @@ public class VioletIntakeModule extends Module {
         EArmState mode = db.powercell.get(INTAKE_STATE, EArmState.class);
         double desiredAngle = 0;
         SmartDashboard.putNumber("Arm pid value: ", desiredAngle);
-
+        if (mode == null) return;
         switch(mode){
             case STOW:
                 desiredAngle = mIntakePivotPID.calculate(db.powercell.get(ARM_ANGLE_deg), kArmMinDegrees);

@@ -18,6 +18,7 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.TrajectoryCommandUtils;
@@ -40,7 +41,7 @@ public class BaseAutonController extends AbstractController {
      * robot and usually doesn't represent real time. This is only intended to be
      * used for temporal offsets.
      */
-    private final Timer mTimer;
+    public final Timer mTimer;
     /**
      * The {@link RamseteController} that is used to follow a {@link Trajectory}. This
      * will be used to calculate the chasis speed based on the robots pose and velocity
@@ -62,7 +63,7 @@ public class BaseAutonController extends AbstractController {
      * The trajectory to execute. At this time this class reaches out and gets the trajectory. Since
      * the trajectory needs to be restarted every time, this is not final and is reloaded in the init method.
      */
-    private Trajectory mTrajectory;
+    public Trajectory mTrajectory;
     /**
      * A history of the speeds of the wheels this module has calculated for the trajectory
      */
@@ -82,6 +83,9 @@ public class BaseAutonController extends AbstractController {
      */
     private UUID mID;
     private Trajectory.State initialState;
+    private boolean kISEXECUTED = false;
+    private int mInitialCycleCount = 0;
+    private int mFinalCycleCount = 0;
 
     /**
      * Default constructor. This will instantiate the variables that are not dependent on the init
@@ -91,7 +95,8 @@ public class BaseAutonController extends AbstractController {
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
 
-        mMotorPidController = new PIDController(3.025,0,-0.000075001);
+      //  mMotorPidController = new PIDController(3.025,0,-0.000075001);
+        mMotorPidController = new PIDController(0.75,0,0);
         mTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
         SmartDashboard.putNumber("trajectory-seconds",-1);
@@ -102,55 +107,50 @@ public class BaseAutonController extends AbstractController {
      * state can be restarted, should the autonomous be run multiple times. (Something that only really happens
      * at home).
      */
-    public void initialize() {
-        mID = UUID.randomUUID();
-        mTimer.reset();
-        mTimer.start();
-        mMotorPidController.reset();
-        mPrevTime = -1;
-        mTrajectory = TrajectoryCommandUtils.getJSONTrajectory();
+    public void initialize(Trajectory pTrajectory) {
+        try {
+            mID = UUID.randomUUID();
+            mTimer.reset();
+            mTimer.start();
+            mMotorPidController.reset();
+            mPrevTime = -1;
+            mTrajectory = pTrajectory;
 //        Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
 //        Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
 //        mTrajectory = trajectory.transformBy(transform);
-        System.out.println(mTrajectory.getInitialPose());
-        initialState = mTrajectory.sample(0);
-        mPrevTargetWheelSpeeds = new DifferentialDriveWheelSpeeds(0,0);
-        mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0,0);
+            initialState = mTrajectory.sample(0);
+            mPrevTargetWheelSpeeds = new DifferentialDriveWheelSpeeds(0,0);
+            mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0,0);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("didn't work");
+        }
+
 
         SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
     }
     @Override
     protected void updateImpl() {
-        execute();
+        if (mInitialCycleCount != 200) {
+            execute();
+            mInitialCycleCount++;
+        }
+        else {
+            if (!kISEXECUTED) {
+                initialize(TrajectoryCommandUtils.getOtherJSONTrajectory());
+            }
+            execute();
+            kISEXECUTED = true;
+        }
     }
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;
 
-    public void execute_simple_deadreckon() {
-        SmartDashboard.putNumber("trajectory-seconds",mTrajectory.getTotalTimeSeconds());
-        double curTime = mTimer.get();
-        double dT = curTime - mPrevTime;
-
-        if (mPrevTime < 0) {
-            updateDriveTrain(new ImmutablePair<Double,Double>(0d,0d));
-            mPrevTime = curTime;
-            return;
-        }
-
-        double target_speed_meters_per_second = 20;
-//        if(!isFinished()) {
-            DifferentialDriveWheelSpeeds targetWheelSpeeds = new DifferentialDriveWheelSpeeds(target_speed_meters_per_second,target_speed_meters_per_second);
-            perform_execute(curTime,dT,calculateActualSpeeds(),targetWheelSpeeds, null);
-//        }
-    }
     /**
      * Method to perform the actual traversal. This should run a single step. A step will be defined as
      * a sequence of execution between some delta time from the previous execution. This method is expected to be
      * called multiple times until the robot traverses the entire Trajectory or until autonmous runs out of time.
      */
     public void execute() {
-
-
         double curTime = mTimer.get();
         double dT = curTime - mPrevTime;
 
@@ -189,7 +189,6 @@ public class BaseAutonController extends AbstractController {
         data.add(instActualAccelRight);
 
         perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds,data);
-
     }
 
     private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds, DifferentialDriveWheelSpeeds targetWheelSpeeds,List<Object>data) {
@@ -332,7 +331,7 @@ public class BaseAutonController extends AbstractController {
 
 
     /**
-     * Get the current robot opose
+     * Get the current robot pose
      * @return
      *  The robot pose represented as {@link Pose2d}
      */

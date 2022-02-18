@@ -96,9 +96,9 @@ public abstract class AbstractController {
             // Divide the drive train adder in half
             double speed = Math.max(Math.abs(db.drivetrain.get(L_ACTUAL_VEL_FT_s)), Math.abs(db.drivetrain.get(R_ACTUAL_VEL_FT_s))) / 2.0;
             // Add a static speed, in case we're human loading
-            speed += 3.0;
+            speed += 5.0;
             // Cap the speed to ensure the intake doesn't over-vibrate loose. This is close to the max drivetrain speed.
-            speed = Math.min(speed, 10.5);
+            speed = Math.max(speed, 10.5);
             db.powercell.set(INTAKE_STATE, EArmState.OUT);
             db.powercell.set(SET_INTAKE_VEL_ft_s , speed);
         } else {
