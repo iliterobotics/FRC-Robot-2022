@@ -18,12 +18,8 @@ public class Settings {
 
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
     public static int kAcceptableLogFailures = 8;
-
     public static double kNetworkTableUpdateRate = 0.01;
-
     public static boolean kIsLogging = true; // decide whether or not to log
-
-    public static double kDJOutput = .25;
 
     public static int sCODEX_COMMS_PORT = 5805;
 
@@ -31,53 +27,66 @@ public class Settings {
 
     public static final String CONTROLLER_PATH_PACKAGE = "us.ilite.robot.controller";
 
-    // ================================
+    // ==================================================
     // System ID's
     // DO NOT CHANGE ANY OF THE FOLLOWING VALUES. PERIOD.
-    // ================================
+    // ALWAYS CONSULT WITH MENTORS OR LEADERSHIP
+    // ==================================================
     public static class HW {
         public static class CAN {
             public static int kTimeoutMs = 10; //use for on the fly updates
             public static int kLongTimeoutMs = 100; //use for constructors
 
-            public static final int kDriveRightMaster = 1;
-            public static final int kDriveRightFollower = 2;
-            public static final int kDriveLeftMaster = 3;
-            public static final int kDriveLeftFollower = 4;
-            // TODO - double check that this is correct when the robot is right-side-up.
-            public static final int kMAXHanger1_left = 5;
-            public static final int kMAXHanger2_right = 6;
-            public static final int kMAXIntakeRollerId = 7;
-            public static final int kMAXIntakeArm = 8;
-            public static final int kSRXTurretId = 9;
-            public static final int kMAXFeederId = 10;
-            public static final int kTalonPowerCellSerializer = 11;
-            public static final int kTalonVerticalID = 12;
-            public static final int kFalconMasterId = 13;
-            public static final int kFalconFollowerId = 14;
-            public static final int kDJSpinnerVictorID = 15;
+            // ===============
+            // DRIVETRAIN ID's
+            // ===============
+            public static final int kDTMR2 = 2;
+            public static final int kDTR4 = 4;
+            public static final int kDTML1 = 1;
+            public static final int kDTML3 = 3;
+            public static final int kDTGyro = 30;
 
-            public static final int kPDP = 20;
-            public static final int kPigeon = 21;
+            // ======================
+            // FEEDER AND INTAKE ID's
+            // ======================
+            public static final int kINRoller = 9;
+            public static final int kINFeeder = 10;
 
-            public static int kLEDControlCanifier = 40;
+            // ============
+            // CLIMBER ID's
+            // ============
+            public static final int kCLM1 = 11;
+            public static final int kCL2 = 12;
+
+            // ========
+            // LED ID's
+            // ========
+            public static int kLEDCanifier = 31;
         }
 
         public static class Analog {
         }
 
         public static class DIO {
-            public static final int kEntryBeamChannel = 9;
-            public static final int kSecondaryBeamChannel = 8; // Change later
-            public static final int kExitBeamChannel = 7; // Change later
-            public static final int kAnglerID = 8; // BunnyBot Catapult
+            public static final int kEDTMR2 = 3;
+            public static final int kEDTML1 = 1;
+            public static final int kINEntryBeam = 9;
+            public static final int kINExitBeam = 10;
         }
 
-        public static class PWM {
-            public static final int kHoodServoId = 9;
-        }
+        public static class PCH {
+            // ======================
+            // FEEDER AND INTAKE ID's
+            // ======================
+            public static final int kINPNIntakeForward = 1;
+            public static final int kINPNIntakeReverse = 2;
+            public static final int kINPNFeeder = 3;
 
-        public static class PCM {
+            // ============
+            // CLIMBER ID's
+            // ============
+            public static final int kCLPNClimbForward = 4;
+            public static final int kCLPNClimbReverse = 5;
         }
 
     }

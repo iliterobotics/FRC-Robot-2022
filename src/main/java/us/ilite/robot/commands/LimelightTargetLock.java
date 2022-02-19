@@ -13,18 +13,8 @@ public class LimelightTargetLock extends TargetLock {
 
     private Limelight mLimelight;
 
-
-//    public LimelightTargetLock(Drive pDrive, Limelight pLimelight, double pAllowableError, ETrackingType pTrackingType, IThrottleProvider pThrottleProvider) {
-//        super(pDrive, pAllowableError, pTrackingType, pLimelight, pThrottleProvider);
-//        this.mLimelight = pLimelight;
-//        mLimelight.setTracking(pTrackingType);
-//        mLog.error("STARTED LIMELIGHT TARGET LOCK");
-//    }
-
     public LimelightTargetLock() {
         super();
-
-//        this.mLimelight = pLimelight;
         mLog.error("STARTED LIMELIGHT TARGET LOCK");
     }
 
@@ -37,7 +27,6 @@ public class LimelightTargetLock extends TargetLock {
     public void shutdown(double pNow) {
         super.shutdown(pNow);
         mLog.warn("SHUT DOWN LIMELIGHT TARGET LOCK");
-        Robot.DATA.goaltracking.set(EVisionGoal2020.TARGET_ID , (double)Limelight.NONE.id());
     }
 
 }
