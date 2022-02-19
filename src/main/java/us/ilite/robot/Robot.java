@@ -162,6 +162,7 @@ public class Robot extends TimedRobot {
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
+        mRunningModules.modeInit(TELEOPERATED);
     }
 
     @Override

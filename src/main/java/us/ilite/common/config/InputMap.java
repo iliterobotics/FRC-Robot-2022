@@ -62,14 +62,14 @@ public class InputMap {
         AIM = ELogitech310.B_BTN,
 
         FAR_MODE = ELogitech310.Y_BTN,
-//        NEAR_MODE = ELogitech310.A_BTN,
+        NEAR_MODE = ELogitech310.A_BTN,
         CLOSE_MODE = ELogitech310.L_BTN,
         MANUAL_HOOD_UP = ELogitech310.DPAD_UP,
         MANUAL_HOOD_DOWN = ELogitech310.DPAD_DOWN,
 
         // DO NOT CHANGE THESE
-//        INTAKE_ACTIVATE = ELogitech310.LEFT_TRIGGER_AXIS,
-//        INTAKE_REVERSE = ELogitech310.R_BTN,
+        INTAKE_ACTIVATE = ELogitech310.LEFT_TRIGGER_AXIS,
+        INTAKE_REVERSE = ELogitech310.R_BTN,
         INTAKE_STOW = ELogitech310.RIGHT_TRIGGER_AXIS,
         RESET_INTAKE_COUNT = ELogitech310.BACK,
 
@@ -93,7 +93,7 @@ public class InputMap {
                 HOOD_TO_ANGLE = ELogitech310.Y_BTN,
                 TEST_FIRE = ELogitech310.L_BTN,
                 BASIC_INTAKE = ELogitech310.B_BTN,
-//                INTAKE_STOW = ELogitech310.A_BTN,
+                INTAKE_STOW = ELogitech310.A_BTN,
                 REVERSE_INTAKE = ELogitech310.X_BTN,
                 FLYWHEEL_SPINUP_TEST = ELogitech310.START,
                 FLYWHEEL_VELOCITY_10_TEST = ELogitech310.DPAD_UP,
@@ -109,7 +109,7 @@ public class InputMap {
     public static class LIMELIGHT {
         public static final ELogitech310
                 LIMELIGHT_LOCK_TARGET = ELogitech310.B_BTN,
-//                LIMELIGHT_LOCK_BALL = ELogitech310.A_BTN,
+                LIMELIGHT_LOCK_BALL = ELogitech310.A_BTN,
                 LIMELIGHT_LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
                 LIMELIGHT_LOCK_BALL_TRI = ELogitech310.X_BTN,
                 LIMELIGHT_LOCK_BALL_DUAL = ELogitech310.START

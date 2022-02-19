@@ -3,9 +3,12 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.*;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.ProfileGains;
@@ -34,6 +37,7 @@ public class FeederModule extends Module {
 
     //Beam Breakers
     private DigitalBeamSensor mEntryBeamBreaker;
+    private DigitalBeamSensor mExitBeamBreaker;
 
     //PID Controller and Gains
     private ILITEPIDController mFeederPID;
@@ -46,25 +50,32 @@ public class FeederModule extends Module {
     private final double kMaxFalconSpeed = 6380;
 
     public FeederModule () {
-        mIntakeFeeder = new TalonFX(Settings.HW.CAN.kMAXFeederId);
-        mEntryBeamBreaker = new DigitalBeamSensor(9, kDebounceTime);
-        mFeederPID = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kFeederGains, clock);
+//        mIntakeFeeder = new TalonFX(Settings.HW.CAN.kMAXFeederId);
+        mIntakeFeeder = new TalonFX(-1);
+        mEntryBeamBreaker = new DigitalBeamSensor(-1, kDebounceTime);
+        mExitBeamBreaker = new DigitalBeamSensor(-1, kDebounceTime);
+//        mFeederPID = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kFeederGains, clock);
+    }
+
+    @Override
+    public void modeInit(EMatchMode mode) {
         db.feeder.set(NUM_BALLS, 0);
     }
 
     @Override
     public void readInputs() {
-        db.feeder.set(CONVEYOR_pct, mIntakeFeeder.getSelectedSensorVelocity()* kVelocityConversion);
+        db.feeder.set(CONVEYOR_pct, mIntakeFeeder.getSelectedSensorVelocity()* kVelocityConversion / kMaxFalconSpeed);
         db.feeder.set(ENTRY_BEAM, mEntryBeamBreaker.isBroken());
+        db.feeder.set(EXIT_BEAM, mExitBeamBreaker.isBroken());
 
     }
 
     @Override
     public void setOutputs() {
         //calculate pid velocity
-        double desiredVelocity = mFeederPID.calculate(db.feeder.get(CONVEYOR_pct) * kMaxFalconSpeed, db.feeder.get(SET_CONVEYOR_pct) * kMaxFalconSpeed);
+//        double desiredVelocity = mFeederPID.calculate(db.feeder.get(CONVEYOR_pct) * kMaxFalconSpeed, db.feeder.get(SET_CONVEYOR_pct) * kMaxFalconSpeed);
 
-        mIntakeFeeder.set(TalonFXControlMode.Velocity, desiredVelocity);
+        mIntakeFeeder.set(TalonFXControlMode.PercentOutput, db.feeder.get(SET_CONVEYOR_pct));
 
     }
 }
