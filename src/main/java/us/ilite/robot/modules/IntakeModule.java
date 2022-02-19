@@ -32,12 +32,12 @@ public class IntakeModule extends Module{
     private DoubleSolenoid mArmSolenoid;
 
     //PID Controller and Gains
-    private PIDController mRollerPID;
-    private ProfileGains kIntakeGains = new ProfileGains().p(0.000001).i(0).d(0);
+    private ILITEPIDController mRollerPID;
+    private ProfileGains kIntakeGains = new ProfileGains().p(-0.01).i(0).d(0);
 
     //Constants
     private final double kWheelCircumference = 4 * Math.PI;
-    private final double kMaxFalconSpeed = 6380; // change back to falcon
+    private final double kMaxFalconSpeed = 5200; // change back to falcon
     private final double kVelocityConversion = 2048 * 1000 * kWheelCircumference;
 
     public IntakeModule() {
@@ -46,8 +46,9 @@ public class IntakeModule extends Module{
         //initialize motors and such
 
         //create pid values, set min/max input/outputs
-        mRollerPID = new PIDController(kIntakeGains, -kMaxFalconSpeed, kMaxFalconSpeed, 0.1);
+        mRollerPID = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kIntakeGains, clock.simulated());
         mRollerPID.setOutputRange(-kMaxFalconSpeed, kMaxFalconSpeed);
+        mRollerPID.setInputRange(-kMaxFalconSpeed, kMaxFalconSpeed);
     }
 
     @Override
@@ -60,11 +61,11 @@ public class IntakeModule extends Module{
     @Override
     public void setOutputs() {
         //calculate pid velocity
-//        mRollerPID.setSetpoint(db.cargo.get(SET_ROLLER_VEL_ft_s));
-//        double desiredVelocity = mRollerPID.calculate(db.cargo.get(ROLLER_VEL_ft_s), clock.getCurrentTimeInMillis());
+        double desiredVelocity = mRollerPID.calculate(db.cargo.get(ROLLER_VEL_ft_s), db.cargo.get(SET_ROLLER_VEL_ft_s));
 
         //set value to motor
         mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.cargo.get(SET_ROLLER_VEL_ft_s) / kMaxFalconSpeed);
+//        mIntakeRoller.set(desiredVelocity / kMaxFalconSpeed);
 
         //turning the solenoids on or off
         setPneumaticIntake();
