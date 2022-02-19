@@ -51,9 +51,9 @@ public class FeederModule extends Module {
 
     public FeederModule () {
 //        mIntakeFeeder = new TalonFX(Settings.HW.CAN.kMAXFeederId);
-        mIntakeFeeder = new TalonFX(-1);
-        mEntryBeamBreaker = new DigitalBeamSensor(-1, kDebounceTime);
-        mExitBeamBreaker = new DigitalBeamSensor(-1, kDebounceTime);
+        mIntakeFeeder = new TalonFX(Settings.HW.CAN.kINFeeder);
+        mEntryBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
+        mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINExitBeam, kDebounceTime);
 //        mFeederPID = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kFeederGains, clock);
     }
 
