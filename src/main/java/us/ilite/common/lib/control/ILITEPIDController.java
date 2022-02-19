@@ -2,6 +2,7 @@ package us.ilite.common.lib.control;
 
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.lib.util.Utils;
 import us.ilite.robot.hardware.Clock;
@@ -33,6 +34,9 @@ public class ILITEPIDController implements Sendable {
     private double mTotalError = 0.0;
     private double desiredOutput = 0;
 
+    /**Instance counter to count the total instances of this class**/
+    private static int sInstances = 0;
+
     /**
      * Determines whether the output is in velocity mode or position mode
      */
@@ -46,7 +50,6 @@ public class ILITEPIDController implements Sendable {
         mGains = pGains;
         mClock = pClock;
 
-        mP = pGains.P;
         mI = pGains.I;
         mD = pGains.D;
         kF = pGains.F;
@@ -54,6 +57,9 @@ public class ILITEPIDController implements Sendable {
         MAX_ACCEL = mGains.MAX_ACCEL;
         mMaximumOutput = mGains.MAX_VELOCITY;
         mMinimumOutput = -mGains.MAX_VELOCITY;
+
+        sInstances++;
+        SendableRegistry.addLW(this, "ILitePIDController", sInstances);
     }
 
     /**
