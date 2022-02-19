@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
     private FeederModule mFeeder;
     private VioletDriveModule mViolet;
     private IntakeModule mIntake;
+    private RawLimelight mRawLimelight;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -73,10 +74,10 @@ public class Robot extends TimedRobot {
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mDrive = new DriveModule();
-      //  mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
+        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
-//        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
+        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
         mLEDControl = new LEDControl();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
@@ -154,11 +155,11 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mFeeder);
-//        mRunningModules.addModule(mViolet);
-        mRunningModules.addModule(mIntake);
+    //    mRunningModules.addModule(mFeeder);
+        mRunningModules.addModule(mViolet);
+   //     mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mHanger);
-//        mRunningModules.addModule(mLimelight);
+        mRunningModules.addModule(mLimelight);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);

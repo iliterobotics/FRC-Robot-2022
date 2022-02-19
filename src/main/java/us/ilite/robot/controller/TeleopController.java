@@ -3,12 +3,14 @@ package us.ilite.robot.controller;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.common.types.EIntakeData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
@@ -46,6 +48,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
         clock.report("updateFeeder", t -> updateFeeder());
         clock.report("updateIntake", t -> updateIntake());
         super.updateDrivetrain(false);
+        updateLimelightTargetLock();
     }
     private void updateCargo() {
 //        SmartDashboard.putBoolean("Button pressed: ", db.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS));
@@ -94,6 +97,15 @@ public class TeleopController extends BaseManualController { //copied from TestC
             } else {
                 db.feeder.set(EFeederData.SET_CONVEYOR_pct, -0.2);
             }
+        }
+    }
+    private void updateLimelightTargetLock() {
+        if (db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
+            db.limelight.set(ELimelightData.PIPELINE, Field2022.FieldElement.HUB_UPPER.pipeline());
+            db.limelight.set(ELimelightData.LED_MODE, 1);
+        } else {
+            db.limelight.set(ELimelightData.PIPELINE, Field2022.FieldElement.NONE.pipeline());
+            db.limelight.set(ELimelightData.LED_MODE, 0);
         }
     }
 

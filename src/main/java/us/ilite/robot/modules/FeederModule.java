@@ -1,31 +1,13 @@
 package us.ilite.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.revrobotics.*;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.lib.util.FilteredAverage;
-import us.ilite.common.lib.util.Units;
-import us.ilite.common.types.EFeederData;
-import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.types.EMatchMode;
 
-import static us.ilite.common.types.EIntakeData.ROLLER_VEL_ft_s;
-import static us.ilite.common.types.EIntakeData.SET_ROLLER_VEL_ft_s;
-import static us.ilite.robot.Enums.*;
-
-import us.ilite.robot.hardware.ContinuousRotationServo;
 import us.ilite.robot.hardware.DigitalBeamSensor;
-import us.ilite.robot.hardware.HardwareUtils;
-import us.ilite.robot.hardware.SparkMaxFactory;
 
 import static us.ilite.common.types.EFeederData.*;
 

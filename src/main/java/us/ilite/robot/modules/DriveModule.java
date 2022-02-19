@@ -8,8 +8,8 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Enums.EDriveState;
-import static us.ilite.common.types.EVisionGoal2020.TV;
-import static us.ilite.common.types.EVisionGoal2020.TX;
+import static us.ilite.common.types.ELimelightData.TV;
+import static us.ilite.common.types.ELimelightData.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 public class DriveModule extends Module {
@@ -160,9 +160,9 @@ public class DriveModule extends Module {
 				break;
 			case TARGET_ANGLE_LOCK:
 				double pidOutput = 0;
-				if(mTargetAngleLockPid != null && db.goaltracking != null && db.goaltracking.isSet(TV) && db.goaltracking.isSet(TX)) {
+				if(mTargetAngleLockPid != null && db.limelight != null && db.limelight.isSet(TV) && db.limelight.isSet(TX)) {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.goaltracking.get(TX), clock.dt());
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.limelight.get(TX), clock.dt());
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 //					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
 					turn = pidOutput;
