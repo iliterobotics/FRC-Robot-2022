@@ -49,8 +49,8 @@ public class Limelight extends Module implements ITargetDataProvider {
     private List<Translation2d> mLowerCorners = new ArrayList<>();
     private List<Translation2d> mUpperCorners = new ArrayList<>();
     private final CameraConfig mLimelight;
-//    private final Ilite3DSolver mUpperCornerSolver;
-//    private final Ilite3DSolver mLowerCornerSolver;
+    private final Ilite3DSolver mUpperCornerSolver;
+    private final Ilite3DSolver mLowerCornerSolver;
 
     private final NetworkTable mTable;
 
