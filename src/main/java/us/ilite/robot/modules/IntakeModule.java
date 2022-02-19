@@ -37,7 +37,7 @@ public class IntakeModule extends Module{
 
     //Constants
     private final double kWheelCircumference = 4 * Math.PI;
-    private final double kMaxFalconSpeed = 5820; // change back to falcon
+    private final double kMaxFalconSpeed = 6380; // change back to falcon
     private final double kVelocityConversion = 2048 * 1000 * kWheelCircumference;
 
     public IntakeModule() {
