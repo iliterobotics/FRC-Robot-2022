@@ -99,7 +99,7 @@ public class PIDController implements Sendable {
         }
 
         // Only add to totalError if output isn't being saturated
-        if ( ( mError * mProfileGains.P < mMaximumOutput ) && ( mError * mProfileGains.P > mMinimumOutput ) ) {
+        if ( ( mError * mPIDControl.get(EPIDController.P_GAIN) < mMaximumOutput ) && ( mError * mPIDControl.get(EPIDController.P_GAIN) > mMinimumOutput ) ) {
             mTotalError += mError * mDt;
         } else {
             mTotalError = 0;
@@ -108,7 +108,7 @@ public class PIDController implements Sendable {
         // Don't blow away mError so as to not break derivative
         double proportionalError = Math.abs( mError ) < mDeadband ? 0 : mError;
 
-        mResult = ( mProfileGains.P * proportionalError ) + ( mProfileGains.I * mTotalError ) + ( mProfileGains.D * ( mError - mPrevError ) / mDt )
+        mResult = ( mPIDControl.get(EPIDController.P_GAIN) * proportionalError ) + ( mPIDControl.get(EPIDController.I_GAIN) * mTotalError ) + ( mPIDControl.get(EPIDController.D_GAIN) * ( mError - mPrevError ) / mDt )
                 + ( mProfileGains.F * mSetpoint );
         mPrevError = mError;
 
