@@ -15,6 +15,7 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.FilteredAverage;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EFeederData;
+import us.ilite.common.types.ELEDControlData;
 import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.types.EMatchMode;
 
@@ -33,7 +34,7 @@ import static us.ilite.common.types.EFeederData.*;
 public class FeederModule extends Module {
 
     //Motors
-    private TalonFX mIntakeFeeder;
+    private TalonSRX mIntakeFeeder;
 
     //Beam Breakers
     private DigitalBeamSensor mEntryBeamBreaker;
@@ -41,7 +42,7 @@ public class FeederModule extends Module {
 
     //PID Controller and Gains
     private PIDController mFeederPID;
-    private ProfileGains kFeederGains = new ProfileGains().p(0.001).i(0).d(0);
+    private ProfileGains kFeederGains = new ProfileGains().p(0.5).i(0).d(0);
 
     //Constants
     private final double kWheelCircumference = 4 * Math.PI;
@@ -50,9 +51,9 @@ public class FeederModule extends Module {
     private final double kMaxFalconSpeed = 6380;
 
     public FeederModule () {
-        mIntakeFeeder = new TalonFX(Settings.HW.CAN.kINFeeder);
-        mEntryBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
-        mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINExitBeam, kDebounceTime);
+        mIntakeFeeder = new TalonSRX(11);
+        mEntryBeamBreaker = new DigitalBeamSensor(9, kDebounceTime);
+        mExitBeamBreaker = new DigitalBeamSensor(7, kDebounceTime);
         mFeederPID = new PIDController(kFeederGains, -kMaxFalconSpeed, kMaxFalconSpeed, 0.02);
     }
 
@@ -75,10 +76,11 @@ public class FeederModule extends Module {
         mFeederPID.setSetpoint(0.3);
         double desiredVelocity = mFeederPID.calculate(0, clock.getCurrentTimeInMillis());
 
-        mIntakeFeeder.set(TalonFXControlMode.PercentOutput, db.feeder.get(SET_CONVEYOR_pct));
-//        mIntakeFeeder.set(TalonFXControlMode.PercentOutput, desiredVelocity);
+        mIntakeFeeder.set(TalonSRXControlMode.PercentOutput, desiredVelocity);
+
         SmartDashboard.putNumber("PID Calc: ", desiredVelocity);
         SmartDashboard.putNumber("Actual VELOCIty: ", db.feeder.get(CONVEYOR_pct));
         SmartDashboard.putNumber("Desired VELOCIty: ", db.feeder.get(SET_CONVEYOR_pct));
+//        SmartDashboard.putNumber("numballs: ", db.feeder.get(NUM_BALLS));
     }
 }

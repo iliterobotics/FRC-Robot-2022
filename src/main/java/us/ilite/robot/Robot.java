@@ -60,6 +60,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         // Init the actual robot
 //        initTimer.reset();
@@ -159,6 +160,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mLimelight);
+        mRunningModules.addModule(mLEDControl);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);

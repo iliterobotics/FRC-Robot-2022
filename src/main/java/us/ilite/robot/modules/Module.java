@@ -24,7 +24,6 @@ public abstract class Module {
      * Runs when we init a new robot mode, for example teleopInit() or autonomousInit()
      */
     public void modeInit(EMatchMode pMode){
-
     }
 
     /**

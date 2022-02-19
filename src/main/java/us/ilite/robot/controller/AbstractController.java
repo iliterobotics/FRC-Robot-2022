@@ -8,6 +8,7 @@ import us.ilite.common.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
+import us.ilite.common.types.EFeederData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Clock;
 
@@ -22,6 +23,9 @@ public abstract class AbstractController {
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
     protected double dt = 1d;
+    private boolean isBallAdded = false;
+    private boolean isBallOut = false;
+    private int numBalls = 0;
 
     protected int mNumBalls = 0;
 
@@ -61,6 +65,30 @@ public abstract class AbstractController {
     }
 
     protected abstract void updateImpl();
+
+    protected void indexCargo() {
+        //Indexing balls coming in
+        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d) {
+            if(!isBallAdded) {
+                numBalls++;
+                isBallAdded = true;
+            }
+            db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
+        } else if (isBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
+            isBallAdded = false;
+        }
+        //Indexing balls coming out
+        else if (db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
+            db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
+            if(!isBallOut) {
+                numBalls--;
+                isBallOut = true;
+            }
+        } else if (isBallOut && db.feeder.get(EFeederData.EXIT_BEAM) == 0d) {
+            isBallOut = false;
+        }
+        db.feeder.set(EFeederData.NUM_BALLS, numBalls);
+    }
 
     /**
      * Provides a way to report on what is used in our codex vs not used. This should help reduce the
