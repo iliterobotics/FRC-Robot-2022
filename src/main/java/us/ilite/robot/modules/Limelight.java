@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.Field2022;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.EShooterSystemData;
+import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.IFieldComponent;
 
@@ -49,8 +49,8 @@ public class Limelight extends Module implements ITargetDataProvider {
     private List<Translation2d> mLowerCorners = new ArrayList<>();
     private List<Translation2d> mUpperCorners = new ArrayList<>();
     private final CameraConfig mLimelight;
-    private final Ilite3DSolver mUpperCornerSolver;
-    private final Ilite3DSolver mLowerCornerSolver;
+//    private final Ilite3DSolver mUpperCornerSolver;
+//    private final Ilite3DSolver mLowerCornerSolver;
 
     private final NetworkTable mTable;
 
@@ -75,41 +75,41 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     @Override
     public void readInputs() {
-        boolean targetValid = mTable.getEntry("tv").getDouble(Double.NaN) > 0.0;
-        db.goaltracking.set(TV, targetValid);
-        if(mGoal.id() >= 0 && targetValid) {
-            db.goaltracking.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
-            db.goaltracking.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
-            db.goaltracking.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
-            db.goaltracking.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
-            if(db.goaltracking.get(TARGET_ID) != NONE.id()) {
-                // Old way of doing it
-                db.goaltracking.set(TARGET_RANGE_in, calcTargetDistance(mGoal));
-
-                // New way of doing it
-                updateCorners();
-                mUpperCornerSolver.updatePoseToGoal(mUpperCorners);
-                mLowerCornerSolver.updatePoseToGoal(mLowerCorners);
-                if(!mUpperCorners.isEmpty()) {
-                    db.goaltracking.set(T3D_TOP_X_in, mUpperCornerSolver.x().inches());
-                    db.goaltracking.set(T3D_TOP_Y_in, mUpperCornerSolver.y().inches());
-                    db.goaltracking.set(T3D_TOP_AZIMUTH_deg, mUpperCornerSolver.azimuth().degrees());
-                    db.goaltracking.set(T3D_TOP_AZ_OFFSET_deg, mUpperCornerSolver.offsetAzimuth().degrees());
-                    db.goaltracking.set(T3D_TOP_GOAL_RANGE_in, mUpperCornerSolver.range().inches());
-                    db.goaltracking.set(T3D_TOP_LEFT_RANGE_in, mUpperCornerSolver.leftRange().inches());
-                    db.goaltracking.set(T3D_TOP_RIGHT_RANGE_in, mUpperCornerSolver.rightRange().inches());
-                }
-                if(!mLowerCorners.isEmpty()) {
-                    db.goaltracking.set(T3D_BOT_X_in, mLowerCornerSolver.x().inches());
-                    db.goaltracking.set(T3D_BOT_Y_in, mLowerCornerSolver.y().inches());
-                    db.goaltracking.set(T3D_BOT_AZIMUTH_deg, mLowerCornerSolver.azimuth().degrees());
-                    db.goaltracking.set(T3D_BOT_AZ_OFFSET_deg, mLowerCornerSolver.offsetAzimuth().degrees());
-                    db.goaltracking.set(T3D_BOT_GOAL_RANGE_in, mLowerCornerSolver.range().inches());
-                    db.goaltracking.set(T3D_BOT_LEFT_RANGE_in, mLowerCornerSolver.leftRange().inches());
-                    db.goaltracking.set(T3D_BOT_RIGHT_RANGE_in, mLowerCornerSolver.rightRange().inches());
-                }
-            }
-        }
+//        boolean targetValid = mTable.getEntry("tv").getDouble(Double.NaN) > 0.0;
+//        db.goaltracking.set(TV, targetValid);
+//        if(mGoal.id() >= 0 && targetValid) {
+//            db.goaltracking.set(TX, mTable.getEntry("tx").getDouble(Double.NaN));
+//            db.goaltracking.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
+//            db.goaltracking.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
+//            db.goaltracking.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
+//            if(db.goaltracking.get(TARGET_ID) != NONE.id()) {
+//                // Old way of doing it
+//                db.goaltracking.set(TARGET_RANGE_in, calcTargetDistance(mGoal));
+//
+//                // New way of doing it
+//                updateCorners();
+//                mUpperCornerSolver.updatePoseToGoal(mUpperCorners);
+//                mLowerCornerSolver.updatePoseToGoal(mLowerCorners);
+//                if(!mUpperCorners.isEmpty()) {
+//                    db.goaltracking.set(T3D_TOP_X_in, mUpperCornerSolver.x().inches());
+//                    db.goaltracking.set(T3D_TOP_Y_in, mUpperCornerSolver.y().inches());
+//                    db.goaltracking.set(T3D_TOP_AZIMUTH_deg, mUpperCornerSolver.azimuth().degrees());
+//                    db.goaltracking.set(T3D_TOP_AZ_OFFSET_deg, mUpperCornerSolver.offsetAzimuth().degrees());
+//                    db.goaltracking.set(T3D_TOP_GOAL_RANGE_in, mUpperCornerSolver.range().inches());
+//                    db.goaltracking.set(T3D_TOP_LEFT_RANGE_in, mUpperCornerSolver.leftRange().inches());
+//                    db.goaltracking.set(T3D_TOP_RIGHT_RANGE_in, mUpperCornerSolver.rightRange().inches());
+//                }
+//                if(!mLowerCorners.isEmpty()) {
+//                    db.goaltracking.set(T3D_BOT_X_in, mLowerCornerSolver.x().inches());
+//                    db.goaltracking.set(T3D_BOT_Y_in, mLowerCornerSolver.y().inches());
+//                    db.goaltracking.set(T3D_BOT_AZIMUTH_deg, mLowerCornerSolver.azimuth().degrees());
+//                    db.goaltracking.set(T3D_BOT_AZ_OFFSET_deg, mLowerCornerSolver.offsetAzimuth().degrees());
+//                    db.goaltracking.set(T3D_BOT_GOAL_RANGE_in, mLowerCornerSolver.range().inches());
+//                    db.goaltracking.set(T3D_BOT_LEFT_RANGE_in, mLowerCornerSolver.leftRange().inches());
+//                    db.goaltracking.set(T3D_BOT_RIGHT_RANGE_in, mLowerCornerSolver.rightRange().inches());
+//                }
+//            }
+//        }
     }
 
     @Override
@@ -123,7 +123,7 @@ public class Limelight extends Module implements ITargetDataProvider {
         db.goaltracking.set(PIPELINE, mGoal.pipeline());
         mTable.getEntry("pipeline").setNumber(mGoal.pipeline());
         // TODO - calibrate this angle. The LL angle may have an offset from the hood, by a few degrees
-        mLimelight.setElevationAngle(db.flywheel.safeGet(EShooterSystemData.HOOD_ANGLE_deg, 0d));
+//        mLimelight.setElevationAngle(db.flywheel.safeGet(EFeederData.HOOD_ANGLE_deg, 0d));
 
         SmartDashboard.putBoolean("Valid Goal", db.goaltracking.isSet(TV));
         if(db.goaltracking.isSet(TV)) {

@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.util.Color;
+import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
-import us.ilite.robot.Enums;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,8 +46,8 @@ public class Data {
     public final RobotCodex<EVisionGoal2020> groundTracking = new RobotCodex(NULL_CODEX_VALUE, EVisionGoal2020.class);
     public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
     public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
-    public final RobotCodex<EIntakeData> intake = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
-    public final RobotCodex<EShooterSystemData> flywheel = new RobotCodex(NULL_CODEX_VALUE, EShooterSystemData.class);
+    public final RobotCodex<EIntakeData> cargo = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
+    public final RobotCodex<EFeederData> feeder = new RobotCodex(NULL_CODEX_VALUE, EFeederData.class);
     public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
     public final RobotCodex<EVisionGoal2020> limelight = new RobotCodex(NULL_CODEX_VALUE , EVisionGoal2020.class);
     public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
@@ -59,8 +59,8 @@ public class Data {
             pdp,
             rawLimelight,
             groundTracking,
-            flywheel,
-            intake,
+            feeder,
+            cargo,
             hanger,
             goaltracking,
             color,
@@ -73,9 +73,9 @@ public class Data {
             drivetrain,
             driverinput,
             operatorinput,
-            flywheel,
+            feeder,
             pdp,
-            intake,
+            cargo,
             hanger,
             color,
             goaltracking,
