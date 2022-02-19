@@ -9,9 +9,12 @@ import com.flybotix.hfr.codex.Codex;
 import com.flybotix.hfr.codex.CodexOf;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import us.ilite.common.lib.util.Utils;
 
-public class PIDController {
+public class PIDController implements Sendable {
 
     private ILog mLogger = Logger.createLog( this.getClass() );
 
@@ -42,6 +45,8 @@ public class PIDController {
     private double mDTForCodex;
     private double mDefaultDT;
 
+    private static int instanceCount = 0;
+
 
     /**
      * Constructs a PIDController object with a ProfileGains object and defaultDT
@@ -55,6 +60,8 @@ public class PIDController {
         mMinimumInput = pMinInput;
         mMaximumInput = pMaxInput;
         mDefaultDT = kDefaultDT;
+
+        SendableRegistry.addLW(this, "PIDControllerOfIlite", instanceCount++);
     }
 
     /**
@@ -145,6 +152,15 @@ public class PIDController {
         mPIDControl.set( EPIDController.I_GAIN, mProfileGains.I );
         mPIDControl.set( EPIDController.D_GAIN, mProfileGains.D );
         mPIDControl.set( EPIDController.F_GAIN, mProfileGains.F );
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("PIDController");
+        builder.addDoubleProperty("p", ()->mPIDControl.get(EPIDController.P_GAIN), (pP)->mPIDControl.set(EPIDController.P_GAIN,pP));
+        builder.addDoubleProperty("i", ()->mPIDControl.get(EPIDController.I_GAIN), (pI)->mPIDControl.set(EPIDController.I_GAIN,pI));
+        builder.addDoubleProperty("d", ()->mPIDControl.get(EPIDController.D_GAIN), (pD)->mPIDControl.set(EPIDController.D_GAIN,pD));
+        builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
     }
 
     enum EPIDController implements CodexOf<Double> {
