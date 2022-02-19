@@ -15,22 +15,19 @@ import us.ilite.robot.hardware.DigitalBeamSensor;
 public class ClimberModule extends Module{
     private TalonFX mCLL0;
     private TalonFX mCLMR0;
-    private DigitalBeamSensor mCLBeamCheck;
 
     private ILITEPIDController mPidVelocityController;
     private ILITEPIDController mPidPositionController;
-    private ProfileGains kHangerProfile;
+    private ProfileGains kHangerVelocityProfile;
+    private ProfileGains kHangerPositionProfile;
     private Clock mClock = new Clock();
-    private double kGearboxRatio = 268.8;
-
-    //verify these:
-    private double kWheelDiameterInches = 5.875;
-    private double kWheelCircumferenceFeet = kWheelDiameterInches * Math.PI/12.0;
 
     public ClimberModule() {
-        kHangerProfile = new ProfileGains().p(.00001).i(0).d(0);
-        mPidVelocityController = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kHangerProfile, mClock);
-        mPidPositionController = new ILITEPIDController(ILITEPIDController.EPIDControlType.POSITION, kHangerProfile, mClock);
+        kHangerVelocityProfile = new ProfileGains().p(.00001).i(0).d(0);
+        mPidVelocityController = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kHangerVelocityProfile, mClock);
+
+        kHangerPositionProfile = new ProfileGains().p(.00001).i(0).d(0);
+        mPidPositionController = new ILITEPIDController(ILITEPIDController.EPIDControlType.POSITION, kHangerPositionProfile, mClock);
 
         //verify these:
         mPidVelocityController.setOutputRange(-6380, 6380);
@@ -39,7 +36,6 @@ public class ClimberModule extends Module{
         mPidPositionController.setInputRange(6380, -6380);
 
         //change these ids:
-        mCLBeamCheck = new DigitalBeamSensor(-1);
         mCLL0 = new TalonFX(-1);
         mCLMR0 = new TalonFX(-1);
 
@@ -51,28 +47,26 @@ public class ClimberModule extends Module{
 
     @Override
     public void readInputs() {
-        //convert from raw sensor velocity inputs to feet per second
+        //convert from raw sensor velocity inputs to rpm
         double leftRawSensorVelocity = mCLL0.getSelectedSensorVelocity();
         double leftRotationsPerSecond = (leftRawSensorVelocity / 2048) / 1000;
-        double leftFeetPerSecond = leftRotationsPerSecond / kWheelCircumferenceFeet;
+        double leftRotationsPerMinute = leftRotationsPerSecond * 60;
 
         double rightRawSensorVelocity = mCLMR0.getSelectedSensorVelocity();
         double rightRotationsPerSecond = (rightRawSensorVelocity / 2048) / 1000;
-        double rightFeetPerSecond = rightRotationsPerSecond / kWheelCircumferenceFeet;
+        double rightRotationsPerMinute = rightRotationsPerSecond * 60;
 
-        //convert from raw sensor position inputs to feet
+        //convert from raw sensor position inputs rpm
         double leftRawSensorPosition = mCLL0.getSelectedSensorPosition();
         double leftRotations = (leftRawSensorPosition / 2048);
-        double leftFeet = leftRotations / kWheelCircumferenceFeet;
 
         double rightRawSensorPosition = mCLMR0.getSelectedSensorPosition();
         double rightRotations = (rightRawSensorPosition / 2048);
-        double rightFeet = rightRotations / kWheelCircumferenceFeet;
 
-        db.hanger.set(EHangerModuleData.L_VEL_rpm,leftFeetPerSecond);
-        db.hanger.set(EHangerModuleData.R_VEL_rpm, rightFeetPerSecond);
-        db.hanger.set(EHangerModuleData.L_POSITION_rot, leftFeet);
-        db.hanger.set(EHangerModuleData.R_POSITION_rot, rightFeet);
+        db.hanger.set(EHangerModuleData.L_VEL_rpm,leftRotationsPerMinute);
+        db.hanger.set(EHangerModuleData.R_VEL_rpm, rightRotationsPerMinute);
+        db.hanger.set(EHangerModuleData.L_POSITION_rot, leftRotations);
+        db.hanger.set(EHangerModuleData.R_POSITION_rot, rightRotations);
 
     }
 
