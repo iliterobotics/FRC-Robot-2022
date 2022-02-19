@@ -55,6 +55,8 @@ public class FeederModule extends Module {
         mEntryBeamBreaker = new DigitalBeamSensor(9, kDebounceTime);
         mExitBeamBreaker = new DigitalBeamSensor(7, kDebounceTime);
         mFeederPID = new PIDController(kFeederGains, -kMaxFalconSpeed, kMaxFalconSpeed, 0.02);
+
+        SmartDashboard.putData(mFeederPID);
     }
 
     @Override

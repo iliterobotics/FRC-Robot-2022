@@ -12,6 +12,7 @@ import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.lib.util.Utils;
 
 public class PIDController implements Sendable {
@@ -60,6 +61,10 @@ public class PIDController implements Sendable {
         mMinimumInput = pMinInput;
         mMaximumInput = pMaxInput;
         mDefaultDT = kDefaultDT;
+
+        mPIDControl.set(EPIDController.P_GAIN, mProfileGains.P);
+        mPIDControl.set(EPIDController.I_GAIN, mProfileGains.I);
+        mPIDControl.set(EPIDController.D_GAIN, mProfileGains.D);
 
         SendableRegistry.addLW(this, "PIDControllerOfIlite", instanceCount++);
     }
@@ -153,6 +158,7 @@ public class PIDController implements Sendable {
         mPIDControl.set( EPIDController.D_GAIN, mProfileGains.D );
         mPIDControl.set( EPIDController.F_GAIN, mProfileGains.F );
     }
+
 
     @Override
     public void initSendable(SendableBuilder builder) {
