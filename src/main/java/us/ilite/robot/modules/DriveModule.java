@@ -84,12 +84,12 @@ public class DriveModule extends Module {
 			.slot(dSlot);
 
 	public DriveModule() {
-		mLeftMaster = new TalonFX(Settings.HW.CAN.kDriveLeftMaster);
-		mLeftFollower = new TalonFX(Settings.HW.CAN.kDriveLeftFollower);
+		mLeftMaster = new TalonFX(Settings.HW.CAN.kDTML1);
+		mLeftFollower = new TalonFX(Settings.HW.CAN.kDTML3);
 		mLeftFollower.follow(mLeftMaster);
 
-		mRightMaster = new TalonFX(Settings.HW.CAN.kDriveRightMaster);
-		mRightFollower = new TalonFX(Settings.HW.CAN.kDriveRightFollower);
+		mRightMaster = new TalonFX(Settings.HW.CAN.kDTMR2);
+		mRightFollower = new TalonFX(Settings.HW.CAN.kDTR4);
 		mRightFollower.follow(mRightMaster);
 
 		velocityPID = new PIDController(velocityGains, -kMaxDriveThreshold * kDriveTrainMaxVelocityRPM,

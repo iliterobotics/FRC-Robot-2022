@@ -104,7 +104,8 @@ public class Enums {
         SMART_MOTION,
         TURN_TO,
         TURN_FOR,
-        HOME
+        HOME,
+        TANK
     }
 
 
