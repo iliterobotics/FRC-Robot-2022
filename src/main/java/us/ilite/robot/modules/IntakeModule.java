@@ -41,7 +41,7 @@ public class IntakeModule extends Module{
     private final double kVelocityConversion = 2048 * 1000 * kWheelCircumference;
 
     public IntakeModule() {
-        mIntakeRoller = new TalonFX(Settings.HW.CAN.kMAXIntakeRollerId);
+        mIntakeRoller = new TalonFX(-1);
         mArmSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,-1, -1);
         //initialize motors and such
 

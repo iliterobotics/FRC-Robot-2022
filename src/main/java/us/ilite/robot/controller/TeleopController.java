@@ -76,15 +76,15 @@ public class TeleopController extends BaseManualController { //copied from TestC
     private void updateIntake() {
         //If not max balls and button down, bring arm down and start intaking
         if (db.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS)) { //left trigger
-//                db.cargo.set(REV_PNEUMATIC_STATE, 0d);
-//                db.cargo.set(FWD_PNEUMATIC_STATE, 1d);
-//            if(db.feeder.get(EFeederData.NUM_BALLS) < 2) {
+                db.cargo.set(REV_PNEUMATIC_STATE, 0d);
+                db.cargo.set(FWD_PNEUMATIC_STATE, 1d);
+            if(db.feeder.get(EFeederData.NUM_BALLS) < 2) {
                 db.cargo.set(SET_ROLLER_VEL_ft_s, Math.max(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s), db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)) + 1000);
-//            }
+            }
             //If beam breaker is broken, add one ball
         } else {
-//                db.cargo.set(FWD_PNEUMATIC_STATE, 0d);
-//                db.cargo.set(REV_PNEUMATIC_STATE, 1d);
+                db.cargo.set(FWD_PNEUMATIC_STATE, 0d);
+                db.cargo.set(REV_PNEUMATIC_STATE, 1d);
         }
 
         //Reverse intake
