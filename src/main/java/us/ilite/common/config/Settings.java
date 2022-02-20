@@ -78,8 +78,8 @@ public class Settings {
             // ======================
             // FEEDER AND INTAKE ID's
             // ======================
-            public static final int kINPNIntakeForward = 1;
-            public static final int kINPNIntakeReverse = 2;
+            public static final int kINPNIntakeForward = 0;
+            public static final int kINPNIntakeReverse = 1;
             public static final int kINPNFeeder = 3;
 
             // ============

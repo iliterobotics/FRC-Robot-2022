@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
     private FeederModule mFeeder;
     private VioletDriveModule mViolet;
     private IntakeModule mIntake;
+    private Compressor mCompressor;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -61,13 +62,15 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
+        mCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
+        mCompressor.enableAnalog(90, 120);
         // Init the actual robot
 //        initTimer.reset();
 //        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
-        mViolet = new VioletDriveModule();
-        mDrive = new DriveModule();
+     //   mViolet = new VioletDriveModule();
+      //  mDrive = new DriveModule();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -188,7 +191,8 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.readInputs();
-        mDrive.readInputs();
+//        mDrive.readInputs();
+        mIntake.readInputs();
         mFeeder.readInputs();
         Shuffleboard.update();
     }

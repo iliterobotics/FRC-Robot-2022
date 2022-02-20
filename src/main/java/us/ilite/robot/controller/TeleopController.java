@@ -44,14 +44,16 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // ========================================
         clock.report("updateCargo", t -> updateCargo());
         clock.report("updateFeeder", t -> updateFeeder());
-        clock.report("updateIntake", t -> updateIntake());
+//        clock.report("updateIntake", t -> updateIntake());
         super.updateDrivetrain(false);
+        updateIntake();
     }
+
     private void updateCargo() {
 //        SmartDashboard.putBoolean("Button pressed: ", db.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS));
         //Indexing balls coming in
         if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d) {
-            if(!isBallAdded) {
+            if (!isBallAdded) {
                 numBalls++;
                 isBallAdded = true;
             }
@@ -60,9 +62,9 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //            db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.0);
             isBallAdded = false;
         } //Indexing balls coming out
-       else if (db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
+        else if (db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
             db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
-            if(!isBallOut) {
+            if (!isBallOut) {
                 numBalls--;
                 isBallOut = true;
             }
@@ -74,26 +76,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateIntake() {
-        //If not max balls and button down, bring arm down and start intaking
         if (db.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS)) { //left trigger
-                db.cargo.set(REV_PNEUMATIC_STATE, 0d);
-                db.cargo.set(FWD_PNEUMATIC_STATE, 1d);
-            if(db.feeder.get(EFeederData.NUM_BALLS) < 2) {
-                db.cargo.set(SET_ROLLER_VEL_ft_s, Math.max(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s), db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)) + 15);
-            }
-            //If beam breaker is broken, add one ball
-        } else {
-                db.cargo.set(FWD_PNEUMATIC_STATE, 0d);
-                db.cargo.set(REV_PNEUMATIC_STATE, 1d);
-        }
-
-        //Reverse intake
-        if (db.driverinput.isSet(ELogitech310.R_BTN)) { //r button
-            if (db.feeder.get(EFeederData.NUM_BALLS) == 0d) {
-                db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0);
-            } else {
-                db.feeder.set(EFeederData.SET_CONVEYOR_pct, -0.2);
-            }
+            db.cargo.set(ARM_STATE, Enums.EArmState.DEFAULT);
+        } else if (db.driverinput.isSet(ELogitech310.RIGHT_TRIGGER_AXIS)) {
+            db.cargo.set(ARM_STATE, Enums.EArmState.RETRACT);
         }
     }
 

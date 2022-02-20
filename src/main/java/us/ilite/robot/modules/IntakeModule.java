@@ -9,6 +9,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EIntakeData;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EIntakeData.*;
@@ -32,7 +33,7 @@ public class IntakeModule extends Module{
 
     public IntakeModule() {
         mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
-        mArmSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
+        mArmSolenoid = new DoubleSolenoid(20, PneumaticsModuleType.REVPH, Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
         mRollerPID = new PIDController(kIntakeGains, -kMaxFalconSpeed * kFeetSpeedConversion, kMaxFalconSpeed * kFeetSpeedConversion, 0.1);
         mRollerPID.setOutputRange(-kMaxFalconSpeed * kFeetSpeedConversion, kMaxFalconSpeed * kFeetSpeedConversion);
     }
@@ -44,26 +45,29 @@ public class IntakeModule extends Module{
         //TODO figure out difference between stator and supply
         db.cargo.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
         db.cargo.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
-        db.cargo.set(FWD_PNEUMATIC_STATE, mArmSolenoid.get());
-        db.cargo.set(REV_PNEUMATIC_STATE, mArmSolenoid.get());
+        db.cargo.set(RETRACT, mArmSolenoid.get());
+        db.cargo.set(EXTEND, mArmSolenoid.get());
     }
 
     @Override
     public void setOutputs() {
-        setPneumaticIntake();
-        setRollerState();
+       setPneumaticIntake();
+       setRollerState();
     }
 
     //if pneumatic state is 1/on, set solenoids on
     public void setPneumaticIntake() {
-        if(db.cargo.get(FWD_PNEUMATIC_STATE) == 1d) {
-            mArmSolenoid.set(DoubleSolenoid.Value.kReverse);
+        Enums.EArmState mode = db.cargo.get(ARM_STATE, Enums.EArmState.class);
+        if (mode == null) {
+           return;
         }
-        else if (db.cargo.get(REV_PNEUMATIC_STATE) == 1d) {
-            mArmSolenoid.set(DoubleSolenoid.Value.kForward);
-        }
-        else {
-            mArmSolenoid.set(DoubleSolenoid.Value.kOff);
+        switch (mode) {
+            case DEFAULT:
+                mArmSolenoid.set(DoubleSolenoid.Value.kReverse);
+                break;
+            case RETRACT:
+                mArmSolenoid.set(DoubleSolenoid.Value.kForward);
+                break;
         }
     }
 

@@ -105,11 +105,17 @@ public class Enums {
 
 
     // =============================================================================
-    // Power Cell Module States
+    // Intake Module States
     // =============================================================================
     public enum EIntakeState {
         PERCENT_OUTPUT,
         VELOCITY;
+    }
+
+    public enum EArmState {
+        EXTEND,
+        RETRACT,
+        DEFAULT;
     }
 
 
