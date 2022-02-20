@@ -31,17 +31,11 @@ import static us.ilite.common.types.EFeederData.*;
 
 
 public class FeederModule extends Module {
-
     //Motors
     private TalonFX mIntakeFeeder;
-
     //Beam Breakers
     private DigitalBeamSensor mEntryBeamBreaker;
     private DigitalBeamSensor mExitBeamBreaker;
-
-    //PID Controller and Gains
-    private ILITEPIDController mFeederPID;
-    private ProfileGains kFeederGains = new ProfileGains().p(0.001).i(0).d(0);
 
     //Constants
     private final double kWheelCircumference = 4 * Math.PI;
@@ -50,11 +44,9 @@ public class FeederModule extends Module {
     private final double kMaxFalconSpeed = 6380;
 
     public FeederModule () {
-//        mIntakeFeeder = new TalonFX(Settings.HW.CAN.kMAXFeederId);
         mIntakeFeeder = new TalonFX(Settings.HW.CAN.kINFeeder);
         mEntryBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
         mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINExitBeam, kDebounceTime);
-//        mFeederPID = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, kFeederGains, clock);
     }
 
     @Override
@@ -73,9 +65,6 @@ public class FeederModule extends Module {
     @Override
     public void setOutputs() {
         //calculate pid velocity
-//        double desiredVelocity = mFeederPID.calculate(db.feeder.get(CONVEYOR_pct) * kMaxFalconSpeed, db.feeder.get(SET_CONVEYOR_pct) * kMaxFalconSpeed);
-
         mIntakeFeeder.set(TalonFXControlMode.PercentOutput, db.feeder.get(SET_CONVEYOR_pct));
-
     }
 }

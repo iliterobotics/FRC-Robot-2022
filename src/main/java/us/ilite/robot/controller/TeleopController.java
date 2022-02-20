@@ -79,7 +79,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
                 db.cargo.set(REV_PNEUMATIC_STATE, 0d);
                 db.cargo.set(FWD_PNEUMATIC_STATE, 1d);
             if(db.feeder.get(EFeederData.NUM_BALLS) < 2) {
-                db.cargo.set(SET_ROLLER_VEL_ft_s, Math.max(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s), db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)) + 1000);
+                db.cargo.set(SET_ROLLER_VEL_ft_s, Math.max(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s), db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)) + 15);
             }
             //If beam breaker is broken, add one ball
         } else {
