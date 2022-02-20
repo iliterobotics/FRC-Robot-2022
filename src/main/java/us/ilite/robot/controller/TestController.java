@@ -26,7 +26,6 @@ public class TestController extends BaseManualController {
     private double mLimelightZoomThreshold = 7.0;
     private double mLimelightGoalThreshold = 5.0;
 
-    private EIntakeState mIntakeState;
     private double mPreviousTime;
     private double mGoalBeamCountBroken = 0;
     private boolean crossedEntry = false;

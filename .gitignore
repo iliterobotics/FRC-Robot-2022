@@ -162,3 +162,9 @@ bin/
 
 #intellij files
 .idea
+
+# Python virtual environment
+venv
+
+# Data Files
+*.csv

@@ -1,6 +1,7 @@
 package us.ilite.robot.controller;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.config.InputMap;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.input.EInputScale;
 import us.ilite.common.types.input.ELogitech310;
@@ -91,8 +92,8 @@ public abstract class BaseManualController extends AbstractController {
 
     void updateDrivetrain(boolean isTank) {
         if (isTank) {
-            double left = db.driverinput.get(ELogitech310.LEFT_Y_AXIS);
-            double right = -db.driverinput.get(ELogitech310.RIGHT_Y_AXIS);
+            double left = db.driverinput.get(LEFT_AXIS);
+            double right = -db.driverinput.get(RIGHT_AXIS);
 
             left = Math.abs(left) > 0.1 ? left : 0.0;
             right = Math.abs(right) > 0.1 ? right : 0.0;

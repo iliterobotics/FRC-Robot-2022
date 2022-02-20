@@ -26,17 +26,11 @@ import static us.ilite.common.types.EFeederData.*;
 
 
 public class FeederModule extends Module {
-
     //Motors
     private TalonFX mIntakeFeeder;
-
     //Beam Breakers
     private DigitalBeamSensor mEntryBeamBreaker;
     private DigitalBeamSensor mExitBeamBreaker;
-
-    //PID Controller and Gains
-    private PIDController mFeederPID;
-    private ProfileGains kFeederGains = new ProfileGains().p(0.005).i(0).d(0);
 
     //Constants
     private final double kWheelCircumference = 4 * Math.PI;
@@ -64,6 +58,7 @@ public class FeederModule extends Module {
 
     @Override
     public void setOutputs() {
+        //calculate pid velocity
         mIntakeFeeder.set(TalonFXControlMode.PercentOutput, db.feeder.get(SET_CONVEYOR_pct));
     }
 }

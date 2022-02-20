@@ -61,7 +61,7 @@ public class Settings {
             // ========
             // LED ID's
             // ========
-            public static int kLEDCanifier = 31;
+            public static final int kLEDCanifier = 31;
         }
 
         public static class Analog {
