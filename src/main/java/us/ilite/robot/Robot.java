@@ -46,6 +46,8 @@ public class Robot extends TimedRobot {
     private VioletDriveModule mViolet;
     private IntakeModule mIntake;
     private RawLimelight mRawLimelight;
+    private ClimberModule mClimber;
+//    private Compressor mCompressor;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -73,12 +75,14 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
-        mDrive = new DriveModule();
         mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
         mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
         mLEDControl = new LEDControl();
+        mClimber = new ClimberModule();
+//        mCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
+//        mCompressor.enableAnalog(55, 60);
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -156,10 +160,12 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
     //    mRunningModules.addModule(mFeeder);
-        mRunningModules.addModule(mViolet);
+//        mRunningModules.addModule(mViolet);
    //     mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mHanger);
-        mRunningModules.addModule(mLimelight);
+        mRunningModules.addModule(mDrive);
+//        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mClimber);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -169,6 +175,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         commonPeriodic();
+//        System.out.println(mCompressor.enabled());
     }
 
     @Override
