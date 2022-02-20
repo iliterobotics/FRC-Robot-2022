@@ -26,22 +26,29 @@ import static us.ilite.common.types.EIntakeData.*;
 public class IntakeModule extends Module{
 
     //Motors
-    private TalonFX mIntakeRoller;
+//    private TalonFX mIntakeRoller;
+    private CANSparkMax mIntake;
+    private RelativeEncoder mEncoder;
+
 
     //Solenoids
     private DoubleSolenoid mArmSolenoid;
 
     //PID Controller and Gains
     private ILITEPIDController mRollerPID;
-    private ProfileGains kIntakeGains = new ProfileGains().p(-0.01).i(0).d(0);
+    private ProfileGains kIntakeGains = new ProfileGains().p(-1).i(0).d(0);
 
     //Constants
     private final double kWheelCircumference = 4 * Math.PI;
-    private final double kMaxFalconSpeed = 5200; // change back to falcon
+    private final double kMaxFalconSpeed = 5676; // change back to falcon
     private final double kVelocityConversion = 2048 * 1000 * kWheelCircumference;
 
     public IntakeModule() {
-        mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
+//        mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
+//        mIntakeRoller.setInverted(true);
+        mIntake = new CANSparkMax(9, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mEncoder = mIntake.getEncoder();
+
         mArmSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
         //initialize motors and such
 
@@ -53,7 +60,9 @@ public class IntakeModule extends Module{
 
     @Override
     public void readInputs() {
-        db.cargo.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kVelocityConversion);
+//        db.cargo.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kVelocityConversion);
+        db.cargo.set(ROLLER_VEL_ft_s, mEncoder.getVelocity());
+
         db.cargo.set(FWD_PNEUMATIC_STATE, mArmSolenoid.get());
         db.cargo.set(REV_PNEUMATIC_STATE, mArmSolenoid.get());
     }
@@ -63,12 +72,17 @@ public class IntakeModule extends Module{
         //calculate pid velocity
         double desiredVelocity = mRollerPID.calculate(db.cargo.get(ROLLER_VEL_ft_s), db.cargo.get(SET_ROLLER_VEL_ft_s));
 
-        //set value to motor
-        mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.cargo.get(SET_ROLLER_VEL_ft_s) / kMaxFalconSpeed);
-//        mIntakeRoller.set(desiredVelocity / kMaxFalconSpeed);
+//        mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.cargo.get(SET_ROLLER_VEL_ft_s) / kMaxFalconSpeed);
+        mIntake.set((db.cargo.get(ROLLER_VEL_ft_s) + desiredVelocity) / kMaxFalconSpeed);
+//        mIntake.set(db.cargo.get(SET_ROLLER_VEL_ft_s) / kMaxFalconSpeed);
+
+        SmartDashboard.putNumber("PID Output: ", desiredVelocity);
+        SmartDashboard.putNumber("PID Output %: ", desiredVelocity / kMaxFalconSpeed);
+        SmartDashboard.putNumber("Desired Velocity: ", db.cargo.get(SET_ROLLER_VEL_ft_s));
+        SmartDashboard.putNumber("Actual Velocity: ", db.cargo.get(ROLLER_VEL_ft_s));
 
         //turning the solenoids on or off
-        setPneumaticIntake();
+//        setPneumaticIntake();
     }
 
     //if pneumatic state is 1/on, set solenoids on

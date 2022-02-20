@@ -68,6 +68,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
                 db.feeder.set(EFeederData.SET_CONVEYOR_pct, -0.2);
             }
         }
+
+        if(db.driverinput.isSet(ELogitech310.A_BTN)) {
+            db.cargo.set(SET_ROLLER_VEL_ft_s, 1000);
+        }
     }
 
     private void updateFeeder() {
@@ -76,6 +80,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
         if (db.driverinput.isSet(ELogitech310.Y_BTN)) {
             if (db.feeder.get(EFeederData.NUM_BALLS) > 0) {
                 db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
+
                 db.ledcontrol.set(ELEDControlData.LED_STATE, 0d);
                 db.ledcontrol.set(ELEDControlData.DESIRED_R, 255);
                 db.ledcontrol.set(ELEDControlData.DESIRED_G, 0);
