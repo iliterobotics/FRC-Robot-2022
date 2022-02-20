@@ -19,7 +19,7 @@ public class IntakeModule extends Module{
     //Solenoids
     private DoubleSolenoid mArmSolenoid;
     //PID Controller and Gains
-    private ILITEPIDController mRollerPID;
+    private PIDController mRollerPID;
     private ProfileGains kIntakeGains = new ProfileGains().p(-1).i(0).d(0);
 
     // INTAKE GEAR RATIOS AND CONVERSIONS
