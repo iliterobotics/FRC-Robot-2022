@@ -117,6 +117,10 @@ public class Enums {
         RETRACT,
         DEFAULT;
     }
+    public enum EFeederState {
+        PERCENT_OUTPUT,
+        INDEXING_VELOCITY;
+    }
 
 
 }

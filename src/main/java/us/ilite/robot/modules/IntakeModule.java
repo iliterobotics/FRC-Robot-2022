@@ -3,8 +3,10 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
@@ -23,6 +25,7 @@ public class IntakeModule extends Module{
     private PIDController mRollerPID;
     private ProfileGains kIntakeGains = new ProfileGains().p(0.000001).i(0).d(0);
 
+    private Compressor mCompressor;
     // INTAKE GEAR RATIOS AND CONVERSIONS
     // DO NOT MODIFY THESE PLEASE
     private static final double kMaxFalconSpeed = 6380;
@@ -33,9 +36,12 @@ public class IntakeModule extends Module{
 
     public IntakeModule() {
         mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
+        mIntakeRoller.setInverted(true);
         mArmSolenoid = new DoubleSolenoid(20, PneumaticsModuleType.REVPH, Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
         mRollerPID = new PIDController(kIntakeGains, -kMaxFalconSpeed * kFeetSpeedConversion, kMaxFalconSpeed * kFeetSpeedConversion, 0.1);
         mRollerPID.setOutputRange(-kMaxFalconSpeed * kFeetSpeedConversion, kMaxFalconSpeed * kFeetSpeedConversion);
+        mCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
+        mCompressor.enableAnalog(100, 110);
     }
 
     @Override
@@ -47,6 +53,7 @@ public class IntakeModule extends Module{
         db.cargo.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
         db.cargo.set(RETRACT, mArmSolenoid.get());
         db.cargo.set(EXTEND, mArmSolenoid.get());
+        SmartDashboard.putNumber("Compressor PSI", mCompressor.getPressure());
     }
 
     @Override
@@ -74,7 +81,7 @@ public class IntakeModule extends Module{
     public void setRollerState() {
         Enums.EIntakeState mode = db.cargo.get(STATE, Enums.EIntakeState.class);
         if (mode == null) {
-            return;
+            mode = Enums.EIntakeState.PERCENT_OUTPUT;
         }
         switch (mode) {
             case PERCENT_OUTPUT:

@@ -62,8 +62,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
-        mCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
-        mCompressor.enableAnalog(90, 120);
+
         // Init the actual robot
 //        initTimer.reset();
 //        initTimer.start();
@@ -160,6 +159,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mFeeder);
 //        mRunningModules.addModule(mViolet);
         mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mLimelight);
         MODE=TELEOPERATED;

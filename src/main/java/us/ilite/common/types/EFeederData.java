@@ -33,6 +33,7 @@ public enum EFeederData implements CodexOf<Double>{
     ENTRY_BEAM,
     EXIT_BEAM,
     NUM_BALLS,
+    STATE,
 
     SET_CONVEYOR_pct,
     CONVEYOR_pct,

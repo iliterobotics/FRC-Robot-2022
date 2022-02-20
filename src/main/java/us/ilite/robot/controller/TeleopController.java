@@ -2,17 +2,9 @@ package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
-import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EFeederData;
-import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.EIntakeData;
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
-import us.ilite.robot.hardware.DigitalBeamSensor;
 
 import static us.ilite.common.types.EIntakeData.*;
 
@@ -42,11 +34,13 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        clock.report("updateCargo", t -> updateCargo());
-        clock.report("updateFeeder", t -> updateFeeder());
+      //  clock.report("updateCargo", t -> updateCargo());
+      //  clock.report("updateFeeder", t -> updateFeeder());
 //        clock.report("updateIntake", t -> updateIntake());
         super.updateDrivetrain(false);
-        updateIntake();
+        updateIntakeOpenLoop();
+        updateRollersOpenLoop();
+        updateFeederOpenLoop();
     }
 
     private void updateCargo() {
@@ -75,11 +69,30 @@ public class TeleopController extends BaseManualController { //copied from TestC
         db.feeder.set(EFeederData.NUM_BALLS, numBalls);
     }
 
-    private void updateIntake() {
-        if (db.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS)) { //left trigger
+    private void updateIntakeOpenLoop() {
+        if (db.operatorinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS)) { //left trigger
             db.cargo.set(ARM_STATE, Enums.EArmState.DEFAULT);
-        } else if (db.driverinput.isSet(ELogitech310.RIGHT_TRIGGER_AXIS)) {
+        } else if (db.operatorinput.isSet(ELogitech310.RIGHT_TRIGGER_AXIS)) {
             db.cargo.set(ARM_STATE, Enums.EArmState.RETRACT);
+        }
+    }
+    private void updateRollersOpenLoop() {
+        if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
+            db.cargo.set(STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.cargo.set(DESIRED_PCT, 1.0);
+        } else if (db.operatorinput.isSet(ELogitech310.B_BTN)) {
+            db.cargo.set(STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.cargo.set(DESIRED_PCT, -1.0);
+        }
+    }
+
+    private void updateFeederOpenLoop() {
+        if (db.operatorinput.isSet(ELogitech310.X_BTN)) {
+            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
+            db.feeder.set(EFeederData.SET_CONVEYOR_pct, 1.0);
+        } else if (db.operatorinput.isSet(ELogitech310.Y_BTN)) {
+            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
+            db.feeder.set(EFeederData.SET_CONVEYOR_pct, -1.0);
         }
     }
 
