@@ -50,20 +50,20 @@ public class TeleopController extends BaseManualController { //copied from TestC
     private void updateRollers() {
         if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
             db.cargo.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
-            db.cargo.set(DESIRED_PCT, 1.0);
+            db.cargo.set(DESIRED_pct, 1.0);
         } else if (db.operatorinput.isSet(ELogitech310.B_BTN)) {
             db.cargo.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
-            db.cargo.set(DESIRED_PCT, -1.0);
+            db.cargo.set(DESIRED_pct, -1.0);
         }
     }
 
     private void updateFeeder() {
         if (db.operatorinput.isSet(ELogitech310.X_BTN)) {
             db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 1.0);
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.5);
         } else if (db.operatorinput.isSet(ELogitech310.Y_BTN)) {
             db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
-            db.feeder.set(EFeederData.SET_FEEDER_pct, -1.0);
+            db.feeder.set(EFeederData.SET_FEEDER_pct, -0.5);
         }
     }
 }

@@ -17,11 +17,13 @@ public class FeederModule extends Module {
     private final DigitalBeamSensor mEntryBeamBreaker;
     private final DigitalBeamSensor mExitBeamBreaker;
 
-    //Constants
-    private final double kWheelCircumference = 4 * Math.PI;
-    private final double kDebounceTime = 0.1;
-    private final double kVelocityConversion = 2048 * 1000 * kWheelCircumference;
-    private final double kMaxFalconSpeed = 6380;
+    public static final double kFeederGearRatio = (12.0 / 64.0) * (30.0 / 80.0);
+    public static final double kFeederWheelDiameterInches = 2.5 / 12.0;
+    public static final double kWheelCircumference = kFeederWheelDiameterInches * Math.PI;
+    public static final double kDebounceTime = 0.1;
+    public static final double kScaledRPMConversion = 600.0 / 2048.0 * kFeederGearRatio;
+    public static final double kVelocityConversion = (kScaledRPMConversion * kWheelCircumference) / 60.0;
+    public static final double kMaxFalconSpeed = 6380 * kFeederGearRatio;
 
     public FeederModule () {
         mIntakeFeeder = new TalonFX(Settings.HW.CAN.kINFeeder);
@@ -36,7 +38,8 @@ public class FeederModule extends Module {
 
     @Override
     public void readInputs() {
-        db.feeder.set(FEEDER_pct, mIntakeFeeder.getSelectedSensorVelocity()* kVelocityConversion / kMaxFalconSpeed);
+        db.feeder.set(FEEDER_pct, (mIntakeFeeder.getSelectedSensorVelocity() * kScaledRPMConversion) / kMaxFalconSpeed);
+        db.feeder.set(EXIT_BALL_VELOCITY_ft_s, mIntakeFeeder.getSelectedSensorVelocity() * kVelocityConversion);
         db.feeder.set(ENTRY_BEAM, mEntryBeamBreaker.isBroken());
         db.feeder.set(EXIT_BEAM, mExitBeamBreaker.isBroken());
     }

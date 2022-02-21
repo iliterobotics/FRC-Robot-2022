@@ -18,23 +18,25 @@ public class IntakeModule extends Module {
 
     // INTAKE GEAR RATIOS AND CONVERSIONS
     // DO NOT MODIFY THESE PLEASE
-    private static final double kMaxFalconSpeed = 6380;
-    public static final double kIntakeRollerRatio = 1 / 4;
+    public static final double kIntakeRollerRatio = (1.0 / 4.0) * (24.0 / 32.0);
+    public static final double kMaxFalconSpeed = 6380 * kIntakeRollerRatio;
     public static final double kWheelDiameter = 2.0 / 12.0;
-    public static final double kScaledUnitsToRPM = (600 / 2048) * kIntakeRollerRatio;
-    public static final double kFeetSpeedConversion = kScaledUnitsToRPM * kWheelDiameter * Math.PI / 60.0;
+    public static final double kWheelCircumference = kWheelDiameter * Math.PI;
+    public static final double kScaledUnitsToRPM = (600.0 / 2048.0) * kIntakeRollerRatio;
+    public static final double kFeetSpeedConversion = (kScaledUnitsToRPM * kWheelCircumference) / 60.0;
 
     public IntakeModule() {
         mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
         mIntakeRoller.setInverted(true);
-        mArmSolenoid = new DoubleSolenoid(20, PneumaticsModuleType.REVPH, Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
-        mCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
-        mCompressor.enableAnalog(100, 110);
+        mArmSolenoid = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
+        mCompressor = new Compressor(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH);
+     //   mCompressor.enableAnalog(100, 110);
     }
 
     @Override
     public void readInputs() {
         db.cargo.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
+        db.cargo.set(CURRENT_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
         db.cargo.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
         db.cargo.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
         db.cargo.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
@@ -69,7 +71,7 @@ public class IntakeModule extends Module {
         }
         switch (mode) {
             case PERCENT_OUTPUT:
-                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.cargo.get(DESIRED_PCT));
+                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.cargo.get(DESIRED_pct));
                 break;
         }
     }

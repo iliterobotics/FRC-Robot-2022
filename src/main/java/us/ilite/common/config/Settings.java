@@ -75,6 +75,7 @@ public class Settings {
         }
 
         public static class PCH {
+            public static final int kPCHCompressorModule = 20;
             // ======================
             // FEEDER AND INTAKE ID's
             // ======================
