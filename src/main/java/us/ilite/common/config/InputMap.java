@@ -43,7 +43,7 @@ public class InputMap {
 
         SNAIL_MODE = ELogitech310.RIGHT_TRIGGER_AXIS,
         HOME_TO_DRIVER_STATION = ELogitech310.X_BTN,
-        DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.LEFT_TRIGGER_AXIS,
+        DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.A_BTN,
         HOME_TO_HUB = ELogitech310.Y_BTN, // Practically target-lock but without limelight
 
         POSITION_CLIMB = ELogitech310.BACK,

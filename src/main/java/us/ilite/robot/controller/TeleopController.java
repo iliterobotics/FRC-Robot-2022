@@ -56,6 +56,15 @@ public class TeleopController extends BaseManualController { //copied from TestC
             db.cargo.set(DESIRED_pct, -1.0);
         }
     }
+    private void updateLimelightTargetLock() {
+        if (db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
+            db.limelight.set(ELimelightData.PIPELINE, Field2022.FieldElement.HUB_UPPER.pipeline());
+            db.limelight.set(ELimelightData.LED_MODE, 1);
+        } else {
+            db.limelight.set(ELimelightData.PIPELINE, Field2022.FieldElement.NONE.pipeline());
+            db.limelight.set(ELimelightData.LED_MODE, 0);
+        }
+    }
 
     private void updateFeeder() {
         if (db.operatorinput.isSet(ELogitech310.X_BTN)) {

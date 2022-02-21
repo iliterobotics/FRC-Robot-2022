@@ -1,28 +1,34 @@
 package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.robot.Enums.EDriveState;
-import static us.ilite.common.types.EVisionGoal2020.TV;
-import static us.ilite.common.types.EVisionGoal2020.TX;
+
 import static us.ilite.common.types.drive.EDriveData.*;
 
 public class DriveModule extends Module {
 
 	private TalonFX mLeftMaster, mLeftFollower, mRightMaster, mRightFollower;
-	
-	//TODO change this
-	public static double kGearboxRatio = (10.0 / 40.0) * (14.0 / 40.0);
+	private Encoder mLeftEncoder, mRightEncoder;
+
+	private static final double kGearboxRatio = 12.0 / 40.0 * 14.0 / 40.0;
+	//Divide the radius of the wheel by the pules per rotation and divide by 12 to return feet (pulses to feet)
+	private static final double kWheelCircumferenceFeet = 3.9 / 12.0 * Math.PI;
+	//Multiply the conversion by the gearbox ratio by the pulses to generate the correct the distance
+	private static  final double kDistanceConversion = kWheelCircumferenceFeet;
+	private static final double kVelocityConversion = kDistanceConversion / 60;
+	private static final double kFalconConversion = 600.0 / 2048.0 * kGearboxRatio;
+	private static final double kTemporaryTicksToRotations = 225000.0;
 
 	//public static double kWheelDiameterInches = 6.125;
 	//TODO change these
-	public static double kWheelDiameterInches = 5.875;
-	public static double kWheelCircumferenceFeet = kWheelDiameterInches * Math.PI/12.0;
 	// For position, getPosition() returns raw rotations - so convert that to feet
 	public static double kDriveFalconPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
 	public static double kDriveFalconVelocityFactor = kDriveFalconPositionFactor / 60.0;
@@ -41,7 +47,6 @@ public class DriveModule extends Module {
 	public static double kEffectiveWheelbase = 23.25;
 	public static double kCurvatureCircumference = kEffectiveWheelbase * Math.PI;
 	public static double kInchesPerCurvatureDegree = kCurvatureCircumference / 360.0;
-	public static double kWheelTurnsPerCurvatureDegree = kInchesPerCurvatureDegree / kWheelDiameterInches;
 
 	private final double kWheelDiameter = 4;
 	private final double kWheelCircumference = kWheelDiameter * Math.PI;
@@ -85,12 +90,24 @@ public class DriveModule extends Module {
 
 	public DriveModule() {
 		mLeftMaster = new TalonFX(Settings.HW.CAN.kDTML1);
-		mLeftFollower = new TalonFX(Settings.HW.CAN.kDTML3);
+		mLeftFollower = new TalonFX(Settings.HW.CAN.kDTL3);
 		mLeftFollower.follow(mLeftMaster);
+
+		mLeftMaster.setNeutralMode(NeutralMode.Coast);
+		mLeftFollower.setNeutralMode(NeutralMode.Coast);
 
 		mRightMaster = new TalonFX(Settings.HW.CAN.kDTMR2);
 		mRightFollower = new TalonFX(Settings.HW.CAN.kDTR4);
 		mRightFollower.follow(mRightMaster);
+
+		mRightMaster.setNeutralMode(NeutralMode.Coast);
+		mRightFollower.setNeutralMode(NeutralMode.Coast);
+
+		mRightMaster.setInverted(true);
+		mRightFollower.setInverted(true);
+
+		mLeftEncoder = new Encoder(Settings.HW.DIO.kEDTLA, Settings.HW.DIO.kEDTLB);
+		mRightEncoder = new Encoder(Settings.HW.DIO.kEDTRA, Settings.HW.DIO.kEDTRB);
 
 		velocityPID = new PIDController(velocityGains, -kMaxDriveThreshold * kDriveTrainMaxVelocityRPM,
 				kMaxDriveThreshold * kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
@@ -105,6 +122,7 @@ public class DriveModule extends Module {
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 		mTargetAngleLockPid.setSetpoint(0);
 		mTargetAngleLockPid.reset();
+
 		reset();
 	}
 
@@ -126,10 +144,18 @@ public class DriveModule extends Module {
 		double rotRight = (rawPositionRight) / 2048;
 		double feetRight = rotRight / kWheelCircumferenceFeet;
 
-		db.drivetrain.set(L_ACTUAL_POS_FT, feetLeft);
-		db.drivetrain.set(R_ACTUAL_POS_FT, feetRight);
+//		db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getDistance());
+//		db.drivetrain.set(R_ACTUAL_POS_FT, mRightEncoder.getDistance());
 		db.drivetrain.set(L_ACTUAL_VEL_FT_s, feetPerSecondLeft);
 		db.drivetrain.set(R_ACTUAL_VEL_FT_s, feetPerSecondRight);
+
+		SmartDashboard.putNumber("Sensor Velocity ", mLeftMaster.getSelectedSensorPosition());
+		SmartDashboard.putNumber("Calculated  Left", mLeftMaster.getSelectedSensorPosition()/kTemporaryTicksToRotations);
+		SmartDashboard.putNumber("Calculated Feet Left", mLeftMaster.getSelectedSensorPosition()/kTemporaryTicksToRotations*kWheelCircumferenceFeet);
+
+//		SmartDashboard.putNumber("Calculated Pulses Right", mRightEncoder.getDistance());
+//		SmartDashboard.putNumber("Calculated Feet Right", mRightEncoder.getDistance()*kDistanceConversion);
+//		SmartDashboard.putNumber("Calculated Rotations Right", mRightEncoder.getDistance()/255);
 	}
 
 	@Override
@@ -160,9 +186,9 @@ public class DriveModule extends Module {
 				break;
 			case TARGET_ANGLE_LOCK:
 				double pidOutput = 0;
-				if(mTargetAngleLockPid != null && db.goaltracking != null && db.goaltracking.isSet(TV) && db.goaltracking.isSet(TX)) {
+				if(mTargetAngleLockPid != null && db.limelight != null && db.limelight.isSet(TV) && db.limelight.isSet(TX)) {
 					//if there is a target in the limelight's fov, lock onto target using feedback loop
-					pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.goaltracking.get(TX), clock.dt());
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.limelight.get(TX), clock.dt());
 					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
 //					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
 					turn = pidOutput;

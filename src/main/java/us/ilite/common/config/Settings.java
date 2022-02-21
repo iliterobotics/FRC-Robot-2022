@@ -43,7 +43,7 @@ public class Settings {
             public static final int kDTMR2 = 2;
             public static final int kDTR4 = 4;
             public static final int kDTML1 = 1;
-            public static final int kDTML3 = 3;
+            public static final int kDTL3 = 3;
             public static final int kDTGyro = 30;
 
             // ======================
@@ -68,8 +68,10 @@ public class Settings {
         }
 
         public static class DIO {
-            public static final int kEDTMR2 = 3;
-            public static final int kEDTML1 = 1;
+            public static final int kEDTLA = 3;
+            public static final int kEDTLB = 2;
+            public static final int kEDTRA = 1;
+            public static final int kEDTRB = 0;
             public static final int kINEntryBeam = 9;
             public static final int kINExitBeam = 10;
         }
