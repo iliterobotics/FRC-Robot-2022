@@ -44,18 +44,18 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateIntake() {
-        if (db.operatorinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS)) { //left trigger
+        if (db.operatorinput.isSet(InputMap.OPERATOR.EXTEND_INTAKE)) {
             db.cargo.set(ARM_STATE, Enums.EArmState.DEFAULT);
-        } else if (db.operatorinput.isSet(ELogitech310.RIGHT_TRIGGER_AXIS)) {
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.RETRACT_INTAKE)) {
             db.cargo.set(ARM_STATE, Enums.EArmState.RETRACT);
         }
     }
 
     private void updateRollers() {
-        if (db.operatorinput.isSet(ELogitech310.A_BTN)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_ROLLERS)) {
             db.cargo.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
             db.cargo.set(DESIRED_pct, 1.0);
-        } else if (db.operatorinput.isSet(ELogitech310.B_BTN)) {
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
             db.cargo.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
             db.cargo.set(DESIRED_pct, -1.0);
         }
@@ -71,10 +71,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateFeeder() {
-        if (db.operatorinput.isSet(ELogitech310.X_BTN)) {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
             db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
             db.feeder.set(EFeederData.SET_FEEDER_pct, 1.0);
-        } else if (db.operatorinput.isSet(ELogitech310.Y_BTN)) {
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_FEEDER)) {
             db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
             db.feeder.set(EFeederData.SET_FEEDER_pct, -1.0);
         }
