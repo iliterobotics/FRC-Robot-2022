@@ -35,6 +35,6 @@ public enum EFeederData implements CodexOf<Double>{
     NUM_BALLS,
     STATE,
 
-    SET_CONVEYOR_pct,
-    CONVEYOR_pct,
+    SET_FEEDER_pct,
+    FEEDER_pct,
 }

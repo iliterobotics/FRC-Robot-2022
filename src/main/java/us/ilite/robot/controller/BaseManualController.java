@@ -24,7 +24,7 @@ public abstract class BaseManualController extends AbstractController {
 
     private int mCyclesHolding = 0;
 
-    void updateDrivetrain() {
+    public void updateDrivetrain() {
         double throttle = db.driverinput.get(THROTTLE_AXIS);
         double rotate = db.driverinput.get(TURN_AXIS) * 0.75;
 
