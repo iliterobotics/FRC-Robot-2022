@@ -35,11 +35,12 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        super.updateDrivetrain(false);
+        super.updateDrivetrain();
         super.updateBalls();
         updateIntake();
         updateRollers();
         updateFeeder();
+        moveFiveFeet();
     }
 
     private void updateIntake() {

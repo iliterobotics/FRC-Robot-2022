@@ -132,16 +132,14 @@ public class Robot extends TimedRobot {
         }
 
         MODE=AUTONOMOUS;
-//        mActiveController = mAutonSelection.getSelectedAutonController();
         mActiveController = new DriveStraightTurnController();
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
 //        mRunningModules.addModule(mLimelight);
-        mRunningModules.addModule(mFeeder);
-        mRunningModules.addModule(mIntake);
-//        mRunningModules.addModule(mDrive);
-//        mRunningModules.addModule(mViolet);
-//        mRunningModules.modeInit(AUTONOMOUS);
+      //  mRunningModules.addModule(mFeeder);
+      //  mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mDrive);
+        mRunningModules.modeInit(AUTONOMOUS);
     }
 
     @Override

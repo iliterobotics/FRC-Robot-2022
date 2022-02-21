@@ -50,6 +50,7 @@ public class ILITEPIDController implements Sendable {
         mGains = pGains;
         mClock = pClock;
 
+        mP = pGains.P;
         mI = pGains.I;
         mD = pGains.D;
         kF = pGains.F;
@@ -93,7 +94,7 @@ public class ILITEPIDController implements Sendable {
 
         double mCurrentTime = mClock.getCurrentTimeInMillis();
         double dT = mCurrentTime - mPreviousTime;
-        double dX = Utils.clamp(mError - mPrevError, MAX_ACCEL);
+        double dX = mError - mPrevError;
 
         if (max(min(mMaximumOutput, mError * mP), mMinimumOutput) == mError * mP) {
             mTotalError += mError * mClock.dt();
