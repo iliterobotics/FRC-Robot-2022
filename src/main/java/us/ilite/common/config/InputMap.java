@@ -53,12 +53,12 @@ public class InputMap {
 
     public static class OPERATOR {
         public static final ELogitech310
-        SHOOT_CARGO = ELogitech310.RIGHT_TRIGGER_AXIS,
-        RUN_INTAKE = ELogitech310.LEFT_TRIGGER_AXIS,
-        REVERSE_INTAKE = ELogitech310.L_BTN,
-        FAR_ANGLE = ELogitech310.Y_BTN,
-        RUN_CLIMB = ELogitech310.START,
-        MANUAL_CLIMB = ELogitech310.RIGHT_Y_AXIS;
+        RETRACT_INTAKE = ELogitech310.RIGHT_TRIGGER_AXIS,
+        EXTEND_INTAKE = ELogitech310.LEFT_TRIGGER_AXIS,
+        SPIN_ROLLERS = ELogitech310.A_BTN,
+        REVERSE_ROLLERS = ELogitech310.B_BTN,
+        SPIN_FEEDER = ELogitech310.X_BTN,
+        REVERSE_FEEDER = ELogitech310.Y_BTN
         ;
 
     }
