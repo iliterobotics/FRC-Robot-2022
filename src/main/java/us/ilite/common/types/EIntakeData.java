@@ -12,7 +12,7 @@ public enum EIntakeData implements CodexOf<Double> {
     CURRENT_ROLLER_RPM,
     SET_ROLLER_RPM,
     DESIRED_pct,
-    CURRENT_pct,
+    FEEDER_pct,
     INTAKE_SUPPLY_CURRENT,
     INTAKE_STATOR_CURRENT,
     COMPRESSOR_PSI,

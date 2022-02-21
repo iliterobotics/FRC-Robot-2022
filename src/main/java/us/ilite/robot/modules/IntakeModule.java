@@ -16,8 +16,9 @@ public class IntakeModule extends Module {
     private final DoubleSolenoid mArmSolenoid;
     private final Compressor mCompressor;
 
-    // INTAKE GEAR RATIOS AND CONVERSIONS
-    // DO NOT MODIFY THESE PLEASE
+    // ========================================
+    // DO NOT MODIFY THESE CONSTANTS
+    // ========================================
     public static final double kIntakeRollerRatio = (1.0 / 4.0) * (24.0 / 32.0);
     public static final double kMaxFalconSpeed = 6380 * kIntakeRollerRatio;
     public static final double kWheelDiameter = 2.0 / 12.0;
@@ -30,13 +31,13 @@ public class IntakeModule extends Module {
         mIntakeRoller.setInverted(true);
         mArmSolenoid = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
         mCompressor = new Compressor(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH);
-     //   mCompressor.enableAnalog(100, 110);
+        mCompressor.enableAnalog(100, 110);
     }
 
     @Override
     public void readInputs() {
         db.cargo.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
-        db.cargo.set(CURRENT_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
+        db.cargo.set(FEEDER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
         db.cargo.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
         db.cargo.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
         db.cargo.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());

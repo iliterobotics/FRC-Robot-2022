@@ -19,6 +19,9 @@ public class DriveModule extends Module {
 	private TalonFX mLeftMaster, mLeftFollower, mRightMaster, mRightFollower;
 	private Encoder mLeftEncoder, mRightEncoder;
 
+	// ========================================
+	// DO NOT MODIFY THESE CONSTANTS
+	// ========================================
 	public static final double kGearboxRatio = 12.0 / 40.0 * 14.0 / 40.0;
 	public static final double kWheelCircumferenceFeet = 3.9 / 12.0 * Math.PI;
 	public static final double kUnitsToScaledRPM = 600.0 / 2048.0 * kGearboxRatio;
@@ -207,7 +210,6 @@ public class DriveModule extends Module {
 				double desiredRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
 				mLeftMaster.set(ControlMode.PercentOutput, desiredLeft);
 				mRightMaster.set(ControlMode.PercentOutput, desiredRight);
-				System.out.println(left + " " + right);
 				break;
 			default:
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);

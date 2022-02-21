@@ -17,6 +17,9 @@ public class FeederModule extends Module {
     private final DigitalBeamSensor mEntryBeamBreaker;
     private final DigitalBeamSensor mExitBeamBreaker;
 
+    // ========================================
+    // DO NOT MODIFY THESE METHOD CONSTANTS
+    // ========================================
     public static final double kFeederGearRatio = (12.0 / 64.0) * (30.0 / 80.0);
     public static final double kFeederWheelDiameterInches = 2.5 / 12.0;
     public static final double kWheelCircumference = kFeederWheelDiameterInches * Math.PI;
