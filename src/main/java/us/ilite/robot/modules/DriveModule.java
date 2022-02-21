@@ -25,7 +25,7 @@ public class DriveModule extends Module {
 	private static  final double kDistanceConversion = kWheelCircumferenceFeet;
 	private static final double kVelocityConversion = kDistanceConversion / 60;
 	private static final double kFalconConversion = 600.0 / 2048.0 * kGearboxRatio;
-	private static final double kTemporaryTicksToRotations = 223547.0;
+	private static final double kTemporaryTicksToRotations = 225000.0;
 
 	//public static double kWheelDiameterInches = 6.125;
 	//TODO change these
@@ -149,8 +149,8 @@ public class DriveModule extends Module {
 		db.drivetrain.set(L_ACTUAL_VEL_FT_s, feetPerSecondLeft);
 		db.drivetrain.set(R_ACTUAL_VEL_FT_s, feetPerSecondRight);
 
-		SmartDashboard.putNumber("Calculated Pulses Left", mLeftMaster.getSelectedSensorPosition());
-		SmartDashboard.putNumber("Calculated Rotations Left", mLeftMaster.getSelectedSensorPosition()/kTemporaryTicksToRotations);
+		SmartDashboard.putNumber("Sensor Velocity ", mLeftMaster.getSelectedSensorPosition());
+		SmartDashboard.putNumber("Calculated  Left", mLeftMaster.getSelectedSensorPosition()/kTemporaryTicksToRotations);
 		SmartDashboard.putNumber("Calculated Feet Left", mLeftMaster.getSelectedSensorPosition()/kTemporaryTicksToRotations*kWheelCircumferenceFeet);
 
 //		SmartDashboard.putNumber("Calculated Pulses Right", mRightEncoder.getDistance());
@@ -160,82 +160,80 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs() {
-//		EDriveState state = db.drivetrain.get(STATE, EDriveState.class);
-//		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
-//		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
-//
-//		double left = throttle + turn;
-//		double right = throttle - turn;
-//
-//		if (state == null) return;
-//
-//		switch(state) {
-//			case RESET:
-//				reset();
-//				break;
-//			case PERCENT_OUTPUT:
-//				mLeftMaster.set(ControlMode.PercentOutput, left);
-//				mRightMaster.set(ControlMode.PercentOutput, right);
-//				break;
-//			case VELOCITY:
-//				double leftPIDValue =  velocityPID.calculate(left*kDriveTrainMaxVelocityRPM, clock.dt());
-//				double rightPIDValue =  velocityPID.calculate(right*kDriveTrainMaxVelocityRPM, clock.dt());
-//				mLeftMaster.set(ControlMode.Velocity,left*kDriveTrainMaxVelocityRPM);
-//				mRightMaster.set(ControlMode.Velocity, right*kDriveTrainMaxVelocityRPM);
-//				mCyclesHolding = 0;
-//				break;
-//			case TARGET_ANGLE_LOCK:
-//				double pidOutput = 0;
-//				if(mTargetAngleLockPid != null && db.limelight != null && db.limelight.isSet(TV) && db.limelight.isSet(TX)) {
-//					//if there is a target in the limelight's fov, lock onto target using feedback loop
-//					pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.limelight.get(TX), clock.dt());
-//					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-////					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
-//					turn = pidOutput;
-//				}
-//				mLeftMaster.set(ControlMode.Velocity, pidOutput);
-//				mRightMaster.set(ControlMode.Velocity, -pidOutput);
-//				break;
-//			case HOLD:
-//				if (mCyclesHolding == 0) {
-//					mLeftHoldPosition = db.drivetrain.get(L_ACTUAL_POS_FT);
-//					mRightHoldPosition = db.drivetrain.get(R_ACTUAL_POS_FT);
-//				}
-//
-//				double mCurrentLeftPosition = db.drivetrain.get(L_ACTUAL_POS_FT);
-//				double mCurrentRightPosition = db.drivetrain.get(R_ACTUAL_POS_FT);
-//
-//				double deltaLeft = mCurrentLeftPosition - mLeftHoldPosition;
-//				double deltaRight = mCurrentRightPosition - mRightHoldPosition;
-//
-//				if (db.drivetrain.get(L_ACTUAL_VEL_FT_s) < 100) {
-//					if (Math.abs(deltaLeft) >= 0.1) {
-//						mLeftMaster.set(ControlMode.Position, positionPID.calculate(mLeftHoldPosition, clock.dt()));
-//					} else {
-//						mLeftMaster.set(ControlMode.Velocity, 0);
-//					}
-//				}
-//
-//				if (db.drivetrain.get(R_ACTUAL_VEL_FT_s) < 100) {
-//					if (Math.abs(deltaRight) >= 0.1) {
-//						mRightMaster.set(ControlMode.Position, positionPID.calculate(mRightHoldPosition, clock.dt()));
-//					} else {
-//						mRightMaster.set(ControlMode.Velocity, 0);
-//					}
-//				}
-//
-//				mCyclesHolding++;
-//				break;
-//			case SMART_MOTION:
-//				mLeftMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(L_DESIRED_POS), clock.dt()));
-//				mRightMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(R_DESIRED_POS), clock.dt()));
-//				break;
-//			default:
-//				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
-//				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
-//		}
-		mLeftMaster.set(ControlMode.PercentOutput, 0.1);
-		mRightMaster.set(ControlMode.PercentOutput, 0.1);
+		EDriveState state = db.drivetrain.get(STATE, EDriveState.class);
+		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
+		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
+
+		double left = throttle + turn;
+		double right = throttle - turn;
+
+		if (state == null) return;
+
+		switch(state) {
+			case RESET:
+				reset();
+				break;
+			case PERCENT_OUTPUT:
+				mLeftMaster.set(ControlMode.PercentOutput, left);
+				mRightMaster.set(ControlMode.PercentOutput, right);
+				break;
+			case VELOCITY:
+				double leftPIDValue =  velocityPID.calculate(left*kDriveTrainMaxVelocityRPM, clock.dt());
+				double rightPIDValue =  velocityPID.calculate(right*kDriveTrainMaxVelocityRPM, clock.dt());
+				mLeftMaster.set(ControlMode.Velocity,left*kDriveTrainMaxVelocityRPM);
+				mRightMaster.set(ControlMode.Velocity, right*kDriveTrainMaxVelocityRPM);
+				mCyclesHolding = 0;
+				break;
+			case TARGET_ANGLE_LOCK:
+				double pidOutput = 0;
+				if(mTargetAngleLockPid != null && db.limelight != null && db.limelight.isSet(TV) && db.limelight.isSet(TX)) {
+					//if there is a target in the limelight's fov, lock onto target using feedback loop
+					pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.limelight.get(TX), clock.dt());
+					pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
+//					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
+					turn = pidOutput;
+				}
+				mLeftMaster.set(ControlMode.Velocity, pidOutput);
+				mRightMaster.set(ControlMode.Velocity, -pidOutput);
+				break;
+			case HOLD:
+				if (mCyclesHolding == 0) {
+					mLeftHoldPosition = db.drivetrain.get(L_ACTUAL_POS_FT);
+					mRightHoldPosition = db.drivetrain.get(R_ACTUAL_POS_FT);
+				}
+
+				double mCurrentLeftPosition = db.drivetrain.get(L_ACTUAL_POS_FT);
+				double mCurrentRightPosition = db.drivetrain.get(R_ACTUAL_POS_FT);
+
+				double deltaLeft = mCurrentLeftPosition - mLeftHoldPosition;
+				double deltaRight = mCurrentRightPosition - mRightHoldPosition;
+
+				if (db.drivetrain.get(L_ACTUAL_VEL_FT_s) < 100) {
+					if (Math.abs(deltaLeft) >= 0.1) {
+						mLeftMaster.set(ControlMode.Position, positionPID.calculate(mLeftHoldPosition, clock.dt()));
+					} else {
+						mLeftMaster.set(ControlMode.Velocity, 0);
+					}
+				}
+
+				if (db.drivetrain.get(R_ACTUAL_VEL_FT_s) < 100) {
+					if (Math.abs(deltaRight) >= 0.1) {
+						mRightMaster.set(ControlMode.Position, positionPID.calculate(mRightHoldPosition, clock.dt()));
+					} else {
+						mRightMaster.set(ControlMode.Velocity, 0);
+					}
+				}
+
+				mCyclesHolding++;
+				break;
+			case SMART_MOTION:
+				mLeftMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(L_DESIRED_POS), clock.dt()));
+				mRightMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(R_DESIRED_POS), clock.dt()));
+				break;
+			default:
+				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
+				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
+		}
 	}
 	private void reset() {
 		mLeftMaster.set(ControlMode.Position, 0.0);
