@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
     private FeederModule mFeeder;
     private VioletDriveModule mViolet;
     private IntakeModule mIntake;
-    private Compressor mCompressor;
+    private ClimberModule mClimber;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
      //   mViolet = new VioletDriveModule();
-      //  mDrive = new DriveModule();
+        mDrive = new DriveModule();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -77,7 +77,6 @@ public class Robot extends TimedRobot {
         mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
-        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
         mLEDControl = new LEDControl();
         mClimber = new ClimberModule();
 //        mCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
@@ -158,12 +157,11 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-    //    mRunningModules.addModule(mFeeder);
+        mRunningModules.addModule(mFeeder);
 //        mRunningModules.addModule(mViolet);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
-        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mLimelight);
 //        mRunningModules.addModule(mClimber);
         MODE=TELEOPERATED;

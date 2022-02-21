@@ -24,6 +24,7 @@ public enum EDriveData implements CodexOf<Double> {
 
     DESIRED_TURN_PCT, DESIRED_THROTTLE_PCT,
     DESIRED_LEFT_PCT, DESIRED_RIGHT_PCT,
+    ACTUAL_LEFT_PCT, ACTUAL_RIGHT_PCT,
 
     DELTA_HEADING,
     SET_YAW_RATE_deg_s,

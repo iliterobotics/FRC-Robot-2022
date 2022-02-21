@@ -3,18 +3,13 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
-
-import static us.ilite.common.types.ELimelightData.TV;
-import static us.ilite.common.types.ELimelightData.TX;
+import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 public class DriveModule extends Module {
@@ -25,7 +20,7 @@ public class DriveModule extends Module {
 	public static final double kGearboxRatio = 12.0 / 40.0 * 14.0 / 40.0;
 	public static final double kWheelCircumferenceFeet = 3.9 / 12.0 * Math.PI;
 	public static final double kUnitsToScaledRPM = 600.0 / 2048.0 * kGearboxRatio;
-	public static final double kRPMtoFTs = kUnitsToScaledRPM * kWheelCircumferenceFeet;
+	public static final double kRPMtoFTs = (kUnitsToScaledRPM * kWheelCircumferenceFeet) / 60.0;
 	public static final double kTrackWidthFeet = 22.0 / 12.0;
 	public static final double kWheelBaseDiagonalFeet = 35.0 / 12.0;
 	public static final double kMaxDriveThreshold = 0.75;
@@ -47,10 +42,7 @@ public class DriveModule extends Module {
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kYawGains = new ProfileGains().p(0.1);
 
-	private final int kVelocitySlot = 0;
-	private final int kPositionSlot = 1;
-
-	private final ProfileGains velocityGains = new ProfileGains()
+	private final ProfileGains kVelocityGains = new ProfileGains()
 			.p(0.0001)
 			.i(0.0)
 			.d(0.0)
@@ -59,7 +51,7 @@ public class DriveModule extends Module {
 			.velocityConversion(1)
 			.maxAccel(kDriveRampRate)
 			.slot(vSlot);
-	private final ProfileGains positionGains = new ProfileGains()
+	private final ProfileGains kPositionGains = new ProfileGains()
 			.p(0.0001)
 			.i(0.0)
 			.d(0.0)
@@ -90,9 +82,9 @@ public class DriveModule extends Module {
 		mLeftEncoder = new Encoder(Settings.HW.DIO.kEDTLA, Settings.HW.DIO.kEDTLB);
 		mRightEncoder = new Encoder(Settings.HW.DIO.kEDTRA, Settings.HW.DIO.kEDTRB);
 
-		velocityPID = new PIDController(velocityGains, -kMaxDriveThreshold * kMaxDriveVelocity * kGearboxRatio,
+		velocityPID = new PIDController(kVelocityGains, -kMaxDriveThreshold * kMaxDriveVelocity * kGearboxRatio,
 				kMaxDriveThreshold * kMaxDriveVelocity * kGearboxRatio, Settings.kControlLoopPeriod);
-		positionPID = new PIDController(positionGains, -kMaxDriveThreshold * kMaxDriveVelocity * kGearboxRatio,
+		positionPID = new PIDController(kPositionGains, -kMaxDriveThreshold * kMaxDriveVelocity * kGearboxRatio,
 				kMaxDriveThreshold * kMaxDriveVelocity * kGearboxRatio, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid = new PIDController(Settings.kTargetAngleLockGains, Settings.kTargetAngleLockMinInput,
 				Settings.kTargetAngleLockMaxInput, Settings.kControlLoopPeriod);
@@ -103,7 +95,6 @@ public class DriveModule extends Module {
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 		mTargetAngleLockPid.setSetpoint(0);
 		mTargetAngleLockPid.reset();
-
 		reset();
 	}
 
@@ -119,6 +110,8 @@ public class DriveModule extends Module {
 		db.drivetrain.set(R_ACTUAL_VEL_FT_s, mLeftMaster.getSelectedSensorVelocity() * kRPMtoFTs);
 		db.drivetrain.set(L_ACTUAL_POS_FT, mLeftMaster.getSelectedSensorPosition() * kRPMtoFTs * 60);
 		db.drivetrain.set(R_ACTUAL_POS_FT, mRightMaster.getSelectedSensorPosition() * kRPMtoFTs * 60);
+		db.drivetrain.set(ACTUAL_LEFT_PCT, (mLeftMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
+		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 	}
 
 	@Override
@@ -190,7 +183,7 @@ public class DriveModule extends Module {
 
 				mCyclesHolding++;
 				break;
-			case SMART_MOTION:
+			case POSITION:
 				mLeftMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(L_DESIRED_POS), clock.dt()));
 				mRightMaster.set(ControlMode.Position, positionPID.calculate(db.drivetrain.get(R_DESIRED_POS), clock.dt()));
 				break;
