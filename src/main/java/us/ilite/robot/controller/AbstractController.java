@@ -1,7 +1,6 @@
 package us.ilite.robot.controller;
 
 import com.flybotix.hfr.codex.RobotCodex;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.*;
 
 
@@ -27,7 +26,9 @@ public abstract class AbstractController {
     private boolean isBallOut = false;
     private int numBalls = 0;
 
-    protected int mNumBalls = 0;
+    private boolean mIsBallAdded = false;
+    private boolean mIsBallOut = false;
+    private int mNumBalls = 0;
 
     public AbstractController(){
         super();
@@ -43,10 +44,6 @@ public abstract class AbstractController {
             mCycleCount++;
         }
         mLastTime = clock.now();
-    }
-
-    public void indexBalls() {
-        // WHATEVER
     }
 
     /**
@@ -66,28 +63,25 @@ public abstract class AbstractController {
 
     protected abstract void updateImpl();
 
-    protected void indexCargo() {
-        //Indexing balls coming in
+    protected void updateBalls() {
         if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d) {
-            if(!isBallAdded) {
-                numBalls++;
-                isBallAdded = true;
+            if (!mIsBallAdded) {
+                mNumBalls++;
+                mIsBallAdded = true;
             }
-            db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
-        } else if (isBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
-            isBallAdded = false;
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.2);
+        } else if (mIsBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
+            mIsBallAdded = false;
         }
-        //Indexing balls coming out
         else if (db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
-            db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
-            if(!isBallOut) {
-                numBalls--;
-                isBallOut = true;
+            if (!mIsBallOut) {
+                mNumBalls--;
+                mIsBallOut = true;
             }
-        } else if (isBallOut && db.feeder.get(EFeederData.EXIT_BEAM) == 0d) {
-            isBallOut = false;
+        } else if (mIsBallOut && db.feeder.get(EFeederData.EXIT_BEAM) == 0d) {
+            mIsBallOut = false;
         }
-        db.feeder.set(EFeederData.NUM_BALLS, numBalls);
+        db.feeder.set(EFeederData.NUM_BALLS, mNumBalls);
     }
 
     /**

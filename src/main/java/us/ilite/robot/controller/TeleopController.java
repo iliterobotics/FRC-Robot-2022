@@ -2,18 +2,12 @@ package us.ilite.robot.controller;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
-import us.ilite.common.config.Settings;
-import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EFeederData;
-import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.EIntakeData;
-import us.ilite.common.types.ELEDControlData;
-import us.ilite.common.types.drive.EDriveData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
-import us.ilite.robot.hardware.DigitalBeamSensor;
 
 import static us.ilite.common.types.EIntakeData.*;
 
@@ -41,63 +35,52 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        clock.report("updateFeeder", t -> updateFeeder());
-        clock.report("updateIntake", t -> updateIntake());
-        super.updateDrivetrain(false);
+        super.updateDrivetrain();
+        super.updateBalls();
+        updateIntake();
+        updateRollers();
+        updateFeeder();
+        moveFiveFeet();
     }
 
     private void updateIntake() {
-        //If not max balls and button down, bring arm down and start intaking
-        if (db.driverinput.isSet(ELogitech310.LEFT_TRIGGER_AXIS)) { //left trigger
-                db.cargo.set(REV_PNEUMATIC_STATE, 0d);
-                db.cargo.set(FWD_PNEUMATIC_STATE, 1d);
-            if(db.feeder.get(EFeederData.NUM_BALLS) < 2) {
-                db.cargo.set(SET_ROLLER_VEL_ft_s, Math.max(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s), db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s)) + 15);
-            }
-            //If beam breaker is broken, add one ball
-        } else {
-                db.cargo.set(FWD_PNEUMATIC_STATE, 0d);
-                db.cargo.set(REV_PNEUMATIC_STATE, 1d);
+        if (db.operatorinput.isSet(InputMap.OPERATOR.EXTEND_INTAKE)) {
+            db.cargo.set(ARM_STATE, Enums.EArmState.DEFAULT);
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.RETRACT_INTAKE)) {
+            db.cargo.set(ARM_STATE, Enums.EArmState.RETRACT);
         }
+    }
 
-        //Reverse intake
-        if (db.driverinput.isSet(ELogitech310.R_BTN)) { //r button
-            if (db.feeder.get(EFeederData.NUM_BALLS) == 0d) {
-                db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0);
-            } else {
-                db.feeder.set(EFeederData.SET_CONVEYOR_pct, -0.2);
-            }
+    private void updateRollers() {
+        if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_ROLLERS)) {
+            db.cargo.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.cargo.set(DESIRED_pct, 1.0);
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
+            db.cargo.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.cargo.set(DESIRED_pct, -1.0);
         }
 
         if(db.driverinput.isSet(ELogitech310.A_BTN)) {
             db.cargo.set(SET_ROLLER_VEL_ft_s, 1000);
         }
     }
+    private void updateLimelightTargetLock() {
+        if (db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
+            db.limelight.set(ELimelightData.PIPELINE, Field2022.FieldElement.HUB_UPPER.pipeline());
+            db.limelight.set(ELimelightData.LED_MODE, 1);
+        } else {
+            db.limelight.set(ELimelightData.PIPELINE, Field2022.FieldElement.NONE.pipeline());
+            db.limelight.set(ELimelightData.LED_MODE, 0);
+        }
+    }
 
     private void updateFeeder() {
-        indexCargo();
-        //Shoot balls based off how many balls are in robot
-        if (db.driverinput.isSet(ELogitech310.Y_BTN)) {
-            if (db.feeder.get(EFeederData.NUM_BALLS) > 0) {
-                db.feeder.set(EFeederData.SET_CONVEYOR_pct, 0.2);
-
-                db.ledcontrol.set(ELEDControlData.LED_STATE, 0d);
-                db.ledcontrol.set(ELEDControlData.DESIRED_R, 255);
-                db.ledcontrol.set(ELEDControlData.DESIRED_G, 0);
-                db.ledcontrol.set(ELEDControlData.DESIRED_B, 0);
-            }
-            else {
-                db.ledcontrol.set(ELEDControlData.LED_STATE, 0d);
-                db.ledcontrol.set(ELEDControlData.DESIRED_R, 0);
-                db.ledcontrol.set(ELEDControlData.DESIRED_G, 255);
-                db.ledcontrol.set(ELEDControlData.DESIRED_B, 0);
-            }
-        }
-        else {
-            db.ledcontrol.set(ELEDControlData.LED_STATE, 0);
-            db.ledcontrol.set(ELEDControlData.DESIRED_R, 0);
-            db.ledcontrol.set(ELEDControlData.DESIRED_G, 0);
-            db.ledcontrol.set(ELEDControlData.DESIRED_B, 0);
+        if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
+            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 1.0);
+        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_FEEDER)) {
+            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
+            db.feeder.set(EFeederData.SET_FEEDER_pct, -1.0);
         }
     }
 }

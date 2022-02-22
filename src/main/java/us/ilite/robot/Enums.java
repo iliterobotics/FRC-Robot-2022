@@ -95,7 +95,8 @@ public class Enums {
         HOLD,
         VELOCITY,
         PERCENT_OUTPUT,
-        SMART_MOTION,
+        POSITION,
+        MOTION_MAGIC,
         TURN_TO,
         TURN_FOR,
         HOME,
@@ -105,11 +106,21 @@ public class Enums {
 
 
     // =============================================================================
-    // Power Cell Module States
+    // Intake Module States
     // =============================================================================
     public enum EIntakeState {
         PERCENT_OUTPUT,
         VELOCITY;
+    }
+
+    public enum EArmState {
+        EXTEND,
+        RETRACT,
+        DEFAULT;
+    }
+    public enum EFeederState {
+        PERCENT_OUTPUT,
+        INDEXING_VELOCITY;
     }
 
 

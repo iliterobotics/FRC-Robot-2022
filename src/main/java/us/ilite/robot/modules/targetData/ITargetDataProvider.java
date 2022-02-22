@@ -7,18 +7,15 @@
 
 package us.ilite.robot.modules.targetData;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 import com.flybotix.hfr.codex.RobotCodex;
-import us.ilite.common.types.EVisionGoal2020;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.IFieldComponent;
 
 /**
  * Add your docs here.
  */
 public interface ITargetDataProvider {
-    RobotCodex<EVisionGoal2020> getTargetingData();
+    RobotCodex<ELimelightData> getTargetingData();
 
     double getCameraHeightIn();
 
