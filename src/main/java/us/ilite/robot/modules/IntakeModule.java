@@ -36,12 +36,12 @@ public class IntakeModule extends Module {
 
     @Override
     public void readInputs() {
-        db.cargo.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
-        db.cargo.set(FEEDER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
-        db.cargo.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
-        db.cargo.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
-        db.cargo.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
-        db.cargo.set(COMPRESSOR_PSI, mCompressor.getPressure());
+        db.intake.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
+        db.intake.set(FEEDER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
+        db.intake.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
+        db.intake.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
+        db.intake.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
+        db.intake.set(COMPRESSOR_PSI, mCompressor.getPressure());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class IntakeModule extends Module {
     }
 
     public void setPneumaticState() {
-        Enums.EArmState mode = db.cargo.get(ARM_STATE, Enums.EArmState.class);
+        Enums.EArmState mode = db.intake.get(ARM_STATE, Enums.EArmState.class);
         if (mode == null) {
            return;
         }
@@ -66,13 +66,13 @@ public class IntakeModule extends Module {
     }
 
     public void setRollerState() {
-        Enums.EIntakeState mode = db.cargo.get(ROLLER_STATE, Enums.EIntakeState.class);
+        Enums.EIntakeState mode = db.intake.get(ROLLER_STATE, Enums.EIntakeState.class);
         if (mode == null) {
             mode = Enums.EIntakeState.PERCENT_OUTPUT;
         }
         switch (mode) {
             case PERCENT_OUTPUT:
-                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.cargo.get(DESIRED_pct));
+                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.intake.get(DESIRED_pct));
                 break;
         }
     }

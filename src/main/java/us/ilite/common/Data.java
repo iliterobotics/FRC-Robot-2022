@@ -43,7 +43,7 @@ public class Data {
     public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
     public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
     public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
-    public final RobotCodex<EIntakeData> cargo = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
+    public final RobotCodex<EIntakeData> intake = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
     public final RobotCodex<EFeederData> feeder = new RobotCodex(NULL_CODEX_VALUE, EFeederData.class);
     public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
     public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE , ELimelightData.class);
@@ -56,7 +56,7 @@ public class Data {
             pdp,
             rawLimelight,
             feeder,
-            cargo,
+            intake,
             hanger,
             color,
     };
@@ -70,7 +70,7 @@ public class Data {
             operatorinput,
             feeder,
             pdp,
-            cargo,
+            intake,
             hanger,
             color,
     };
