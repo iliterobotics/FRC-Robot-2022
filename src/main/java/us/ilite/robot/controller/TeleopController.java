@@ -6,7 +6,6 @@ import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EIntakeData.*;
@@ -45,19 +44,19 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     private void updateIntake() {
         if (db.operatorinput.isSet(InputMap.OPERATOR.EXTEND_INTAKE)) {
-            db.cargo.set(ARM_STATE, Enums.EArmState.DEFAULT);
+            db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.RETRACT_INTAKE)) {
-            db.cargo.set(ARM_STATE, Enums.EArmState.RETRACT);
+            db.intake.set(ARM_STATE, Enums.EArmState.RETRACT);
         }
     }
 
     private void updateRollers() {
         if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_ROLLERS)) {
-            db.cargo.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
-            db.cargo.set(DESIRED_pct, 1.0);
+            db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.intake.set(DESIRED_pct, 1.0);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
-            db.cargo.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
-            db.cargo.set(DESIRED_pct, -1.0);
+            db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.intake.set(DESIRED_pct, -1.0);
         }
     }
     private void updateLimelightTargetLock() {
