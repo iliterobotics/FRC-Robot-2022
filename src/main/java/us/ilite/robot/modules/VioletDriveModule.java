@@ -5,10 +5,8 @@ import com.flybotix.hfr.util.log.Logger;
 import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ILITEPIDController;
@@ -16,8 +14,8 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
 
-import static us.ilite.common.types.EVisionGoal2020.TV;
-import static us.ilite.common.types.EVisionGoal2020.TX;
+import static us.ilite.common.types.ELimelightData.TV;
+import static us.ilite.common.types.ELimelightData.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.sensor.EGyro;
@@ -179,13 +177,13 @@ public class VioletDriveModule extends Module {
     }
 
     public VioletDriveModule() {
-        mLeftMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDTML1, kDriveConfig);
-        mLeftFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDTML3, kDriveConfig);
+        mLeftMaster = SparkMaxFactory.createSparkMax(3, kDriveConfig);
+        mLeftFollower = SparkMaxFactory.createSparkMax(4, kDriveConfig);
         mLeftFollower.follow(mLeftMaster);
         mLeftEncoder = mLeftMaster.getEncoder();
 
-        mRightMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDTMR2, kDriveConfig);
-        mRightFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDTR4, kDriveConfig);
+        mRightMaster = SparkMaxFactory.createSparkMax(1, kDriveConfig);
+        mRightFollower = SparkMaxFactory.createSparkMax(2, kDriveConfig);
         mRightFollower.follow(mRightMaster);
         mRightEncoder = mRightMaster.getEncoder();
         mRightMaster.setInverted(true);
@@ -351,18 +349,17 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set(holdRight);
                 break;
             case TARGET_ANGLE_LOCK:
-//				targetData.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
-                double pidOutput = 0;
-                if(mTargetAngleLockPid != null && db.goaltracking != null && db.goaltracking.isSet(TV) && db.goaltracking.isSet(TX)) {
-                    //if there is a target in the limelight's fov, lock onto target using feedback loop
-                    pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.goaltracking.get(TX), clock.dt());
-                    pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
-                    turn = pidOutput;
+//                double pidOutput = 0;
+                if(mTargetAngleLockPid != null && db.limelight != null && db.limelight.isSet(TV) && db.limelight.isSet(TX)) {
+//                    //if there is a target in the limelight's fov, lock onto target using feedback loop
+//                    pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.limelight.get(TX), clock.dt());
+//                    pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
+//					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
+//                    turn = pidOutput;
                 }
 
-                mLeftMaster.set(pidOutput);
-                mRightMaster.set(-pidOutput);
+//                mLeftMaster.set(pidOutput);
+//                mRightMaster.set(-pidOutput);
                 // NOTE - fall through here
             case VELOCITY:
                 mStartHoldingPosition = false;
@@ -386,8 +383,8 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set((throttle-turn)*Settings.Input.kMaxAllowedVelocityMultiplier);
                 break;
             case PATH_FOLLOWING_BASIC:
-                mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS));
-                mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS));
+                mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS_FT));
+                mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS_FT));
 
                 double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
                 double posRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());

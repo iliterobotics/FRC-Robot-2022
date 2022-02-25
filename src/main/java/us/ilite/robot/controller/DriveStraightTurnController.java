@@ -12,14 +12,15 @@ public class DriveStraightTurnController extends BaseAutonController {
 
     @Override
     public void updateImpl() {
-        double leftPosition = db.drivetrain.get(L_ACTUAL_VEL_FT_s);
-        double rightPosition = db.drivetrain.get(R_ACTUAL_VEL_FT_s);
+        double leftPosition = db.drivetrain.get(L_ACTUAL_POS_FT);
+        double rightPosition = db.drivetrain.get(R_ACTUAL_POS_FT);
 
-        db.drivetrain.set(STATE, PATH_FOLLOWING_BASIC);
+        db.drivetrain.set(STATE, POSITION);
 
         if ((leftPosition+rightPosition)/2 <= 6) {
-            db.drivetrain.set(L_DESIRED_POS, 6);
-            db.drivetrain.set(R_DESIRED_POS, 6);
+            db.drivetrain.set(L_DESIRED_POS_FT, 6);
+            db.drivetrain.set(R_DESIRED_POS_FT, 6);
+            System.out.println("reached");
         } else {
             mCyclesPastDistance++;
         }

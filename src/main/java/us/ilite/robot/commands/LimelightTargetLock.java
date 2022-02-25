@@ -2,8 +2,6 @@ package us.ilite.robot.commands;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import us.ilite.common.types.EVisionGoal2020;
-import us.ilite.robot.Robot;
 import us.ilite.robot.modules.Limelight;
 
 @Deprecated

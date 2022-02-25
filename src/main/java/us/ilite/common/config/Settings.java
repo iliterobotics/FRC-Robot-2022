@@ -43,7 +43,7 @@ public class Settings {
             public static final int kDTMR2 = 2;
             public static final int kDTR4 = 4;
             public static final int kDTML1 = 1;
-            public static final int kDTML3 = 3;
+            public static final int kDTL3 = 3;
             public static final int kDTGyro = 30;
 
             // ======================
@@ -61,25 +61,28 @@ public class Settings {
             // ========
             // LED ID's
             // ========
-            public static int kLEDCanifier = 31;
+            public static final int kLEDCanifier = 31;
         }
 
         public static class Analog {
         }
 
         public static class DIO {
-            public static final int kEDTMR2 = 3;
-            public static final int kEDTML1 = 1;
+            public static final int kEDTLA = 3;
+            public static final int kEDTLB = 2;
+            public static final int kEDTRA = 1;
+            public static final int kEDTRB = 0;
             public static final int kINEntryBeam = 9;
             public static final int kINExitBeam = 10;
         }
 
         public static class PCH {
+            public static final int kPCHCompressorModule = 20;
             // ======================
             // FEEDER AND INTAKE ID's
             // ======================
-            public static final int kINPNIntakeForward = 1;
-            public static final int kINPNIntakeReverse = 2;
+            public static final int kINPNIntakeForward = 0;
+            public static final int kINPNIntakeReverse = 1;
             public static final int kINPNFeeder = 3;
 
             // ============

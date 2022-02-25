@@ -1,11 +1,15 @@
 package us.ilite.common.lib.control;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.lib.util.Utils;
 import us.ilite.robot.hardware.Clock;
 
 import static java.lang.Math.*;
 
-public class ILITEPIDController {
+public class ILITEPIDController implements Sendable {
 
     private EPIDControlType mPIDType;
     private final ProfileGains mGains;
@@ -19,9 +23,9 @@ public class ILITEPIDController {
 
     // Gains
     private final double MAX_ACCEL;
-    private final double kP;
-    private final double kI;
-    private final double kD;
+    private double mP;
+    private double mI;
+    private double mD;
     private final double kF;
 
     // Calculations
@@ -29,6 +33,9 @@ public class ILITEPIDController {
     private double mPrevError = 0.0;
     private double mTotalError = 0.0;
     private double desiredOutput = 0;
+
+    /**Instance counter to count the total instances of this class**/
+    private static int sInstances = 0;
 
     /**
      * Determines whether the output is in velocity mode or position mode
@@ -43,14 +50,17 @@ public class ILITEPIDController {
         mGains = pGains;
         mClock = pClock;
 
-        kP = pGains.P;
-        kI = pGains.I;
-        kD = pGains.D;
+        mP = pGains.P;
+        mI = pGains.I;
+        mD = pGains.D;
         kF = pGains.F;
 
         MAX_ACCEL = mGains.MAX_ACCEL;
         mMaximumOutput = mGains.MAX_VELOCITY;
         mMinimumOutput = -mGains.MAX_VELOCITY;
+
+        sInstances++;
+        SendableRegistry.addLW(this, "ILitePIDController", sInstances);
     }
 
     /**
@@ -84,17 +94,17 @@ public class ILITEPIDController {
 
         double mCurrentTime = mClock.getCurrentTimeInMillis();
         double dT = mCurrentTime - mPreviousTime;
-        double dX = Utils.clamp(mError - mPrevError, MAX_ACCEL);
+        double dX = mError - mPrevError;
 
-        if (max(min(mMaximumOutput, mError *kP), mMinimumOutput) == mError *kP) {
+        if (max(min(mMaximumOutput, mError * mP), mMinimumOutput) == mError * mP) {
             mTotalError += mError * mClock.dt();
         } else {
             mTotalError = 0;
         }
 
-        double proportion = -kP * mError;
-        double integral = -kI * mTotalError;
-        double derivative = -kD * dX/dT;
+        double proportion = -mP * mError;
+        double integral = -mI * mTotalError;
+        double derivative = -mD * dX/dT;
         double feedforward = kF * setpoint;
 
         switch(mPIDType) {
@@ -127,15 +137,15 @@ public class ILITEPIDController {
         double dT = mCurrentTime - mPreviousTime;
         double dX = Utils.clamp(mError - mPrevError, MAX_ACCEL);
 
-        if (max(min(mMaximumOutput, mError *kP), mMinimumOutput) == mError *kP) {
+        if (max(min(mMaximumOutput, mError * mP), mMinimumOutput) == mError * mP) {
             mTotalError += mError * mClock.dt();
         } else {
             mTotalError = 0;
         }
 
-        double proportion = kP * mError;
-        double integral = kI * mTotalError;
-        double derivative = kD * dX/dT;
+        double proportion = mP * mError;
+        double integral = mI * mTotalError;
+        double derivative = mD * dX/dT;
         double feedforward = kF * setpoint;
 
         switch(mPIDType) {
@@ -151,5 +161,31 @@ public class ILITEPIDController {
         mPrevError = mError;
 
         return desiredOutput;
+    }
+
+    private void setP(double pPID) {
+        mP = pPID;
+        SmartDashboard.putNumber("P", mP);
+    }
+    private void setI(double pI) {
+        mI = pI;
+        SmartDashboard.putNumber("I", mI);
+    }
+
+    private void setD(double pD) {
+        mD = pD;
+        SmartDashboard.putNumber("D", mD);
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("PIDController");
+        builder.addDoubleProperty("p", ()-> mP, this::setP);
+        builder.addDoubleProperty("i", ()-> mI, this::setI);
+        builder.addDoubleProperty("d", ()-> mD, this::setD);
+        builder.addDoubleProperty("setpoint", ()->0d, this::setSetPoint);
+    }
+    private void setSetPoint(double pSetpoint) {
+        //deliberate blank
     }
 }

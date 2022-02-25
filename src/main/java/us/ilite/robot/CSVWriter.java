@@ -4,7 +4,11 @@ import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import us.ilite.common.FMSInfoUtils;
 import us.ilite.common.config.Settings;
 
 import java.io.BufferedWriter;
@@ -100,6 +104,8 @@ public class CSVWriter {
     private static final String getFileName(RobotCodex<?>pCodex) {
         String fileName = "";
         String logDir = "/"+kUSB_DIR;
+
+        logDir = logDir+"/"+ FMSInfoUtils.getInstance().getEventName()+"/"+FMSInfoUtils.getInstance().getMatchNumber();
 
         switch(pCodex.meta().getEnum().getSimpleName()) {
             case "ELogitech310":
