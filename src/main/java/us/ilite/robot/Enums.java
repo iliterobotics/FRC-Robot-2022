@@ -122,6 +122,13 @@ public class Enums {
         PERCENT_OUTPUT,
         INDEXING_VELOCITY;
     }
+    public enum EMusicState {
+        TARGET_LOCK,
+        CURRENT_LIMITING,
+        HANGING,
+        //TODO figure out other places to play music
+    }
+
 
 
 }

@@ -63,18 +63,6 @@ public class TestController extends BaseManualController {
         SmartDashboard.putNumber("Max Robot Omega (deg/s)", mMaxYaw);
     }
 
-    public void updateHanger() {
-        if(db.driverinput.isSet(ELogitech310.R_BTN) && db.operatorinput.isSet(ELogitech310.R_BTN)) {
-            db.hanger.set(EHangerModuleData.SET_pct, 0.3);
-        }
-        else if (db.driverinput.isSet(ELogitech310.L_BTN) && db.operatorinput.isSet(ELogitech310.L_BTN)) {
-            db.hanger.set(EHangerModuleData.SET_pct, -0.3);
-        }
-        else {
-            db.hanger.set(EHangerModuleData.SET_pct, 0);
-        }
-    }
-
     public void updateLED() {
         if(db.driverinput.isSet(ELogitech310.X_BTN)) {
             db.ledcontrol.set(ELEDControlData.LED_STATE, 1.0);

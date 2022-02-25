@@ -8,7 +8,6 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
@@ -44,7 +43,7 @@ public class Robot extends TimedRobot {
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FeederModule mFeeder;
-    private TalonSoundModule mTalonSound;
+    private MusicModule mTalonSound;
     private VioletDriveModule mViolet;
     private IntakeModule mIntake;
     private ClimberModule mClimber;
@@ -72,7 +71,7 @@ public class Robot extends TimedRobot {
         mBaseAutonController = new BaseAutonController();
      //   mViolet = new VioletDriveModule();
         mDrive = new DriveModule();
-        mTalonSound = new TalonSoundModule();
+        mTalonSound = new MusicModule();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();

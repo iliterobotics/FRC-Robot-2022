@@ -41,13 +41,13 @@ public class Data {
     public final RobotCodex<ELogitech310> tankinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
     public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
-    public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
     public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
     public final RobotCodex<EIntakeData> intake = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
     public final RobotCodex<EFeederData> feeder = new RobotCodex(NULL_CODEX_VALUE, EFeederData.class);
     public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
     public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE , ELimelightData.class);
     public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
+    public final RobotCodex<EMusicModuleData> music = new RobotCodex(NULL_CODEX_VALUE, EMusicModuleData.class);
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
             imu,
             drivetrain,
@@ -57,8 +57,8 @@ public class Data {
             rawLimelight,
             feeder,
             intake,
-            hanger,
             color,
+            music,
     };
 
     public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
@@ -71,8 +71,8 @@ public class Data {
             feeder,
             pdp,
             intake,
-            hanger,
             color,
+            music,
     };
 
     //Stores writers per codex needed for CSV logging
