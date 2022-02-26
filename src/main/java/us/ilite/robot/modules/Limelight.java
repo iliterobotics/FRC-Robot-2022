@@ -87,7 +87,7 @@ public class Limelight extends Module implements ITargetDataProvider {
                 db.limelight.set(TARGET_RANGE_in, calcTargetDistance(mGoal));
 
                 // New way of doing it
-                updateCorners();
+//                updateCorners();
                 mUpperCornerSolver.updatePoseToGoal(mUpperCorners);
                 mLowerCornerSolver.updatePoseToGoal(mLowerCorners);
                 if(!mUpperCorners.isEmpty()) {
