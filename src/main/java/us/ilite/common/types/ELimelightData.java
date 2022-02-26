@@ -1,6 +1,6 @@
 package us.ilite.common.types;
 
-public enum EVisionGoal2020 {
+public enum ELimelightData {
     //  Limelight target values
     TV,         // Whether the limelight has any valid targets (0 or 1)
     TX,         // Horizontal Offset From Crosshair To Target (LL1: -27 degrees to 27 degrees | LL2: -29.8 to 29.8 degrees)

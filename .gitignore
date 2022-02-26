@@ -166,3 +166,9 @@ bin/
 **/*.csv
 **/__pycache__/**
 **/logs/**
+
+# Python virtual environment
+venv
+
+# Data Files
+*.csv

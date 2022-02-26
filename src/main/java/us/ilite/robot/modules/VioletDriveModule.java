@@ -6,6 +6,8 @@ import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -20,8 +22,8 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EMatchMode;
 
-import static us.ilite.common.types.EVisionGoal2020.TV;
-import static us.ilite.common.types.EVisionGoal2020.TX;
+import static us.ilite.common.types.ELimelightData.TV;
+import static us.ilite.common.types.ELimelightData.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.drive.EDriveData;
@@ -37,8 +39,6 @@ import us.ilite.robot.hardware.*;
 /**
  * Class for running all drivetrain train control operations from both autonomous and
  * driver-control.
- * TODO Support for rotation trajectories
- * TODO Turn-to-heading with Motion Magic
  */
 public class VioletDriveModule extends Module {
     private final ILog mLogger = Logger.createLog(DriveModule.class);
@@ -87,9 +87,12 @@ public class VioletDriveModule extends Module {
     private static final int POSITION_PID_SLOT = 2;
     private static final int SMART_MOTION_PID_SLOT = 3;
 
+    private int mStartAngleDeg = 0;
+    private static DifferentialDriveOdometry mOdometry;
+    private static DifferentialDrive mDrive;
+
     public static ProfileGains kPositionGains = new ProfileGains()
-            .f(0.00015)
-            .p(0.00000025)
+            .p(0.000025)
             .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
             // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
             .maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
@@ -102,10 +105,10 @@ public class VioletDriveModule extends Module {
             .maxAccel(1000d)
             .slot(SMART_MOTION_PID_SLOT)
             .velocityConversion(kDriveNEOPositionFactor);
+
     public static ProfileGains kVelocityGains = new ProfileGains()
         .f(0.00015)
         .p(0.00000025)
-        // Enforce a maximum allowed speed, system-wide. DO NOT undo kMaxAllowedVelocityMultiplier without checking with a mentor first.
         .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
         // Divide by the simulated blue nitrile CoF 1.2, multiply by omni (on school floor) theoretical of 0.4
         .maxAccel(kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.8)
@@ -118,6 +121,20 @@ public class VioletDriveModule extends Module {
             .kS(Settings.kS)
             .kA(Settings.kA)
             .kV(Settings.kV);
+
+    public static ProfileGains vGains = new ProfileGains()
+        .p(0.0001)
+        .f(0.0001)
+        .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
+        .maxAccel(1000);
+        ;
+
+    public static ProfileGains kTankGains = new ProfileGains()
+        .p(0.00000025)
+        .f(0.00015)
+        .maxVelocity(Settings.Input.kMaxAllowedVelocityMultiplier)
+        ;
+
 
 
     public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
@@ -160,6 +177,11 @@ public class VioletDriveModule extends Module {
     private PIDController mLeftPositionPID;
     private PIDController mRightPositionPID;
 
+    private PIDController mLeftTankPID;
+    private PIDController mRightTankPID;
+
+    private ILITEPIDController mVelocityPID;
+
     private double mLeftHoldSetpoint;
     private double mRightHoldSetpoint;
     private boolean mStartHoldingPosition;
@@ -187,6 +209,8 @@ public class VioletDriveModule extends Module {
     }
 
     public VioletDriveModule() {
+        mLeftMaster = SparkMaxFactory.createSparkMax(3, kDriveConfig);
+        mLeftFollower = SparkMaxFactory.createSparkMax(4, kDriveConfig);
         SmartDashboard.putNumber("Odometry posX", -1);
         SmartDashboard.putNumber("Odometry posY", -1);
         SmartDashboard.putNumber("Odometry init posX", -1);
@@ -198,14 +222,14 @@ public class VioletDriveModule extends Module {
         mLeftFollower.follow(mLeftMaster);
         mLeftEncoder = mLeftMaster.getEncoder();
 
-        mRightMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveRightMaster, kDriveConfig);
-        mRightFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveRightFollower, kDriveConfig);
+        mRightMaster = SparkMaxFactory.createSparkMax(1, kDriveConfig);
+        mRightFollower = SparkMaxFactory.createSparkMax(2, kDriveConfig);
         mRightFollower.follow(mRightMaster);
         mRightEncoder = mRightMaster.getEncoder();
         mRightMaster.setInverted(true);
         mRightFollower.setInverted(true);
 
-        mGyro = new Pigeon(clock, Settings.HW.CAN.kPigeon);
+        mGyro = new Pigeon(clock, 21);
 
         double ramprate = 0.20;
         mLeftMaster.setClosedLoopRampRate(ramprate);
@@ -228,6 +252,11 @@ public class VioletDriveModule extends Module {
         mLeftPositionPID = new PIDController( kPositionGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
         mRightPositionPID = new PIDController( kPositionGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
 
+        mLeftTankPID = new PIDController(kTankGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
+        mRightTankPID = new PIDController(kTankGains, -kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM, Settings.kControlLoopPeriod);
+
+        mVelocityPID = new ILITEPIDController(ILITEPIDController.EPIDControlType.VELOCITY, vGains, clock);
+
         //TODO - we want to do use our conversion factor calculated above, but that requires re-turning of F & P
         mLeftEncoder.setPositionConversionFactor(1d);
         mLeftEncoder.setVelocityConversionFactor(1d);
@@ -238,6 +267,7 @@ public class VioletDriveModule extends Module {
         mRightMaster.burnFlash();
         mRightFollower.burnFlash();
         mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
+        mDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
     }
 
     @Override
@@ -268,11 +298,20 @@ public class VioletDriveModule extends Module {
         mRightPositionPID.reset();
         mRightPositionPID.setDeadband(Settings.Input.kInputDeadbandF310Joystick);
 
+        mVelocityPID.setInputRange(-kDriveTrainMaxVelocityRPM, kDriveTrainMaxVelocityRPM);
+        mVelocityPID.setOutputRange(-Settings.Input.kMaxAllowedVelocityMultiplier, Settings.Input.kMaxAllowedVelocityMultiplier);
+
         mStartHoldingPosition = false;
         SmartDashboard.putNumber("Heading", mGyro.getHeading().getDegrees());
 
         reset();
         System.err.println(" ==== DRIVE MAX ACCEL (RPM): " + (kDriveMaxAccel_simulated.feet() / kDriveNEOVelocityFactor / 1.2 * 0.4));
+
+        mLeftMaster.setClosedLoopRampRate(0.2);
+        mLeftFollower.setClosedLoopRampRate(0.2);
+
+        mRightMaster.setClosedLoopRampRate(0.2);
+        mRightFollower.setClosedLoopRampRate(0.2);
         resetOdometry(TrajectoryCommandUtils.getJSONTrajectory().getInitialPose());
         initialXPosition = mOdometry.getPoseMeters().getX();
         initialYPosition = mOdometry.getPoseMeters().getY();
@@ -325,6 +364,9 @@ public class VioletDriveModule extends Module {
         double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
         double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
 
+        double left = db.drivetrain.safeGet(DESIRED_LEFT_PCT, 0d);
+        double right = db.drivetrain.safeGet(DESIRED_RIGHT_PCT, 0d);
+
         switch (mode) {
             case RESET:
                 reset();
@@ -362,24 +404,36 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set(holdRight);
                 break;
             case TARGET_ANGLE_LOCK:
-//				targetData.set(ELimelightData.TARGET_ID, Limelight.NONE.id());
-                double pidOutput = 0;
-                if(mTargetAngleLockPid != null && db.goaltracking != null && db.goaltracking.isSet(TV) && db.goaltracking.isSet(TX)) {
-                    //if there is a target in the limelight's fov, lock onto target using feedback loop
-                    pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.goaltracking.get(TX), clock.dt());
-                    pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
-					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
-                    turn = pidOutput;
+//                double pidOutput = 0;
+                if(mTargetAngleLockPid != null && db.limelight != null && db.limelight.isSet(TV) && db.limelight.isSet(TX)) {
+//                    //if there is a target in the limelight's fov, lock onto target using feedback loop
+//                    pidOutput = mTargetAngleLockPid.calculate(-1.0 * db.limelight.get(TX), clock.dt());
+//                    pidOutput = pidOutput + (Math.signum(pidOutput) * Settings.kTargetAngleLockFrictionFeedforward);
+//					SmartDashboard.putNumber("Target Angle Lock PID Output", pidOutput);
+//                    turn = pidOutput;
                 }
+
+//                mLeftMaster.set(pidOutput);
+//                mRightMaster.set(-pidOutput);
                 mLeftMaster.set(pidOutput);
                 mRightMaster.set(-pidOutput);
                 // NOTE - fall through here
             case VELOCITY:
                 mStartHoldingPosition = false;
+
+                mLeftVelocityPID.setSetpoint((throttle+turn) * kDriveTrainMaxVelocityRPM* Settings.Input.kMaxAllowedVelocityMultiplier);
+                mRightVelocityPID.setSetpoint((throttle-turn) * kDriveTrainMaxVelocityRPM* Settings.Input.kMaxAllowedVelocityMultiplier);
+
                 mLeftVelocityPID.setSetpoint((throttle+turn) * kDriveTrainMaxVelocityRPM* Settings.Input.kMaxAllowedVelocityMultiplier);
                 mRightVelocityPID.setSetpoint((throttle-turn) * kDriveTrainMaxVelocityRPM* Settings.Input.kMaxAllowedVelocityMultiplier);
                 double vLeft = mLeftVelocityPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
                 double vRight = mRightVelocityPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
+
+//                double vLeft = mLeftVelocityPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM),
+//                                                            (throttle+turn) * kDriveTrainMaxVelocityRPM* Settings.Input.kMaxAllowedVelocityMultiplier);
+//                double vRight = mLeftVelocityPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM),
+//                        (throttle-turn) * kDriveTrainMaxVelocityRPM* Settings.Input.kMaxAllowedVelocityMultiplier);
+
                 mLeftMaster.set(vLeft);
                 mRightMaster.set(vRight);
                 break;
@@ -388,6 +442,12 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set((throttle-turn)*Settings.Input.kMaxAllowedVelocityMultiplier);
                 break;
             case PATH_FOLLOWING_BASIC:
+                mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS_FT));
+                mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS_FT));
+
+                double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+                double posRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
+
                 mLeftPositionPID.setSetpoint(db.drivetrain.get(L_PATH_FT_s));
                 mRightPositionPID.setSetpoint(db.drivetrain.get(R_PATH_FT_s));
                 double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), clock.getCurrentTimeInMillis());
@@ -395,6 +455,10 @@ public class VioletDriveModule extends Module {
                 mLeftMaster.set(posLeft);
                 mRightMaster.set(posRight);
                 break;
+            case PATH_FOLLOWING_RAMSETE:
+                mLeftMaster.setVoltage(db.drivetrain.get(DESIRED_LEFT_VOLTAGE));
+                mRightMaster.setVoltage(db.drivetrain.get(DESIRED_RIGHT_VOLTAGE));
+                mDrive.feed();
             case PATH_FOLLOWING_RAMSETE:
 //                mLeftMaster.setVoltage(db.drivetrain.get(DESIRED_LEFT_VOLTAGE));
 //                mRightMaster.setVoltage(db.drivetrain.get(DESIRED_RIGHT_VOLTAGE));
@@ -438,6 +502,16 @@ public class VioletDriveModule extends Module {
 
                 mLeftMaster.set(leftOutputHome);
                 mRightMaster.set(rightOutputHome);
+                break;
+            case TANK:
+                mLeftTankPID.setSetpoint((left)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
+                mRightTankPID.setSetpoint((right)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
+
+                double vLeftTank = mLeftTankPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
+                double vRightTank = mRightTankPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
+
+                mLeftMaster.set(vLeftTank);
+                mRightMaster.set(vRightTank);
                 break;
         }
     }

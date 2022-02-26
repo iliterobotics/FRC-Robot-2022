@@ -1,7 +1,6 @@
 package us.ilite.robot.controller;
 
 import com.flybotix.hfr.codex.RobotCodex;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.*;
 
 
@@ -9,6 +8,7 @@ import static us.ilite.common.types.EIntakeData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
+import us.ilite.common.types.EFeederData;
 import us.ilite.common.lib.util.XorLatch;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Clock;
@@ -25,6 +25,9 @@ public abstract class AbstractController {
     protected double mLastTime = 0d;
     protected double dt = 1d;
 
+    private boolean mIsBallAdded = false;
+    private boolean mIsBallOut = false;
+    private int mNumBalls = 0;
     protected int mNumBalls = 0;
     protected final XorLatch mSecondaryLatch = new XorLatch();
     protected final XorLatch mEntryLatch = new XorLatch();
@@ -46,7 +49,6 @@ public abstract class AbstractController {
         mLastTime = clock.now();
     }
 
-
     /**
      * Enables / Disables this controller.
      * @param pEnabled TRUE if enabled
@@ -63,6 +65,27 @@ public abstract class AbstractController {
     }
 
     protected abstract void updateImpl();
+
+    protected void updateBalls() {
+        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d) {
+            if (!mIsBallAdded) {
+                mNumBalls++;
+                mIsBallAdded = true;
+            }
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.2);
+        } else if (mIsBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
+            mIsBallAdded = false;
+        }
+        else if (db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
+            if (!mIsBallOut) {
+                mNumBalls--;
+                mIsBallOut = true;
+            }
+        } else if (mIsBallOut && db.feeder.get(EFeederData.EXIT_BEAM) == 0d) {
+            mIsBallOut = false;
+        }
+        db.feeder.set(EFeederData.NUM_BALLS, mNumBalls);
+    }
 
     /**
      * Provides a way to report on what is used in our codex vs not used. This should help reduce the

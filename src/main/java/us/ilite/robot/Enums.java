@@ -3,6 +3,7 @@ package us.ilite.robot;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import edu.wpi.first.wpilibj.util.Color;
+import us.ilite.robot.modules.LEDControl;
 
 public class Enums {
     // =============================================================================
@@ -18,6 +19,41 @@ public class Enums {
         LED_OFF,
         LED_BLINK,
         LED_ON;
+    }
+
+    // LED control and colors
+    public enum LEDColorMode {
+        PURPLE( 255, 0, 200 ),
+        RED( 255, 0, 0 ),
+        LIGHT_BLUE( 0, 100, 220 ),
+        WHITE( 255, 255, 255 ),
+        GREEN( 0, 255, 0 ),
+        YELLOW( 255, 255, 0 ),
+        GREEN_HSV( 84, 255, 255 ),
+        BLUE( 0, 0, 255 ),
+        RED_HSV( 0, 255, 255 ),
+        YELLOW_HSV( 20, 255, 255 ),
+        PURPLE_HSV( 212, 255, 255 ),
+        ORANGE( 255, 165, 0 ),
+        DEFAULT( 0, 0, 0 );
+        double red;
+        double green;
+        double blue;
+        LEDColorMode(double pR, double pG, double pB) {
+            red = pR;
+            green = pG;
+            blue = pB;
+        }
+
+        public double getRed() {
+            return red;
+        }
+
+//        Color clr = new Color(red, green, blue);
+//
+//        public Color getColor() {
+//            return this.clr;
+//        }
     }
 
     //  Limelight camera mode
@@ -59,95 +95,32 @@ public class Enums {
         HOLD,
         VELOCITY,
         PERCENT_OUTPUT,
-        SMART_MOTION,
+        POSITION,
+        MOTION_MAGIC,
         TURN_TO,
         TURN_FOR,
-        HOME
-    }
-
-
-    // =============================================================================
-    // Flywheel States
-    // =============================================================================
-    public enum FlywheelWheelState {
-        NONE,
-        OPEN_LOOP,
-        VELOCITY
-    }
-
-    /**
-     * Closed-loop velocity settings for various target speeds
-     */
-    public enum FlywheelSpeeds {
-        OFF(                00.0, 62.0, 0.00, FlywheelWheelState.NONE),
-        HOME(               0.0, 30.0, 0.00, FlywheelWheelState.NONE),
-        DEFAULT(            20.0, 45.0, 0.75, FlywheelWheelState.VELOCITY),
-        CLOSE(              24.0, 62.0, 0.75, FlywheelWheelState.VELOCITY),
-        INITIATION_LINE(    29.0, 39.5, 0.75, FlywheelWheelState.VELOCITY),
-        FAR(                35.0, 31.5 * 1.1, 0.75, FlywheelWheelState.VELOCITY),
-        FAR_TRENCH(         52.0, 22.0 * 1.1, 0.75, FlywheelWheelState.VELOCITY),
-        /** Override represents a highly-variable angle / speed state where the controller must directly set everything */
-        OVERRIDE(           00.0, 45.0, 0.00, FlywheelWheelState.VELOCITY);
-
-        /**
-         * Ball trajectory exit speed in feet per second
-         */
-        public double speed;
-
-        /**
-         * Ball trajectory exit angle from the floor, in degrees
-         */
-        public double angle;
-
-        /**
-         * Feeder wheel PCT_OUTPUT, {-1,1}
-         */
-        public double feeder;
-        public FlywheelWheelState wheelstate;
-        FlywheelSpeeds(double _speed, double _angle, double _feeder, FlywheelWheelState _wheelstate){
-            speed=_speed;
-            angle=_angle;
-            feeder=_feeder;
-            wheelstate = _wheelstate;
-        }
+        HOME,
+        TANK
     }
 
 
 
     // =============================================================================
-    // Power Cell Module States
+    // Intake Module States
     // =============================================================================
     public enum EIntakeState {
-        //TODO find velocities
-        STOP (0.0),
-        INTAKE (0.1),
-        REVERSE (-0.1);
-
-        double pPower;
-
-        EIntakeState (double pPower) {
-            this.pPower = pPower;
-        }
-
-        public double getPower() {
-            return pPower;
-        }
+        PERCENT_OUTPUT,
+        VELOCITY;
     }
 
-
-    public enum EIndexingState {
-        BROKEN (true),
-        NOT_BROKEN(false);
-
-        boolean broken;
-
-        EIndexingState(boolean broken) {
-            this.broken = broken;
-        }
-
-        public boolean getState(){
-            return this.broken;
-        }
+    public enum EArmState {
+        EXTEND,
+        RETRACT,
+        DEFAULT;
+    }
+    public enum EFeederState {
+        PERCENT_OUTPUT,
+        INDEXING_VELOCITY;
     }
     public enum EArmState {
         NONE (0, 0),
@@ -160,5 +133,6 @@ public class Enums {
             this.angle = angle;
         }
     }
+
 
 }

@@ -1,25 +1,28 @@
 package us.ilite.robot.modules;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.*;
+import us.ilite.common.config.Settings;
 import us.ilite.common.types.EHangerModuleData;
 import us.ilite.robot.hardware.SparkMaxFactory;
 
 public class ClimberModule extends Module{
 
-    private CANSparkMax mSparkMaxOne;
-    private RelativeEncoder mEncdoerSparkMaxOne;
+    private TalonFX mClimb1;
+    private TalonFX mClimb2;
 
     public ClimberModule() {
-        mSparkMaxOne = SparkMaxFactory.createDefaultSparkMax(9, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mEncdoerSparkMaxOne = mSparkMaxOne.getEncoder();
+        mClimb1 = new TalonFX(Settings.HW.CAN.kCLM1);
+        mClimb2 = new TalonFX(Settings.HW.CAN.kCL2);
+        mClimb2.follow(mClimb1);
     }
     @Override
     public void readInputs() {
-        db.hanger.set(EHangerModuleData.L_VEL_rpm, mEncdoerSparkMaxOne.getVelocity());
     }
 
     @Override
     public void setOutputs() {
-        mSparkMaxOne.set(db.hanger.get(EHangerModuleData.SET_pct));
+        mClimb1.set(TalonFXControlMode.PercentOutput, 0.1);
     }
 }

@@ -42,12 +42,12 @@ public class Robot extends TimedRobot {
 
     private DriveModule mDrive;
     private Limelight mLimelight;
-    private RawLimelight mRawLimelight;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
-    private FlywheelModule mShooter;
+    private FeederModule mFeeder;
     private VioletDriveModule mViolet;
-    private VioletIntakeModule mIntake;
+    private IntakeModule mIntake;
+    private ClimberModule mClimber;
 
 //    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
@@ -55,8 +55,7 @@ public class Robot extends TimedRobot {
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
-    private BaseAutonController mBaseAutonController;
-//    private final AbstractController mBaseAutonController = new BaseAutonController();
+    private AbstractController mBaseAutonController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
@@ -66,24 +65,26 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
+
         // Init the actual robot
 //        initTimer.reset();
 //        initTimer.start();
 
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
-        mViolet = new VioletDriveModule();
-        //practice = TrajectoryCommandUtils.buildTrajectoryCommand(mDrive, PracticeTrajectory.runStraight());
+     //   mViolet = new VioletDriveModule();
+        mDrive = new DriveModule();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
-        mIntake = new VioletIntakeModule();
-        mDrive = new DriveModule();
-        mShooter = new FlywheelModule();
-      //  mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
-//        mRawLimelight = new RawLimelight(Settings.kGroundLimelightNetworkTable);
+        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
+        mFeeder = new FeederModule();
+        mIntake = new IntakeModule();
         mLEDControl = new LEDControl();
+        mClimber = new ClimberModule();
+//        mCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
+//        mCompressor.enableAnalog(55, 60);
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -137,17 +138,13 @@ public class Robot extends TimedRobot {
         }
 
         MODE=AUTONOMOUS;
-        mBaseAutonController.initialize();
-        mBaseAutonController.setEnabled(true);
-        mActiveController = mBaseAutonController;
-      //  mActiveController.setEnabled(true);
+        mActiveController = new DriveStraightTurnController();
+        mActiveController.setEnabled(true);
         mRunningModules.clearModules();
 //        mRunningModules.addModule(mLimelight);
-//        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mViolet);
-       // practice.initialize();
-
+      //  mRunningModules.addModule(mFeeder);
+      //  mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(AUTONOMOUS);
     }
 
@@ -165,19 +162,23 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-//        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mViolet);
+        mRunningModules.addModule(mFeeder);
+//        mRunningModules.addModule(mViolet);
         mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mClimber);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
+        mRunningModules.modeInit(TELEOPERATED);
     }
 
     @Override
     public void teleopPeriodic() {
         commonPeriodic();
+//        System.out.println(mCompressor.enabled());
     }
 
     @Override
@@ -198,8 +199,9 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.readInputs();
-        mDrive.readInputs();
-        mShooter.readInputs();
+//        mDrive.readInputs();
+        mIntake.readInputs();
+        mFeeder.readInputs();
         Shuffleboard.update();
     }
 
@@ -219,11 +221,17 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
 //        mRunningModules.addModule(mLimelight);
-//        mRunningModules.addModule(mShooter);
-        mRunningModules.addModule(mViolet);
+//        mRunningModules.addModule(mFeeder);
+//        mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mIntake);
-//        mRunningModules.addModule(mDJSpinnerModule);
+        mRunningModules.addModule(mLEDControl);
+        if(IS_SIMULATED) {
+            mRunningModules.addModule(mSimulation);
+        }
+//        mRunningModules.addModule(mViolet);
+//        mRunningModules.addModule(mHanger);
+//        mRunningModules.addModule(mIntake);
 //        mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
