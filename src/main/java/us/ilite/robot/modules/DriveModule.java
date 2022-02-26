@@ -126,7 +126,7 @@ public class DriveModule extends Module {
 		mTargetAngleLockPid = new PIDController(kTargetAngleLockGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 
-		mDifferentialDrive = new DifferentialDrive((MotorController) mLeftMaster, (MotorController) mRightMaster);
+	//	mDifferentialDrive = new DifferentialDrive((MotorController) mLeftMaster, (MotorController) mRightMaster);
 		mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
 	}
 
