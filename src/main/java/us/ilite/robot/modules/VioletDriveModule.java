@@ -187,7 +187,6 @@ public class VioletDriveModule extends Module {
     private boolean mStartHoldingPosition;
     private double initialXPosition;
     private double initialYPosition;
-    private double mStartAngleDeg = 0;
 
 
     private final CANSparkMax mLeftMaster;
@@ -197,11 +196,6 @@ public class VioletDriveModule extends Module {
 
     private final RelativeEncoder mLeftEncoder;
     private final RelativeEncoder mRightEncoder;
-
-    //RAMSETE STUFF DO NOT MODIFY
-    public static DifferentialDriveOdometry mOdometry;
-    private DifferentialDrive mDrive;
-
 
     private static final SparkMaxFactory.Configuration kDriveConfig = new SparkMaxFactory.Configuration();
     static {
@@ -216,9 +210,6 @@ public class VioletDriveModule extends Module {
         SmartDashboard.putNumber("Odometry init posX", -1);
         SmartDashboard.putNumber("Odometry init posY", -1);
 
-
-        mLeftMaster = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveLeftMaster, kDriveConfig);
-        mLeftFollower = SparkMaxFactory.createSparkMax(Settings.HW.CAN.kDriveLeftFollower, kDriveConfig);
         mLeftFollower.follow(mLeftMaster);
         mLeftEncoder = mLeftMaster.getEncoder();
 
@@ -415,8 +406,8 @@ public class VioletDriveModule extends Module {
 
 //                mLeftMaster.set(pidOutput);
 //                mRightMaster.set(-pidOutput);
-                mLeftMaster.set(pidOutput);
-                mRightMaster.set(-pidOutput);
+//                mLeftMaster.set(pidOutput);
+//                mRightMaster.set(-pidOutput);
                 // NOTE - fall through here
             case VELOCITY:
                 mStartHoldingPosition = false;
@@ -448,17 +439,9 @@ public class VioletDriveModule extends Module {
                 double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
                 double posRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
 
-                mLeftPositionPID.setSetpoint(db.drivetrain.get(L_PATH_FT_s));
-                mRightPositionPID.setSetpoint(db.drivetrain.get(R_PATH_FT_s));
-                double posLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_FT_s), clock.getCurrentTimeInMillis());
-                double posRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_FT_s), clock.getCurrentTimeInMillis());
                 mLeftMaster.set(posLeft);
                 mRightMaster.set(posRight);
                 break;
-            case PATH_FOLLOWING_RAMSETE:
-                mLeftMaster.setVoltage(db.drivetrain.get(DESIRED_LEFT_VOLTAGE));
-                mRightMaster.setVoltage(db.drivetrain.get(DESIRED_RIGHT_VOLTAGE));
-                mDrive.feed();
             case PATH_FOLLOWING_RAMSETE:
 //                mLeftMaster.setVoltage(db.drivetrain.get(DESIRED_LEFT_VOLTAGE));
 //                mRightMaster.setVoltage(db.drivetrain.get(DESIRED_RIGHT_VOLTAGE));

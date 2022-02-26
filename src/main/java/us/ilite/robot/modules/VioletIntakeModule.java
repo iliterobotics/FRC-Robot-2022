@@ -83,7 +83,7 @@ public class VioletIntakeModule extends Module {
         mIntakeRoller.setSmartCurrentLimit(40);
         mIntakeRollerEncoder = mIntakeRoller.getEncoder();
 
-        mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.HW.CAN.kTalonPowerCellSerializer);
+        mConveyorMotorHorizontal = TalonSRXFactory.createDefaultTalon( Settings.HW.CAN.kTalonintakeSerializer);
         mConveyorMotorVertical = TalonSRXFactory.createDefaultTalon( Settings.HW.CAN.kTalonVerticalID );
         mConveyorMotorVertical.setInverted(true);
 
@@ -115,11 +115,11 @@ public class VioletIntakeModule extends Module {
 
     @Override
     public void readInputs() {
-        db.powercell.set(INTAKE_VEL_ft_s, mIntakeRollerEncoder.getVelocity() * kIntakeRollerSpeedConversion);
-        db.powercell.set(ARM_ANGLE_deg, mIntakePivotEncoder.getPosition() * kPivotConversion);
-        db.powercell.set(ENTRY_BEAM, mEntryBeam.isBroken());
-        db.powercell.set(H_BEAM, mSecondaryBeam.isBroken());
-        db.powercell.set(EXIT_BEAM, mExitBeam.isBroken());
+        db.intake.set(INTAKE_VEL_ft_s, mIntakeRollerEncoder.getVelocity() * kIntakeRollerSpeedConversion);
+        db.intake.set(ARM_ANGLE_deg, mIntakePivotEncoder.getPosition() * kPivotConversion);
+        db.intake.set(ENTRY_BEAM, mEntryBeam.isBroken());
+        db.intake.set(H_BEAM, mSecondaryBeam.isBroken());
+        db.intake.set(EXIT_BEAM, mExitBeam.isBroken());
     }
 
     @Override
@@ -127,27 +127,27 @@ public class VioletIntakeModule extends Module {
         setPivotArm();
         setSerializer();
         mIntakeRollerPID.setSetpoint(10);
-        double velocity = mIntakeRollerPID.calculate(db.powercell.get(INTAKE_VEL_ft_s), clock.getCurrentTimeInMillis());
+        double velocity = mIntakeRollerPID.calculate(db.intake.get(INTAKE_VEL_ft_s), clock.getCurrentTimeInMillis());
         velocity = (velocity == Double.NaN) ? 0.5 : velocity;
         SmartDashboard.putNumber("Roller Velocity", velocity);
-        mIntakeRoller.set(db.powercell.get(SET_INTAKE_VEL_ft_s) / 18);
+        mIntakeRoller.set(db.intake.get(SET_INTAKE_VEL_ft_s) / 18);
     }
 
     private void setPivotArm() {
-        EArmState mode = db.powercell.get(INTAKE_STATE, EArmState.class);
+        EArmState mode = db.intake.get(INTAKE_STATE, EArmState.class);
         double desiredAngle = 0;
         SmartDashboard.putNumber("Arm pid value: ", desiredAngle);
         if (mode == null) return;
         switch(mode){
             case STOW:
-                desiredAngle = mIntakePivotPID.calculate(db.powercell.get(ARM_ANGLE_deg), kArmMinDegrees);
+                desiredAngle = mIntakePivotPID.calculate(db.intake.get(ARM_ANGLE_deg), kArmMinDegrees);
                 break;
             case OUT:
-                desiredAngle = mIntakePivotPID.calculate(db.powercell.get(ARM_ANGLE_deg), kArmMaxDegrees);
+                desiredAngle = mIntakePivotPID.calculate(db.intake.get(ARM_ANGLE_deg), kArmMaxDegrees);
                 break;
             case NONE:
-                db.powercell.set(INTAKE_STATE, EArmState.STOW);
-                mode = db.powercell.get(INTAKE_STATE, EArmState.class);
+                db.intake.set(INTAKE_STATE, EArmState.STOW);
+                mode = db.intake.get(INTAKE_STATE, EArmState.class);
                 break;
         }
 
