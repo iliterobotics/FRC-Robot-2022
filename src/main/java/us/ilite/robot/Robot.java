@@ -37,7 +37,6 @@ public class Robot extends TimedRobot {
     private CSVLogger mCSVLogger;
     private Timer initTimer = new Timer();
     private DriveModule mDrive;
-    private Limelight mLimelight;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FeederModule mFeeder;
@@ -62,11 +61,10 @@ public class Robot extends TimedRobot {
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
         mDrive = new DriveModule();
-        MODE=INITIALIZING;
+        MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
-        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
         mLEDControl = new LEDControl();
