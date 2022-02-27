@@ -28,10 +28,7 @@ public abstract class AbstractController {
     private boolean mIsBallAdded = false;
     private boolean mIsBallOut = false;
     private int mNumBalls = 0;
-    protected final XorLatch mSecondaryLatch = new XorLatch();
-    protected final XorLatch mEntryLatch = new XorLatch();
-
-
+   
     public AbstractController(){
         super();
     }
@@ -55,12 +52,6 @@ public abstract class AbstractController {
     public final void setEnabled(boolean pEnabled) {
         mCycleCount = 0;
         mEnabled = pEnabled;
-    }
-
-    protected void stopDrivetrain() {
-        db.drivetrain.set(STATE, EDriveState.PERCENT_OUTPUT);
-        db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
-        db.drivetrain.set(DESIRED_TURN_PCT,0.0);
     }
 
     protected abstract void updateImpl();
@@ -113,20 +104,5 @@ public abstract class AbstractController {
         }
         return unused;
     }
-    protected void setIntakeArmEnabled(boolean pEnabled) {
-//
-    }
 
-    protected final void resetSerializerState() {
-        mEntryLatch.reset();
-        mSecondaryLatch.reset();
-        mNumBalls = 0;
-    }
-
-    protected void activateSerializer() {
-    }
-
-    protected void reverseSerializer() {
-
-    }
 }
