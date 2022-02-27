@@ -1,6 +1,7 @@
 package us.ilite.robot.controller;
 
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -18,10 +19,13 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.TrajectoryCommandUtils;
+import us.ilite.robot.hardware.ECommonControlMode;
+import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.VioletDriveModule;
 
@@ -43,6 +47,7 @@ public class BaseAutonController extends AbstractController {
      * used for temporal offsets.
      */
     public final Timer mTimer;
+    public final Timer mFirstLeg;
     /**
      * The {@link RamseteController} that is used to follow a {@link Trajectory}. This
      * will be used to calculate the chasis speed based on the robots pose and velocity
@@ -84,6 +89,7 @@ public class BaseAutonController extends AbstractController {
      */
     private UUID mID;
     private Trajectory.State initialState;
+    private int mCycleCount = 0;
 
     /**
      * Default constructor. This will instantiate the variables that are not dependent on the init
@@ -92,8 +98,9 @@ public class BaseAutonController extends AbstractController {
     public BaseAutonController() {
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
-        mMotorPidController = new PIDController(1,0,0);
+        mMotorPidController = new PIDController(0.00051968,0,0);
         mTimer = new Timer();
+        mFirstLeg = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Units.feet_to_meters(DriveModule.kTrackWidthFeet));
         SmartDashboard.putNumber("trajectory-seconds",-1);
     }
@@ -103,25 +110,55 @@ public class BaseAutonController extends AbstractController {
      * state can be restarted, should the autonomous be run multiple times. (Something that only really happens
      * at home).
      */
-    public void initialize() {
+    public void initialize(Trajectory pTrajectory) {
         mID = UUID.randomUUID();
         mTimer.reset();
         mTimer.start();
+        mFirstLeg.reset();
+        mFirstLeg.start();
         startTime = mTimer.get();
         mMotorPidController.reset();
         mPrevTime = -1;
-        mTrajectory = TrajectoryCommandUtils.getJSONTrajectory();
+        mTrajectory = pTrajectory;
 //      Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
 //      Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
 //      mTrajectory = trajectory.transformBy(transform);
         initialState = mTrajectory.sample(0);
+        SmartDashboard.putNumber("Initial state x", initialState.poseMeters.getX());
+        SmartDashboard.putNumber("Initial state y", initialState.poseMeters.getY());
         mPrevTargetWheelSpeeds = new DifferentialDriveWheelSpeeds(0,0);
         mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0,0);
         SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
     }
     @Override
     protected void updateImpl() {
-        execute();
+        db.drivetrain.set(EDriveData.NEUTRAL_MODE, NeutralMode.Brake);
+        if (mFirstLeg.get() < 0.5) {
+            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 1.0);
+            db.intake.set(EIntakeData.ARM_STATE, Enums.EArmState.DEFAULT);
+        } else if (mFirstLeg.get() == 0.5) {
+            mTimer.reset();
+        } else {
+            db.intake.set(EIntakeData.ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.intake.set(EIntakeData.DESIRED_pct, 1.0);
+            execute();
+            if (isFinished()) {
+                if (db.drivetrain.get(EDriveData.ACTUAL_HEADING_DEGREES) >= 85 && db.drivetrain.get(EDriveData.ACTUAL_HEADING_DEGREES) <= 95) {
+                    mCycleCount++;
+                }
+                if (mCycleCount >= 5) {
+                    initialize(TrajectoryCommandUtils.getOtherJSONTrajectory());
+                    execute();
+                } else {
+                    db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TURN_TO);
+                    db.drivetrain.set(EDriveData.DESIRED_TURN_ANGLE_deg, 120);
+                    db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.05);
+                }
+            }
+
+        }
+
     }
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;

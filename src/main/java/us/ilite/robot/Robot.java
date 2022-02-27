@@ -62,7 +62,6 @@ public class Robot extends TimedRobot {
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
-        mBaseAutonController.initialize();
         mDrive = new DriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -118,6 +117,7 @@ public class Robot extends TimedRobot {
 
         MODE=AUTONOMOUS;
         mActiveController = mBaseAutonController;
+        mBaseAutonController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);

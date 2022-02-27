@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -20,6 +21,7 @@ import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
+import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.hardware.Pigeon;
 
 import java.util.Set;
@@ -74,6 +76,7 @@ public class DriveModule extends Module {
 	public static PIDController mRightPositionPID;
 	public static PIDController mLeftPositionPID;
 	public static PIDController mTargetAngleLockPid;
+	public static PIDController mTurnToDegreePID;
 
 	private static DifferentialDriveOdometry mOdometry;
 	private static DifferentialDrive mDifferentialDrive;
@@ -84,7 +87,7 @@ public class DriveModule extends Module {
 	private static double mLastHeading = 0;
 	private static double mDeltaTime = 0;
 
-	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
+	public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.0285);
 	public static double kTurnSensitivity = 0.85;
 
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
@@ -115,16 +118,14 @@ public class DriveModule extends Module {
 		mLeftMaster = new WPI_TalonFX(Settings.HW.CAN.kDTML1);
 		mLeftFollower = new WPI_TalonFX(Settings.HW.CAN.kDTL3);
 		mLeftFollower.follow(mLeftMaster);
-
-		mLeftMaster.setNeutralMode(NeutralMode.Coast);
-		mLeftFollower.setNeutralMode(NeutralMode.Coast);
+		mLeftMaster.setNeutralMode(NeutralMode.Brake);
+		mLeftFollower.setNeutralMode(NeutralMode.Brake);
 
 		mRightMaster = new WPI_TalonFX(Settings.HW.CAN.kDTMR2);
 		mRightFollower = new WPI_TalonFX(Settings.HW.CAN.kDTR4);
 		mRightFollower.follow(mRightMaster);
-
-		mRightMaster.setNeutralMode(NeutralMode.Coast);
-		mRightFollower.setNeutralMode(NeutralMode.Coast);
+		mRightMaster.setNeutralMode(NeutralMode.Brake);
+		mRightFollower.setNeutralMode(NeutralMode.Brake);
 
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
@@ -151,6 +152,10 @@ public class DriveModule extends Module {
 		mTargetAngleLockPid = new PIDController(kTargetAngleLockGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 
+		mTurnToDegreePID = new PIDController(kTurnToProfileGains, -180, 180, Settings.kControlLoopPeriod);
+		mTurnToDegreePID.setContinuous(true);
+		mTurnToDegreePID.setOutputRange(-1, 1);
+
 		//TODO figure out a way to call mDrive.feed() using TalonFX
 		mDifferentialDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
 		mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
@@ -159,6 +164,7 @@ public class DriveModule extends Module {
 	@Override
 	public void modeInit(EMatchMode mode) {
 		reset();
+		mGyro.zeroAll();
 		resetOdometry(TrajectoryCommandUtils.getJSONTrajectory().getInitialPose());
 		kInitialXPosition = mOdometry.getPoseMeters().getX();
 		kInitialYPosition = mOdometry.getPoseMeters().getY();
@@ -169,10 +175,8 @@ public class DriveModule extends Module {
 	@Override
 	public void readInputs() {
 		mGyro.update();
-		db.drivetrain.set(DELTA_HEADING, mGyro.getHeading().getDegrees() - mLastHeading);
-		db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
-		db.drivetrain.set(ACTUAL_HEADING_RADIANS, mGyro.getHeading().getRadians());
-		db.drivetrain.set(ACTUAL_HEADING_DEGREES, mGyro.getHeading().getRadians());
+		db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getHeading().getRadians());
+		db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getHeading().getDegrees());
 		db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getBusVoltage());
 		db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getBusVoltage());
 		db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getStatorCurrent());
@@ -207,6 +211,11 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs() {
+
+		mRightMaster.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
+		mRightFollower.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
+		mLeftMaster.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
+		mLeftFollower.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
 		Enums.EDriveState state = db.drivetrain.get(STATE, Enums.EDriveState.class);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
@@ -283,6 +292,14 @@ public class DriveModule extends Module {
 				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);
 				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);
 				mDifferentialDrive.feed();
+				break;
+			case TURN_TO:
+				mTurnToDegreePID.setSetpoint(db.drivetrain.get(DESIRED_TURN_ANGLE_deg));
+				double output = mTurnToDegreePID.calculate(db.drivetrain.get(ACTUAL_HEADING_DEGREES), clock.getCurrentTimeInMillis());
+//				output += Math.signum(output) * DriveModule.kTurnToProfileGains.F;
+				db.drivetrain.set(DESIRED_TURN_PCT, output);
+				mLeftMaster.set(output);
+				mRightMaster.set(-output);
 				break;
 			default:
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);

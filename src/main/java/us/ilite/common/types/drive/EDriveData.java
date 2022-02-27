@@ -21,7 +21,6 @@ public enum EDriveData implements CodexOf<Double> {
     IS_CURRENT_LIMITING,
 
     DESIRED_TURN_ANGLE_deg,
-    ACTUAL_TURN_ANGLE_deg,
     GREYHILL_ACTUAL_RIGHT_ft, GREYHILL_ACTUAL_LEFT_ft,
     GREYHILL_ACTUAL_RIGHT_meters, GREYHILL_ACTUAL_LEFT_meters,
 
@@ -32,11 +31,8 @@ public enum EDriveData implements CodexOf<Double> {
     DESIRED_LEFT_PCT, DESIRED_RIGHT_PCT,
     ACTUAL_LEFT_PCT, ACTUAL_RIGHT_PCT,
 
-    DELTA_HEADING,
     ACTUAL_HEADING_RADIANS,
     ACTUAL_HEADING_DEGREES,
-    SET_YAW_RATE_deg_s,
-    GYRO_RATE,
 
     NEUTRAL_MODE,
     STATE,
