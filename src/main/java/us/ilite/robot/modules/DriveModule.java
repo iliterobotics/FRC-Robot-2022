@@ -15,6 +15,7 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.drive.EDriveData;
+import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
@@ -24,6 +25,8 @@ import java.util.Set;
 
 import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
+import static us.ilite.common.types.sensor.EPowerDistPanel.*;
+import static us.ilite.common.types.sensor.EPowerDistPanel.CURRENT14;
 
 public class DriveModule extends Module {
 
@@ -50,6 +53,17 @@ public class DriveModule extends Module {
 	public static final double kDriveRampRate = kMaxDriveVelocity / 5;
 	public static final double kUnitsToScaledRotationsPosition = 2048.0 / kGearboxRatio;
 	public static final double kPulsesPerRotation = 256;
+	public static final int kCurrentLimitAmps = 50;
+
+	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
+			/* Left */
+			CURRENT1,
+			CURRENT2,
+
+			/* Right */
+			CURRENT13,
+			CURRENT14,
+	};
 
 	private final int vSlot = 1;
 	private final int dSlot = 2;
@@ -136,7 +150,8 @@ public class DriveModule extends Module {
 		mTargetAngleLockPid = new PIDController(kTargetAngleLockGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 
-		mDifferentialDrive = new DifferentialDrive((MotorController) mLeftMaster, (MotorController) mRightMaster);
+		//TODO figure out a way to call mDrive.feed() using TalonFX
+//		mDifferentialDrive = new DifferentialDrive((MotorController) mLeftMaster, (MotorController) mRightMaster);
 		mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
 	}
 
@@ -173,6 +188,8 @@ public class DriveModule extends Module {
 		db.drivetrain.set(R_ACTUAL_POS_meters, Units.feet_to_meters(((mRightMaster.getSelectedSensorPosition() - kInitialRightPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet));
 		db.drivetrain.set(ACTUAL_LEFT_PCT, (mLeftMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
+		db.drivetrain.set(IS_CURRENT_LIMITING, EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots));
+
 
 		double odoX = mOdometry.getPoseMeters().getX() - kInitialXPosition;
 		double odoY = mOdometry.getPoseMeters().getY() - kInitialYPosition;
@@ -266,7 +283,7 @@ public class DriveModule extends Module {
 			case PATH_FOLLOWING_RAMSETE:
 				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(DESIRED_LEFT_ft_s) / kMaxDriveVelocityFTs);
 				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(DESIRED_RIGHT_ft_s) / kMaxDriveVelocityFTs);
-				mDifferentialDrive.feed();
+//				mDifferentialDrive.feed();
 				break;
 			default:
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);

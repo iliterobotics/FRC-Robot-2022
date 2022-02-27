@@ -39,7 +39,6 @@ public class Robot extends TimedRobot {
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger;
     private Timer initTimer = new Timer();
-    public static Field2d mField = new Field2d();
 
     private DriveModule mDrive;
     private LEDControl mLEDControl;
@@ -47,8 +46,6 @@ public class Robot extends TimedRobot {
     private FeederModule mFeeder;
     private IntakeModule mIntake;
     private ClimberModule mClimber;
-
-//    private PowerDistributionPanel pdp = new PowerDistributionPanel(Settings.Hardware.CAN.kPDP);
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -109,8 +106,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        SmartDashboard.putData(mField);
-        mField.getObject("traj").setTrajectory(TrajectoryCommandUtils.getJSONTrajectory());
+        SmartDashboard.putData(FIELD);
+        FIELD.getObject("Current Trajectory").setTrajectory(TrajectoryCommandUtils.getJSONTrajectory());
     }
 
     @Override
@@ -120,7 +117,7 @@ public class Robot extends TimedRobot {
         }
 
         MODE=AUTONOMOUS;
-        mActiveController = new DriveStraightTurnController();
+        mActiveController = new BaseAutonController();
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
