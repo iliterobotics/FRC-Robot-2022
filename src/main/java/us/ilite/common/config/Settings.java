@@ -124,4 +124,19 @@ public class Settings {
     public static final double kTargetAngleLockMaxInput = 27;
     public static final double kTargetAngleLockFrictionFeedforward = 0.44 / 12;
 
+    // =============================================================================
+    // RamseteCommand constants
+    // =============================================================================
+    public static final double kS = 0.33136;
+    public static final double kV = 0.1398;
+    public static final double kA = 0.0076288;
+
+    public static final double kP = 0.1139;
+
+    public static final double kTrackWidthMeters = 0.6858;
+    public static final double kMaxSpeedMetersPerSecond = 15;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 15;
+
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
 }

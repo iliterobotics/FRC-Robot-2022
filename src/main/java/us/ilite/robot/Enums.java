@@ -123,5 +123,4 @@ public class Enums {
         INDEXING_VELOCITY;
     }
 
-
 }

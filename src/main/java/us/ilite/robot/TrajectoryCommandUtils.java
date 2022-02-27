@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -24,13 +25,82 @@ import java.util.List;
 
 public class TrajectoryCommandUtils {
 
+    private static class TrajectoryWrapper extends Trajectory {
+        private Trajectory mTraj;
+        TrajectoryWrapper(Trajectory pTraj) {
+            mTraj = pTraj;
+        }
+
+        @Override
+        public List<State> getStates() {
+            return mTraj.getStates();
+        }
+
+        @Override
+        public Pose2d getInitialPose() {
+            return mTraj.getInitialPose();
+        }
+
+        @Override
+        public double getTotalTimeSeconds() {
+            return 4;
+        }
+
+        @Override
+        public State sample(double timeSeconds) {
+            return mTraj.sample(timeSeconds);
+        }
+
+        @Override
+        public Trajectory transformBy(Transform2d transform) {
+            return transformBy(transform);
+        }
+
+        @Override
+        public Trajectory relativeTo(Pose2d pose) {
+            return mTraj.relativeTo(pose);
+        }
+
+        @Override
+        public Trajectory concatenate(Trajectory other) {
+            return mTraj.concatenate(other);
+        }
+
+        @Override
+        public String toString() {
+            return mTraj.toString();
+        }
+
+        public int hashCode() {
+            return mTraj.hashCode();
+        }
+        public boolean equals(Object other) {
+            return mTraj.equals(other);
+        }
+
+    }
+
 
     public static Trajectory getJSONTrajectory() {
-        String trajectoryJSON = "paths/test.wpilib.json";
+        String trajectoryJSON = "paths/FirstBall.wpilib.json";
         Trajectory trajectory = new Trajectory();
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-            trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+            trajectory = new TrajectoryWrapper(TrajectoryUtil.fromPathweaverJson(trajectoryPath));
+            System.out.println("Successful");
+        } catch (IOException ex) {
+            System.out.println("Unable to open " + trajectoryJSON + " " + Arrays.toString(ex.getStackTrace()));
+        }
+        System.out.println("DONE");
+        return trajectory;
+    }
+
+    public static Trajectory getOtherJSONTrajectory() {
+        String trajectoryJSON = "paths/SecondBall.wpilib.json";
+        Trajectory trajectory = new Trajectory();
+        try {
+            Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+            trajectory = new TrajectoryWrapper(TrajectoryUtil.fromPathweaverJson(trajectoryPath));
             System.out.println("Successful");
         } catch (IOException ex) {
             System.out.println("Unable to open " + trajectoryJSON + " " + Arrays.toString(ex.getStackTrace()));

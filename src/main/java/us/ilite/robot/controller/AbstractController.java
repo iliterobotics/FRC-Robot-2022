@@ -4,10 +4,12 @@ import com.flybotix.hfr.codex.RobotCodex;
 import us.ilite.common.*;
 
 
+import static us.ilite.common.types.EIntakeData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
 import us.ilite.common.types.EFeederData;
+import us.ilite.common.lib.util.XorLatch;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Clock;
 
@@ -26,6 +28,9 @@ public abstract class AbstractController {
     private boolean mIsBallAdded = false;
     private boolean mIsBallOut = false;
     private int mNumBalls = 0;
+    protected final XorLatch mSecondaryLatch = new XorLatch();
+    protected final XorLatch mEntryLatch = new XorLatch();
+
 
     public AbstractController(){
         super();
@@ -107,5 +112,21 @@ public abstract class AbstractController {
             }
         }
         return unused;
+    }
+    protected void setIntakeArmEnabled(boolean pEnabled) {
+//
+    }
+
+    protected final void resetSerializerState() {
+        mEntryLatch.reset();
+        mSecondaryLatch.reset();
+        mNumBalls = 0;
+    }
+
+    protected void activateSerializer() {
+    }
+
+    protected void reverseSerializer() {
+
     }
 }
