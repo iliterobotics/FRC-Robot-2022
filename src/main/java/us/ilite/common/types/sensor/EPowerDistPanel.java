@@ -40,12 +40,7 @@ public enum EPowerDistPanel implements CodexOf<Double> {
   EPowerDistPanel(double pBreakerValue) {
     BREAKER_VALUE = pBreakerValue;
   }
-  
-//  private final static Executor executor = Executors.newFixedThreadPool(18);
-//  private interface IMap {
-//    public EPowerDistPanel run();
-//  }
-  
+
   /**
    * WARNING -
    * This code takes about 5ms to execute.  If I try to split it to concurrently read the PDP,
@@ -56,33 +51,7 @@ public enum EPowerDistPanel implements CodexOf<Double> {
    * @param pPDP PDP hardware
    */
   public static void map(Codex<Double, EPowerDistPanel> pCodex, PowerDistribution pPDP) {
-//    List<IMap> tasks = new ArrayList<>();
-//    Arrays.stream(EPowerDistPanel.values())
-//      .forEach(epdp -> {
-//        switch(epdp) {
-//        case VOLTAGE:
-//          tasks.add(() -> {pCodex.set(epdp, pPDP.getVoltage()); return epdp;});
-//          break;
-//        case TEMPERATURE:
-//          tasks.add(() -> {pCodex.set(epdp, pPDP.getTemperature()); return epdp;});
-//          break;
-//        default:
-//          tasks.add(() -> {pCodex.set(epdp.ordinal(), pPDP.getCurrent(epdp.ordinal())); return epdp;});
-//          break;
-//        }
-//      });
-//    
-//    List<CompletableFuture<EPowerDistPanel>> futures = tasks
-//       .stream()
-//       .map(t -> CompletableFuture.supplyAsync(() -> t.run(), executor))
-//       .collect(Collectors.toList());
-//   
-//    futures.stream()
-//           .map(CompletableFuture::join)
-//           .collect(Collectors.toList());
-    
-    
-    for(int i = 0; i < 16; i++) {
+    for (int i = 0; i < 16; i++) {
       pCodex.set(i, pPDP.getCurrent(i));
     }
     pCodex.set(VOLTAGE, pPDP.getVoltage());

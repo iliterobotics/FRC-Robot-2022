@@ -5,13 +5,21 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
+import us.ilite.robot.Robot;
+import us.ilite.robot.hardware.Pigeon;
+
+import java.util.Set;
+
 import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 
@@ -19,6 +27,7 @@ public class DriveModule extends Module {
 
 	private TalonFX mLeftMaster, mLeftFollower, mRightMaster, mRightFollower;
 	private Encoder mLeftEncoder, mRightEncoder;
+	private Pigeon mGyro;
 
 	// ========================================
 	// DO NOT MODIFY THESE CONSTANTS
@@ -40,11 +49,12 @@ public class DriveModule extends Module {
 
 	public static PIDController mLeftVelocityPID;
 	public static PIDController mRightVelocityPID;
-
 	public static PIDController mRightPositionPID;
 	public static PIDController mLeftPositionPID;
-
 	public static PIDController mTargetAngleLockPid;
+
+	private static DifferentialDriveOdometry mOdometry;
+	private static DifferentialDrive mDifferentialDrive;
 
 	private static double mLeftHoldPosition = 0;
 	private static double mRightHoldPosition = 0;
@@ -60,7 +70,7 @@ public class DriveModule extends Module {
 	public static double kInitialRightPosition = 0;
 
 	private final ProfileGains kVelocityGains = new ProfileGains()
-			.p(0.005)
+			.p(0.0005)
 			.i(0.0)
 			.d(0.0)
 			.maxVelocity(kMaxDriveVelocityFTs)
@@ -93,15 +103,17 @@ public class DriveModule extends Module {
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
 
+		mGyro = new Pigeon(Robot.CLOCK, Settings.HW.CAN.kDTGyro);
+
 		mLeftEncoder = new Encoder(Settings.HW.DIO.kEDTLA, Settings.HW.DIO.kEDTLB);
 		mRightEncoder = new Encoder(Settings.HW.DIO.kEDTRA, Settings.HW.DIO.kEDTRB);
 
 		mLeftVelocityPID = new PIDController(kVelocityGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mLeftVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
-				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
+		mLeftVelocityPID.setOutputRange(-1,
+				1);
 		mRightVelocityPID = new PIDController(kVelocityGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mRightVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
-				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
+		mRightVelocityPID.setOutputRange(-1,
+				1);
 
 		mLeftPositionPID = new PIDController(kPositionGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mLeftPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
@@ -112,6 +124,9 @@ public class DriveModule extends Module {
 
 		mTargetAngleLockPid = new PIDController(kTargetAngleLockGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
+
+	//	mDifferentialDrive = new DifferentialDrive((MotorController) mLeftMaster, (MotorController) mRightMaster);
+		mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
 	}
 
 	@Override
@@ -123,6 +138,7 @@ public class DriveModule extends Module {
 
 	@Override
 	public void readInputs() {
+		mGyro.update();
 		db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getBusVoltage());
 		db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getBusVoltage());
 		db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getStatorCurrent());
@@ -132,9 +148,15 @@ public class DriveModule extends Module {
 		db.drivetrain.set(L_ACTUAL_VEL_FT_s, mLeftMaster.getSelectedSensorVelocity() * kRPMtoFTs);
 		db.drivetrain.set(R_ACTUAL_VEL_FT_s, mLeftMaster.getSelectedSensorVelocity() * kRPMtoFTs);
 		db.drivetrain.set(L_ACTUAL_POS_FT, ((mLeftMaster.getSelectedSensorPosition() - kInitialLeftPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet);
-		db.drivetrain.set(R_ACTUAL_POS_FT,  ((mRightMaster.getSelectedSensorPosition() - kInitialRightPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet);
+		db.drivetrain.set(R_ACTUAL_POS_FT, ((mRightMaster.getSelectedSensorPosition() - kInitialRightPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet);
 		db.drivetrain.set(ACTUAL_LEFT_PCT, (mLeftMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
+		db.drivetrain.set(GREYHILL_ACTUAL_LEFT, mLeftEncoder.getDistance() / 256);
+		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT, mRightEncoder.getDistance() / 256);
+		//TODO change to greyhill once we get that working
+		mOdometry.update(mGyro.getHeading(), Units.feet_to_meters(db.drivetrain.get(L_ACTUAL_POS_FT)),
+				Units.feet_to_meters(db.drivetrain.get(R_ACTUAL_POS_FT)));
+		Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
+import us.ilite.common.Field2022;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
@@ -31,6 +32,7 @@ public class Robot extends TimedRobot {
     private ILog mLogger = Logger.createLog(this.getClass());
     public static final Data DATA = new Data();
     public static final Clock CLOCK = (RobotBase.isReal() ? new Clock() : new Clock().simulated());
+    public static final Field2d FIELD = new Field2d();
     public static final boolean IS_SIMULATED = RobotBase.isSimulation();
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
