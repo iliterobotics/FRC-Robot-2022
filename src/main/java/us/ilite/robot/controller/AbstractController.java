@@ -28,7 +28,7 @@ public abstract class AbstractController {
     private boolean mIsBallAdded = false;
     private boolean mIsBallOut = false;
     private int mNumBalls = 0;
-   
+
     public AbstractController(){
         super();
     }

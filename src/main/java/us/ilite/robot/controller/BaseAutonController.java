@@ -83,9 +83,6 @@ public class BaseAutonController extends AbstractController {
      */
     private UUID mID;
     private Trajectory.State initialState;
-    private boolean kISEXECUTED = false;
-    private int mInitialCycleCount = 0;
-    private int mFinalCycleCount = 0;
 
     /**
      * Default constructor. This will instantiate the variables that are not dependent on the init
@@ -94,8 +91,6 @@ public class BaseAutonController extends AbstractController {
     public BaseAutonController() {
         mFollower = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
-
-      //  mMotorPidController = new PIDController(3.025,0,-0.000075001);
         mMotorPidController = new PIDController(1,0,0);
         mTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
@@ -108,21 +103,18 @@ public class BaseAutonController extends AbstractController {
      * at home).
      */
     public void initialize() {
-
-            mID = UUID.randomUUID();
-            mTimer.reset();
-            mTimer.start();
-            mMotorPidController.reset();
-            mPrevTime = -1;
-            mTrajectory = TrajectoryCommandUtils.getJSONTrajectory();
-//        Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
-//        Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
-//        mTrajectory = trajectory.transformBy(transform);
-            initialState = mTrajectory.sample(0);
-            mPrevTargetWheelSpeeds = new DifferentialDriveWheelSpeeds(0,0);
-            mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0,0);
-
-
+        mID = UUID.randomUUID();
+        mTimer.reset();
+        mTimer.start();
+        mMotorPidController.reset();
+        mPrevTime = -1;
+        mTrajectory = TrajectoryCommandUtils.getJSONTrajectory();
+//      Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
+//      Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
+//      mTrajectory = trajectory.transformBy(transform);
+        initialState = mTrajectory.sample(0);
+        mPrevTargetWheelSpeeds = new DifferentialDriveWheelSpeeds(0,0);
+        mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0,0);
         SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
     }
     @Override
@@ -167,24 +159,24 @@ public class BaseAutonController extends AbstractController {
         data.add(actualSpeeds.leftMetersPerSecond);
         data.add(actualSpeeds.rightMetersPerSecond);
 
-        double instActualAccelLeft = (actualSpeeds.leftMetersPerSecond - mPrevActualSpeed.leftMetersPerSecond)/dT;
-        double instActualAccelRight = (actualSpeeds.rightMetersPerSecond - mPrevActualSpeed.rightMetersPerSecond)/dT;
+        double instActualAccelLeft = (actualSpeeds.leftMetersPerSecond - mPrevActualSpeed.leftMetersPerSecond) / dT;
+        double instActualAccelRight = (actualSpeeds.rightMetersPerSecond - mPrevActualSpeed.rightMetersPerSecond) / dT;
 
         mPrevActualSpeed = new DifferentialDriveWheelSpeeds(actualSpeeds.leftMetersPerSecond, actualSpeeds.rightMetersPerSecond);
 
         data.add(instActualAccelLeft);
         data.add(instActualAccelRight);
 
-        perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds,data);
+        perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds, data);
     }
 
-    private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds, DifferentialDriveWheelSpeeds targetWheelSpeeds,List<Object>data) {
+    private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds,
+                                 DifferentialDriveWheelSpeeds targetWheelSpeeds, List<Object>data) {
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         MutablePair<Double,Double> output = new MutablePair<>();
 
         double leftSetpoint = targetWheelSpeeds.leftMetersPerSecond;
         double rightSetpoint = targetWheelSpeeds.rightMetersPerSecond;
-
 
         double leftFeedforward =
                 calculateFeedsForward(leftSetpoint, mPrevTargetWheelSpeeds.leftMetersPerSecond, dT);
@@ -193,10 +185,7 @@ public class BaseAutonController extends AbstractController {
 
         output.left = calculateOutputFromFeedForward(leftFeedforward, mMotorPidController, actualSpeeds.leftMetersPerSecond, targetWheelSpeeds.leftMetersPerSecond,data);
         output.right = calculateOutputFromFeedForward(rightFeedforward, mMotorPidController, actualSpeeds.rightMetersPerSecond, targetWheelSpeeds.rightMetersPerSecond,data);
-
         if(data != null) {
-            //pid calculate left
-            //pid calculate right
             data.add(leftSetpoint);
             data.add(rightSetpoint);
             data.add(leftFeedforward);
@@ -207,47 +196,9 @@ public class BaseAutonController extends AbstractController {
             data.add(output.right);
             CSVToLogFile.getInstance().logCSVData(data, this.getClass());
         }
-
-
         updateDriveTrain(output);
         mPrevTargetWheelSpeeds = targetWheelSpeeds;
         mPrevTime = curTime;
-    }
-
-    private void logDataToSmartDashboard(double dt,Trajectory.State sample, DifferentialDriveWheelSpeeds targetWheelSpeeds, DifferentialDriveWheelSpeeds actualSpeeds) {
-        SmartDashboard.putNumber("Exec Count", EXEC_COUNT++);
-        boolean finished = isFinished();
-        if(finished && !HAS_FINISHED) {
-            HAS_FINISHED = true;
-            SmartDashboard.putNumber("Trajectory finished time", mTimer.get());
-            Pose2d finalPose = getRobotPose();
-            SmartDashboard.putNumber("Final Pose X: ", finalPose.getX());
-            SmartDashboard.putNumber("Final Pose Y: ", finalPose.getY());
-            SmartDashboard.putNumber("Final Pose heading: ", finalPose.getRotation().getDegrees());
-        }
-
-
-        SmartDashboard.putBoolean("Trajectory is Finished", finished);
-        SmartDashboard.putNumber("Delta Time",dt);
-        SmartDashboard.putNumber("TrajectoryX", sample.poseMeters.getX());
-        SmartDashboard.putNumber("TrajectoryY", sample.poseMeters.getY());
-        SmartDashboard.putNumber("TrajectoryDegrees", sample.poseMeters.getRotation().getDegrees());
-        SmartDashboard.putNumber("TrajectoryVelocity", sample.velocityMetersPerSecond);
-        SmartDashboard.putNumber("TrajectoryAccel", sample.accelerationMetersPerSecondSq);
-        SmartDashboard.putNumber("Target Speed Left: ", targetWheelSpeeds.leftMetersPerSecond);
-        SmartDashboard.putNumber("Target Speed Right: ", targetWheelSpeeds.rightMetersPerSecond);
-        SmartDashboard.putNumber("Actual Speed Left: ", actualSpeeds.leftMetersPerSecond);
-        SmartDashboard.putNumber("Actual Speed Right", actualSpeeds.rightMetersPerSecond);
-    }
-
-    /**
-     * Helper method to get constant speed. This will check to see if we are finished with the
-     * trajectory.If it is, it will return 0 speed. Otherwise it will return full speed straight.
-     * @return
-     */
-    private ImmutablePair<Double,Double> getConstantSpeed() {
-        double speed = isFinished() ? 0.0 : 7.0;
-        return new ImmutablePair<>(speed,speed);
     }
 
     /**
@@ -323,12 +274,10 @@ public class BaseAutonController extends AbstractController {
      *  The robot pose represented as {@link Pose2d}
      */
     private Pose2d getRobotPose() {
-
         double absX = initialState.poseMeters.getX() + db.drivetrain.get(EDriveData.GET_X_OFFSET_METERS);
         double absY = initialState.poseMeters.getY() + db.drivetrain.get(EDriveData.GET_Y_OFFSET_METERS);
         Rotation2d r2d = new Rotation2d(db.drivetrain.get(EDriveData.ACTUAL_HEADING_RADIANS));
-        Pose2d robotPose = new Pose2d(new Translation2d(absX,absY),r2d);
-
+        Pose2d robotPose = new Pose2d(new Translation2d(absX, absY), r2d);
         return robotPose;
     }
 
@@ -365,5 +314,30 @@ public class BaseAutonController extends AbstractController {
             db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, 0);
             db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, 0);
         }
+    }
+
+
+    private void logDataToSmartDashboard(double dt,Trajectory.State sample, DifferentialDriveWheelSpeeds targetWheelSpeeds, DifferentialDriveWheelSpeeds actualSpeeds) {
+        SmartDashboard.putNumber("Exec Count", EXEC_COUNT++);
+        boolean finished = isFinished();
+        if(finished && !HAS_FINISHED) {
+            HAS_FINISHED = true;
+            SmartDashboard.putNumber("Trajectory finished time", mTimer.get());
+            Pose2d finalPose = getRobotPose();
+            SmartDashboard.putNumber("Final Pose X: ", finalPose.getX());
+            SmartDashboard.putNumber("Final Pose Y: ", finalPose.getY());
+            SmartDashboard.putNumber("Final Pose heading: ", finalPose.getRotation().getDegrees());
+        }
+        SmartDashboard.putBoolean("Trajectory is Finished", finished);
+        SmartDashboard.putNumber("Delta Time",dt);
+        SmartDashboard.putNumber("TrajectoryX", sample.poseMeters.getX());
+        SmartDashboard.putNumber("TrajectoryY", sample.poseMeters.getY());
+        SmartDashboard.putNumber("TrajectoryDegrees", sample.poseMeters.getRotation().getDegrees());
+        SmartDashboard.putNumber("TrajectoryVelocity", sample.velocityMetersPerSecond);
+        SmartDashboard.putNumber("TrajectoryAccel", sample.accelerationMetersPerSecondSq);
+        SmartDashboard.putNumber("Target Speed Left: ", targetWheelSpeeds.leftMetersPerSecond);
+        SmartDashboard.putNumber("Target Speed Right: ", targetWheelSpeeds.rightMetersPerSecond);
+        SmartDashboard.putNumber("Actual Speed Left: ", actualSpeeds.leftMetersPerSecond);
+        SmartDashboard.putNumber("Actual Speed Right", actualSpeeds.rightMetersPerSecond);
     }
 }

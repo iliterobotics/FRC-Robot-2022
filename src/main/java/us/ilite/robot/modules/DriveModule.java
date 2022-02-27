@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -16,6 +17,7 @@ import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
+import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.hardware.Pigeon;
 
 import java.util.Set;
@@ -25,9 +27,13 @@ import static us.ilite.common.types.drive.EDriveData.*;
 
 public class DriveModule extends Module {
 
-	private TalonFX mLeftMaster, mLeftFollower, mRightMaster, mRightFollower;
-	private Encoder mLeftEncoder, mRightEncoder;
-	private Pigeon mGyro;
+	private final TalonFX mLeftMaster;
+	private final TalonFX mLeftFollower;
+	private final TalonFX mRightMaster;
+	private final TalonFX mRightFollower;
+	private final Encoder mLeftEncoder;
+	private final Encoder mRightEncoder;
+	private static Pigeon mGyro;
 
 	// ========================================
 	// DO NOT MODIFY THESE CONSTANTS
@@ -68,6 +74,8 @@ public class DriveModule extends Module {
 
 	public static double kInitialLeftPosition = 0;
 	public static double kInitialRightPosition = 0;
+	public static double kInitialXPosition = 0;
+	public static double kInitialYPosition = 0;
 
 	private final ProfileGains kVelocityGains = new ProfileGains()
 			.p(0.0005)
@@ -125,13 +133,16 @@ public class DriveModule extends Module {
 		mTargetAngleLockPid = new PIDController(kTargetAngleLockGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 
-	//	mDifferentialDrive = new DifferentialDrive((MotorController) mLeftMaster, (MotorController) mRightMaster);
+		mDifferentialDrive = new DifferentialDrive((MotorController) mLeftMaster, (MotorController) mRightMaster);
 		mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
 	}
 
 	@Override
 	public void modeInit(EMatchMode mode) {
 		reset();
+		resetOdometry(TrajectoryCommandUtils.getJSONTrajectory().getInitialPose());
+		kInitialXPosition = mOdometry.getPoseMeters().getX();
+		kInitialYPosition = mOdometry.getPoseMeters().getY();
 		kInitialLeftPosition = mLeftMaster.getSelectedSensorPosition();
 		kInitialRightPosition = mRightMaster.getSelectedSensorPosition();
 	}
@@ -151,6 +162,12 @@ public class DriveModule extends Module {
 		db.drivetrain.set(R_ACTUAL_POS_FT, ((mRightMaster.getSelectedSensorPosition() - kInitialRightPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet);
 		db.drivetrain.set(ACTUAL_LEFT_PCT, (mLeftMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
+
+		double odoX = mOdometry.getPoseMeters().getX() - kInitialXPosition;
+		double odoY = mOdometry.getPoseMeters().getY() - kInitialYPosition;
+		db.drivetrain.set(GET_X_OFFSET_METERS, odoX);
+		db.drivetrain.set(GET_Y_OFFSET_METERS, odoY);
+
 		db.drivetrain.set(GREYHILL_ACTUAL_LEFT, mLeftEncoder.getDistance() / 256);
 		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT, mRightEncoder.getDistance() / 256);
 		//TODO change to greyhill once we get that working
@@ -236,11 +253,17 @@ public class DriveModule extends Module {
 			case PATH_FOLLOWING_RAMSETE:
 				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(DESIRED_LEFT_ft_s) / kMaxDriveVelocityFTs);
 				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(DESIRED_RIGHT_ft_s) / kMaxDriveVelocityFTs);
+				mDifferentialDrive.feed();
+				break;
 			default:
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
 		}
 	}
+	public static void resetOdometry(Pose2d pose) {
+		mOdometry.resetPosition(pose, mGyro.getHeading());
+	}
+
 	private void reset() {
 		mLeftMaster.set(ControlMode.Position, 0.0);
 		mRightMaster.set(ControlMode.Position, 0.0);
