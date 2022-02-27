@@ -51,11 +51,10 @@ public class Robot extends TimedRobot {
     private MatchMetadata mMatchMeta = null;
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
-    private AbstractController mBaseAutonController;
+    private BaseAutonController mBaseAutonController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
-    private ShootIntakeMoveController mAutonController;
 
 
     @Override
@@ -63,6 +62,7 @@ public class Robot extends TimedRobot {
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
+        mBaseAutonController.initialize();
         mDrive = new DriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -117,7 +117,7 @@ public class Robot extends TimedRobot {
         }
 
         MODE=AUTONOMOUS;
-        mActiveController = new BaseAutonController();
+        mActiveController = mBaseAutonController;
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
