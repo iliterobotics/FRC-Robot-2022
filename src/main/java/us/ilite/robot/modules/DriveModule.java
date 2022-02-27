@@ -3,6 +3,7 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.Encoder;
@@ -30,10 +31,10 @@ import static us.ilite.common.types.sensor.EPowerDistPanel.CURRENT14;
 
 public class DriveModule extends Module {
 
-	private final TalonFX mLeftMaster;
-	private final TalonFX mLeftFollower;
-	private final TalonFX mRightMaster;
-	private final TalonFX mRightFollower;
+	private final WPI_TalonFX mLeftMaster;
+	private final WPI_TalonFX mLeftFollower;
+	private final WPI_TalonFX mRightMaster;
+	private final WPI_TalonFX mRightFollower;
 	private final Encoder mLeftEncoder;
 	private final Encoder mRightEncoder;
 	private static Pigeon mGyro;
@@ -95,7 +96,7 @@ public class DriveModule extends Module {
 	public static double kInitialYPosition = 0;
 
 	private final ProfileGains kVelocityGains = new ProfileGains()
-			.p(0.0005)
+			.p(0.00051968)
 			.i(0.0)
 			.d(0.0)
 			.maxVelocity(kMaxDriveVelocityFTs)
@@ -111,15 +112,15 @@ public class DriveModule extends Module {
 			.slot(dSlot);
 
 	public DriveModule() {
-		mLeftMaster = new TalonFX(Settings.HW.CAN.kDTML1);
-		mLeftFollower = new TalonFX(Settings.HW.CAN.kDTL3);
+		mLeftMaster = new WPI_TalonFX(Settings.HW.CAN.kDTML1);
+		mLeftFollower = new WPI_TalonFX(Settings.HW.CAN.kDTL3);
 		mLeftFollower.follow(mLeftMaster);
 
 		mLeftMaster.setNeutralMode(NeutralMode.Coast);
 		mLeftFollower.setNeutralMode(NeutralMode.Coast);
 
-		mRightMaster = new TalonFX(Settings.HW.CAN.kDTMR2);
-		mRightFollower = new TalonFX(Settings.HW.CAN.kDTR4);
+		mRightMaster = new WPI_TalonFX(Settings.HW.CAN.kDTMR2);
+		mRightFollower = new WPI_TalonFX(Settings.HW.CAN.kDTR4);
 		mRightFollower.follow(mRightMaster);
 
 		mRightMaster.setNeutralMode(NeutralMode.Coast);
@@ -151,7 +152,7 @@ public class DriveModule extends Module {
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 
 		//TODO figure out a way to call mDrive.feed() using TalonFX
-//		mDifferentialDrive = new DifferentialDrive((MotorController) mLeftMaster, (MotorController) mRightMaster);
+		mDifferentialDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
 		mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
 	}
 
@@ -190,7 +191,6 @@ public class DriveModule extends Module {
 		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 		db.drivetrain.set(IS_CURRENT_LIMITING, EPowerDistPanel.isAboveCurrentThreshold(kCurrentLimitAmps, Robot.DATA.pdp, kPdpSlots));
 
-
 		double odoX = mOdometry.getPoseMeters().getX() - kInitialXPosition;
 		double odoY = mOdometry.getPoseMeters().getY() - kInitialYPosition;
 		db.drivetrain.set(GET_X_OFFSET_METERS, odoX);
@@ -200,7 +200,6 @@ public class DriveModule extends Module {
 		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT_ft, (mRightEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
 		db.drivetrain.set(GREYHILL_ACTUAL_LEFT_meters, Units.feet_to_meters(mLeftEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
 		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT_meters, Units.feet_to_meters(mRightEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
-		//TODO change to greyhill once we get that working
 		mOdometry.update(mGyro.getHeading(), Units.feet_to_meters(db.drivetrain.get(L_ACTUAL_POS_FT)),
 				Units.feet_to_meters(db.drivetrain.get(R_ACTUAL_POS_FT)));
 		Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
@@ -281,9 +280,9 @@ public class DriveModule extends Module {
 				mRightMaster.set(ControlMode.PercentOutput, desiredRight);
 				break;
 			case PATH_FOLLOWING_RAMSETE:
-				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(DESIRED_LEFT_ft_s) / kMaxDriveVelocityFTs);
-				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(DESIRED_RIGHT_ft_s) / kMaxDriveVelocityFTs);
-//				mDifferentialDrive.feed();
+				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);
+				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);
+				mDifferentialDrive.feed();
 				break;
 			default:
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);

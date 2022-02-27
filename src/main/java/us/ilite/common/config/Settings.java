@@ -127,9 +127,9 @@ public class Settings {
     // =============================================================================
     // RamseteCommand constants
     // =============================================================================
-    public static final double kS = 0.33136;
-    public static final double kV = 0.1398;
-    public static final double kA = 0.0076288;
+    public static final double kS = 0.64353;
+    public static final double kV = 0.00046589;
+    public static final double kA = 3.2696 * Math.pow(10.0, -5.0);
 
     public static final double kP = 0.1139;
 

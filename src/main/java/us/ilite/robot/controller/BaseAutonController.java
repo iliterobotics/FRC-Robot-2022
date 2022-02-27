@@ -107,6 +107,7 @@ public class BaseAutonController extends AbstractController {
         mID = UUID.randomUUID();
         mTimer.reset();
         mTimer.start();
+        startTime = mTimer.get();
         mMotorPidController.reset();
         mPrevTime = -1;
         mTrajectory = TrajectoryCommandUtils.getJSONTrajectory();
@@ -124,6 +125,7 @@ public class BaseAutonController extends AbstractController {
     }
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;
+    private double startTime = 0;
 
     /**
      * Method to perform the actual traversal. This should run a single step. A step will be defined as
@@ -131,7 +133,7 @@ public class BaseAutonController extends AbstractController {
      * called multiple times until the robot traverses the entire Trajectory or until autonmous runs out of time.
      */
     public void execute() {
-        double curTime = mTimer.get();
+        double curTime = mTimer.get() - startTime;
         double dT = curTime - mPrevTime;
 
 
