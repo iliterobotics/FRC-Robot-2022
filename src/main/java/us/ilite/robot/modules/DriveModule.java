@@ -71,7 +71,7 @@ public class DriveModule extends Module {
 	public static double kInitialRightPosition = 0;
 
 	private final ProfileGains kVelocityGains = new ProfileGains()
-			.p(0.005)
+			.p(0.0005)
 			.i(0.0)
 			.d(0.0)
 			.maxVelocity(kMaxDriveVelocityFTs)
@@ -110,11 +110,11 @@ public class DriveModule extends Module {
 		mRightEncoder = new Encoder(Settings.HW.DIO.kEDTRA, Settings.HW.DIO.kEDTRB);
 
 		mLeftVelocityPID = new PIDController(kVelocityGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mLeftVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
-				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
+		mLeftVelocityPID.setOutputRange(-1,
+				1);
 		mRightVelocityPID = new PIDController(kVelocityGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mRightVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
-				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
+		mRightVelocityPID.setOutputRange(-1,
+				1);
 
 		mLeftPositionPID = new PIDController(kPositionGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mLeftPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,

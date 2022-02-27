@@ -34,9 +34,9 @@ public abstract class BaseManualController extends AbstractController {
 //        double left = db.driverinput.get(ELogitech310.LEFT_Y_AXIS);
 //        double right = db.driverinput.get(ELogitech310.RIGHT_Y_AXIS);
 
-        rotate = EInputScale.EXPONENTIAL.map(rotate, 2);
-        rotate = Math.abs(rotate) > 0.05 ? rotate : 0.0; //Handling Deadband
-        throttle = Math.abs(throttle) > 0.1 ? throttle : 0.0; //Handling Deadband
+//        rotate = EInputScale.SIN_WITH_FGAIN1.map(rotate, 2);
+        rotate = Math.abs(rotate) > 0.02 ? rotate : 0.0; //Handling Deadband
+        throttle = Math.abs(throttle) > 0.02 ? throttle : 0.0; //Handling Deadband
 
 //        left = Math.abs(left) > 0.005 ? left : 0.0;
 //        right = Math.abs(right) > 0.005 ? right : 0.0;
