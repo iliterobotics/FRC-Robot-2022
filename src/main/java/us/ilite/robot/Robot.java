@@ -35,15 +35,12 @@ public class Robot extends TimedRobot {
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger;
-   // private HangerModule mHanger;
     private Timer initTimer = new Timer();
-
     private DriveModule mDrive;
     private Limelight mLimelight;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FeederModule mFeeder;
-    private VioletDriveModule mViolet;
     private IntakeModule mIntake;
     private ClimberModule mClimber;
 
@@ -62,13 +59,8 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
-
-        // Init the actual robot
-//        initTimer.reset();
-//        initTimer.start();
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
-     //   mViolet = new VioletDriveModule();
         mDrive = new DriveModule();
         MODE=INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -79,23 +71,13 @@ public class Robot extends TimedRobot {
         mIntake = new IntakeModule();
         mLEDControl = new LEDControl();
         mClimber = new ClimberModule();
-//        mCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
-//        mCompressor.enableAnalog(55, 60);
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
 
-        //look for practice robot config:
         AbstractSystemSettingsUtils.loadPracticeSettings(mSettings);
-
         Logger.setLevel(ELevel.WARN);
         mLogger.info("Starting Robot Initialization...");
-
-//        mSettings.writeToNetworkTables();
-
-//        new Thread(new DSConnectInitThread()).start();
-        // Init static variables and get singleton instances first
-
         ICodexTimeProvider provider = new ICodexTimeProvider() {
             @Override
             public double getTimestamp() {
@@ -135,9 +117,8 @@ public class Robot extends TimedRobot {
         mActiveController = new DriveStraightTurnController();
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
-//        mRunningModules.addModule(mLimelight);
-      //  mRunningModules.addModule(mFeeder);
-      //  mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mFeeder);
+        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
         mRunningModules.modeInit(AUTONOMOUS);
     }
@@ -156,12 +137,8 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFeeder);
-//        mRunningModules.addModule(mViolet);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mDrive);
-//        mRunningModules.addModule(mHanger);
-//        mRunningModules.addModule(mLimelight);
-//        mRunningModules.addModule(mClimber);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -171,7 +148,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         commonPeriodic();
-//        System.out.println(mCompressor.enabled());
     }
 
     @Override
@@ -180,11 +156,8 @@ public class Robot extends TimedRobot {
         mLogger.info("Disabled Initialization");
 
         mRunningModules.shutdown();
-        // Don't clear the modules - we want them to continue updating shuffleboard with sensor readings
 
-//        mCSVLogger.stop();
-
-        if(mActiveController != null) {
+        if (mActiveController != null) {
             mActiveController.setEnabled(false);
         }
     }
@@ -192,7 +165,7 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.readInputs();
-//        mDrive.readInputs();
+        mDrive.readInputs();
         mIntake.readInputs();
         mFeeder.readInputs();
         Shuffleboard.update();
@@ -213,34 +186,20 @@ public class Robot extends TimedRobot {
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-//        mRunningModules.addModule(mLimelight);
-//        mRunningModules.addModule(mFeeder);
-//        mRunningModules.addModule(mDrive);
-//        mRunningModules.addModule(mHanger);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mFeeder);
+        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
             mRunningModules.addModule(mSimulation);
         }
-//        mRunningModules.addModule(mViolet);
-//        mRunningModules.addModule(mHanger);
-//        mRunningModules.addModule(mIntake);
-//        mRunningModules.addModule(mLEDControl);
-//        if(IS_SIMULATED) {
-//            mRunningModules.addModule(mSimulation);
-//        }
+        mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(TEST);
         mRunningModules.checkModule();
     }
 
     @Override
     public void testPeriodic() {
-        //Used to Test logging
-//        for (RobotCodex c : DATA.mLoggedCodexes ) {
-//            if (c.equals(DATA.drivetrain)) {
-//                DATA.randomizeCodex(c);
-//            }
-//        }
         commonPeriodic();
     }
 
@@ -257,7 +216,6 @@ public class Robot extends TimedRobot {
         for ( RobotCodex c : DATA.mAllCodexes ) {
             c.reset();
         }
-//        EPowerDistPanel.map(mData.pdp, pdp);
 
         mRunningModules.readInputs();
         mActiveController.update();
@@ -289,9 +247,6 @@ public class Robot extends TimedRobot {
         if (this.isAutonomous()) {
             mRobotMode = "Autonomous";
         }
-//        if (this.isOperatorControl()) {
-//            mRobotMode = "OPERATOR Control";
-//        }
         if (this.isTest()) {
             mRobotEnabledDisabled = "Test";
         }
