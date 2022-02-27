@@ -343,7 +343,7 @@ public class VioletDriveModule extends Module {
                 mGyro.getHeading(), Units.feetToMeters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
                 Units.feetToMeters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
 
-        Robot.mField.setRobotPose(mOdometry.getPoseMeters());
+        Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
     }
 
     @Override
