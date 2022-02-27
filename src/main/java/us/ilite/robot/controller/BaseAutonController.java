@@ -22,6 +22,7 @@ import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.TrajectoryCommandUtils;
+import us.ilite.robot.modules.DriveModule;
 import us.ilite.robot.modules.VioletDriveModule;
 
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class BaseAutonController extends AbstractController {
         mFeedforward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
         mMotorPidController = new PIDController(1,0,0);
         mTimer = new Timer();
-        mDriveKinematics = new DifferentialDriveKinematics(Settings.kTrackWidthMeters);
+        mDriveKinematics = new DifferentialDriveKinematics(Units.feet_to_meters(DriveModule.kTrackWidthFeet));
         SmartDashboard.putNumber("trajectory-seconds",-1);
     }
 
