@@ -241,9 +241,9 @@ public class BaseAutonController extends AbstractController {
      *  Return the {@link DifferentialDriveWheelSpeeds}
      */
     private DifferentialDriveWheelSpeeds calculateActualSpeeds() {
-        double actualLeftSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
-        double actualRightSpeed = Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
-        return new DifferentialDriveWheelSpeeds(actualLeftSpeed, actualRightSpeed);
+        double actualLeftSpeedMeters = Units.feet_to_meters(db.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
+        double actualRightSpeedMeters = Units.feet_to_meters(db.drivetrain.get(EDriveData.R_ACTUAL_VEL_FT_s));
+        return new DifferentialDriveWheelSpeeds(actualLeftSpeedMeters, actualRightSpeedMeters);
     }
 
     /**
@@ -290,7 +290,7 @@ public class BaseAutonController extends AbstractController {
         double leftFeet = Units.meters_to_feet(pOutput.getLeft());
         double rightFeet = Units.meters_to_feet(pOutput.getRight());
 
-        db.drivetrain.set(EDriveData.L_DESIRED_DRIVE_FT_SEC,leftFeet);
+        db.drivetrain.set(EDriveData.L_DESIRED_DRIVE_FT_SEC, leftFeet);
         db.drivetrain.set(EDriveData.R_DESIRED_DRIVE_FT_SEC, rightFeet);
     }
 

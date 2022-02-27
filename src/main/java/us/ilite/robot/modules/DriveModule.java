@@ -49,6 +49,7 @@ public class DriveModule extends Module {
 	public static final double kMaxDriveVelocityFTs = kMaxDriveVelocity * kRPMtoFTs;
 	public static final double kDriveRampRate = kMaxDriveVelocity / 5;
 	public static final double kUnitsToScaledRotationsPosition = 2048.0 / kGearboxRatio;
+	public static final double kPulsesPerRotation = 256;
 
 	private final int vSlot = 1;
 	private final int dSlot = 2;
@@ -160,6 +161,10 @@ public class DriveModule extends Module {
 		db.drivetrain.set(R_ACTUAL_VEL_FT_s, mLeftMaster.getSelectedSensorVelocity() * kRPMtoFTs);
 		db.drivetrain.set(L_ACTUAL_POS_FT, ((mLeftMaster.getSelectedSensorPosition() - kInitialLeftPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet);
 		db.drivetrain.set(R_ACTUAL_POS_FT, ((mRightMaster.getSelectedSensorPosition() - kInitialRightPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet);
+		db.drivetrain.set(L_ACTUAL_VEL_meters_s, Units.feet_to_meters(mLeftMaster.getSelectedSensorVelocity() * kRPMtoFTs));
+		db.drivetrain.set(R_ACTUAL_VEL_meters_s, Units.feet_to_meters(mLeftMaster.getSelectedSensorVelocity() * kRPMtoFTs));
+		db.drivetrain.set(L_ACTUAL_POS_meters, Units.feet_to_meters(((mLeftMaster.getSelectedSensorPosition() - kInitialLeftPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet));
+		db.drivetrain.set(R_ACTUAL_POS_meters, Units.feet_to_meters(((mRightMaster.getSelectedSensorPosition() - kInitialRightPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet));
 		db.drivetrain.set(ACTUAL_LEFT_PCT, (mLeftMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 
@@ -168,8 +173,10 @@ public class DriveModule extends Module {
 		db.drivetrain.set(GET_X_OFFSET_METERS, odoX);
 		db.drivetrain.set(GET_Y_OFFSET_METERS, odoY);
 
-		db.drivetrain.set(GREYHILL_ACTUAL_LEFT, mLeftEncoder.getDistance() / 256);
-		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT, mRightEncoder.getDistance() / 256);
+		db.drivetrain.set(GREYHILL_ACTUAL_LEFT_ft, (mLeftEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
+		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT_ft, (mRightEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
+		db.drivetrain.set(GREYHILL_ACTUAL_LEFT_meters, Units.feet_to_meters(mLeftEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
+		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT_meters, Units.feet_to_meters(mRightEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
 		//TODO change to greyhill once we get that working
 		mOdometry.update(mGyro.getHeading(), Units.feet_to_meters(db.drivetrain.get(L_ACTUAL_POS_FT)),
 				Units.feet_to_meters(db.drivetrain.get(R_ACTUAL_POS_FT)));
