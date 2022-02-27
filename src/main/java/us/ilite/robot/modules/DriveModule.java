@@ -3,6 +3,7 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Encoder;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.ILITEPIDController;
@@ -138,7 +139,6 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs() {
-		//TODO fix velocity mode,position
 		Enums.EDriveState state = db.drivetrain.get(STATE, Enums.EDriveState.class);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
@@ -211,6 +211,9 @@ public class DriveModule extends Module {
 				mLeftMaster.set(ControlMode.PercentOutput, desiredLeft);
 				mRightMaster.set(ControlMode.PercentOutput, desiredRight);
 				break;
+			case PATH_FOLLOWING_RAMSETE:
+				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(DESIRED_LEFT_ft_s) / kMaxDriveVelocityFTs);
+				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(DESIRED_RIGHT_ft_s) / kMaxDriveVelocityFTs);
 			default:
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
 				mLeftMaster.set(ControlMode.PercentOutput, 0.0);
