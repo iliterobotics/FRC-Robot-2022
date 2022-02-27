@@ -34,6 +34,7 @@ public enum EDriveData implements CodexOf<Double> {
 
     DELTA_HEADING,
     ACTUAL_HEADING_RADIANS,
+    ACTUAL_HEADING_DEGREES,
     SET_YAW_RATE_deg_s,
     GYRO_RATE,
 

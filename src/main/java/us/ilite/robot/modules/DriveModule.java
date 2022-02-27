@@ -66,6 +66,8 @@ public class DriveModule extends Module {
 	private static double mLeftHoldPosition = 0;
 	private static double mRightHoldPosition = 0;
 	private static int mCyclesHolding = 0;
+	private static double mLastHeading = 0;
+	private static double mDeltaTime = 0;
 
 	public static ProfileGains kTurnToProfileGains = new ProfileGains().f(0.085);
 	public static double kTurnSensitivity = 0.85;
@@ -151,6 +153,10 @@ public class DriveModule extends Module {
 	@Override
 	public void readInputs() {
 		mGyro.update();
+		db.drivetrain.set(DELTA_HEADING, mGyro.getHeading().getDegrees() - mLastHeading);
+		db.drivetrain.set(GYRO_RATE, db.drivetrain.get(DELTA_HEADING) / mDeltaTime);
+		db.drivetrain.set(ACTUAL_HEADING_RADIANS, mGyro.getHeading().getRadians());
+		db.drivetrain.set(ACTUAL_HEADING_DEGREES, mGyro.getHeading().getRadians());
 		db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getBusVoltage());
 		db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getBusVoltage());
 		db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getStatorCurrent());
