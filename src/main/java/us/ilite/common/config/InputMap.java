@@ -60,7 +60,7 @@ public class InputMap {
         REVERSE_ROLLERS = ELogitech310.B_BTN,
         SPIN_FEEDER = ELogitech310.X_BTN,
         REVERSE_FEEDER = ELogitech310.Y_BTN,
-        RELEASE_BALLS = ELogitech310.DPAD_UP,
+        RELEASE_BALLS = ELogitech310.DPAD_LEFT,
         SHOOT_CARGO = ELogitech310.R_BTN,
         PLACE_CARGO = ELogitech310.L_BTN,
         MANUAL_BALLS_UP = ELogitech310.DPAD_UP,
