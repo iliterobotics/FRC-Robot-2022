@@ -63,4 +63,12 @@ public class InputMap {
 
     }
 
+    public static class HANGER {
+        public static final ELogitech310
+        MANUAL_FWD = ELogitech310.RIGHT_TRIGGER_AXIS,
+        MANUAL_REV = ELogitech310.LEFT_TRIGGER_AXIS,
+        POSITION_LOCK = ELogitech310.START
+        ;
+    }
+
 }
