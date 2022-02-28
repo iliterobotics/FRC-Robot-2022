@@ -22,6 +22,9 @@ public abstract class AbstractController {
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
     protected double dt = 1d;
+    private boolean isBallAdded = false;
+    private boolean isBallOut = false;
+    private int numBalls = 0;
 
     private boolean mIsBallAdded = false;
     private boolean mIsBallOut = false;
@@ -70,15 +73,6 @@ public abstract class AbstractController {
         } else if (mIsBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
             mIsBallAdded = false;
         }
-        else if (db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
-            if (!mIsBallOut) {
-                mNumBalls--;
-                mIsBallOut = true;
-            }
-        } else if (mIsBallOut && db.feeder.get(EFeederData.EXIT_BEAM) == 0d) {
-            mIsBallOut = false;
-        }
-        db.feeder.set(EFeederData.NUM_BALLS, mNumBalls);
     }
 
     /**

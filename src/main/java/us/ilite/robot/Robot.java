@@ -61,6 +61,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
 
         // Init the actual robot

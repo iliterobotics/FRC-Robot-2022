@@ -48,6 +48,13 @@ public class Enums {
         public double getRed() {
             return red;
         }
+        public double getGreen() {
+            return green;
+        }
+        public double getBlue() {
+            return blue;
+        }
+
 
 //        Color clr = new Color(red, green, blue);
 //

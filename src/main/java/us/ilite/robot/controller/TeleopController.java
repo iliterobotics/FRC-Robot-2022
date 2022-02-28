@@ -58,6 +58,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
             db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
             db.intake.set(DESIRED_pct, -1.0);
         }
+
+        if(db.driverinput.isSet(ELogitech310.A_BTN)) {
+            db.cargo.set(SET_ROLLER_VEL_ft_s, 1000);
+        }
     }
     private void updateLimelightTargetLock() {
         if (db.driverinput.isSet(InputMap.DRIVER.DRIVER_LIMELIGHT_LOCK_TARGET)) {
