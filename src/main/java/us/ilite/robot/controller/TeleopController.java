@@ -6,6 +6,7 @@ import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EIntakeData.*;
@@ -60,7 +61,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
         }
 
         if(db.driverinput.isSet(ELogitech310.A_BTN)) {
-            db.cargo.set(SET_ROLLER_VEL_ft_s, 1000);
+            db.intake.set(SET_ROLLER_VEL_ft_s, 1000);
         }
     }
     private void updateLimelightTargetLock() {
