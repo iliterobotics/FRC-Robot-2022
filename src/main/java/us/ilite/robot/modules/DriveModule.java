@@ -211,7 +211,6 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs() {
-
 		mRightMaster.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
 		mRightFollower.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
 		mLeftMaster.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
