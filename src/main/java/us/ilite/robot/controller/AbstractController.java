@@ -103,7 +103,7 @@ public abstract class AbstractController {
         } else if (mNumBalls > 0) {
             db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
         } else {
-            db.feeder.set(EFeederData.FEEDER_pct, 1d);
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
             db.intake.set(EIntakeData.DESIRED_pct, 1d);
         }
 
