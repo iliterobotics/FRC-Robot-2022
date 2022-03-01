@@ -110,11 +110,11 @@ public class DriveModule extends Module {
 		mRightEncoder = new Encoder(Settings.HW.DIO.kEDTRA, Settings.HW.DIO.kEDTRB);
 
 		mLeftVelocityPID = new PIDController(kVelocityGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mLeftVelocityPID.setOutputRange(-1,
-				1);
+		mLeftVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
+				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
 		mRightVelocityPID = new PIDController(kVelocityGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mRightVelocityPID.setOutputRange(-1,
-				1);
+		mRightVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
+				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
 
 		mLeftPositionPID = new PIDController(kPositionGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mLeftPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
@@ -154,7 +154,6 @@ public class DriveModule extends Module {
 		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 		db.drivetrain.set(GREYHILL_ACTUAL_LEFT, mLeftEncoder.getDistance() / 256);
 		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT, mRightEncoder.getDistance() / 256);
-		//TODO change to greyhill once we get that working
 		mOdometry.update(mGyro.getHeading(), Units.feet_to_meters(db.drivetrain.get(L_ACTUAL_POS_FT)),
 				Units.feet_to_meters(db.drivetrain.get(R_ACTUAL_POS_FT)));
 		Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
