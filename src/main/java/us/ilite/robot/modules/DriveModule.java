@@ -56,7 +56,7 @@ public class DriveModule extends Module {
 	public static final double kDriveRampRate = kMaxDriveVelocity / 5;
 	public static final double kUnitsToScaledRotationsPosition = 2048.0 / kGearboxRatio;
 	public static final double kPulsesPerRotation = 256;
-	public static final int kCurrentLimitAmps = 50;
+	public static final int kCurrentLimitAmps = 60;
 
 	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
 			/* Left */
@@ -70,33 +70,6 @@ public class DriveModule extends Module {
 
 	private final int vSlot = 1;
 	private final int dSlot = 2;
-
-	public static PIDController mLeftVelocityPID;
-	public static PIDController mRightVelocityPID;
-	public static PIDController mRightPositionPID;
-	public static PIDController mLeftPositionPID;
-	public static PIDController mTargetAngleLockPid;
-	public static PIDController mTurnToDegreePID;
-
-	private static DifferentialDriveOdometry mOdometry;
-	private static DifferentialDrive mDifferentialDrive;
-
-	private static double mLeftHoldPosition = 0;
-	private static double mRightHoldPosition = 0;
-	private static int mCyclesHolding = 0;
-	private static double mLastHeading = 0;
-	private static double mDeltaTime = 0;
-
-	public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.0285);
-	public static double kTurnSensitivity = 0.85;
-
-	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
-	public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.1);
-
-	public static double kInitialLeftPosition = 0;
-	public static double kInitialRightPosition = 0;
-	public static double kInitialXPosition = 0;
-	public static double kInitialYPosition = 0;
 
 	private final ProfileGains kVelocityGains = new ProfileGains()
 			.p(0.00051968)
@@ -113,7 +86,29 @@ public class DriveModule extends Module {
 			.positionConversion(1)
 			.maxAccel(kDriveRampRate)
 			.slot(dSlot);
+	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
+	public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.1);
+	public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.0285);
 
+	public static PIDController mLeftVelocityPID;
+	public static PIDController mRightVelocityPID;
+	public static PIDController mRightPositionPID;
+	public static PIDController mLeftPositionPID;
+	public static PIDController mTargetAngleLockPid;
+	public static PIDController mTurnToDegreePID;
+
+	private static DifferentialDriveOdometry mOdometry;
+	private static DifferentialDrive mDifferentialDrive;
+
+	private static double mLeftHoldPosition = 0;
+	private static double mRightHoldPosition = 0;
+	private static int mCyclesHolding = 0;
+	public static double kTurnSensitivity = 0.85;
+	public static double kInitialLeftPosition = 0;
+	public static double kInitialRightPosition = 0;
+	public static double kInitialXPosition = 0;
+	public static double kInitialYPosition = 0;
+	
 	public DriveModule() {
 		mLeftMaster = new WPI_TalonFX(Settings.HW.CAN.kDTML1);
 		mLeftFollower = new WPI_TalonFX(Settings.HW.CAN.kDTL3);
