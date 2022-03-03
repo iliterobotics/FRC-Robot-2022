@@ -59,6 +59,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
