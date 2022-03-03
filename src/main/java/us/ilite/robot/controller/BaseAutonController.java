@@ -24,10 +24,7 @@ import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.TrajectoryCommandUtils;
-import us.ilite.robot.hardware.ECommonControlMode;
-import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.modules.DriveModule;
-import us.ilite.robot.modules.VioletDriveModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,7 +137,7 @@ public class BaseAutonController extends AbstractController {
         } else if (mFirstLeg.get() == 0.5) {
             mTimer.reset();
         } else {
-            db.intake.set(EIntakeData.ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
             db.intake.set(EIntakeData.DESIRED_pct, 1.0);
             execute();
             if (isFinished()) {

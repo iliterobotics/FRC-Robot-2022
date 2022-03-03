@@ -76,10 +76,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     private void updateRollers() {
         if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_ROLLERS)) {
-            db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
             db.intake.set(DESIRED_pct, 1.0);
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
-            db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+            db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
             db.intake.set(DESIRED_pct, -1.0);
         }
     }
@@ -105,7 +105,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     private void updateCargo() { // Experimental way of incorporating ball count into indexing
         db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
-        db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+        db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
 
         if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_CARGO)) {
             db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.RED);

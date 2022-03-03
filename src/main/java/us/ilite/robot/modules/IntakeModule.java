@@ -66,9 +66,9 @@ public class IntakeModule extends Module {
     }
 
     public void setRollerState() {
-        Enums.EIntakeState mode = db.intake.get(ROLLER_STATE, Enums.EIntakeState.class);
+        Enums.ERollerState mode = db.intake.get(ROLLER_STATE, Enums.ERollerState.class);
         if (mode == null) {
-            mode = Enums.EIntakeState.PERCENT_OUTPUT;
+            mode = Enums.ERollerState.PERCENT_OUTPUT;
         }
         switch (mode) {
             case PERCENT_OUTPUT:
