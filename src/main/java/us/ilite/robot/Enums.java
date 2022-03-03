@@ -14,10 +14,10 @@ public class Enums {
     }
 
     public enum EHangerPneumaticMode {
-        LEFT_CLAMPED,
-        RIGHT_CLAMPED,
-        LEFT_RELEASED,
-        RIGHT_RELEASED,
+        TOP_CLAMPED,
+        BOTTOM_CLAMPED,
+        TOP_RELEASED,
+        BOTTOM_RELEASED,
         DEFAULT
     }
 

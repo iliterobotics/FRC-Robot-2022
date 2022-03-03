@@ -41,27 +41,73 @@ public class TeleopController extends BaseManualController { //copied from TestC
         super.updateDrivetrain();
         updateIntake();
         updateCargo();
-        updateHanger();
+        updateHangerMotors();
+        updateHangerPneumatics();
     }
 
-    private void updateHanger() {
-        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-            if (db.operatorinput.isSet(InputMap.HANGER.POSITION_LOCK)) {
-                // Set the state to position mode
-            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_FWD)) {
-                db.hanger.set(EHangerModuleData.SET_pct, 0.75);
-            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV)) {
-                db.hanger.set(EHangerModuleData.SET_pct, -0.75);
+    private void updateHangerMotors() {
+//        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+//            if (db.operatorinput.isSet(InputMap.HANGER.POSITION_LOCK)) {
+//                // Set the state to position mode
+//            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_FWD)) {
+//                db.hanger.set(EHangerModuleData.SET_pct, 0.75);
+//            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV)) {
+//                db.hanger.set(EHangerModuleData.SET_pct, -0.75);
+//            } else {
+//                db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.WHITE);
+//            }
+//
+//            if (db.operatorinput.isSet(InputMap.HANGER.LOCK_FWD)) {
+//                // Lock or unlock the first solenoid
+//                db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.BLUE);
+//            } else if (db.operatorinput.isSet(InputMap.HANGER.LOCK_REV)) {
+//                // Lock or unlock the second solenoid
+//                db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.RED);
+//            }
+//        }
+        if(db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_FWD_FULL)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
+                db.hanger.set(EHangerModuleData.L_SET_pct, 1);
+                db.hanger.set(EHangerModuleData.R_SET_pct, 1);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_FWD_HALF_SPEED)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
+                db.hanger.set(EHangerModuleData.L_SET_pct, 0.5);
+                db.hanger.set(EHangerModuleData.R_SET_pct, 0.5);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_FWD_SLOW)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
+                db.hanger.set(EHangerModuleData.L_SET_pct, 0.2);
+                db.hanger.set(EHangerModuleData.R_SET_pct, 0.2);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV_FULL)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
+                db.hanger.set(EHangerModuleData.L_SET_pct, -1);
+                db.hanger.set(EHangerModuleData.R_SET_pct, -1);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV_HALF_SPEED)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
+                db.hanger.set(EHangerModuleData.L_SET_pct, -0.5);
+                db.hanger.set(EHangerModuleData.R_SET_pct, -0.5);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV_SLOW)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
+                db.hanger.set(EHangerModuleData.L_SET_pct, -0.2);
+                db.hanger.set(EHangerModuleData.R_SET_pct, -0.2);
             } else {
-                db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.WHITE);
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.DEFAULT);
             }
+        }
+    }
 
-            if (db.operatorinput.isSet(InputMap.HANGER.LOCK_FWD)) {
-                // Lock or unlock the first solenoid
-                db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.BLUE);
-            } else if (db.operatorinput.isSet(InputMap.HANGER.LOCK_REV)) {
-                // Lock or unlock the second solenoid
-                db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.RED);
+    private void updateHangerPneumatics() {
+        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.HANGER.TOP_CLAMPED)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerPneumaticMode.TOP_CLAMPED);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.TOP_RELEASED)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerPneumaticMode.TOP_RELEASED);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.BOTTOM_CLAMPED)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerPneumaticMode.BOTTOM_CLAMPED);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.BOTTOM_RELEASED)) {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerPneumaticMode.BOTTOM_RELEASED);
+            } else {
+                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerPneumaticMode.DEFAULT);
             }
         }
     }

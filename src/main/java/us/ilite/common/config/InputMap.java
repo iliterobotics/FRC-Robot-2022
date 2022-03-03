@@ -70,10 +70,16 @@ public class InputMap {
 
     public static class HANGER {
         public static final ELogitech310
-        MANUAL_FWD = ELogitech310.RIGHT_TRIGGER_AXIS,
-        MANUAL_REV = ELogitech310.LEFT_TRIGGER_AXIS,
-        LOCK_FWD = ELogitech310.R_BTN,
-        LOCK_REV = ELogitech310.L_BTN,
+        MANUAL_FWD_FULL = ELogitech310.RIGHT_TRIGGER_AXIS,
+        MANUAL_FWD_HALF_SPEED = ELogitech310.A_BTN,
+        MANUAL_FWD_SLOW = ELogitech310.B_BTN,
+        MANUAL_REV_FULL = ELogitech310.LEFT_TRIGGER_AXIS,
+        MANUAL_REV_HALF_SPEED = ELogitech310.X_BTN,
+        MANUAL_REV_SLOW = ELogitech310.Y_BTN,
+        TOP_CLAMPED = ELogitech310.DPAD_UP,
+        TOP_RELEASED = ELogitech310.DPAD_DOWN,
+        BOTTOM_CLAMPED = ELogitech310.DPAD_RIGHT,
+        BOTTOM_RELEASED = ELogitech310.DPAD_DOWN,
         POSITION_LOCK = ELogitech310.START
         ;
     }

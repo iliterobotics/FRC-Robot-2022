@@ -83,16 +83,16 @@ public class ClimberModule extends Module{
             pneumaticMode = Enums.EHangerPneumaticMode.DEFAULT;
         }
         switch (pneumaticMode) {
-            case LEFT_CLAMPED:
+            case TOP_CLAMPED:
                 mCLPNL.set(DoubleSolenoid.Value.kForward);
                 break;
-            case RIGHT_CLAMPED:
+            case BOTTOM_CLAMPED:
                 mCLPNR.set(DoubleSolenoid.Value.kForward);
                 break;
-            case LEFT_RELEASED:
+            case TOP_RELEASED:
                 mCLPNL.set(DoubleSolenoid.Value.kReverse);
                 break;
-            case RIGHT_RELEASED:
+            case BOTTOM_RELEASED:
                 mCLPNR.set(DoubleSolenoid.Value.kReverse);
                 break;
             case DEFAULT:
