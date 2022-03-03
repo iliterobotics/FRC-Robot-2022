@@ -88,10 +88,12 @@ public class Settings {
             // ============
             // CLIMBER ID's
             // ============
-            public static final int kCLPNClimbForward = 4;
-            public static final int kCLPNClimbReverse = 5;
-        }
+            public static final int kCLPNClimbForwardOne = 2;
+            public static final int kCLPNClimbReverseOne = 3;
 
+            public static final int kCLPNClimbForwardTwo = 4;
+            public static final int kCLPNClimbReverseTwo = 5;
+        }
     }
 
     public static class Input {

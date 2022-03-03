@@ -9,6 +9,15 @@ public class Enums {
     public enum EHangerMode {
         VELOCITY,
         POSITION,
+        PERCENT_OUTPUT,
+        DEFAULT
+    }
+
+    public enum EHangerPneumaticMode {
+        LEFT_CLAMPED,
+        RIGHT_CLAMPED,
+        LEFT_RELEASED,
+        RIGHT_RELEASED,
         DEFAULT
     }
 
