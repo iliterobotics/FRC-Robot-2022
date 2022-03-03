@@ -13,6 +13,7 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.modules.LEDControl;
 
 import static us.ilite.robot.Enums.*;
+import static us.ilite.common.types.EFeederData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 
@@ -26,7 +27,6 @@ public class TestController extends BaseManualController {
     private double mLimelightZoomThreshold = 7.0;
     private double mLimelightGoalThreshold = 5.0;
 
-    private EIntakeState mIntakeState;
     private double mPreviousTime;
     private double mGoalBeamCountBroken = 0;
     private boolean crossedEntry = false;
@@ -54,8 +54,6 @@ public class TestController extends BaseManualController {
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
-        clock.report("updateDrivetrain", t -> updateDrivetrain());
-        clock.report("updateLED", t -> updateLED());
 
         double spd = Math.max(db.drivetrain.get(R_ACTUAL_VEL_FT_s), db.drivetrain.get(L_ACTUAL_VEL_FT_s));
         mMaxSpeed = Math.max(mMaxSpeed, spd);

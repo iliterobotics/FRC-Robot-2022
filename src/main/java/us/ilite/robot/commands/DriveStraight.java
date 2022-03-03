@@ -38,12 +38,12 @@ public class DriveStraight implements ICommand {
     private PIDController mHeadingController = new PIDController(
             DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
 
-    private ProfiledPIDController mDistanceController = DriveModule.positionPID.getPIDGains().generateController();
+//    private ProfiledPIDController mDistanceController = DriveModule.mPositionPID.getPIDGains().generateController();
 
     public DriveStraight(EDriveControlMode pDriveControlMode, Distance pDistanceToDrive) {
         mDistanceToDrive = pDistanceToDrive;
         mDriveControlMode = pDriveControlMode;
-        mDistanceController.setGoal(mDistanceToDrive.inches());
+       // mDistanceController.setGoal(mDistanceToDrive.inches());
     }
 
     /**
@@ -77,17 +77,18 @@ public class DriveStraight implements ICommand {
     @Override
     public boolean update(double pNow) {
 
-        double turn = mHeadingController.calculate(getHeading().degrees(), pNow - mLastTime);
-        // TODO - the units here are probably incorrect
-        double throttle = mDistanceController.calculate(getAverageDriveDistance().inches());
-
-        if(mDistanceController.atSetpoint()) {
-            return true;
-        } else {
-            Robot.DATA.drivetrain.set(NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
-            mLastTime = pNow;
-            return false;
-        }
+//        double turn = mHeadingController.calculate(getHeading().degrees(), pNow - mLastTime);
+//        // TODO - the units here are probably incorrect
+//        double throttle = mDistanceController.calculate(getAverageDriveDistance().inches());
+//
+//        if(mDistanceController.atSetpoint()) {
+//            return true;
+//        } else {
+//            Robot.DATA.drivetrain.set(NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
+//            mLastTime = pNow;
+//            return false;
+//        }
+        return false;
 
     }
 

@@ -3,73 +3,77 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.control.PIDController;
-import us.ilite.common.lib.control.ProfileGains;
+import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EIntakeData.*;
 
-public class IntakeModule extends Module{
+public class IntakeModule extends Module {
+    private final TalonFX mIntakeRoller;
+    private final DoubleSolenoid mArmSolenoid;
+    private final Compressor mCompressor;
 
-    private TalonFX mIntakeRoller;
-    private TalonFX mIntakeConveyor;
-
-    private Solenoid mArmSolenoidLeft;
-    private Solenoid mArmSolenoidRight;
-
-    private PIDController mIntakePID;
-
-    private final int kMaxNeoVelocity = 5676;//change to falcon
-    private final double kWheelCircumference = 1.5;
-    private final double kVelocityConversion = 2048 * 1000 * kWheelCircumference;
-
-    private ProfileGains kIntakeGains = new ProfileGains().p(0.001).i(0).d(0);
+    // ========================================
+    // DO NOT MODIFY THESE CONSTANTS
+    // ========================================
+    public static final double kIntakeRollerRatio = (1.0 / 4.0) * (24.0 / 32.0);
+    public static final double kMaxFalconSpeed = 6380 * kIntakeRollerRatio;
+    public static final double kWheelDiameter = 2.0 / 12.0;
+    public static final double kWheelCircumference = kWheelDiameter * Math.PI;
+    public static final double kScaledUnitsToRPM = (600.0 / 2048.0) * kIntakeRollerRatio;
+    public static final double kFeetSpeedConversion = (kScaledUnitsToRPM * kWheelCircumference) / 60.0;
 
     public IntakeModule() {
-        mIntakeRoller = new TalonFX(Settings.HW.CAN.kMAXIntakeRollerId);
-        mIntakeConveyor = new TalonFX(Settings.HW.CAN.kMAXFeederId);
-
-        mArmSolenoidLeft = new Solenoid(PneumaticsModuleType.CTREPCM,-1);
-        mArmSolenoidRight = new Solenoid(PneumaticsModuleType.CTREPCM, -1);
-
-        mIntakePID = new PIDController(kIntakeGains, -kMaxNeoVelocity, kMaxNeoVelocity, clock.dt()); //clock.dt may not be correct time value
+        mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
+        mIntakeRoller.setInverted(true);
+        mArmSolenoid = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
+        mCompressor = new Compressor(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH);
+        mCompressor.enableAnalog(100, 110);
     }
 
-    //sends the information to db that updates frequently
     @Override
     public void readInputs() {
-        //need conversion
-        db.intake.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kVelocityConversion); //send data to db constantly
-        db.intake.set(ROLLER_VEL_ft_s, mIntakeConveyor.getSelectedSensorVelocity()* kVelocityConversion);
-
-        db.intake.set(LEFT_PNEUMATIC_STATE, mArmSolenoidLeft.get());
-        db.intake.set(RIGHT_PNEUMATIC_STATE, mArmSolenoidRight.get());
+        db.intake.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
+        db.intake.set(FEEDER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
+        db.intake.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
+        db.intake.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
+        db.intake.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
+        db.intake.set(COMPRESSOR_PSI, mCompressor.getPressure());
     }
 
-    //sets the outputs for things in this module, what this module will do on robot
     @Override
     public void setOutputs() {
-        double desiredVelocity = mIntakePID.getOutput();
-        //setting the motors to the variable given
-        mIntakeRoller.set(TalonFXControlMode.Velocity, db.intake.get(SET_ROLLER_VEL_ft_s));
-        mIntakeConveyor.set(TalonFXControlMode.PercentOutput, db.intake.get(SET_CONVEYOR_pct));
-
-
-        setPneumaticIntake();
+       setPneumaticState();
+       setRollerState();
     }
 
-    public void setPneumaticIntake() {
-        //convert the double values of the pneumatic states to booleans
-        if (db.intake.get(LEFT_PNEUMATIC_STATE) == 1.0) {
-            mArmSolenoidLeft.set(true);
+    public void setPneumaticState() {
+        Enums.EArmState mode = db.intake.get(ARM_STATE, Enums.EArmState.class);
+        if (mode == null) {
+           return;
         }
-        mArmSolenoidLeft.set(false);
+        switch (mode) {
+            case DEFAULT:
+                mArmSolenoid.set(DoubleSolenoid.Value.kReverse);
+                break;
+            case RETRACT:
+                mArmSolenoid.set(DoubleSolenoid.Value.kForward);
+                break;
+        }
+    }
 
-        if (db.intake.get(RIGHT_PNEUMATIC_STATE) == 1.0) {
-            mArmSolenoidRight.set(true);
+    public void setRollerState() {
+        Enums.EIntakeState mode = db.intake.get(ROLLER_STATE, Enums.EIntakeState.class);
+        if (mode == null) {
+            mode = Enums.EIntakeState.PERCENT_OUTPUT;
         }
-        mArmSolenoidRight.set(false);
+        switch (mode) {
+            case PERCENT_OUTPUT:
+                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.intake.get(DESIRED_pct));
+                break;
+        }
     }
 }

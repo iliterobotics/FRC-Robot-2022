@@ -36,92 +36,32 @@ public class InputMap {
 
     public static class DRIVER {
         public static final ELogitech310
-        TURN_AXIS = ELogitech310.RIGHT_X_AXIS,
+        TURN_AXIS = ELogitech310.RIGHT_X_AXIS, // Arcade drive
         THROTTLE_AXIS = ELogitech310.LEFT_Y_AXIS,
-        SNAIL_MODE = ELogitech310.RIGHT_TRIGGER_AXIS,
-        HOME_TO_DRIVER_STATION = ELogitech310.Y_BTN,
-        DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.B_BTN,
-        HANGER_EXECUTE = ELogitech310.R_BTN;
 
-//        HANGER_LOCK = ELogitech310.START,
-//        GROUND_TRACK = ELogitech310.A_BTN,
-//        FIRE_POWER_CELLS = ELogitech310.LEFT_TRIGGER_AXIS,
-//        NUDGE_SEEK_LEFT = ELogitech310.L_BTN,
-//        NUDGE_SEEK_RIGHT = ELogitech310.R_BTN,
-//        BEGIN_HANG = ELogitech310.Y_BTN,
-//        RELEASE_HANG = ELogitech310.A_BTN,
-//        TRACK_CARGO_BTN = ELogitech310.X_BTN,
-//        TRACK_TARGET_BTN = ELogitech310.A_BTN,
-//        DRIVER_LIMELIGHT_LOCK_BALL = ELogitech310.A_BTN,
-//        DRIVER_LIMELIGHT_LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
-//        DRIVER_LIMELIGHT_LOCK_BALL_TRI = ELogitech310.X_BTN,
-//        DRIVER_LIMELIGHT_LOCK_BALL_DUAL = ELogitech310.START;
+        LEFT_AXIS = ELogitech310.LEFT_Y_AXIS, // Tank Drive
+        RIGHT_AXIS = ELogitech310.RIGHT_Y_AXIS,
+
+        SNAIL_MODE = ELogitech310.RIGHT_TRIGGER_AXIS,
+        HOME_TO_DRIVER_STATION = ELogitech310.X_BTN,
+        DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.A_BTN,
+        HOME_TO_HUB = ELogitech310.Y_BTN, // Practically target-lock but without limelight
+
+        POSITION_CLIMB = ELogitech310.BACK,
+        RUN_CLIMB = ELogitech310.START;
+        ;
     }
 
     public static class OPERATOR {
-        public static  final ELogitech310
-        INTAKE_BULLDOZE = ELogitech310.X_BTN,
-        AIM = ELogitech310.B_BTN,
-
-        FAR_MODE = ELogitech310.Y_BTN,
-        NEAR_MODE = ELogitech310.A_BTN,
-        CLOSE_MODE = ELogitech310.L_BTN,
-        MANUAL_HOOD_UP = ELogitech310.DPAD_UP,
-        MANUAL_HOOD_DOWN = ELogitech310.DPAD_DOWN,
-
-        // DO NOT CHANGE THESE
-        INTAKE_ACTIVATE = ELogitech310.LEFT_TRIGGER_AXIS,
-        INTAKE_REVERSE = ELogitech310.R_BTN,
-        INTAKE_STOW = ELogitech310.RIGHT_TRIGGER_AXIS,
-        RESET_INTAKE_COUNT = ELogitech310.BACK,
-
-        // PUT TEST ITEMS BELOW
-        BEGIN_HANG = ELogitech310.LEFT_Y_AXIS,
-        REVERSE_HANG = ELogitech310.LEFT_X_AXIS,
-        //RELEASE_HANG = ELogitech310.START,
-        COLOR_POSITION = ELogitech310.DPAD_RIGHT,
-        //FLYWHEEL_AXIS = ELogitech310.START,
-        COLOR_ROTATION = ELogitech310.DPAD_LEFT,
-        //SHOOT_FLYWHEEL = ELogitech310.A_BTN,
-        LIMELIGHT_SEARCH = ELogitech310.RIGHT_X_AXIS
+        public static final ELogitech310
+        RETRACT_INTAKE = ELogitech310.RIGHT_TRIGGER_AXIS,
+        EXTEND_INTAKE = ELogitech310.LEFT_TRIGGER_AXIS,
+        SPIN_ROLLERS = ELogitech310.A_BTN,
+        REVERSE_ROLLERS = ELogitech310.B_BTN,
+        SPIN_FEEDER = ELogitech310.X_BTN,
+        REVERSE_FEEDER = ELogitech310.Y_BTN
         ;
 
     }
 
-    // For flywheel tuning, Joystick port 2 (driver's station row 3)
-    public static class FLYWHEEL {
-        public static final ELogitech310
-                HOOD = ELogitech310.COMBINED_TRIGGER_AXIS,
-                HOOD_TO_ANGLE = ELogitech310.Y_BTN,
-                TEST_FIRE = ELogitech310.L_BTN,
-                BASIC_INTAKE = ELogitech310.B_BTN,
-                INTAKE_STOW = ELogitech310.A_BTN,
-                REVERSE_INTAKE = ELogitech310.X_BTN,
-                FLYWHEEL_SPINUP_TEST = ELogitech310.START,
-                FLYWHEEL_VELOCITY_10_TEST = ELogitech310.DPAD_UP,
-                FLYWHEEL_VELOCITY_20_TEST = ELogitech310.DPAD_RIGHT,
-                FLYWHEEL_VELOCITY_30_TEST = ELogitech310.DPAD_DOWN,
-                FLYWHEEL_VELOCITY_40_TEST = ELogitech310.DPAD_LEFT,
-                FEEDER_SPINUP_TEST = ELogitech310.Y_BTN,
-                RESET_INTAKE_COUNT = ELogitech310.BACK,
-                FLYWHEEL_SPINUP_AXIS = ELogitech310.RIGHT_TRIGGER_AXIS
-        ;
-    }
-
-    public static class LIMELIGHT {
-        public static final ELogitech310
-                LIMELIGHT_LOCK_TARGET = ELogitech310.B_BTN,
-                LIMELIGHT_LOCK_BALL = ELogitech310.A_BTN,
-                LIMELIGHT_LOCK_TARGET_ZOOM = ELogitech310.Y_BTN,
-                LIMELIGHT_LOCK_BALL_TRI = ELogitech310.X_BTN,
-                LIMELIGHT_LOCK_BALL_DUAL = ELogitech310.START
-                        ;
-    }
-
-    public static class OPERATOR_REFACTOR {
-        public static final ELogitech310
-                MANUAL_TURRET = ELogitech310.RIGHT_X_AXIS
-
-                ;
-    }
 }
