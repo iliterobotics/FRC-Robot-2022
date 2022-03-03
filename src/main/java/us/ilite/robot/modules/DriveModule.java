@@ -131,11 +131,11 @@ public class DriveModule extends Module {
 		mRightEncoder = new Encoder(Settings.HW.DIO.kEDTRA, Settings.HW.DIO.kEDTRB);
 
 		mLeftVelocityPID = new PIDController(kVelocityGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mLeftVelocityPID.setOutputRange(-1,
-				1);
+		mLeftVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
+				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
 		mRightVelocityPID = new PIDController(kVelocityGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mRightVelocityPID.setOutputRange(-1,
-				1);
+		mRightVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
+				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
 
 		mLeftPositionPID = new PIDController(kPositionGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mLeftPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,

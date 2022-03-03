@@ -10,22 +10,13 @@ import us.ilite.common.lib.control.ProfileGains;
  *  - Field element locations & vision target heights
  */
 public class Settings {
-    public static final String kGroundLimelightNetworkTable = "limelight-bottom";
     public static final String kFlywheelLimelightNetworkTable = "limelight-top";
-
-
     public static double kControlLoopPeriod = 0.02; // seconds
-
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
     public static int kAcceptableLogFailures = 8;
     public static double kNetworkTableUpdateRate = 0.01;
     public static boolean kIsLogging = true; // decide whether or not to log
-
     public static int sCODEX_COMMS_PORT = 5805;
-
-    public static final String AUTO_PATH_PACKAGE = "us.ilite.robot.auto.paths";
-
-    public static final String CONTROLLER_PATH_PACKAGE = "us.ilite.robot.controller";
 
     // ==================================================
     // System ID's
@@ -95,16 +86,13 @@ public class Settings {
     }
 
     public static class Input {
-
         public static double kNormalPercentThrottleReduction = 1.0;
         // These are applied AFTER the normal throttle reduction
         public static double kSnailModePercentThrottleReduction = 0.5;
         public static double kSnailModePercentRotateReduction = 0.4;
-        public static double kMaxAllowedVelocityMultiplier = 0.75;
-
+        public static double kMaxAllowedVelocityMultiplier = 1.0;
         // Applied after any scaling
         public static double kDriverInputTurnMaxMagnitude = 0.5;
-
         public static double kInputDeadbandF310Joystick = 0.05;
         public static double kInputDeadbandF310Trigger = 0.5;
         public static int kJoystickPortDriver = 0;
