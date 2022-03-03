@@ -58,18 +58,18 @@ public class Limelight extends Module implements ITargetDataProvider {
         mLimelight = LIMELIGHT_V2_LOW_RES.setAddress(pNetworkTableName).setLensHeight(kHeightIn);
 
         //TODO setup correctly this lower and upper corner solver
-        mUpperCornerSolver = new Ilite3DSolver(
-                mLimelight,
-                Distance.fromInches(0),
-                Distance.fromInches(0),
-                Field2022.Distances.TARGETTING_OFFSET.mDistance
-        );
-        mLowerCornerSolver = new Ilite3DSolver(
-                mLimelight,
-                Distance.fromInches(0),
-                Distance.fromInches(0),
-                Field2022.Distances.TARGETTING_OFFSET.mDistance
-        );
+//        mUpperCornerSolver = new Ilite3DSolver(
+//                mLimelight,
+//                Distance.fromInches(0),
+//                Distance.fromInches(0),
+//                Field2022.Distances.TARGETTING_OFFSET.mDistance
+//        );
+//        mLowerCornerSolver = new Ilite3DSolver(
+//                mLimelight,
+//                Distance.fromInches(0),
+//                Distance.fromInches(0),
+//                Field2022.Distances.TARGETTING_OFFSET.mDistance
+//        );
         mTable = NetworkTableInstance.getDefault().getTable(pNetworkTableName);
     }
 

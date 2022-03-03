@@ -4,10 +4,14 @@ import com.flybotix.hfr.codex.RobotCodex;
 import us.ilite.common.*;
 
 
+import static us.ilite.common.types.EFeederData.*;
+import static us.ilite.common.types.EIntakeData.DESIRED_pct;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
 import us.ilite.common.types.EFeederData;
+import us.ilite.common.types.EIntakeData;
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Clock;
 
@@ -22,6 +26,9 @@ public abstract class AbstractController {
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
     protected double dt = 1d;
+    private boolean isBallAdded = false;
+    private boolean isBallOut = false;
+    private int numBalls = 0;
 
     private boolean mIsBallAdded = false;
     private boolean mIsBallOut = false;
@@ -53,7 +60,7 @@ public abstract class AbstractController {
     }
 
     protected void stopDrivetrain() {
-        db.drivetrain.set(STATE, EDriveState.PERCENT_OUTPUT);
+        db.drivetrain.set(EDriveData.STATE, EDriveState.PERCENT_OUTPUT);
         db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
         db.drivetrain.set(DESIRED_TURN_PCT,0.0);
     }
@@ -70,15 +77,47 @@ public abstract class AbstractController {
         } else if (mIsBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
             mIsBallAdded = false;
         }
-        else if (db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
-            if (!mIsBallOut) {
-                mNumBalls--;
-                mIsBallOut = true;
-            }
-        } else if (mIsBallOut && db.feeder.get(EFeederData.EXIT_BEAM) == 0d) {
-            mIsBallOut = false;
+    }
+
+    protected void fireCargo() {
+        db.intake.set(EIntakeData.DESIRED_pct, 1d);
+        db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
+    }
+
+    protected void indexCargo() {
+        if (db.feeder.get(RESET_BALLS) == 1d) {
+            mNumBalls = 0;
+        } else {
+            mNumBalls = (int)db.feeder.get(NUM_BALLS);
         }
+
+        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d) {
+            if (!mIsBallAdded) {
+                mNumBalls++;
+                mIsBallAdded = true;
+            }
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.2);
+        } else if (mIsBallAdded) {
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
+            mIsBallAdded = false;
+        } else if (mNumBalls > 0) {
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
+        } else {
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
+            db.intake.set(EIntakeData.DESIRED_pct, 1d);
+        }
+
         db.feeder.set(EFeederData.NUM_BALLS, mNumBalls);
+    }
+
+    protected void placeCargo() {
+        db.feeder.set(EFeederData.SET_FEEDER_pct, -0.2);
+        db.intake.set(EIntakeData.DESIRED_pct, -0.1);
+    }
+
+    protected void reverseCargo() {
+        db.intake.set(DESIRED_pct, -1.0);
+        db.feeder.set(SET_FEEDER_pct, -1.0);
     }
 
     /**
