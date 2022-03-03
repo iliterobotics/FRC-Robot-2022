@@ -12,8 +12,8 @@ import us.ilite.common.types.EShooterSystemData;
 import us.ilite.common.types.EVisionGoal2020;
 import us.ilite.common.IFieldComponent;
 
-import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_LOWER_CORNERS;
-import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_UPPER_CORNERS;
+//import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_LOWER_CORNERS;
+//import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_UPPER_CORNERS;
 import static us.ilite.common.types.EVisionGoal2020.T3D_TOP_Y_in;
 import static us.ilite.robot.Enums.*;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
@@ -48,26 +48,26 @@ public class Limelight extends Module implements ITargetDataProvider {
     private IFieldComponent mGoal = NONE; // The controller updates this
     private List<Translation2d> mLowerCorners = new ArrayList<>();
     private List<Translation2d> mUpperCorners = new ArrayList<>();
-    private final CameraConfig mLimelight;
-    private final Ilite3DSolver mUpperCornerSolver;
-    private final Ilite3DSolver mLowerCornerSolver;
+//    private final CameraConfig mLimelight;
+//    private final Ilite3DSolver mUpperCornerSolver;
+//    private final Ilite3DSolver mLowerCornerSolver;
 
     private final NetworkTable mTable;
 
     public Limelight(String pNetworkTableName) {
-        mLimelight = LIMELIGHT_V2_LOW_RES.setAddress(pNetworkTableName).setLensHeight(kHeightIn);
-        mUpperCornerSolver = new Ilite3DSolver(
-                mLimelight,
-                Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.height()),
-                Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.width()),
-                Field2022.Distances.TARGETTING_OFFSET.mDistance
-        );
-        mLowerCornerSolver = new Ilite3DSolver(
-                mLimelight,
-                Distance.fromInches(OUTER_GOAL_LOWER_CORNERS.height()),
-                Distance.fromInches(OUTER_GOAL_LOWER_CORNERS.width()),
-                Field2022.Distances.TARGETTING_OFFSET.mDistance
-        );
+//        mLimelight = LIMELIGHT_V2_LOW_RES.setAddress(pNetworkTableName).setLensHeight(kHeightIn);
+//        mUpperCornerSolver = new Ilite3DSolver(
+//                mLimelight,
+//                Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.height()),
+//                Distance.fromInches(OUTER_GOAL_UPPER_CORNERS.width()),
+//                Field2022.Distances.TARGETTING_OFFSET.mDistance
+//        );
+//        mLowerCornerSolver = new Ilite3DSolver(
+//                mLimelight,
+//                Distance.fromInches(OUTER_GOAL_LOWER_CORNERS.height()),
+//                Distance.fromInches(OUTER_GOAL_LOWER_CORNERS.width()),
+//                Field2022.Distances.TARGETTING_OFFSET.mDistance
+//        );
         mTable = NetworkTableInstance.getDefault().getTable(pNetworkTableName);
     }
 
@@ -91,26 +91,26 @@ public class Limelight extends Module implements ITargetDataProvider {
 
                 // New way of doing it
                 updateCorners();
-                mUpperCornerSolver.updatePoseToGoal(mUpperCorners);
-                mLowerCornerSolver.updatePoseToGoal(mLowerCorners);
-                if(!mUpperCorners.isEmpty()) {
-                    db.goaltracking.set(T3D_TOP_X_in, mUpperCornerSolver.x().inches());
-                    db.goaltracking.set(T3D_TOP_Y_in, mUpperCornerSolver.y().inches());
-                    db.goaltracking.set(T3D_TOP_AZIMUTH_deg, mUpperCornerSolver.azimuth().degrees());
-                    db.goaltracking.set(T3D_TOP_AZ_OFFSET_deg, mUpperCornerSolver.offsetAzimuth().degrees());
-                    db.goaltracking.set(T3D_TOP_GOAL_RANGE_in, mUpperCornerSolver.range().inches());
-                    db.goaltracking.set(T3D_TOP_LEFT_RANGE_in, mUpperCornerSolver.leftRange().inches());
-                    db.goaltracking.set(T3D_TOP_RIGHT_RANGE_in, mUpperCornerSolver.rightRange().inches());
-                }
-                if(!mLowerCorners.isEmpty()) {
-                    db.goaltracking.set(T3D_BOT_X_in, mLowerCornerSolver.x().inches());
-                    db.goaltracking.set(T3D_BOT_Y_in, mLowerCornerSolver.y().inches());
-                    db.goaltracking.set(T3D_BOT_AZIMUTH_deg, mLowerCornerSolver.azimuth().degrees());
-                    db.goaltracking.set(T3D_BOT_AZ_OFFSET_deg, mLowerCornerSolver.offsetAzimuth().degrees());
-                    db.goaltracking.set(T3D_BOT_GOAL_RANGE_in, mLowerCornerSolver.range().inches());
-                    db.goaltracking.set(T3D_BOT_LEFT_RANGE_in, mLowerCornerSolver.leftRange().inches());
-                    db.goaltracking.set(T3D_BOT_RIGHT_RANGE_in, mLowerCornerSolver.rightRange().inches());
-                }
+//                mUpperCornerSolver.updatePoseToGoal(mUpperCorners);
+//                mLowerCornerSolver.updatePoseToGoal(mLowerCorners);
+//                if(!mUpperCorners.isEmpty()) {
+//                    db.goaltracking.set(T3D_TOP_X_in, mUpperCornerSolver.x().inches());
+//                    db.goaltracking.set(T3D_TOP_Y_in, mUpperCornerSolver.y().inches());
+//                    db.goaltracking.set(T3D_TOP_AZIMUTH_deg, mUpperCornerSolver.azimuth().degrees());
+//                    db.goaltracking.set(T3D_TOP_AZ_OFFSET_deg, mUpperCornerSolver.offsetAzimuth().degrees());
+//                    db.goaltracking.set(T3D_TOP_GOAL_RANGE_in, mUpperCornerSolver.range().inches());
+//                    db.goaltracking.set(T3D_TOP_LEFT_RANGE_in, mUpperCornerSolver.leftRange().inches());
+//                    db.goaltracking.set(T3D_TOP_RIGHT_RANGE_in, mUpperCornerSolver.rightRange().inches());
+//                }
+//                if(!mLowerCorners.isEmpty()) {
+//                    db.goaltracking.set(T3D_BOT_X_in, mLowerCornerSolver.x().inches());
+//                    db.goaltracking.set(T3D_BOT_Y_in, mLowerCornerSolver.y().inches());
+//                    db.goaltracking.set(T3D_BOT_AZIMUTH_deg, mLowerCornerSolver.azimuth().degrees());
+//                    db.goaltracking.set(T3D_BOT_AZ_OFFSET_deg, mLowerCornerSolver.offsetAzimuth().degrees());
+//                    db.goaltracking.set(T3D_BOT_GOAL_RANGE_in, mLowerCornerSolver.range().inches());
+//                    db.goaltracking.set(T3D_BOT_LEFT_RANGE_in, mLowerCornerSolver.leftRange().inches());
+//                    db.goaltracking.set(T3D_BOT_RIGHT_RANGE_in, mLowerCornerSolver.rightRange().inches());
+//                }
             }
         }
     }
@@ -126,7 +126,7 @@ public class Limelight extends Module implements ITargetDataProvider {
         db.goaltracking.set(PIPELINE, mGoal.pipeline());
         mTable.getEntry("pipeline").setNumber(mGoal.pipeline());
         // TODO - calibrate this angle. The LL angle may have an offset from the hood, by a few degrees
-        mLimelight.setElevationAngle(db.flywheel.safeGet(EShooterSystemData.HOOD_ANGLE_deg, 0d));
+//        mLimelight.setElevationAngle(db.flywheel.safeGet(EShooterSystemData.HOOD_ANGLE_deg, 0d));
 
         SmartDashboard.putBoolean("Valid Goal", db.goaltracking.isSet(TV));
         if(db.goaltracking.isSet(TV)) {
@@ -172,7 +172,8 @@ public class Limelight extends Module implements ITargetDataProvider {
 
     @Override
     public double getCameraAngleDeg() {
-        return mLimelight.elevation_deg();
+//        return mLimelight.elevation_deg();
+        return 0d;
     }
 
     @Override
