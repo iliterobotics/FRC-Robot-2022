@@ -2,6 +2,8 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -124,6 +126,11 @@ public class DriveModule extends Module {
 
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
+
+		mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
+		mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
+		mLeftFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
+		mRightFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
 
 		mGyro = new Pigeon(Robot.CLOCK, Settings.HW.CAN.kDTGyro);
 
