@@ -94,15 +94,15 @@ public class TeleopController extends BaseManualController { //copied from TestC
 //            }
 //        }
 
-        if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_FWD_SLOW)) {
+        if (db.driverinput.isSet(InputMap.DRIVER.MANUAL_FWD_SLOW)) {
             db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-            db.climber.set(EClimberModuleData.L_SET_pct, 0.2);
-            db.climber.set(EClimberModuleData.R_SET_pct, 0.2);
+            db.climber.set(EClimberModuleData.L_SET_pct, 0.4);
+            db.climber.set(EClimberModuleData.R_SET_pct, 0.4);
         }
-        else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV_SLOW)) {
+        else if (db.driverinput.isSet(InputMap.DRIVER.MANUAL_REV_SLOW)) {
             db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-            db.climber.set(EClimberModuleData.L_SET_pct, -0.2);
-            db.climber.set(EClimberModuleData.R_SET_pct, -0.2);
+            db.climber.set(EClimberModuleData.L_SET_pct, -0.4);
+            db.climber.set(EClimberModuleData.R_SET_pct, -0.4);
         }
         else {
             db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
@@ -112,19 +112,21 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateHangerPneumatics() {
-        //if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-            if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_CLAMPED)) {
-                db.climber.set(EClimberModuleData.PNEUMATIC_STATE, Enums.EHangerPneumaticMode.TOP_CLAMPED);
-            } if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_RELEASED)) {
-                db.climber.set(EClimberModuleData.PNEUMATIC_STATE, Enums.EHangerPneumaticMode.TOP_RELEASED);
-            }
+//        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
 
-            if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_CLAMPED)) {
-                db.climber.set(EClimberModuleData.PNEUMATIC_STATE, Enums.EHangerPneumaticMode.BOTTOM_CLAMPED);
-            } if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_RELEASED)) {
-                db.climber.set(EClimberModuleData.PNEUMATIC_STATE, Enums.EHangerPneumaticMode.BOTTOM_RELEASED);
-            }
-       // }
+        if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_CLAMPED)) {
+            db.climber.set(EClimberModuleData.IS_A_CLAMPED, 1.0);
+        } if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_RELEASED)) {
+            db.climber.set(EClimberModuleData.IS_A_CLAMPED, 2.0);
+        }
+
+        if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_CLAMPED)) {
+            db.climber.set(EClimberModuleData.IS_B_CLAMPED, 1.0);
+        } if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_RELEASED)) {
+            db.climber.set(EClimberModuleData.IS_B_CLAMPED, 2.0);
+        }
+
+//        }
     }
 
     private void updateIntake() {

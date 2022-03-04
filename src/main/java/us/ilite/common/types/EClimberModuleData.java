@@ -8,5 +8,7 @@ public enum EClimberModuleData {
     L_OUTPUT_CURRENT,R_OUTPUT_CURRENT,
     L_SET_pct, R_SET_pct,
     HANGER_STATE,
+    IS_A_CLAMPED,
+    IS_B_CLAMPED,
     PNEUMATIC_STATE
     }

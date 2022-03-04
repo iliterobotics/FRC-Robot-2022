@@ -48,7 +48,9 @@ public class InputMap {
         HOME_TO_DRIVER_STATION = ELogitech310.X_BTN,
         DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.A_BTN,
         HOME_TO_HUB = ELogitech310.Y_BTN,
-        ACTIVATE_CLIMB = ELogitech310.START
+        ACTIVATE_CLIMB = ELogitech310.START,
+        MANUAL_REV_SLOW = ELogitech310.Y_BTN,
+        MANUAL_FWD_SLOW = ELogitech310.B_BTN
         ;
     }
 
@@ -76,10 +78,8 @@ public class InputMap {
         public static final ELogitech310
         MANUAL_FWD_FULL = ELogitech310.RIGHT_TRIGGER_AXIS,
         MANUAL_FWD_HALF_SPEED = ELogitech310.A_BTN,
-        MANUAL_FWD_SLOW = ELogitech310.B_BTN,
         MANUAL_REV_FULL = ELogitech310.LEFT_TRIGGER_AXIS,
         MANUAL_REV_HALF_SPEED = ELogitech310.X_BTN,
-        MANUAL_REV_SLOW = ELogitech310.Y_BTN,
         TOP_CLAMPED = ELogitech310.DPAD_UP,
         TOP_RELEASED = ELogitech310.DPAD_DOWN,
         BOTTOM_CLAMPED = ELogitech310.DPAD_RIGHT,
