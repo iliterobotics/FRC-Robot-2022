@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -53,6 +54,8 @@ public class DriveModule extends Module {
 	public static final double kTrackWidthFeet = 22.0 / 12.0;
 	public static final double kWheelBaseDiagonalFeet = 35.0 / 12.0;
 	public static final double kMaxDriveThreshold = 0.75;
+	//In reality the max drive velocity is 6380 multiplied by the Gear Ratio
+	//I didn't multiply because we already accounted for it earlier
 	public static final double kMaxDriveVelocity = 6380.0;
 	public static final double kMaxDriveVelocityFTs = kMaxDriveVelocity * kRPMtoFTs;
 	public static final double kDriveRampRate = kMaxDriveVelocity / 5;
@@ -127,10 +130,7 @@ public class DriveModule extends Module {
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
 
-		mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
-		mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
-		mLeftFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
-		mRightFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
+		configureStatusFrames();
 
 		mGyro = new Pigeon(Robot.CLOCK, Settings.HW.CAN.kDTGyro);
 
@@ -158,9 +158,33 @@ public class DriveModule extends Module {
 		mTurnToDegreePID.setContinuous(true);
 		mTurnToDegreePID.setOutputRange(-1, 1);
 
-		//TODO figure out a way to call mDrive.feed() using TalonFX
 		mDifferentialDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
 		mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
+	}
+
+	public void configureStatusFrames() {
+		mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
+		mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
+		mLeftFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255);
+		mRightFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255);
+
+		mLeftFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255);
+		mRightFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255);
+
+		mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
+		mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
+		mLeftFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
+		mRightFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
+
+		mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);
+		mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);
+		mLeftFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);
+		mRightFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);
+
+		mLeftMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
+		mRightMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
+		mLeftFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
+		mRightFollower.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
 	}
 
 	@Override
