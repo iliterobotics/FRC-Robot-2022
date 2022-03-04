@@ -42,7 +42,6 @@ public class Robot extends TimedRobot {
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
-    private Limelight mLimelight;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FeederModule mFeeder;
@@ -78,7 +77,6 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
-        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
         mLEDControl = new LEDControl();
@@ -165,7 +163,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mLimelight);
-//        mRunningModules.addModule(mClimber);
+        mRunningModules.addModule(mClimber);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);

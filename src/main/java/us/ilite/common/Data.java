@@ -41,7 +41,7 @@ public class Data {
     public final RobotCodex<ELogitech310> tankinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
     public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
-    public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
+    public final RobotCodex<EClimberModuleData> climber = new RobotCodex(NULL_CODEX_VALUE, EClimberModuleData.class);
     public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
     public final RobotCodex<EIntakeData> intake = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
     public final RobotCodex<EFeederData> feeder = new RobotCodex(NULL_CODEX_VALUE, EFeederData.class);
@@ -57,7 +57,7 @@ public class Data {
             rawLimelight,
             feeder,
             intake,
-            hanger,
+            climber,
             color,
     };
 
@@ -71,7 +71,7 @@ public class Data {
             feeder,
             pdp,
             intake,
-            hanger,
+            climber,
             color,
     };
 

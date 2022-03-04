@@ -6,7 +6,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import us.ilite.common.types.EHangerModuleData;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import us.ilite.common.config.Settings;
+import us.ilite.common.types.EClimberModuleData;
 import us.ilite.robot.Enums;
 
 public class ClimberModule extends Module{
@@ -22,8 +24,8 @@ public class ClimberModule extends Module{
         mCLMR0.setNeutralMode(NeutralMode.Brake);
         mCLL0.setNeutralMode(NeutralMode.Brake);
 
-        mCLPNL = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 3);
-        mCLPNR = new DoubleSolenoid(PneumaticsModuleType.REVPH, 4, 5);
+        mCLPNL = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, 2, 3);
+        mCLPNR = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, 4, 5);
 
         mCLL0.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         mCLMR0.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
@@ -31,6 +33,7 @@ public class ClimberModule extends Module{
 
     @Override
     public void readInputs() {
+        mCLPNL.get();
         //convert from raw sensor velocity inputs to rpm
         double leftRawSensorVelocity = mCLL0.getSelectedSensorVelocity();
         double leftRotationsPerSecond = (leftRawSensorVelocity / 2048) / 1000;
@@ -47,58 +50,74 @@ public class ClimberModule extends Module{
         double rightRawSensorPosition = mCLMR0.getSelectedSensorPosition();
         double rightRotations = (rightRawSensorPosition / 2048);
 
-        db.hanger.set(EHangerModuleData.L_VEL_rpm,leftRotationsPerMinute);
-        db.hanger.set(EHangerModuleData.R_VEL_rpm, rightRotationsPerMinute);
-        db.hanger.set(EHangerModuleData.L_POSITION_rot, leftRotations);
-        db.hanger.set(EHangerModuleData.R_POSITION_rot, rightRotations);
+        db.climber.set(EClimberModuleData.L_VEL_rpm,leftRotationsPerMinute);
+        db.climber.set(EClimberModuleData.R_VEL_rpm, rightRotationsPerMinute);
+        db.climber.set(EClimberModuleData.L_POSITION_rot, leftRotations);
+        db.climber.set(EClimberModuleData.R_POSITION_rot, rightRotations);
     }
+
 
     @Override
     public void setOutputs() {
-        Enums.EHangerMode motorMode = db.hanger.get(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.class);
+        int tmp = (int)db.climber.safeGet(EClimberModuleData.HANGER_STATE, 0d);
+        Enums.EClimberMode motorMode = Enums.EClimberMode.values()[tmp];
         if (motorMode == null) {
-            motorMode = Enums.EHangerMode.DEFAULT;
+            motorMode = Enums.EClimberMode.PERCENT_OUTPUT;
         }
-        switch(motorMode) {
-            case VELOCITY:
-                mCLL0.set(ControlMode.Velocity, db.hanger.get(EHangerModuleData.L_DESIRED_VEL_rpm));
-                mCLMR0.set(ControlMode.Velocity, db.hanger.get(EHangerModuleData.R_DESIRED_VEL_rpm));
-                break;
-            case DEFAULT:
-                mCLL0.set(ControlMode.Velocity, 0);
-                mCLMR0.set(ControlMode.Velocity, 0);
-                break;
-            case PERCENT_OUTPUT :
-                mCLL0.set(ControlMode.PercentOutput, db.hanger.get(EHangerModuleData.L_SET_pct));
-                mCLMR0.set(ControlMode.PercentOutput, db.hanger.get(EHangerModuleData.R_SET_pct));
-                break;
-            case POSITION:
-                mCLL0.set(ControlMode.Position, db.hanger.get(EHangerModuleData.L_DESIRED_POSITION_rot));
-                mCLMR0.set(ControlMode.Position, db.hanger.get(EHangerModuleData.R_DESIRED_POSITION_rot));
-                break;
-        }
+        mCLL0.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.L_SET_pct));
+        mCLMR0.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.R_SET_pct));
+//        switch(motorMode) {
+//            case VELOCITY:
+//                mCLL0.set(ControlMode.Velocity, db.climber.get(EClimberModuleData.L_DESIRED_VEL_rpm));
+//                mCLMR0.set(ControlMode.Velocity, db.climber.get(EClimberModuleData.R_DESIRED_VEL_rpm));
+//                break;
+//            case DEFAULT:
+//                mCLL0.set(ControlMode.Velocity, 0);
+//                mCLMR0.set(ControlMode.Velocity, 0);
+//                break;
+//            case PERCENT_OUTPUT :
+//                mCLL0.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.L_SET_pct));
+//                mCLMR0.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.R_SET_pct));
+//                break;
+//            case POSITION:
+//                mCLL0.set(ControlMode.Position, db.climber.get(EClimberModuleData.L_DESIRED_POSITION_rot));
+//                mCLMR0.set(ControlMode.Position, db.climber.get(EClimberModuleData.R_DESIRED_POSITION_rot));
+//                break;
 
-        Enums.EHangerPneumaticMode pneumaticMode = db.hanger.get(EHangerModuleData.PNEUMATIC_STATE, Enums.EHangerPneumaticMode.class);
+//        }
+        Enums.EHangerPneumaticMode pneumaticMode = db.climber.get(EClimberModuleData.PNEUMATIC_STATE, Enums.EHangerPneumaticMode.class);
         if (pneumaticMode == null) {
             pneumaticMode = Enums.EHangerPneumaticMode.DEFAULT;
         }
-        switch (pneumaticMode) {
-            case TOP_CLAMPED:
-                mCLPNL.set(DoubleSolenoid.Value.kForward);
-                break;
-            case BOTTOM_CLAMPED:
-                mCLPNR.set(DoubleSolenoid.Value.kForward);
-                break;
-            case TOP_RELEASED:
-                mCLPNL.set(DoubleSolenoid.Value.kReverse);
-                break;
-            case BOTTOM_RELEASED:
-                mCLPNR.set(DoubleSolenoid.Value.kReverse);
-                break;
-            case DEFAULT:
-                mCLPNL.set(DoubleSolenoid.Value.kReverse);
-                mCLPNR.set(DoubleSolenoid.Value.kReverse);
-                break;
+//        switch (pneumaticMode) {
+//            case TOP_CLAMPED:
+//                mCLPNL.set(DoubleSolenoid.Value.kForward);
+//                break;
+//            case BOTTOM_CLAMPED:
+//                mCLPNR.set(DoubleSolenoid.Value.kForward);
+//                break;
+//            case TOP_RELEASED:
+//                mCLPNL.set(DoubleSolenoid.Value.kReverse);
+//                break;
+//            case BOTTOM_RELEASED:
+//                mCLPNR.set(DoubleSolenoid.Value.kReverse);
+//                break;
+//            case DEFAULT:
+//                mCLPNL.set(DoubleSolenoid.Value.kReverse);
+//                mCLPNR.set(DoubleSolenoid.Value.kReverse);
+//                break;
+//        }
+        System.out.println("MODE: " + pneumaticMode);
+        if(pneumaticMode == Enums.EHangerPneumaticMode.TOP_CLAMPED) {
+            mCLPNL.set(DoubleSolenoid.Value.kForward);
+        } else {
+            mCLPNL.set(DoubleSolenoid.Value.kReverse);
+        }
+
+        if(pneumaticMode == Enums.EHangerPneumaticMode.BOTTOM_CLAMPED) {
+            mCLPNR.set(DoubleSolenoid.Value.kForward);
+        } else {
+            mCLPNR.set(DoubleSolenoid.Value.kReverse);
         }
     }
 }

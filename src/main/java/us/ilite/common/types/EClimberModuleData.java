@@ -1,6 +1,6 @@
 package us.ilite.common.types;
 
-public enum EHangerModuleData {
+public enum EClimberModuleData {
     L_VEL_rpm,R_VEL_rpm,
     L_DESIRED_VEL_rpm, R_DESIRED_VEL_rpm,
     L_POSITION_rot,R_POSITION_rot,

@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.robot.modules.LEDControl;
 
 public class Enums {
-    public enum EHangerMode {
+    public enum EClimberMode {
         VELOCITY,
         POSITION,
         PERCENT_OUTPUT,

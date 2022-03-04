@@ -83,7 +83,6 @@ public class Settings {
             // ======================
             public static final int kINPNIntakeForward = 0;
             public static final int kINPNIntakeReverse = 1;
-            public static final int kINPNFeeder = 3;
 
             // ============
             // CLIMBER ID's
