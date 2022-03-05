@@ -17,6 +17,7 @@ public enum EDriveData implements CodexOf<Double> {
 
     DESIRED_TURN_ANGLE_deg,
     ACTUAL_TURN_ANGLE_deg,
+    GREYHILL_ACTUAL_RIGHT, GREYHILL_ACTUAL_LEFT,
 
     // Outputs from a generated path
     L_PATH_FT_s, R_PATH_FT_s,

@@ -44,7 +44,6 @@ public class FeederModule extends Module {
         db.feeder.set(FEEDER_pct, (mIntakeFeeder.getSelectedSensorVelocity() * kScaledRPMConversion) / kMaxFalconSpeed);
         db.feeder.set(EXIT_BALL_VELOCITY_ft_s, mIntakeFeeder.getSelectedSensorVelocity() * kVelocityConversion);
         db.feeder.set(ENTRY_BEAM, mEntryBeamBreaker.isBroken());
-        db.feeder.set(EXIT_BEAM, mExitBeamBreaker.isBroken());
     }
 
     @Override

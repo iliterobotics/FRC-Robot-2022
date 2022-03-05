@@ -17,7 +17,6 @@ public class Settings {
     public static double kControlLoopPeriod = 0.02; // seconds
 
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
-    public static int kAcceptableLogFailures = 8;
     public static double kNetworkTableUpdateRate = 0.01;
     public static boolean kIsLogging = true; // decide whether or not to log
 
@@ -83,15 +82,16 @@ public class Settings {
             // ======================
             public static final int kINPNIntakeForward = 0;
             public static final int kINPNIntakeReverse = 1;
-            public static final int kINPNFeeder = 3;
 
             // ============
             // CLIMBER ID's
             // ============
-            public static final int kCLPNClimbForward = 4;
-            public static final int kCLPNClimbReverse = 5;
-        }
+            public static final int kCLPNClimbForwardOne = 2;
+            public static final int kCLPNClimbReverseOne = 3;
 
+            public static final int kCLPNClimbForwardTwo = 4;
+            public static final int kCLPNClimbReverseTwo = 5;
+        }
     }
 
     public static class Input {

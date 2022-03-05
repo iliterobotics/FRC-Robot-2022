@@ -9,12 +9,16 @@ import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.Data;
+import us.ilite.common.Field2022;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
+import us.ilite.logging.CSVLogger;
 import us.ilite.robot.auto.AutonSelection;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
@@ -30,16 +34,16 @@ public class Robot extends TimedRobot {
     private ILog mLogger = Logger.createLog(this.getClass());
     public static final Data DATA = new Data();
     public static final Clock CLOCK = (RobotBase.isReal() ? new Clock() : new Clock().simulated());
+    public static final Field2d FIELD = new Field2d();
     public static final boolean IS_SIMULATED = RobotBase.isSimulation();
     private static EMatchMode MODE = DISABLED;
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger;
-   // private HangerModule mHanger;
+    private ClimberModule mHanger;
     private Timer initTimer = new Timer();
 
     private DriveModule mDrive;
-    private Limelight mLimelight;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FeederModule mFeeder;
@@ -61,6 +65,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
 
         // Init the actual robot
@@ -74,7 +79,6 @@ public class Robot extends TimedRobot {
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
-        mLimelight = new Limelight(Settings.kFlywheelLimelightNetworkTable);
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
         mLEDControl = new LEDControl();
@@ -161,7 +165,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mDrive);
 //        mRunningModules.addModule(mHanger);
 //        mRunningModules.addModule(mLimelight);
-//        mRunningModules.addModule(mClimber);
+        mRunningModules.addModule(mClimber);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -250,7 +254,7 @@ public class Robot extends TimedRobot {
         if ( Settings.kIsLogging && MODE != DISABLED) {
             for ( RobotCodex c : DATA.mLoggedCodexes ) {
                 if ( c.hasChanged() ) {
-                    mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
+                    mCSVLogger.addToQueue( new ImmutablePair<String,RobotCodex>(c.toFormattedCSV(),c));
                 }
             }
         }

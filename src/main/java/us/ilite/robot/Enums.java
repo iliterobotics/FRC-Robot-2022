@@ -6,6 +6,21 @@ import edu.wpi.first.wpilibj.util.Color;
 import us.ilite.robot.modules.LEDControl;
 
 public class Enums {
+    public enum EClimberMode {
+        VELOCITY,
+        POSITION,
+        PERCENT_OUTPUT,
+        DEFAULT
+    }
+
+    public enum EHangerPneumaticMode {
+        DEFAULT,
+        B_CLAMPED,
+        A_RELEASED,
+        B_RELEASED,
+        IS_A_CLAMPED
+    }
+
     // =============================================================================
     // Limelight States
     // =============================================================================
@@ -48,6 +63,13 @@ public class Enums {
         public double getRed() {
             return red;
         }
+        public double getGreen() {
+            return green;
+        }
+        public double getBlue() {
+            return blue;
+        }
+
 
 //        Color clr = new Color(red, green, blue);
 //
