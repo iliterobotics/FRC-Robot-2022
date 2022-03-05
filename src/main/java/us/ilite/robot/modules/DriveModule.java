@@ -15,6 +15,7 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.drive.EDriveData;
+import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Pigeon;
@@ -154,7 +155,13 @@ public class DriveModule extends Module {
 		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 		db.drivetrain.set(GREYHILL_ACTUAL_LEFT, mLeftEncoder.getDistance() / 256);
 		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT, mRightEncoder.getDistance() / 256);
-		//TODO change to greyhill once we get that working
+		db.imu.set(EGyro.ACCEL_X, mGyro.getAccelX());
+		db.imu.set(EGyro.ACCEL_Y, mGyro.getAccelY());
+		db.imu.set(EGyro.PITCH_DEGREES, mGyro.getPitch().getDegrees());
+		db.imu.set(EGyro.ROLL_DEGREES, mGyro.getRoll().getDegrees());
+		db.imu.set(EGyro.YAW_DEGREES, mGyro.getYaw().getDegrees());
+		db.imu.set(EGyro.YAW_OMEGA_DEGREES, mGyro.getYawRate().getDegrees());
+
 		mOdometry.update(mGyro.getHeading(), Units.feet_to_meters(db.drivetrain.get(L_ACTUAL_POS_FT)),
 				Units.feet_to_meters(db.drivetrain.get(R_ACTUAL_POS_FT)));
 		Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
