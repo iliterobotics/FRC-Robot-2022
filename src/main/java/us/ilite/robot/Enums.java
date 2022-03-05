@@ -1,10 +1,5 @@
 package us.ilite.robot;
 
-import com.revrobotics.ColorMatch;
-import com.revrobotics.ColorMatchResult;
-import edu.wpi.first.wpilibj.util.Color;
-import us.ilite.robot.modules.LEDControl;
-
 public class Enums {
     public enum EClimberMode {
         VELOCITY,
@@ -130,7 +125,7 @@ public class Enums {
     // =============================================================================
     // Intake Module States
     // =============================================================================
-    public enum EIntakeState {
+    public enum ERollerState {
         PERCENT_OUTPUT,
         VELOCITY;
     }
@@ -144,6 +139,5 @@ public class Enums {
         PERCENT_OUTPUT,
         INDEXING_VELOCITY;
     }
-
 
 }
