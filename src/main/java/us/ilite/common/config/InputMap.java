@@ -47,7 +47,6 @@ public class InputMap {
         BOOST_MODE = ELogitech310.LEFT_TRIGGER_AXIS,
         HOME_TO_DRIVER_STATION = ELogitech310.X_BTN,
         DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.A_BTN,
-        HOME_TO_HUB = ELogitech310.Y_BTN,
         ACTIVATE_CLIMB = ELogitech310.START,
         MANUAL_REV_SLOW = ELogitech310.Y_BTN,
         MANUAL_FWD_SLOW = ELogitech310.B_BTN
