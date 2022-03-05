@@ -91,7 +91,7 @@ public class CSVLogger {
      */
     private void logFromCodexToCSVHeader() {
         for(CSVWriter writer : mCSVWriters.values()) {
-            addToQueue(new ImmutablePair<>(writer.getCodex().getCSVHeader(), writer.getCodex()));
+            writer.logCSVLine(writer.getCodex().getCSVHeader());
         }
     }
 
