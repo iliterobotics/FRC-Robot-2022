@@ -64,6 +64,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
                 db.climber.set(EClimberModuleData.R_SET_pct, 0);
             }
         }
+
+        if (db.driverinput.isSet(InputMap.OPERATOR.SET_COAST)) {
+            db.climber.set(EClimberModuleData.IS_COAST, 1d);
+        }
     }
 
     private void updateHangerPneumatics() {
@@ -95,10 +99,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
     private void updateRollers() {
         if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_ROLLERS)) {
-                db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+                db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
                 db.intake.set(DESIRED_pct, 1.0);
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
-                db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+                db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
                 db.intake.set(DESIRED_pct, -1.0);
             }
         }

@@ -24,8 +24,8 @@ public class ClimberModule extends Module{
     public static final double kScaledUnitsToRPM = (600.0 / 2048.0) * kClimberRatio;
 
     public ClimberModule() {
-        mCLMR11 = new TalonFX(11);
-        mCL12 = new TalonFX(12);
+        mCLMR11 = new TalonFX(Settings.HW.CAN.kCLM1);
+        mCL12 = new TalonFX(Settings.HW.CAN.kCL2);
         mCLMR11.setNeutralMode(NeutralMode.Brake);
         mCL12.setNeutralMode(NeutralMode.Brake);
         mCL12.configOpenloopRamp(0.5);
@@ -47,6 +47,8 @@ public class ClimberModule extends Module{
         db.climber.set(EClimberModuleData.R_VEL_rpm, mCLMR11.getSelectedSensorVelocity() * kScaledUnitsToRPM);
         db.climber.set(EClimberModuleData.L_OUTPUT_CURRENT, mCLMR11.getSupplyCurrent());
         db.climber.set(EClimberModuleData.R_OUTPUT_CURRENT, mCLMR11.getSupplyCurrent());
+        db.climber.set(EClimberModuleData.BUS_VOLTAGE_LEFT, mCL12.getBusVoltage());
+        db.climber.set(EClimberModuleData.BUS_VOLTAGE_RIGHT, mCLMR11.getBusVoltage());
     }
 
 
@@ -54,6 +56,14 @@ public class ClimberModule extends Module{
     public void setOutputs() {
         mCL12.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.L_SET_pct));
         mCLMR11.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.R_SET_pct));
+
+        if (db.climber.isSet(EClimberModuleData.IS_COAST)) {
+            mCL12.setNeutralMode(NeutralMode.Coast);
+            mCLMR11.setNeutralMode(NeutralMode.Coast);
+        } else {
+            mCL12.setNeutralMode(NeutralMode.Brake);
+            mCLMR11.setNeutralMode(NeutralMode.Brake);
+        }
 
         double isAClamped = db.climber.get(EClimberModuleData.IS_A_CLAMPED);
         double isBClamped = db.climber.get(EClimberModuleData.IS_B_CLAMPED);

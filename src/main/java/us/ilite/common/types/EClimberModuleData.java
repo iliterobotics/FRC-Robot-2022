@@ -10,5 +10,8 @@ public enum EClimberModuleData {
     HANGER_STATE,
     IS_A_CLAMPED,
     IS_B_CLAMPED,
-    PNEUMATIC_STATE
+    PNEUMATIC_STATE,
+    IS_COAST,
+    BUS_VOLTAGE_RIGHT,
+    BUS_VOLTAGE_LEFT,
     }

@@ -145,8 +145,8 @@ public class BaseAutonController extends AbstractController {
                     mCycleCount++;
                 }
                 if (mCycleCount >= 5) {
-                    initialize(TrajectoryCommandUtils.getOtherJSONTrajectory());
-                    execute();
+//                    initialize(TrajectoryCommandUtils.getOtherJSONTrajectory());
+//                    execute();
                 } else {
                     db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TURN_TO);
                     db.drivetrain.set(EDriveData.DESIRED_TURN_ANGLE_deg, 120);

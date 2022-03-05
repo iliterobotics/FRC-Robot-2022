@@ -70,7 +70,8 @@ public class InputMap {
         TOP_CLAMPED = ELogitech310.DPAD_UP,
         TOP_RELEASED = ELogitech310.DPAD_DOWN,
         BOTTOM_CLAMPED = ELogitech310.Y_BTN,
-        BOTTOM_RELEASED = ELogitech310.A_BTN
+        BOTTOM_RELEASED = ELogitech310.A_BTN,
+        SET_COAST = ELogitech310.BACK
         ;
     }
 

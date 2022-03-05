@@ -119,14 +119,14 @@ public class DriveModule extends Module {
 		mLeftMaster = new WPI_TalonFX(Settings.HW.CAN.kDTML1);
 		mLeftFollower = new WPI_TalonFX(Settings.HW.CAN.kDTL3);
 		mLeftFollower.follow(mLeftMaster);
-		mLeftMaster.setNeutralMode(NeutralMode.Brake);
-		mLeftFollower.setNeutralMode(NeutralMode.Brake);
+		mLeftMaster.setNeutralMode(NeutralMode.Coast);
+		mLeftFollower.setNeutralMode(NeutralMode.Coast);
 
 		mRightMaster = new WPI_TalonFX(Settings.HW.CAN.kDTMR2);
 		mRightFollower = new WPI_TalonFX(Settings.HW.CAN.kDTR4);
 		mRightFollower.follow(mRightMaster);
-		mRightMaster.setNeutralMode(NeutralMode.Brake);
-		mRightFollower.setNeutralMode(NeutralMode.Brake);
+		mRightMaster.setNeutralMode(NeutralMode.Coast);
+		mRightFollower.setNeutralMode(NeutralMode.Coast);
 
 		mRightMaster.setInverted(true);
 		mRightFollower.setInverted(true);
@@ -220,8 +220,6 @@ public class DriveModule extends Module {
 		db.drivetrain.set(R_ACTUAL_POS_meters, Units.feet_to_meters(((mRightMaster.getSelectedSensorPosition() - kInitialRightPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet));
 		db.drivetrain.set(ACTUAL_LEFT_PCT, (mLeftMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
-		db.drivetrain.set(GREYHILL_ACTUAL_LEFT, mLeftEncoder.getDistance() / 256);
-		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT, mRightEncoder.getDistance() / 256);
 		db.imu.set(EGyro.ACCEL_X, mGyro.getAccelX());
 		db.imu.set(EGyro.ACCEL_Y, mGyro.getAccelY());
 		db.imu.set(EGyro.PITCH_DEGREES, mGyro.getPitch().getDegrees());
@@ -247,10 +245,6 @@ public class DriveModule extends Module {
 
 	@Override
 	public void setOutputs() {
-		mRightMaster.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
-		mRightFollower.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
-		mLeftMaster.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
-		mLeftFollower.setNeutralMode(db.drivetrain.get(NEUTRAL_MODE, NeutralMode.class));
 		Enums.EDriveState state = db.drivetrain.get(STATE, Enums.EDriveState.class);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);
