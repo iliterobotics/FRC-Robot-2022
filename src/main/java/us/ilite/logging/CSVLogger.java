@@ -89,7 +89,7 @@ public class CSVLogger {
      */
     private void logFromCodexToCSVHeader() {
         for(CSVWriter writer : mCSVWriters.values()) {
-            writer.writeHeader();
+            addToQueue(new ImmutablePair<>(writer.getCodex().getCSVHeader(), writer.getCodex()));
         }
     }
 

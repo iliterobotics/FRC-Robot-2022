@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CSVWriter {
 
@@ -32,17 +34,9 @@ public class CSVWriter {
      */
     private static final String kEventName = DriverStation.getEventName();
     /**
-     * The file writer
-     */
-    private final Optional<BufferedWriter> optionalWriter;
-    /**
      * Logger
      */
     private final ILog mLog = Logger.createLog(CSVWriter.class);
-    /**
-     * The total number of log fails. Once a value is hit, then we will log an error message
-     */
-    private static int sLogFailures;
     /**
      * The Codex that is being logged
      */
@@ -51,6 +45,10 @@ public class CSVWriter {
      * The CSVLogger responsible for passing the event to this writter
      */
     private final CSVLogger mParentLogger;
+    /**
+     * The logfile itself
+     */
+    private final File logfile;
 
     /**
      * Creates the {@link CSVWriter}
@@ -65,63 +63,42 @@ public class CSVWriter {
 
         BufferedWriter bw = null;
 
-        sLogFailures = 0;
         String fileName = getFileName(mCodex);
-        File file = new File(fileName);
+        logfile = new File(fileName);
 
-        boolean fileCreated = FileUtils.handleCreation(file);
+        boolean fileCreated = FileUtils.handleCreation(logfile);
 
-        if(fileCreated) {
-            try {
-                bw = new BufferedWriter( new FileWriter( file ) );
-            } catch (IOException e) {
+        if(!fileCreated) {
+            mLog.error("Unable to create logfile: "+fileName +" no logging for codex: " + mCodex.meta().getEnum());
+        }
+
+    }
+
+    /**
+     * Helper method to write a single line to the file. This will grab a handle to the file
+     * and then after it writes the contents to the file, it releases the handle.
+     * @param pLine
+     *  The line of text to write to the file
+     */
+    private void write_line(String pLine) {
+        int logFails = -1;
+        if(logfile != null && logfile.exists()) {
+            try(BufferedWriter bw = new BufferedWriter(new FileWriter(logfile))) {
+                bw.append(pLine);
+                bw.newLine();
+            } catch (IOException e){
+                mLog.error("Failed to log due to exception");
                 mLog.exception(e);
             }
         }
-
-        optionalWriter = Optional.ofNullable(bw);
-
     }
 
     void logCSVLine(String s ) {
-        try {
-
-            if ( optionalWriter.isPresent() ) {
-                optionalWriter.get().append(s);
-                optionalWriter.get().newLine();
-            }
-            else {
-                if ( sLogFailures < Settings.kAcceptableLogFailures ) {
-                    mLog.error("Failure with logging codex: " + mCodex.meta().getEnum().getSimpleName() );
-                    mLog.error( "Could not find Path:  (Path to USB)  on roborio! Try plugging in the USB." );
-                    sLogFailures++;
-                }
-                else if ( sLogFailures == Settings.kAcceptableLogFailures ) {
-                    mLog.error("---------------------CSV LOGGING DISABLED----------------------");
-//                    Robot.mCSVLogger.closeWriters();
-                    sLogFailures++;
-                }
-            }
-        } catch (IOException pE) {}
+        logCSVLine(s);
     }
 
-    public void close() {
-        if ( optionalWriter.isPresent() ) {
-            try {
-                optionalWriter.get().flush();
-                optionalWriter.get().close();
-            }
-            catch ( Exception e ) {}
-
-        }
-    }
-
-    public void writeHeader() {
-        mParentLogger.addToQueue( new ImmutablePair<String,RobotCodex>(mCodex.getCSVHeader(),mCodex));
-    }
-
-    public CodexMetadata<?> getMetaDataOfAssociatedCodex() {
-        return mCodex.meta();
+    public RobotCodex<?> getCodex() {
+        return mCodex;
     }
 
     private static final String getFileName(RobotCodex<?>pCodex) {
