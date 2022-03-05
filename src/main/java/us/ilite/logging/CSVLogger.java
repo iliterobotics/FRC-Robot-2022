@@ -1,11 +1,11 @@
-package us.ilite.robot;
+package us.ilite.logging;
 
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.math.Pair;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.config.Settings;
+import us.ilite.robot.Robot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.concurrent.*;
 
 public class CSVLogger {
     public static LinkedBlockingDeque<ImmutablePair<String,RobotCodex>> kCSVLoggerQueue = new LinkedBlockingDeque<>();
-    private final Map<Integer,CSVWriter>mCSVWriters = new ConcurrentHashMap<>();
+    private final Map<Integer, CSVWriter>mCSVWriters = new ConcurrentHashMap<>();
     private ILog mLogger = Logger.createLog(this.getClass());
     private static final ScheduledExecutorService mExService =
             Executors.newSingleThreadScheduledExecutor((run)->new Thread(run, "My timer thread"));

@@ -2,6 +2,7 @@ package us.ilite.robot;
 
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import us.ilite.logging.CSVWriter;
 
 import java.io.File;
 import java.io.IOException;

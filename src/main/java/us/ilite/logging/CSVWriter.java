@@ -1,27 +1,23 @@
-package us.ilite.robot;
+package us.ilite.logging;
 
 import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.FMSInfoUtils;
 import us.ilite.common.config.Settings;
+import us.ilite.robot.FileUtils;
+import us.ilite.robot.Robot;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Optional;
 
-import static us.ilite.robot.CSVLogger.kCSVLoggerQueue;
+import static us.ilite.logging.CSVLogger.kCSVLoggerQueue;
 
 public class CSVWriter {
 
