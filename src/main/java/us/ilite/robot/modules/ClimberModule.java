@@ -19,7 +19,7 @@ public class ClimberModule extends Module{
     // ========================================
     // DO NOT MODIFY THESE CONSTANTS
     // ========================================
-    public static final double kClimberRatio = (12.0 / 72.0) * (20.0 / 80.0) * (20.0 / 80.0) * (16/42);
+    public static final double kClimberRatio = (12.0 / 72.0) * (20.0 / 80.0) * (20.0 / 80.0) * (16.0 / 42.0);
     public static final double kMaxFalconSpeed = 6380 * kClimberRatio;
     public static final double kScaledUnitsToRPM = (600.0 / 2048.0) * kClimberRatio;
 

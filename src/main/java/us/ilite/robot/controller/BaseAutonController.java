@@ -50,18 +50,18 @@ public class BaseAutonController extends AbstractController {
      * will be used to calculate the chasis speed based on the robots pose and velocity
      * at a given time. It will also look up where the robot should be along the trajectory
      */
-    private final RamseteController mFollower;
+    public final RamseteController mFollower;
     /**
      * The module responsible for calculating how much volatage to send to the motors based on the
      * desired velocity.
      */
-    private final SimpleMotorFeedforward mFeedforward;
+    public final SimpleMotorFeedforward mFeedforward;
     /**
      * The kinematics of the motors based on the distance between the wheels (left and right).
      */
-    private final DifferentialDriveKinematics mDriveKinematics;
+    public final DifferentialDriveKinematics mDriveKinematics;
 
-    private final PIDController mMotorPidController;
+    public final PIDController mMotorPidController;
     /**
      * The trajectory to execute. At this time this class reaches out and gets the trajectory. Since
      * the trajectory needs to be restarted every time, this is not final and is reloaded in the init method.
@@ -74,19 +74,19 @@ public class BaseAutonController extends AbstractController {
     /**
      * A history of the speeds of the actual speeds the robot moved
      */
-    private DifferentialDriveWheelSpeeds mPrevActualSpeed;
+    public DifferentialDriveWheelSpeeds mPrevActualSpeed;
     /**
      * The time, in seconds. This may not reflect realtime.
      */
-    private double mPrevTime;
+    public double mPrevTime;
 
     /**
      * Unique identifier for this object. This should get reinitialized on each initialize call
      *
      */
     private UUID mID;
-    private Trajectory.State initialState;
-    private int mCycleCount = 0;
+    public Trajectory.State initialState;
+    public int mCycleCount = 0;
 
     /**
      * Default constructor. This will instantiate the variables that are not dependent on the init
