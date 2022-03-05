@@ -17,24 +17,50 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
 
-import static us.ilite.logging.CSVLogger.kCSVLoggerQueue;
-
 public class CSVWriter {
 
     /**
      * The drive where the USB drive is mounted to
      */
     private static final String kUSB_DIR = "u";
+    /**
+     * The path to the file template
+     */
     private static final String kLOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
+    /**
+     * The name of the event
+     */
     private static final String kEventName = DriverStation.getEventName();
+    /**
+     * The file writer
+     */
     private final Optional<BufferedWriter> optionalWriter;
-
+    /**
+     * Logger
+     */
     private final ILog mLog = Logger.createLog(CSVWriter.class);
+    /**
+     * The total number of log fails. Once a value is hit, then we will log an error message
+     */
     private static int sLogFailures;
+    /**
+     * The Codex that is being logged
+     */
+    private final RobotCodex<?> mCodex;
+    /**
+     * The CSVLogger responsible for passing the event to this writter
+     */
+    private final CSVLogger mParentLogger;
 
-    private RobotCodex<?> mCodex;
-
-    public CSVWriter(RobotCodex<?> pCodex) {
+    /**
+     * Creates the {@link CSVWriter}
+     * @param pParentLogger
+     *  The parent logger that passes events to this writter
+     * @param pCodex
+     *  The codex that this writter is handling events for
+     */
+    CSVWriter(CSVLogger pParentLogger, RobotCodex<?> pCodex) {
+        mParentLogger = pParentLogger;
         mCodex = pCodex;
 
         BufferedWriter bw = null;
@@ -57,7 +83,7 @@ public class CSVWriter {
 
     }
 
-    public void log( String s ) {
+    void logCSVLine(String s ) {
         try {
 
             if ( optionalWriter.isPresent() ) {
@@ -91,7 +117,7 @@ public class CSVWriter {
     }
 
     public void writeHeader() {
-        kCSVLoggerQueue.add( new ImmutablePair<String,RobotCodex>(mCodex.getCSVHeader(),mCodex));
+        mParentLogger.addToQueue( new ImmutablePair<String,RobotCodex>(mCodex.getCSVHeader(),mCodex));
     }
 
     public CodexMetadata<?> getMetaDataOfAssociatedCodex() {
