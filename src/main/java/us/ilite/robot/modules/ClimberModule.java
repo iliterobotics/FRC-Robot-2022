@@ -3,6 +3,7 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -15,13 +16,23 @@ public class ClimberModule extends Module{
     private DoubleSolenoid mCLPNA;
     private DoubleSolenoid mCLPNB;
 
+    // ========================================
+    // DO NOT MODIFY THESE CONSTANTS
+    // ========================================
+    public static final double kClimberRatio = (12.0 / 72.0) * (20.0 / 80.0) * (20.0 / 80.0) * (16/42);
+    public static final double kMaxFalconSpeed = 6380 * kClimberRatio;
+    public static final double kScaledUnitsToRPM = (600.0 / 2048.0) * kClimberRatio;
+
     public ClimberModule() {
         mCLMR11 = new TalonFX(11);
         mCL12 = new TalonFX(12);
         mCLMR11.setNeutralMode(NeutralMode.Brake);
         mCL12.setNeutralMode(NeutralMode.Brake);
-        mCL12.configOpenloopRamp(2);
-        mCLMR11.configOpenloopRamp(2);
+        mCL12.configOpenloopRamp(0.25);
+        mCLMR11.configOpenloopRamp(0.25);
+        //Add 10 ms for current limit
+        mCL12.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 19, 20, 0.01));
+        mCLMR11.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 19, 20, 0.01));
 
         mCLPNA = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, 2, 3);
         mCLPNB = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, 4, 5);
@@ -32,26 +43,10 @@ public class ClimberModule extends Module{
 
     @Override
     public void readInputs() {
-        //convert from raw sensor velocity inputs to rpm
-        double leftRawSensorVelocity = mCL12.getSelectedSensorVelocity();
-        double leftRotationsPerSecond = (leftRawSensorVelocity / 2048) / 1000;
-        double leftRotationsPerMinute = leftRotationsPerSecond * 60;
-
-        double rightRawSensorVelocity = mCLMR11.getSelectedSensorVelocity();
-        double rightRotationsPerSecond = (rightRawSensorVelocity / 2048) / 1000;
-        double rightRotationsPerMinute = rightRotationsPerSecond * 60;
-
-        //convert from raw sensor position inputs rpm
-        double leftRawSensorPosition = mCL12.getSelectedSensorPosition();
-        double leftRotations = (leftRawSensorPosition / 2048);
-
-        double rightRawSensorPosition = mCLMR11.getSelectedSensorPosition();
-        double rightRotations = (rightRawSensorPosition / 2048);
-
-        db.climber.set(EClimberModuleData.L_VEL_rpm,leftRotationsPerMinute);
-        db.climber.set(EClimberModuleData.R_VEL_rpm, rightRotationsPerMinute);
-        db.climber.set(EClimberModuleData.L_POSITION_rot, leftRotations);
-        db.climber.set(EClimberModuleData.R_POSITION_rot, rightRotations);
+        db.climber.set(EClimberModuleData.L_VEL_rpm, mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM);
+        db.climber.set(EClimberModuleData.R_VEL_rpm, mCLMR11.getSelectedSensorVelocity() * kScaledUnitsToRPM);
+        db.climber.set(EClimberModuleData.L_OUTPUT_CURRENT, mCLMR11.getSupplyCurrent());
+        db.climber.set(EClimberModuleData.R_OUTPUT_CURRENT, mCLMR11.getSupplyCurrent());
     }
 
 
