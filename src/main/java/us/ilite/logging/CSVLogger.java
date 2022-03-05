@@ -3,6 +3,7 @@ package us.ilite.logging;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.config.Settings;
 import us.ilite.robot.Robot;
@@ -100,17 +101,24 @@ public class CSVLogger {
      *  The log event
      */
     private void logFromCodexToCSVLog( ImmutablePair<String,RobotCodex> pLogEvent ) {
+        String type = ""+pLogEvent.getRight().meta().getEnum();
         CSVWriter writer = mCSVWriters.get(pLogEvent.getRight().meta().gid());
         if(writer != null) {
+            SmartDashboard.putBoolean("logFromCodexToCSVLog-"+type,true);
             writer.logCSVLine(pLogEvent.getLeft());
+        } else {
+            SmartDashboard.putBoolean("logFromCodexToCSVLog-"+type,false);
         }
     }
     public void start() {
         mIsAcceptingToQueue = true;
     }
     public void addToQueue( ImmutablePair<String,RobotCodex> pLog ) {
+        boolean hasQueue = false;
         if(mLogQueue != null && mIsAcceptingToQueue) {
             mLogQueue.add(pLog);
+            hasQueue = true;
         }
+        SmartDashboard.putBoolean("LoggerHasQueue-"+pLog.getRight().meta().getEnum(),hasQueue);
     }
 }
