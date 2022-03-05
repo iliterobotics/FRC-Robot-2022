@@ -94,7 +94,7 @@ public class CSVWriter {
     }
 
     void logCSVLine(String s ) {
-        logCSVLine(s);
+        write_line(s);
     }
 
     public RobotCodex<?> getCodex() {
