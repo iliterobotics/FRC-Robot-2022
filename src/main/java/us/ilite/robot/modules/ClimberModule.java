@@ -28,8 +28,8 @@ public class ClimberModule extends Module{
         mCL12 = new TalonFX(12);
         mCLMR11.setNeutralMode(NeutralMode.Brake);
         mCL12.setNeutralMode(NeutralMode.Brake);
-        mCL12.configOpenloopRamp(0.25);
-        mCLMR11.configOpenloopRamp(0.25);
+        mCL12.configOpenloopRamp(0.5);
+        mCLMR11.configOpenloopRamp(0.5);
         //Add 10 ms for current limit
         mCL12.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 19, 20, 0.01));
         mCLMR11.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 19, 20, 0.01));

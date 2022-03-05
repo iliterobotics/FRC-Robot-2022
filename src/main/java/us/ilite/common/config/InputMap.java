@@ -47,9 +47,8 @@ public class InputMap {
         BOOST_MODE = ELogitech310.LEFT_TRIGGER_AXIS,
         HOME_TO_DRIVER_STATION = ELogitech310.X_BTN,
         DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.A_BTN,
-        ACTIVATE_CLIMB = ELogitech310.START,
-        MANUAL_REV_SLOW = ELogitech310.Y_BTN,
-        MANUAL_FWD_SLOW = ELogitech310.B_BTN
+        ACTIVATE_CLIMB = ELogitech310.START
+
         ;
     }
 
@@ -66,10 +65,12 @@ public class InputMap {
 //        PLACE_CARGO = ELogitech310.L_BTN,
 //        MANUAL_BALLS_UP = ELogitech310.DPAD_UP,
 //        MANUAL_BALLS_DOWN = ELogitech310.DPAD_DOWN
+        MANUAL_REV_SLOW = ELogitech310.RIGHT_TRIGGER_AXIS,
+        MANUAL_FWD_SLOW = ELogitech310.LEFT_TRIGGER_AXIS,
         TOP_CLAMPED = ELogitech310.DPAD_UP,
-        TOP_RELEASED = ELogitech310.DPAD_LEFT,
-        BOTTOM_CLAMPED = ELogitech310.DPAD_RIGHT,
-        BOTTOM_RELEASED = ELogitech310.DPAD_DOWN
+        TOP_RELEASED = ELogitech310.DPAD_DOWN,
+        BOTTOM_CLAMPED = ELogitech310.Y_BTN,
+        BOTTOM_RELEASED = ELogitech310.A_BTN
         ;
     }
 

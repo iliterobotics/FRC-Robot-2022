@@ -40,110 +40,67 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // ========================================
         super.updateDrivetrain();
         updateIntake();
-        updateCargo();
+        updateRollers();
+        updateFeeder();
         updateHangerMotors();
         updateHangerPneumatics();
     }
 
     private void updateHangerMotors() {
-//        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-//            if (db.operatorinput.isSet(InputMap.HANGER.POSITION_LOCK)) {
-//                // Set the state to position mode
-//            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_FWD)) {
-//                db.hanger.set(EHangerModuleData.SET_pct, 0.75);
-//            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV)) {
-//                db.hanger.set(EHangerModuleData.SET_pct, -0.75);
-//            } else {
-//                db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.WHITE);
-//            }
-//
-//            if (db.operatorinput.isSet(InputMap.HANGER.LOCK_FWD)) {
-//                // Lock or unlock the first solenoid
-//                db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.BLUE);
-//            } else if (db.operatorinput.isSet(InputMap.HANGER.LOCK_REV)) {
-//                // Lock or unlock the second solenoid
-//                db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.RED);
-//            }
-//        }
-//        if(db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-////            if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_FWD_FULL)) {
-////                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
-////                db.hanger.set(EHangerModuleData.L_SET_pct, 1);
-////                db.hanger.set(EHangerModuleData.R_SET_pct, 1);
-////            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_FWD_HALF_SPEED)) {
-////                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
-////                db.hanger.set(EHangerModuleData.L_SET_pct, 0.5);
-////                db.hanger.set(EHangerModuleData.R_SET_pct, 0.5);
-////            }
-//
-////            else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV_FULL)) {
-////                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
-////                db.hanger.set(EHangerModuleData.L_SET_pct, -1);
-////                db.hanger.set(EHangerModuleData.R_SET_pct, -1);
-////            } else if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV_HALF_SPEED)) {
-////                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
-////                db.hanger.set(EHangerModuleData.L_SET_pct, -0.5);
-////                db.hanger.set(EHangerModuleData.R_SET_pct, -0.5);
-////            }
-//            if (db.operatorinput.isSet(InputMap.HANGER.MANUAL_REV_SLOW)) {
-//                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.PERCENT_OUTPUT);
-//                db.hanger.set(EHangerModuleData.L_SET_pct, -0.2);
-//                db.hanger.set(EHangerModuleData.R_SET_pct, -0.2);
-//            } else {
-//                db.hanger.set(EHangerModuleData.HANGER_STATE, Enums.EHangerMode.DEFAULT);
-//            }
-//        }
-
-        if (db.driverinput.isSet(InputMap.DRIVER.MANUAL_FWD_SLOW)) {
-            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-            db.climber.set(EClimberModuleData.L_SET_pct, 0.4);
-            db.climber.set(EClimberModuleData.R_SET_pct, 0.4);
-        }
-        else if (db.driverinput.isSet(InputMap.DRIVER.MANUAL_REV_SLOW)) {
-            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-            db.climber.set(EClimberModuleData.L_SET_pct, -0.4);
-            db.climber.set(EClimberModuleData.R_SET_pct, -0.4);
-        }
-        else {
-            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-            db.climber.set(EClimberModuleData.L_SET_pct, 0);
-            db.climber.set(EClimberModuleData.R_SET_pct, 0);
+        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.OPERATOR.MANUAL_FWD_SLOW)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
+                db.climber.set(EClimberModuleData.L_SET_pct, 0.4);
+                db.climber.set(EClimberModuleData.R_SET_pct, 0.4);
+            }
+            else if (db.operatorinput.isSet(InputMap.OPERATOR.MANUAL_REV_SLOW)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
+                db.climber.set(EClimberModuleData.L_SET_pct, -0.4);
+                db.climber.set(EClimberModuleData.R_SET_pct, -0.4);
+            }
+            else {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
+                db.climber.set(EClimberModuleData.L_SET_pct, 0);
+                db.climber.set(EClimberModuleData.R_SET_pct, 0);
+            }
         }
     }
 
     private void updateHangerPneumatics() {
-//        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_CLAMPED)) {
+                db.climber.set(EClimberModuleData.IS_A_CLAMPED, 1.0);
+            } if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_RELEASED)) {
+                db.climber.set(EClimberModuleData.IS_A_CLAMPED, 2.0);
+            }
 
-        if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_CLAMPED)) {
-            db.climber.set(EClimberModuleData.IS_A_CLAMPED, 1.0);
-        } if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_RELEASED)) {
-            db.climber.set(EClimberModuleData.IS_A_CLAMPED, 2.0);
+            if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_CLAMPED)) {
+                db.climber.set(EClimberModuleData.IS_B_CLAMPED, 1.0);
+            } if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_RELEASED)) {
+                db.climber.set(EClimberModuleData.IS_B_CLAMPED, 2.0);
+            }
         }
-
-        if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_CLAMPED)) {
-            db.climber.set(EClimberModuleData.IS_B_CLAMPED, 1.0);
-        } if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_RELEASED)) {
-            db.climber.set(EClimberModuleData.IS_B_CLAMPED, 2.0);
-        }
-
-//        }
     }
 
     private void updateIntake() {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.EXTEND_INTAKE)) {
-            db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.RETRACT_INTAKE)) {
-            db.intake.set(ARM_STATE, Enums.EArmState.RETRACT);
+        if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.OPERATOR.EXTEND_INTAKE)) {
+                db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
+            } else if (db.operatorinput.isSet(InputMap.OPERATOR.RETRACT_INTAKE)) {
+                db.intake.set(ARM_STATE, Enums.EArmState.RETRACT);
+            }
         }
     }
 
     private void updateRollers() {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_ROLLERS)) {
-            db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
-            db.intake.set(DESIRED_pct, 1.0);
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
-            db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
-            db.intake.set(DESIRED_pct, -1.0);
+        if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_ROLLERS)) {
+                db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+                db.intake.set(DESIRED_pct, 1.0);
+            } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
+                db.intake.set(ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
+                db.intake.set(DESIRED_pct, -1.0);
+            }
         }
     }
 
@@ -222,12 +179,14 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateFeeder() {
-        if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
-            db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
-            db.feeder.set(SET_FEEDER_pct, 1.0);
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_FEEDER)) {
-            db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
-            db.feeder.set(SET_FEEDER_pct, -1.0);
+        if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
+                db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
+                db.feeder.set(SET_FEEDER_pct, 1.0);
+            } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_FEEDER)) {
+                db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
+                db.feeder.set(SET_FEEDER_pct, -1.0);
+            }
         }
     }
 }
