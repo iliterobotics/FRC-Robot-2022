@@ -5,6 +5,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.FMSInfoUtils;
 import us.ilite.common.config.Settings;
@@ -81,16 +82,23 @@ public class CSVWriter {
      *  The line of text to write to the file
      */
     private void write_line(String pLine) {
+        String logState = "";
         int logFails = -1;
         if(logfile != null && logfile.exists()) {
             try(BufferedWriter bw = new BufferedWriter(new FileWriter(logfile))) {
                 bw.append(pLine);
                 bw.newLine();
+                logState = "Log Written-"+System.currentTimeMillis();
             } catch (IOException e){
                 mLog.error("Failed to log due to exception");
                 mLog.exception(e);
+                logState = "Log IOException-"+System.currentTimeMillis();
             }
+        } else {
+            logState = "Log Failed, log file null or does not exist";
         }
+
+        SmartDashboard.putString("CSVLogger-"+mCodex.meta().getEnum(),logState);
     }
 
     void logCSVLine(String s ) {
