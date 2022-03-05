@@ -25,7 +25,7 @@ public class CSVLogger {
      * The main event queue for all Logging events. Each event is the CSV, represented as a string and the
      * {@link RobotCodex} to apply it to. The queue is pulled from the timer thread on a regular interval
      */
-    private final LinkedBlockingDeque<ImmutablePair<String,RobotCodex>> mLogQueue = new LinkedBlockingDeque<>();
+    private final LinkedBlockingDeque<ImmutablePair<String,RobotCodex>> mLogQueue;
     /**
      * A map where the key is the unique identifier of the {@link RobotCodex} and the value is the
      * {@link CSVWriter} that will write to the specific file of the {@link RobotCodex}
@@ -54,7 +54,9 @@ public class CSVLogger {
      * @param pIsLogging
      */
     public CSVLogger( boolean pIsLogging ) {
+        LinkedBlockingDeque<ImmutablePair<String,RobotCodex>>queue = null;
         if ( pIsLogging ) {
+            queue = new LinkedBlockingDeque<>();
             for (RobotCodex c : Robot.DATA.mLoggedCodexes) {
                 mCSVWriters.put(c.meta().gid(),new CSVWriter(this,c));
             }
@@ -62,9 +64,8 @@ public class CSVLogger {
             logFromCodexToCSVHeader();
             scheduledFuture = mExService.scheduleAtFixedRate(this::run, Settings.kSecondsToUpdateCSVLogger, Settings.kSecondsToUpdateCSVLogger, TimeUnit.SECONDS);
         }
-        else {
-            mIsAcceptingToQueue = false;
-        }
+
+        mLogQueue = queue;
     }
 
     /**
@@ -104,24 +105,12 @@ public class CSVLogger {
             writer.logCSVLine(pLogEvent.getLeft());
         }
     }
-
-    /**
-     * Opens the queue
-     */
     public void start() {
         mIsAcceptingToQueue = true;
     }
-
-    /**
-     * Closes the queue
-     */
-    public void stop() {
-        mIsAcceptingToQueue = false;
-    }
-
     public void addToQueue( ImmutablePair<String,RobotCodex> pLog ) {
-        if ( mIsAcceptingToQueue ) {
-            mLogQueue.add( pLog );
+        if(mLogQueue != null && mIsAcceptingToQueue) {
+            mLogQueue.add(pLog);
         }
     }
 }
