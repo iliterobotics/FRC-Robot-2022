@@ -17,7 +17,6 @@ public class Settings {
     public static double kControlLoopPeriod = 0.02; // seconds
 
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
-    public static int kAcceptableLogFailures = 8;
     public static double kNetworkTableUpdateRate = 0.01;
     public static boolean kIsLogging = true; // decide whether or not to log
 
