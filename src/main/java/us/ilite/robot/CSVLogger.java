@@ -3,15 +3,18 @@ package us.ilite.robot;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.math.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.config.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 public class CSVLogger {
-    public static LinkedBlockingDeque<Log> kCSVLoggerQueue = new LinkedBlockingDeque<>();
-    private List<CSVWriter> mCSVWriters;
+    public static LinkedBlockingDeque<ImmutablePair<String,RobotCodex>> kCSVLoggerQueue = new LinkedBlockingDeque<>();
+    private final Map<Integer,CSVWriter>mCSVWriters = new ConcurrentHashMap<>();
     private ILog mLogger = Logger.createLog(this.getClass());
     private static final ScheduledExecutorService mExService =
             Executors.newSingleThreadScheduledExecutor((run)->new Thread(run, "My timer thread"));
@@ -20,9 +23,8 @@ public class CSVLogger {
 
     public CSVLogger( boolean pIsLogging ) {
         if ( pIsLogging ) {
-            mCSVWriters = new ArrayList<>();
             for (RobotCodex c : Robot.DATA.mLoggedCodexes) {
-                mCSVWriters.add(new CSVWriter(c));
+                mCSVWriters.put(c.meta().gid(),new CSVWriter((c)));
             }
             mIsAcceptingToQueue = false;
             logFromCodexToCSVHeader();
@@ -36,28 +38,28 @@ public class CSVLogger {
     private void run() {
         if ( !kCSVLoggerQueue.isEmpty() ) {
             try {
-                ArrayList<Log> kTempCSVLogs = new ArrayList<>();
+                List<ImmutablePair<String,RobotCodex>> kTempCSVLogs = new ArrayList<>();
                 kCSVLoggerQueue.drainTo(kTempCSVLogs);
-                //mLogger.error( "Drained queue got: " + kTempCSVLogs.size() );
-
-                for ( Log log : kTempCSVLogs ) {
-                    //TODO - fix the excessive exceptions
+                for ( ImmutablePair<String,RobotCodex> log : kTempCSVLogs ) {
                     logFromCodexToCSVLog( log );
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void logFromCodexToCSVHeader() {
-        mCSVWriters.forEach(c -> c.writeHeader());
+        for(CSVWriter writer : mCSVWriters.values()) {
+            writer.writeHeader();
+        }
+
     }
     
-    public void logFromCodexToCSVLog( Log pLog ) {
-        for ( CSVWriter c : mCSVWriters ) {
-            if ( c.getMetaDataOfAssociatedCodex().gid() == pLog.getmGlobalId() ) {
-                c.log( pLog.getmLogData() );
-                break;
-            }
+    private void logFromCodexToCSVLog( ImmutablePair<String,RobotCodex> pLog ) {
+        CSVWriter writer = mCSVWriters.get(pLog.getRight().meta().gid());
+        if(writer != null) {
+            writer.log(pLog.getLeft());
         }
     }
 
@@ -75,14 +77,14 @@ public class CSVLogger {
         mIsAcceptingToQueue = false;
     }
 
-    public void addToQueue( Log pLog ) {
+    public void addToQueue( ImmutablePair<String,RobotCodex> pLog ) {
         if ( mIsAcceptingToQueue ) {
             kCSVLoggerQueue.add( pLog );
         }
     }
 
     public void closeWriters() {
-        for ( CSVWriter cw : mCSVWriters ) {
+        for(CSVWriter cw : mCSVWriters.values()) {
             cw.close();
         }
     }

@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.FMSInfoUtils;
 import us.ilite.common.config.Settings;
 
@@ -94,7 +95,7 @@ public class CSVWriter {
     }
 
     public void writeHeader() {
-        kCSVLoggerQueue.add( new Log( mCodex.getCSVHeader(), mCodex.meta().gid() ) );
+        kCSVLoggerQueue.add( new ImmutablePair<String,RobotCodex>(mCodex.getCSVHeader(),mCodex));
     }
 
     public CodexMetadata<?> getMetaDataOfAssociatedCodex() {

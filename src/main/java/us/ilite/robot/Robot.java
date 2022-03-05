@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
@@ -250,7 +251,7 @@ public class Robot extends TimedRobot {
         if ( Settings.kIsLogging && MODE != DISABLED) {
             for ( RobotCodex c : DATA.mLoggedCodexes ) {
                 if ( c.hasChanged() ) {
-                    mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
+                    mCSVLogger.addToQueue( new ImmutablePair<String,RobotCodex>(c.toFormattedCSV(),c));
                 }
             }
         }
