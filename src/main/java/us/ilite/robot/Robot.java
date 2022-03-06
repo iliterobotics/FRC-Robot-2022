@@ -221,9 +221,9 @@ public class Robot extends TimedRobot {
 //                }
 //            }
 //        }
-//        for ( RobotCodex c : DATA.mAllCodexes ) {
-//            c.reset();
-//        }
+        for ( RobotCodex c : DATA.mAllCodexes ) {
+            c.reset();
+        }
 
         mRunningModules.readInputs();
         mActiveController.update();
