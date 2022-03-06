@@ -1,9 +1,6 @@
 package us.ilite.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.PigeonIMU;
@@ -151,16 +148,24 @@ public class DriveModule extends Module {
 		mRightVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
 				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
 
-		mLeftPositionPID = new PIDController(kPositionGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
+		mLeftPositionPID = new PIDController(kPositionGains, -20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
+				20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet, Settings.kControlLoopPeriod);
 //		mLeftPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
 //				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
-		mLeftPositionPID.setOutputRange(-20.0 / kUnitsToScaledRotationsPosition * kWheelCircumferenceFeet,
-				20.0 / kUnitsToScaledRotationsPosition * kWheelCircumferenceFeet);
-		mRightPositionPID = new PIDController(kPositionGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
+		mLeftPositionPID.setOutputRange(-20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
+				20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet);
+		mRightPositionPID = new PIDController(kPositionGains, -20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
+				20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet, Settings.kControlLoopPeriod);
 //		mRightPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
 //				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
-		mRightPositionPID.setOutputRange(-20.0 / kUnitsToScaledRotationsPosition * kWheelCircumferenceFeet,
-				20.0 / kUnitsToScaledRotationsPosition * kWheelCircumferenceFeet);
+		mRightPositionPID.setOutputRange(-20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
+				20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet);
+
+
+		mRightMaster.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 55, 54, 0.01));
+		mRightFollower.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 55, 54, 0.01));
+		mLeftMaster.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 55, 54, 0.01));
+		mLeftFollower.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 55, 54, 0.01));
 
 
 		mTargetAngleLockPid = new PIDController(kTargetAngleLockGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
