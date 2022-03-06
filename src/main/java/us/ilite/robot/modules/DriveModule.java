@@ -87,7 +87,7 @@ public class DriveModule extends Module {
 			.maxAccel(kDriveRampRate)
 			.slot(vSlot);
 	private final ProfileGains kPositionGains = new ProfileGains()
-			.p(0.5);
+			.p(0.8);
 
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.1);
