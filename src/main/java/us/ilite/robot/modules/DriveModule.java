@@ -89,7 +89,14 @@ public class DriveModule extends Module {
 			.maxAccel(kDriveRampRate)
 			.slot(vSlot);
 	private final ProfileGains kPositionGains = new ProfileGains()
-			.p(0.5);
+			.p(0.05)
+			.i(0.0)
+			.d(0.0)
+			.maxVelocity(kMaxDriveVelocityFTs)
+			.f(0.5)
+			.velocityConversion(1)
+			.maxAccel(kDriveRampRate)
+			.slot(dSlot);;
 
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.1);
@@ -145,11 +152,16 @@ public class DriveModule extends Module {
 				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
 
 		mLeftPositionPID = new PIDController(kPositionGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mLeftPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
-				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
+//		mLeftPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
+//				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
+		mLeftPositionPID.setOutputRange(-20.0 / kUnitsToScaledRotationsPosition * kWheelCircumferenceFeet,
+				20.0 / kUnitsToScaledRotationsPosition * kWheelCircumferenceFeet);
 		mRightPositionPID = new PIDController(kPositionGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mRightPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
-				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
+//		mRightPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
+//				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
+		mRightPositionPID.setOutputRange(-20.0 / kUnitsToScaledRotationsPosition * kWheelCircumferenceFeet,
+				20.0 / kUnitsToScaledRotationsPosition * kWheelCircumferenceFeet);
+
 
 		mTargetAngleLockPid = new PIDController(kTargetAngleLockGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
 		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
