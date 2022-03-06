@@ -1,5 +1,6 @@
 package us.ilite.robot.modules;
 
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -16,7 +17,6 @@ public class FeederModule extends Module {
     private final TalonFX mIntakeFeeder;
 
     private final DigitalBeamSensor mEntryBeamBreaker;
-    private final DigitalBeamSensor mExitBeamBreaker;
 
     // ========================================
     // DO NOT MODIFY THESE METHOD CONSTANTS
@@ -31,8 +31,12 @@ public class FeederModule extends Module {
 
     public FeederModule () {
         mIntakeFeeder = new TalonFX(Settings.HW.CAN.kINFeeder);
+        mIntakeFeeder.setStatusFramePeriod(StatusFrame.Status_1_General, 20);
+        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
+        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);
+        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_9_MotProfBuffer, 255);
+        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
         mEntryBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
-        mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINExitBeam, kDebounceTime);
     }
 
     @Override
