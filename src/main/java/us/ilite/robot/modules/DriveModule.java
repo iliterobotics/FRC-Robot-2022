@@ -1,33 +1,23 @@
 package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.*;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
-import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.hardware.Pigeon;
 
-import java.util.Set;
-
-import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
 import static us.ilite.common.types.sensor.EPowerDistPanel.CURRENT14;
@@ -59,7 +49,7 @@ public class DriveModule extends Module {
 	public static final double kDriveRampRate = kMaxDriveVelocity / 5;
 	public static final double kUnitsToScaledRotationsPosition = 2048.0 / kGearboxRatio;
 	public static final double kPulsesPerRotation = 256;
-	public static final int kCurrentLimitAmps = 60;
+	public static final int kCurrentLimitAmps = 55;
 
 	public static double kPositionControlConversion = (2048.0 / 600.0) / (kGearboxRatio * kWheelCircumferenceFeet / 60.0);
 
@@ -73,8 +63,8 @@ public class DriveModule extends Module {
 			CURRENT14,
 	};
 
-	private final int vSlot = 1;
-	private final int dSlot = 2;
+	private final int velocitySlot = 1;
+	private final int positionSlot = 2;
 
 	private final ProfileGains kVelocityGains = new ProfileGains()
 			.p(0.00051968)
@@ -84,7 +74,7 @@ public class DriveModule extends Module {
 			.f(0.5)
 			.velocityConversion(1)
 			.maxAccel(kDriveRampRate)
-			.slot(vSlot);
+			.slot(velocitySlot);
 	private final ProfileGains kPositionGains = new ProfileGains()
 			.p(0.05)
 			.i(0.0)
@@ -93,7 +83,7 @@ public class DriveModule extends Module {
 			.f(0.5)
 			.velocityConversion(1)
 			.maxAccel(kDriveRampRate)
-			.slot(dSlot);;
+			.slot(positionSlot);
 
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.1);
@@ -148,18 +138,19 @@ public class DriveModule extends Module {
 		mRightVelocityPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
 				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
 
-		mLeftPositionPID = new PIDController(kPositionGains, -20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
-				20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet, Settings.kControlLoopPeriod);
+		mLeftPositionPID = new PIDController(kPositionGains,
+//				-20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
+				-1.0,
+				1.0,
+//				20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
+			Settings.kControlLoopPeriod);
 //		mLeftPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
 //				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
-		mLeftPositionPID.setOutputRange(-20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
-				20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet);
-		mRightPositionPID = new PIDController(kPositionGains, -20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
-				20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet, Settings.kControlLoopPeriod);
+		mLeftPositionPID.setOutputRange(-1 , 1);
+		mRightPositionPID = new PIDController(kPositionGains, -1 ,1 , Settings.kControlLoopPeriod);
 //		mRightPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
 //				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
-		mRightPositionPID.setOutputRange(-20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet,
-				20.0 * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet);
+		mRightPositionPID.setOutputRange(-1 , 1);
 
 
 		mRightMaster.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 55, 54, 0.01));
@@ -334,8 +325,8 @@ public class DriveModule extends Module {
 				mRightPositionPID.setSetpoint(dRight);
 				double desiredLeft = mLeftPositionPID.calculate(aRight, clock.getCurrentTimeInMillis());
 				double desiredRight = mRightPositionPID.calculate(aLeft, clock.getCurrentTimeInMillis());
-				mLeftMaster.set(ControlMode.Position, desiredLeft);
-				mRightMaster.set(ControlMode.Position, desiredRight);
+				mLeftMaster.set(ControlMode.PercentOutput, desiredLeft);
+				mRightMaster.set(ControlMode.PercentOutput, desiredRight);
 				break;
 			case PATH_FOLLOWING_RAMSETE:
 				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);
