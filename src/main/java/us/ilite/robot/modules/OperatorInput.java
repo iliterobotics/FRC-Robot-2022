@@ -13,13 +13,11 @@ public class OperatorInput extends Module {
 
     private Joystick mDriverJoystick;
     private Joystick mOperatorJoystick;
-    private Joystick mTankJoystick;
     private EMatchMode mMode = EMatchMode.DISABLED;
 
     public OperatorInput() {
         mDriverJoystick = new Joystick(0);
         mOperatorJoystick = new Joystick(1);
-        mTankJoystick = new Joystick(2);
     }
 
     @Override
@@ -38,7 +36,6 @@ public class OperatorInput extends Module {
     public void readInputs() {
         ELogitech310.map(db.driverinput, mDriverJoystick);
         ELogitech310.map(db.operatorinput, mOperatorJoystick);
-        ELogitech310.map(db.tankinput, mTankJoystick);
     }
 
     @Override

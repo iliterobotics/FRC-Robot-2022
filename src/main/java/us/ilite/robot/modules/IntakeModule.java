@@ -52,6 +52,7 @@ public class IntakeModule extends Module {
 
     @Override
     public void setOutputs() {
+        System.out.println(mIntakeRoller.getSelectedSensorVelocity());
        setPneumaticState();
        setRollerState();
     }

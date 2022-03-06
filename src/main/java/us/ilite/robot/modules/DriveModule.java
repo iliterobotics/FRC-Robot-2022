@@ -64,7 +64,9 @@ public class DriveModule extends Module {
 	public static final double kPulsesPerRotation = 256;
 	public static final int kCurrentLimitAmps = 60;
 
-	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[]{
+	public static double kPositionControlConversion = (2048.0 / 600.0) / (kGearboxRatio * kWheelCircumferenceFeet / 60.0);
+
+	public static EPowerDistPanel[] kPdpSlots = new EPowerDistPanel[] {
 			/* Left */
 			CURRENT1,
 			CURRENT2,
@@ -87,7 +89,7 @@ public class DriveModule extends Module {
 			.maxAccel(kDriveRampRate)
 			.slot(vSlot);
 	private final ProfileGains kPositionGains = new ProfileGains()
-			.p(0.8);
+			.p(0.5);
 
 	public static ProfileGains kDriveHeadingGains = new ProfileGains().p(0.03);
 	public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.1);
@@ -307,12 +309,16 @@ public class DriveModule extends Module {
 				mCyclesHolding++;
 				break;
 			case POSITION:
-				mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS_FT));
-				mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS_FT));
-				double desiredLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-				double desiredRight = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-				mLeftMaster.set(ControlMode.PercentOutput, desiredLeft);
-				mRightMaster.set(ControlMode.PercentOutput, desiredRight);
+				double aRight = (db.drivetrain.get(L_ACTUAL_POS_FT) * kUnitsToScaledRotationsPosition / kWheelCircumferenceFeet);
+				double aLeft = (db.drivetrain.get(L_ACTUAL_POS_FT) * kUnitsToScaledRotationsPosition) / kWheelCircumferenceFeet;
+				double dRight = (db.drivetrain.get(R_DESIRED_POS_FT) * kUnitsToScaledRotationsPosition) / kWheelCircumferenceFeet;
+				double dLeft = (db.drivetrain.get(L_DESIRED_POS_FT) * kUnitsToScaledRotationsPosition) / kWheelCircumferenceFeet;
+				mLeftPositionPID.setSetpoint(dLeft);
+				mRightPositionPID.setSetpoint(dRight);
+				double desiredLeft = mLeftPositionPID.calculate(aRight, clock.getCurrentTimeInMillis());
+				double desiredRight = mRightPositionPID.calculate(aLeft, clock.getCurrentTimeInMillis());
+				mLeftMaster.set(ControlMode.Position, desiredLeft);
+				mRightMaster.set(ControlMode.Position, desiredRight);
 				break;
 			case PATH_FOLLOWING_RAMSETE:
 				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);

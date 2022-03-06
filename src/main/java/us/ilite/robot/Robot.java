@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
     private final AbstractController mTeleopController = TeleopController.getInstance();
     private BaseAutonController mBaseAutonController;
     private ShootMoveController mShootMoveController;
+    private ThreeBallController mThreeBallController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
@@ -65,9 +66,10 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
-        mCSVLogger = new CSVLogger( Settings.kIsLogging );
+      //  mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
+        mThreeBallController = new ThreeBallController();
         mDrive = new DriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -118,8 +120,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         MODE=AUTONOMOUS;
-        mActiveController = mShootMoveController;
-        mShootMoveController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        mActiveController = mThreeBallController;
+        mThreeBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
@@ -135,9 +137,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        if ( Settings.kIsLogging ){
-            mCSVLogger.start();
-        }
+//        if ( Settings.kIsLogging ){
+//            mCSVLogger.start();
+//        }
 
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
@@ -179,9 +181,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        if ( Settings.kIsLogging ){
-            mCSVLogger.start();
-        }
+//        if ( Settings.kIsLogging ){
+//            mCSVLogger.start();
+//        }
 
         if(mTestController == null) {
             mTestController = TestController.getInstance();
@@ -212,16 +214,16 @@ public class Robot extends TimedRobot {
     void commonPeriodic() {
         double start = Timer.getFPGATimestamp();
         CLOCK.update();
-        if ( Settings.kIsLogging && MODE != DISABLED) {
-            for ( RobotCodex c : DATA.mLoggedCodexes ) {
-                if ( c.hasChanged() ) {
-                    mCSVLogger.addToQueue( new ImmutablePair<String,RobotCodex>(c.toFormattedCSV(),c));
-                }
-            }
-        }
-        for ( RobotCodex c : DATA.mAllCodexes ) {
-            c.reset();
-        }
+//        if ( Settings.kIsLogging && MODE != DISABLED) {
+//            for ( RobotCodex c : DATA.mLoggedCodexes ) {
+//                if ( c.hasChanged() ) {
+//                    mCSVLogger.addToQueue( new ImmutablePair<String,RobotCodex>(c.toFormattedCSV(),c));
+//                }
+//            }
+//        }
+//        for ( RobotCodex c : DATA.mAllCodexes ) {
+//            c.reset();
+//        }
 
         mRunningModules.readInputs();
         mActiveController.update();

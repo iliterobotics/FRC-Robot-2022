@@ -23,12 +23,14 @@ public class ShootMoveController extends BaseAutonController{
         mSecondLeg = new Timer();
     }
     public void updateImpl() {
-        db.intake.set(EIntakeData.ARM_STATE, Enums.EArmState.DEFAULT);
-        db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-        db.intake.set(EIntakeData.DESIRED_pct, 1.0);
-        if (mTimer.get() < 3.1 && mTimer.get() > 2.0) {
+        if (mTimer.get() < 2.0) {
+            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
             db.feeder.set(EFeederData.SET_FEEDER_pct, 1.0);
-            db.feeder.set(EFeederData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
+            db.intake.set(EIntakeData.ARM_STATE, Enums.EArmState.DEFAULT);
+        }
+        if (mTimer.get() < 3.1 && mTimer.get() > 2.0) {
+            db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
+            db.intake.set(EIntakeData.DESIRED_pct, 1.0);
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
             db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.5);
         }
