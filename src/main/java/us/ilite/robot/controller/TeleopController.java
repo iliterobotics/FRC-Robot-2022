@@ -50,13 +50,13 @@ public class TeleopController extends BaseManualController { //copied from TestC
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.OPERATOR.MANUAL_FWD_SLOW)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-                db.climber.set(EClimberModuleData.L_SET_pct, 0.4);
-                db.climber.set(EClimberModuleData.R_SET_pct, 0.4);
+                db.climber.set(EClimberModuleData.L_SET_pct, 0.45);
+                db.climber.set(EClimberModuleData.R_SET_pct, 0.45);
             }
             else if (db.operatorinput.isSet(InputMap.OPERATOR.MANUAL_REV_SLOW)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-                db.climber.set(EClimberModuleData.L_SET_pct, -0.4);
-                db.climber.set(EClimberModuleData.R_SET_pct, -0.4);
+                db.climber.set(EClimberModuleData.L_SET_pct, -0.45);
+                db.climber.set(EClimberModuleData.R_SET_pct, -0.45);
             }
             else {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
@@ -100,10 +100,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
         if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_ROLLERS)) {
                 db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-                db.intake.set(DESIRED_pct, 1.0);
+                db.intake.set(DESIRED_ROLLER_pct, 1.0);
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
                 db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-                db.intake.set(DESIRED_pct, -1.0);
+                db.intake.set(DESIRED_ROLLER_pct, -1.0);
             }
         }
     }

@@ -43,7 +43,7 @@ public class IntakeModule extends Module {
     @Override
     public void readInputs() {
         db.intake.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
-        db.intake.set(FEEDER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
+        db.intake.set(ROLLER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
         db.intake.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
         db.intake.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
         db.intake.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
@@ -78,7 +78,7 @@ public class IntakeModule extends Module {
         }
         switch (mode) {
             case PERCENT_OUTPUT:
-                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.intake.get(DESIRED_pct));
+                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.intake.get(DESIRED_ROLLER_pct));
                 break;
         }
     }

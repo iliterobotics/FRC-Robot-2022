@@ -23,7 +23,6 @@ import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
-import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.modules.DriveModule;
 
 import java.util.ArrayList;
@@ -138,7 +137,7 @@ public class BaseAutonController extends AbstractController {
             mTimer.reset();
         } else {
             db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-            db.intake.set(EIntakeData.DESIRED_pct, 1.0);
+            db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 1.0);
             execute();
             if (isFinished()) {
                 if (db.drivetrain.get(EDriveData.ACTUAL_HEADING_DEGREES) >= 85 && db.drivetrain.get(EDriveData.ACTUAL_HEADING_DEGREES) <= 95) {

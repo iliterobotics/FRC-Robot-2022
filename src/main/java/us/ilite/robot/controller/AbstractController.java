@@ -5,7 +5,7 @@ import us.ilite.common.*;
 
 
 import static us.ilite.common.types.EFeederData.*;
-import static us.ilite.common.types.EIntakeData.DESIRED_pct;
+import static us.ilite.common.types.EIntakeData.DESIRED_ROLLER_pct;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
@@ -80,7 +80,7 @@ public abstract class AbstractController {
     }
 
     protected void fireCargo() {
-        db.intake.set(EIntakeData.DESIRED_pct, 1d);
+        db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 1d);
         db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
     }
 
@@ -104,7 +104,7 @@ public abstract class AbstractController {
             db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
         } else {
             db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
-            db.intake.set(EIntakeData.DESIRED_pct, 1d);
+            db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 1d);
         }
 
         db.feeder.set(EFeederData.NUM_BALLS, mNumBalls);
@@ -112,11 +112,11 @@ public abstract class AbstractController {
 
     protected void placeCargo() {
         db.feeder.set(EFeederData.SET_FEEDER_pct, -0.2);
-        db.intake.set(EIntakeData.DESIRED_pct, -0.1);
+        db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
     }
 
     protected void reverseCargo() {
-        db.intake.set(DESIRED_pct, -1.0);
+        db.intake.set(DESIRED_ROLLER_pct, -1.0);
         db.feeder.set(SET_FEEDER_pct, -1.0);
     }
 

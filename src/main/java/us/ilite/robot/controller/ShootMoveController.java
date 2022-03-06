@@ -1,13 +1,11 @@
 package us.ilite.robot.controller;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
-import us.ilite.robot.TrajectoryCommandUtils;
 
 public class ShootMoveController extends BaseAutonController{
 
@@ -30,7 +28,7 @@ public class ShootMoveController extends BaseAutonController{
         }
         if (mTimer.get() < 3.1 && mTimer.get() > 2.0) {
             db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-            db.intake.set(EIntakeData.DESIRED_pct, 1.0);
+            db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 1.0);
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
             db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.5);
         }

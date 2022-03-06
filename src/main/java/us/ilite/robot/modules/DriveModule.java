@@ -76,7 +76,7 @@ public class DriveModule extends Module {
 			.maxAccel(kDriveRampRate)
 			.slot(velocitySlot);
 	private final ProfileGains kPositionGains = new ProfileGains()
-			.p(0.05)
+			.p(0.005)
 			.i(0.0)
 			.d(0.0)
 			.maxVelocity(kMaxDriveVelocityFTs)
