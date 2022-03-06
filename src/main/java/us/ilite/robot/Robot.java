@@ -55,6 +55,7 @@ public class Robot extends TimedRobot {
 
     private final AbstractController mTeleopController = TeleopController.getInstance();
     private BaseAutonController mBaseAutonController;
+    private ShootMoveController mShootMoveController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
@@ -66,6 +67,7 @@ public class Robot extends TimedRobot {
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
+        mShootMoveController = new ShootMoveController();
         mDrive = new DriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -116,8 +118,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         MODE=AUTONOMOUS;
-        mActiveController = mBaseAutonController;
-        mBaseAutonController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        mActiveController = mShootMoveController;
+        mShootMoveController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
@@ -129,7 +131,6 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
         commonPeriodic();
-       // practice.execute();
     }
 
     @Override
