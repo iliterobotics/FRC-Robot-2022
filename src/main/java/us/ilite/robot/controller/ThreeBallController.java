@@ -39,9 +39,18 @@ public class ThreeBallController extends BaseAutonController {
         if (mTimer.get() > 3.6 && mTimer.get() < 5.0) {
             db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
             db.intake.set(EIntakeData.DESIRED_pct, 1.0);
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TURN_TO);
-            db.drivetrain.set(EDriveData.DESIRED_TURN_ANGLE_deg, 120);
-            db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.05);
+//            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TURN_TO);
+//            db.drivetrain.set(EDriveData.DESIRED_TURN_ANGLE_deg, 120);
+//            db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.05);
+        }
+        if (mTimer.get() > 5.0 && mTimer.get() < 7.0) {
+            db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
+            db.intake.set(EIntakeData.DESIRED_pct, 0.0);
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.POSITION);
+            double r_actual = db.drivetrain.get(EDriveData.R_ACTUAL_POS_FT);
+            double l_actual = db.drivetrain.get(EDriveData.L_ACTUAL_POS_FT);
+            db.drivetrain.set(EDriveData.R_DESIRED_POS_FT, (l_actual - 6.0));
+            db.drivetrain.set(EDriveData.L_DESIRED_POS_FT, (r_actual - 6.0));
         }
 //        if (mTimer.get() > 5.3 && mTimer.get() < 6.0) {
 //            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
