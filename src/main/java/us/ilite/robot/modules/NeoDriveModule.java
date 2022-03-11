@@ -2,6 +2,9 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.*;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
@@ -68,6 +71,8 @@ public class NeoDriveModule extends Module {
     private static double kTurnSensitivity = 0.85;
     private static double kInitialXPosition = 0;
     private static double kInitialYPosition = 0;
+    private DifferentialDriveOdometry mOdometry;
+    private DifferentialDrive mDrive;
 
     public NeoDriveModule() {
         mLeftMaster = new CANSparkMax(Settings.HW.CAN.kDTML1, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -103,6 +108,8 @@ public class NeoDriveModule extends Module {
         HardwareUtils.setGains(mRightCtrl, kVelocityGains);
         HardwareUtils.setGains(mLeftCtrl, kSmartMotionGains);
         HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);
+
+        mOdometry = new DifferentialDriveOdometry(new Rotation2d());
     }
     @Override
     public void readInputs() {
