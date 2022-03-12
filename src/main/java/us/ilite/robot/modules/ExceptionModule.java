@@ -4,7 +4,6 @@ public class ExceptionModule extends Module{
 
     @Override
     protected void readInputs() {
-        System.err.println("Inside of Exception Module");
         throw new RuntimeException("This is only a test");
     }
 
