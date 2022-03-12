@@ -49,7 +49,6 @@ public class Robot extends TimedRobot {
     private FeederModule mFeeder;
     private IntakeModule mIntake;
     private ClimberModule mClimber;
-    private ExceptionModule mException;
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -78,7 +77,6 @@ public class Robot extends TimedRobot {
         mIntake = new IntakeModule();
         mLEDControl = new LEDControl();
         mClimber = new ClimberModule();
-        mException = new ExceptionModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -176,8 +174,6 @@ public class Robot extends TimedRobot {
         mDrive.safeReadInputs();
         mIntake.safeReadInputs();
         mFeeder.safeReadInputs();
-        mException.safeReadInputs();
-
         Shuffleboard.update();
     }
 
