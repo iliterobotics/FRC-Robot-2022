@@ -1,6 +1,5 @@
 package us.ilite.robot.commands;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import us.ilite.common.Angle;
 import us.ilite.common.Distance;
@@ -12,8 +11,7 @@ import static us.ilite.common.types.sensor.EGyro.HEADING_DEGREES;
 
 import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.robot.Robot;
-import us.ilite.robot.hardware.ECommonNeutralMode;
-import us.ilite.robot.modules.DriveModule;
+import us.ilite.robot.modules.FalconDriveModule;
 
 
 /**
@@ -36,7 +34,7 @@ public class DriveStraight implements ICommand {
     private double mLastTime = 0.0;
     private double mStartTime = 0.0;
     private PIDController mHeadingController = new PIDController(
-            DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
+            FalconDriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
 
 //    private ProfiledPIDController mDistanceController = DriveModule.mPositionPID.getPIDGains().generateController();
 

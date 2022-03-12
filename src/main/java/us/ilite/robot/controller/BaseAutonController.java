@@ -1,7 +1,6 @@
 package us.ilite.robot.controller;
 
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -19,12 +18,9 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
-import us.ilite.common.types.EFeederData;
-import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
-import us.ilite.robot.TrajectoryCommandUtils;
-import us.ilite.robot.modules.DriveModule;
+import us.ilite.robot.modules.FalconDriveModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +94,7 @@ public class BaseAutonController extends AbstractController {
         mMotorPidController = new PIDController(0.00051968,0,0);
         mTimer = new Timer();
         mFirstLeg = new Timer();
-        mDriveKinematics = new DifferentialDriveKinematics(Units.feet_to_meters(DriveModule.kTrackWidthFeet));
+        mDriveKinematics = new DifferentialDriveKinematics(Units.feet_to_meters(FalconDriveModule.kTrackWidthFeet));
         SmartDashboard.putNumber("trajectory-seconds",-1);
     }
 

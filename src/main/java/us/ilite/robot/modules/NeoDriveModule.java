@@ -17,6 +17,7 @@ import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.Pigeon;
+import us.ilite.robot.hardware.SparkMaxFactory;
 
 import static us.ilite.common.types.drive.EDriveData.*;
 
@@ -58,8 +59,8 @@ public class NeoDriveModule extends Module {
             .slot(SMART_MOTION_PID_SLOT)
             .velocityConversion(kDriveNEOPositionFactor);
     public static ProfileGains kVelocityGains = new ProfileGains()
-            .f(0.5)
-            .p(0.00051968)
+            .f(0.00015)
+            .p(0.00000025)
             .maxVelocity(kMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
             .slot(VELOCITY_PID_SLOT)
             .velocityConversion(kDriveNEOVelocityFactor);
@@ -78,22 +79,19 @@ public class NeoDriveModule extends Module {
     private DifferentialDrive mDrive;
 
     public NeoDriveModule() {
-        mLeftMaster = new CANSparkMax(Settings.HW.CAN.kDTML1, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mLeftFollower = new CANSparkMax(Settings.HW.CAN.kDTL3, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mRightMaster = new CANSparkMax(Settings.HW.CAN.kDTMR2, CANSparkMaxLowLevel.MotorType.kBrushless);
-        mRightFollower = new CANSparkMax(Settings.HW.CAN.kDTR4, CANSparkMaxLowLevel.MotorType.kBrushless);
+        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTML1);
+        mLeftFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTL3);
+        mRightMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTMR2);
+        mRightFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTR4);
+        mLeftFollower.follow(mLeftMaster);
+        mRightFollower.follow(mRightMaster);
         mGyro = new Pigeon(Robot.CLOCK, Settings.HW.CAN.kDTGyro);
 
-        mLeftMaster.burnFlash();
-        mLeftFollower.burnFlash();
-        mRightMaster.burnFlash();
-        mRightFollower.burnFlash();
         mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mRightMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mRightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mRightMaster.setInverted(true);
-        mRightFollower.setInverted(true);
 
         mRightEncoder = mRightMaster.getEncoder();
         mLeftEncoder = mLeftMaster.getEncoder();
@@ -114,6 +112,11 @@ public class NeoDriveModule extends Module {
 
         mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
         mDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
+
+        mLeftMaster.burnFlash();
+        mLeftFollower.burnFlash();
+        mRightMaster.burnFlash();
+        mRightFollower.burnFlash();
     }
     @Override
     public void modeInit(EMatchMode pMode) {
@@ -155,8 +158,8 @@ public class NeoDriveModule extends Module {
     @Override
     public void setOutputs() {
         Enums.EDriveState state = db.drivetrain.get(STATE, Enums.EDriveState.class);
-        double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
-        double turn = db.drivetrain.get(DESIRED_TURN_PCT);
+        double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
+        double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
         double left = throttle + turn;
         double right = throttle - turn;
         if (state == null) return;
@@ -181,9 +184,9 @@ public class NeoDriveModule extends Module {
                 mRightMaster.set(-output);
                 break;
             case SMART_MOTION:
-                mLeftCtrl.setReference( db.drivetrain.get(L_DESIRED_POS_FT) / kDriveNEOPositionFactor,
+                mLeftCtrl.setReference(db.drivetrain.get(L_DESIRED_POS_FT) / kDriveNEOPositionFactor,
                         CANSparkMax.ControlType.kSmartMotion, SMART_MOTION_PID_SLOT, 0 );
-                mRightCtrl.setReference( db.drivetrain.get(L_DESIRED_POS_FT) / kDriveNEOPositionFactor,
+                mRightCtrl.setReference(db.drivetrain.get(L_DESIRED_POS_FT) / kDriveNEOPositionFactor,
                         CANSparkMax.ControlType.kSmartMotion, SMART_MOTION_PID_SLOT, 0 );
                 break;
             case PATH_FOLLOWING_RAMSETE:

@@ -49,14 +49,14 @@ public abstract class BaseManualController extends AbstractController {
 
         if (db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
            // db.drivetrain.set(STATE, EDriveState.TARGET_ANGLE_LOCK);
-        } else if (db.driverinput.isSet(HOME_TO_DRIVER_STATION)) {
-            db.drivetrain.set(STATE, EDriveState.HOME);
-            throttle = 0;
-            rotate = 0;
-        } else if(mCyclesHolding > 60) {
-            db.drivetrain.set(STATE, EDriveState.HOLD);
-            db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
-            db.drivetrain.set(DESIRED_TURN_PCT, rotate);
+//        } else if (db.driverinput.isSet(HOME_TO_DRIVER_STATION)) {
+//            db.drivetrain.set(STATE, EDriveState.HOME);
+//            throttle = 0;
+//            rotate = 0;
+//        } else if(mCyclesHolding > 60) {
+//            db.drivetrain.set(STATE, EDriveState.HOLD);
+//            db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
+//            db.drivetrain.set(DESIRED_TURN_PCT, rotate);
         } else {
             db.drivetrain.set(STATE, EDriveState.PERCENT_OUTPUT);
             if (throttle == 0.0 && rotate != 0.0) {
@@ -65,15 +65,19 @@ public abstract class BaseManualController extends AbstractController {
             DriveMessage  d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
             throttle = d.getThrottle();
             rotate = d.getTurn();
-            if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
-                throttle *= Settings.Input.kSnailModePercentThrottleReduction;
-                rotate *= Settings.Input.kSnailModePercentRotateReduction;
-            }
+//            if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
+//                throttle *= Settings.Input.kSnailModePercentThrottleReduction;
+//                rotate *= Settings.Input.kSnailModePercentRotateReduction;
+//            }
 
             //TODO - Button here is bound to change once everything is integrated
-            if (!db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
-                db.drivetrain.set(STATE, EDriveState.VELOCITY);
-                db.drivetrain.set(DESIRED_TURN_PCT, rotate);
+//            if (!db.driverinput.isSet(DRIVER_LIMELIGHT_LOCK_TARGET)) {
+//                db.drivetrain.set(STATE, EDriveState.VELOCITY);
+//                db.drivetrain.set(DESIRED_TURN_PCT, rotate);
+//            }
+            if (throttle > 0.1 || rotate > 0.1) {
+                throttle = 0.1;
+                rotate  = 0.1;
             }
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
             db.drivetrain.set(DESIRED_TURN_PCT, rotate);

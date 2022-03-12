@@ -2,40 +2,29 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.control.ILITEPIDController;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
-import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.hardware.Pigeon;
 
-import java.util.Set;
-
-import static us.ilite.common.types.ELimelightData.*;
 import static us.ilite.common.types.drive.EDriveData.*;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
 import static us.ilite.common.types.sensor.EPowerDistPanel.CURRENT14;
 
-public class DriveModule extends Module {
+public class FalconDriveModule extends Module {
 
 	private final WPI_TalonFX mLeftMaster;
 	private final WPI_TalonFX mLeftFollower;
@@ -112,7 +101,7 @@ public class DriveModule extends Module {
 	public static double kInitialXPosition = 0;
 	public static double kInitialYPosition = 0;
 	
-	public DriveModule() {
+	public FalconDriveModule() {
 		mLeftMaster = new WPI_TalonFX(Settings.HW.CAN.kDTML1);
 		mLeftFollower = new WPI_TalonFX(Settings.HW.CAN.kDTL3);
 		mLeftFollower.follow(mLeftMaster);

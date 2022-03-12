@@ -4,7 +4,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.ECommonNeutralMode;
-import us.ilite.robot.modules.DriveModule;
+import us.ilite.robot.modules.FalconDriveModule;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.Data;
 import us.ilite.common.lib.control.PIDController;
@@ -46,7 +46,7 @@ public class TurnToDegree implements ICommand {
     mTargetYaw = mInitialYaw.rotateBy( mTurnAngle );
 
     // PIDController configuration
-    pid = new PIDController( DriveModule.kTurnToProfileGains, -180, 180, Settings.kControlLoopPeriod );
+    pid = new PIDController( FalconDriveModule.kTurnToProfileGains, -180, 180, Settings.kControlLoopPeriod );
     pid.setContinuous( true );
     pid.setOutputRange( kMIN_POWER, kMAX_POWER );
     pid.setSetpoint( mTargetYaw.getDegrees() );
@@ -56,7 +56,7 @@ public class TurnToDegree implements ICommand {
 
   public boolean update( double pNow ) {
     mOutput = pid.calculate( getYaw().getDegrees(), pNow );
-    mOutput += Math.signum( mOutput ) * DriveModule.kTurnToProfileGains.F;
+    mOutput += Math.signum( mOutput ) * FalconDriveModule.kTurnToProfileGains.F;
 
     // Keep track of time on target
     if ( ( Math.abs( pid.getError() ) <= Math.abs( mAllowableError ) ) ) {

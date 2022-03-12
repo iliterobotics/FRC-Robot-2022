@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.Data;
-import us.ilite.common.Field2022;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
@@ -43,7 +42,6 @@ public class Robot extends TimedRobot {
     private ClimberModule mHanger;
     private Timer initTimer = new Timer();
 
-    private DriveModule mDrive;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FeederModule mFeeder;
@@ -69,7 +67,7 @@ public class Robot extends TimedRobot {
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
-        mDrive = new DriveModule();
+//        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -126,7 +124,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mNeoDrive);
         mRunningModules.modeInit(AUTONOMOUS);
     }
 
@@ -173,7 +171,8 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.safeReadInputs();
-        mDrive.safeReadInputs();
+//        mDrive.safeReadInputs();
+        mNeoDrive.safeReadInputs();
         mIntake.safeReadInputs();
         mFeeder.safeReadInputs();
         Shuffleboard.update();
@@ -195,7 +194,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFeeder);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mNeoDrive);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
