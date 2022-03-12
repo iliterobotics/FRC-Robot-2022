@@ -2,6 +2,7 @@ package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.*;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -13,6 +14,7 @@ import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
+import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.Pigeon;
 
@@ -116,6 +118,8 @@ public class NeoDriveModule extends Module {
     @Override
     public void modeInit(EMatchMode pMode) {
         mGyro.zeroAll();
+        reset();
+        resetOdometry(TrajectoryCommandUtils.getJSONTrajectory().getInitialPose());
         kInitialXPosition = mOdometry.getPoseMeters().getX();
         kInitialYPosition = mOdometry.getPoseMeters().getY();
     }
@@ -195,5 +199,16 @@ public class NeoDriveModule extends Module {
         mRightEncoder.setPosition(0.0);
         mLeftMaster.set(0.0);
         mRightMaster.set(0.0);
+    }
+
+    /**
+     * Resets the odometry to the specified pose.
+     *
+     * @param pose The pose to which to set the odometry.
+     */
+    public void resetOdometry(Pose2d pose) {
+        mLeftEncoder.setPosition(0);
+        mRightEncoder.setPosition(0);
+        mOdometry.resetPosition(pose, mGyro.getHeading());
     }
 }
