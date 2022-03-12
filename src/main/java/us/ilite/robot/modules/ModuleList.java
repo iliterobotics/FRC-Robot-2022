@@ -20,21 +20,21 @@ public class ModuleList extends Module {
     }
 
     @Override
-    public void readInputs() {
+    protected void readInputs() {
         if(Robot.mode() == EMatchMode.TEST) {
-            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.readInputs()));
+            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.safeReadInputs()));
         } else {
-            mModules.forEach(module -> module.readInputs());
+            mModules.forEach(module -> module.safeReadInputs());
         }
 
     }
 
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
         if(Robot.mode() == EMatchMode.TEST) {
-            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.setOutputs()));
+            mModules.forEach(module -> Robot.CLOCK.report("R-"+module.getClass().getSimpleName(), t->module.safeSetOutputs()));
         } else {
-            mModules.forEach(module -> module.setOutputs());
+            mModules.forEach(module -> module.safeSetOutputs());
         }
     }
 

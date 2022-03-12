@@ -225,7 +225,7 @@ public class Robot extends TimedRobot {
 
         mRunningModules.readInputs();
         mActiveController.update();
-        mRunningModules.setOutputs();
+        mRunningModules.safeSetOutputs();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
         SmartDashboard.putNumber("Clock Time", CLOCK.now());
     }

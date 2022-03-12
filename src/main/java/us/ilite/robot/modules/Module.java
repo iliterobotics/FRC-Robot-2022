@@ -27,14 +27,42 @@ public abstract class Module {
     }
 
     /**
+     * Method to call the readInputs method and wrap it in a try/catch in case there are any
+     * exceptions
+     */
+    public final void safeReadInputs() {
+        try {
+            readInputs();
+         } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * Method to call the setOutputs method and wrap it in a try/catch in case there are any
+     * exceptions
+     */
+    public final void safeSetOutputs() {
+        try {
+            readInputs();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
      * The module's update function. Runs every time [mode]Periodic() is called (Roughly ~50Hz), or in a loop running at a custom frequency.
      */
-    public abstract void readInputs();
+    protected void readInputs() {
+
+    }
 
     /**
      * Optional design pattern to keep hardware outputs all in one place.
      */
-    public abstract void setOutputs();
+    protected void setOutputs() {
+
+    }
 
     /**
      * Shutdown/Cleanup tasks are performed here.

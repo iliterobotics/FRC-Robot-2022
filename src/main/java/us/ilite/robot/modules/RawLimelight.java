@@ -60,7 +60,7 @@ public class RawLimelight extends Module{
     }
 
     @Override
-    public void readInputs() {
+    protected void readInputs() {
         mVisionTarget = Field2022.FieldElement.values()[(int) db.rawLimelight.get(TARGET_ID)];
 
         boolean targetValid = mTable.getEntry("tv").getDouble(0.0) > 0.0;
@@ -114,7 +114,7 @@ public class RawLimelight extends Module{
     }
 
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
         setLedMode();
         setCamMode();
         setStreamMode();

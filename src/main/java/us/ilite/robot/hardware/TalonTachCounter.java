@@ -64,11 +64,6 @@ public class TalonTachCounter extends Module {
 
     }
 
-    @Override
-    public void readInputs() {
-
-    }
-
     public void setTapeState(boolean pCurrentState)
     {
         if(pCurrentState == false && lastState == true) mCurrentTapeState = TapeState.TAPE;
@@ -82,7 +77,7 @@ public class TalonTachCounter extends Module {
     }
 
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
         mCurrentState = getState();
         setTapeState(mCurrentState);
         if(mCurrentTapeState != lastTapeState) hasChanged = true;
