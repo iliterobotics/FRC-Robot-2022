@@ -106,25 +106,6 @@ public class TeleopController extends BaseManualController { //copied from TestC
         }
     }
 
-//    private void updateCargo() {
-//        db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
-//        db.intake.set(EIntakeData.ROLLER_STATE, Enums.EIntakeState.PERCENT_OUTPUT);
-//
-//        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_CARGO)) {
-//            db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.RED);
-//            fireCargo();
-//        } else if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
-//            indexCargo();
-//        } else if (db.operatorinput.isSet(InputMap.OPERATOR.PLACE_CARGO)) {
-//            placeCargo();
-//        } else if (db.operatorinput.isSet(InputMap.OPERATOR.RELEASE_BALLS)) {
-//            reverseCargo();
-//        } else {
-//            db.feeder.set(SET_FEEDER_pct, 0d);
-//            db.intake.set(DESIRED_pct, 0d);
-//        }
-//    }
-
     private void updateCargo() {
         db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
         db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
@@ -133,6 +114,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             mResetCount = true;
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
             db.intake.set(DESIRED_pct, 1.0);
+            db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
             indexCargo();
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.PLACE_CARGO)) {
             placeCargo();
@@ -144,27 +126,6 @@ public class TeleopController extends BaseManualController { //copied from TestC
             db.intake.set(DESIRED_pct, 0d);
             mResetCount = false;
         }
-
-        if (db.operatorinput.isSet(InputMap.OPERATOR.MANUAL_BALLS_UP)) {
-            mAddBalls = true;
-            if (!mPrevAddBalls) {
-                db.feeder.set(NUM_BALLS, db.feeder.get(NUM_BALLS) + 1);
-            }
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.MANUAL_BALLS_DOWN)) {
-            mAddBalls = true;
-            if (!mPrevAddBalls) {
-                db.feeder.set(NUM_BALLS, db.feeder.get(NUM_BALLS) - 1);
-            }
-        } else {
-            mAddBalls = false;
-        }
-        if (mPrevResetCount && !mResetCount) {
-            db.feeder.set(RESET_BALLS, 1d);
-        } else {
-            db.feeder.set(RESET_BALLS, 0d);
-        }
-        mPrevResetCount = mResetCount;
-        mPrevAddBalls = mAddBalls;
     }
 
     private void updateLimelightTargetLock() {

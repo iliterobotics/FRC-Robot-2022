@@ -58,7 +58,7 @@ public abstract class BaseManualController extends AbstractController {
 //            db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
 //            db.drivetrain.set(DESIRED_TURN_PCT, rotate);
         } else {
-            db.drivetrain.set(STATE, EDriveState.PERCENT_OUTPUT);
+            db.drivetrain.set(STATE, EDriveState.VELOCITY);
             if (throttle == 0.0 && rotate != 0.0) {
                 throttle += 0.01;
             }
@@ -75,10 +75,6 @@ public abstract class BaseManualController extends AbstractController {
 //                db.drivetrain.set(STATE, EDriveState.VELOCITY);
 //                db.drivetrain.set(DESIRED_TURN_PCT, rotate);
 //            }
-            if (throttle > 0.1 || rotate > 0.1) {
-                throttle = 0.1;
-                rotate  = 0.1;
-            }
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
             db.drivetrain.set(DESIRED_TURN_PCT, rotate);
         }
