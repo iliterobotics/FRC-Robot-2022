@@ -45,7 +45,7 @@ public class IntakeModule extends Module {
     }
 
     @Override
-    public void readInputs() {
+    protected void readInputs() {
         db.intake.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
         db.intake.set(FEEDER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
         db.intake.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
@@ -55,7 +55,7 @@ public class IntakeModule extends Module {
     }
 
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
        setPneumaticState();
        setRollerState();
     }

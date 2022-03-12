@@ -172,10 +172,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        mOI.readInputs();
-        mDrive.readInputs();
-        mIntake.readInputs();
-        mFeeder.readInputs();
+        mOI.safeReadInputs();
+        mDrive.safeReadInputs();
+        mIntake.safeReadInputs();
+        mFeeder.safeReadInputs();
         Shuffleboard.update();
     }
 
@@ -225,9 +225,9 @@ public class Robot extends TimedRobot {
             c.reset();
         }
 
-        mRunningModules.readInputs();
+        mRunningModules.safeReadInputs();
         mActiveController.update();
-        mRunningModules.setOutputs();
+        mRunningModules.safeSetOutputs();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
         SmartDashboard.putNumber("Clock Time", CLOCK.now());
     }

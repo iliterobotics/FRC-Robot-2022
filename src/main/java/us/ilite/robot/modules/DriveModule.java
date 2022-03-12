@@ -197,7 +197,7 @@ public class DriveModule extends Module {
 	}
 
 	@Override
-	public void readInputs() {
+	protected void readInputs() {
 		mGyro.update();
 		db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getHeading().getRadians());
 		db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getHeading().getDegrees());
@@ -241,7 +241,7 @@ public class DriveModule extends Module {
 	}
 
 	@Override
-	public void setOutputs() {
+	protected void setOutputs() {
 		Enums.EDriveState state = db.drivetrain.get(STATE, Enums.EDriveState.class);
 		double throttle = db.drivetrain.get(DESIRED_THROTTLE_PCT);
 		double turn = db.drivetrain.get(DESIRED_TURN_PCT);

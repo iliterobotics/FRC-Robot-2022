@@ -45,14 +45,14 @@ public class FeederModule extends Module {
     }
 
     @Override
-    public void readInputs() {
+    protected void readInputs() {
         db.feeder.set(ACTUAL_FEEDER_pct, (mIntakeFeeder.getSelectedSensorVelocity() * kScaledRPMConversion) / kMaxFalconSpeed);
         db.feeder.set(EXIT_BALL_VELOCITY_ft_s, mIntakeFeeder.getSelectedSensorVelocity() * kVelocityConversion);
         db.feeder.set(ENTRY_BEAM, mEntryBeamBreaker.isBroken());
     }
 
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
         mIntakeFeeder.set(TalonFXControlMode.PercentOutput, db.feeder.get(SET_FEEDER_pct));
     }
 }

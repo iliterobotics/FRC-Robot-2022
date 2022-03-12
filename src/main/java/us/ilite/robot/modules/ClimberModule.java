@@ -42,7 +42,7 @@ public class ClimberModule extends Module{
     }
 
     @Override
-    public void readInputs() {
+    protected void readInputs() {
         db.climber.set(EClimberModuleData.L_VEL_rpm, mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM);
         db.climber.set(EClimberModuleData.R_VEL_rpm, mCLMR11.getSelectedSensorVelocity() * kScaledUnitsToRPM);
         db.climber.set(EClimberModuleData.L_OUTPUT_CURRENT, mCLMR11.getSupplyCurrent());
@@ -53,7 +53,7 @@ public class ClimberModule extends Module{
 
 
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
         mCL12.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.L_SET_pct));
         mCLMR11.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.R_SET_pct));
 
