@@ -60,11 +60,14 @@ public class InputMap {
         REVERSE_ROLLERS = ELogitech310.B_BTN,
         SPIN_FEEDER = ELogitech310.X_BTN,
         REVERSE_FEEDER = ELogitech310.Y_BTN,
-//        RELEASE_BALLS = ELogitech310.DPAD_LEFT,
-//        SHOOT_CARGO = ELogitech310.R_BTN,
-//        PLACE_CARGO = ELogitech310.L_BTN,
-//        MANUAL_BALLS_UP = ELogitech310.DPAD_UP,
-//        MANUAL_BALLS_DOWN = ELogitech310.DPAD_DOWN
+        RELEASE_BALLS = ELogitech310.DPAD_LEFT,
+
+        SHOOT_CARGO = ELogitech310.R_BTN,
+        PLACE_CARGO = ELogitech310.L_BTN,
+        MANUAL_BALLS_UP = ELogitech310.DPAD_UP,
+        MANUAL_BALLS_DOWN = ELogitech310.DPAD_DOWN,
+
+        //CLIMBER MAPPINGS
         MANUAL_REV_SLOW = ELogitech310.RIGHT_TRIGGER_AXIS,
         MANUAL_FWD_SLOW = ELogitech310.LEFT_TRIGGER_AXIS,
         TOP_CLAMPED = ELogitech310.DPAD_UP,
