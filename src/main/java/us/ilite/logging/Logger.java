@@ -24,8 +24,9 @@ public class Logger {
     }
     public void debug(String message, Throwable ex) {
 
-        ELevel newLevel = ELevel.getForName(SmartDashboard.getString("Logger-"+mLoggerClass,ELevel.DEBUG.name()));
+        ELevel newLevel = ELevel.getForName(SmartDashboard.getString("Logger-"+mLoggerClass,level.name()));
 
+        System.err.println("Inside of debug: level is: " + newLevel);
 
         if(newLevel == ELevel.DEBUG) {
             log("DEBUG: " + message,ex,false);
@@ -36,7 +37,7 @@ public class Logger {
         warn(message, null);
     }
     public void warn(String message, Throwable ex) {
-        ELevel newLevel = ELevel.getForName(SmartDashboard.getString("Logger-"+mLoggerClass,ELevel.DEBUG.name()));
+        ELevel newLevel = ELevel.getForName(SmartDashboard.getString("Logger-"+mLoggerClass,level.name()));
         if(newLevel.ordinal() <= ELevel.WARN.ordinal()) {
             log("WARN: "+message,ex,false);
         }
