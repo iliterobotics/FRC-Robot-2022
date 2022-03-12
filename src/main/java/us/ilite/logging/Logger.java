@@ -9,27 +9,25 @@ import java.io.StringWriter;
 
 public class Logger {
 
-    private final SendableChooser<ELevel> mSelectableLevel;
     private ELevel level;
+    private final Class<?>mLoggerClass;
 
 
     public Logger(Class<?>loggerClass, ELevel defautLevel) {
         level = defautLevel;
+        mLoggerClass = loggerClass;
         SmartDashboard.putString("Logger-"+loggerClass,defautLevel.name());
-
-        mSelectableLevel = new SendableChooser<>();
-        for(ELevel aLevel : ELevel.values()){
-            mSelectableLevel.addOption(aLevel.name(),aLevel);
-        }
-
-        SmartDashboard.putData(mSelectableLevel);
     }
 
     public void debug(String message) {
         debug(message, null);
     }
     public void debug(String message, Throwable ex) {
-        if(mSelectableLevel.getSelected() == ELevel.DEBUG) {
+
+        ELevel newLevel = ELevel.getForName(SmartDashboard.getString("Logger-"+mLoggerClass,ELevel.DEBUG.name()));
+
+
+        if(newLevel == ELevel.DEBUG) {
             log("DEBUG: " + message,ex,false);
         }
     }
@@ -38,7 +36,8 @@ public class Logger {
         warn(message, null);
     }
     public void warn(String message, Throwable ex) {
-        if(mSelectableLevel.getSelected().ordinal() <= ELevel.WARN.ordinal()) {
+        ELevel newLevel = ELevel.getForName(SmartDashboard.getString("Logger-"+mLoggerClass,ELevel.DEBUG.name()));
+        if(newLevel.ordinal() <= ELevel.WARN.ordinal()) {
             log("WARN: "+message,ex,false);
         }
     }
