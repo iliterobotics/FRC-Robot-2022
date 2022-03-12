@@ -2,6 +2,8 @@ package us.ilite.robot.modules;
 
 import us.ilite.common.Data;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.logging.ELevel;
+import us.ilite.logging.Logger;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Clock;
 
@@ -11,6 +13,7 @@ import us.ilite.robot.hardware.Clock;
  * All methods are passed a time, which is expected to be consistent between all modules updated in the same [mode]Periodic() call.
  */
 public abstract class Module {
+    private static Logger sLogger = new Logger(Module.class, ELevel.DEBUG);
 
     protected final Data db = Robot.DATA;
     protected final Clock clock = Robot.CLOCK;
@@ -34,7 +37,7 @@ public abstract class Module {
         try {
             readInputs();
          } catch(Exception e) {
-            e.printStackTrace();
+            sLogger.debug("Got an exception in safeReadInputs",e);
         }
     }
     /**
@@ -45,7 +48,7 @@ public abstract class Module {
         try {
             readInputs();
         } catch(Exception e) {
-            e.printStackTrace();
+            sLogger.debug("Got an exception in safeSetOutputs",e);
         }
     }
 
