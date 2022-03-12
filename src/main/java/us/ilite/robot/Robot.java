@@ -49,6 +49,7 @@ public class Robot extends TimedRobot {
     private FeederModule mFeeder;
     private IntakeModule mIntake;
     private ClimberModule mClimber;
+    private NeoDriveModule mNeoDrive;
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -77,6 +78,7 @@ public class Robot extends TimedRobot {
         mIntake = new IntakeModule();
         mLEDControl = new LEDControl();
         mClimber = new ClimberModule();
+        mNeoDrive = new NeoDriveModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -143,7 +145,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mNeoDrive);
         mRunningModules.addModule(mClimber);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
