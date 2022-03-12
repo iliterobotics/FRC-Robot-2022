@@ -1,6 +1,7 @@
 package us.ilite.logging;
 
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.io.PrintWriter;
@@ -8,6 +9,7 @@ import java.io.StringWriter;
 
 public class Logger {
 
+    private final SendableChooser<ELevel> mSelectableLevel;
     private ELevel level;
 
 
@@ -15,21 +17,19 @@ public class Logger {
         level = defautLevel;
         SmartDashboard.putString("Logger-"+loggerClass,defautLevel.name());
 
-        NetworkTableInstance.getDefault().getTable("SmartDashboard").addEntryListener(new TableEntryListener() {
-            @Override
-            public void valueChanged(NetworkTable table, String key, NetworkTableEntry entry, NetworkTableValue value, int flags) {
-                if(key.equals("Logger-"+loggerClass)) {
-                    level = ELevel.getForName(value.getValue().toString());
-                }
-            }
-        },EntryListenerFlags.kNew|EntryListenerFlags.kUpdate);
+        mSelectableLevel = new SendableChooser<>();
+        for(ELevel aLevel : ELevel.values()){
+            mSelectableLevel.addOption(aLevel.name(),aLevel);
+        }
+
+        SmartDashboard.putData(mSelectableLevel);
     }
 
     public void debug(String message) {
         debug(message, null);
     }
     public void debug(String message, Throwable ex) {
-        if(level == ELevel.DEBUG) {
+        if(mSelectableLevel.getSelected() == ELevel.DEBUG) {
             log("DEBUG: " + message,ex,false);
         }
     }
@@ -38,7 +38,7 @@ public class Logger {
         warn(message, null);
     }
     public void warn(String message, Throwable ex) {
-        if(level.ordinal() <= ELevel.WARN.ordinal()) {
+        if(mSelectableLevel.getSelected().ordinal() <= ELevel.WARN.ordinal()) {
             log("WARN: "+message,ex,false);
         }
     }
