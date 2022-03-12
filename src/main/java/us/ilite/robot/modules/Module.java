@@ -13,7 +13,7 @@ import us.ilite.robot.hardware.Clock;
  * All methods are passed a time, which is expected to be consistent between all modules updated in the same [mode]Periodic() call.
  */
 public abstract class Module {
-    private static Logger sLogger = new Logger(Module.class, ELevel.DEBUG);
+    private static Logger sLogger = new Logger(Module.class, ELevel.ERROR);
 
     protected final Data db = Robot.DATA;
     protected final Clock clock = Robot.CLOCK;
