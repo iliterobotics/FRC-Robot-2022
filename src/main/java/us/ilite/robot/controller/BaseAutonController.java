@@ -117,9 +117,6 @@ public class BaseAutonController extends AbstractController {
         mMotorPidController.reset();
         mPrevTime = -1;
         mTrajectory = pTrajectory;
-//      Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
-//      Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
-//      mTrajectory = trajectory.transformBy(transform);
         initialState = mTrajectory.sample(0);
         SmartDashboard.putNumber("Initial state x", initialState.poseMeters.getX());
         SmartDashboard.putNumber("Initial state y", initialState.poseMeters.getY());
@@ -129,33 +126,7 @@ public class BaseAutonController extends AbstractController {
     }
     @Override
     protected void updateImpl() {
-        db.drivetrain.set(EDriveData.NEUTRAL_MODE, NeutralMode.Brake);
-        if (mFirstLeg.get() < 0.5) {
-            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 1.0);
-            db.intake.set(EIntakeData.ARM_STATE, Enums.EArmState.DEFAULT);
-        } else if (mFirstLeg.get() == 0.5) {
-            mTimer.reset();
-        } else {
-            db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-            db.intake.set(EIntakeData.DESIRED_pct, 1.0);
-            execute();
-            if (isFinished()) {
-                if (db.drivetrain.get(EDriveData.ACTUAL_HEADING_DEGREES) >= 85 && db.drivetrain.get(EDriveData.ACTUAL_HEADING_DEGREES) <= 95) {
-                    mCycleCount++;
-                }
-                if (mCycleCount >= 5) {
-//                    initialize(TrajectoryCommandUtils.getOtherJSONTrajectory());
-//                    execute();
-                } else {
-                    db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TURN_TO);
-                    db.drivetrain.set(EDriveData.DESIRED_TURN_ANGLE_deg, 120);
-                    db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.05);
-                }
-            }
-
-        }
-
+        execute();
     }
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;

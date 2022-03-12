@@ -9,6 +9,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -109,12 +110,24 @@ public class NeoDriveModule extends Module {
         HardwareUtils.setGains(mLeftCtrl, kSmartMotionGains);
         HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);
 
-        mOdometry = new DifferentialDriveOdometry(new Rotation2d());
+        mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
+        mDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
+    }
+    @Override
+    public void modeInit(EMatchMode pMode) {
+        mGyro.zeroAll();
+        kInitialXPosition = mOdometry.getPoseMeters().getX();
+        kInitialYPosition = mOdometry.getPoseMeters().getY();
     }
     @Override
     public void readInputs() {
-        db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getHeading().getRadians());
-        db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getHeading().getDegrees());
+        mGyro.update();
+        double odoX = mOdometry.getPoseMeters().getX() - kInitialXPosition;
+        double odoY = mOdometry.getPoseMeters().getY() - kInitialYPosition;
+        db.drivetrain.set(GET_X_OFFSET_METERS, odoX);
+        db.drivetrain.set(GET_Y_OFFSET_METERS, odoY);
+        db.drivetrain.set(ACTUAL_HEADING_RADIANS, mGyro.getHeading().getRadians());
+        db.drivetrain.set(ACTUAL_HEADING_DEGREES, mGyro.getHeading().getDegrees());
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getOutputCurrent());
@@ -168,6 +181,11 @@ public class NeoDriveModule extends Module {
                         CANSparkMax.ControlType.kSmartMotion, SMART_MOTION_PID_SLOT, 0 );
                 mRightCtrl.setReference( db.drivetrain.get(L_DESIRED_POS_FT) / kDriveNEOPositionFactor,
                         CANSparkMax.ControlType.kSmartMotion, SMART_MOTION_PID_SLOT, 0 );
+                break;
+            case PATH_FOLLOWING_RAMSETE:
+                mLeftMaster.set(db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / 24.0);
+                mRightMaster.set(db.drivetrain.get(R_DESIRED_DRIVE_FT_SEC) / 24.0);
+                mDrive.feed();
                 break;
         }
     }
