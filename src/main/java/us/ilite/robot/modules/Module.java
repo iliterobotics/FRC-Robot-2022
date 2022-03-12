@@ -46,7 +46,7 @@ public abstract class Module {
      */
     public final void safeSetOutputs() {
         try {
-            readInputs();
+            setOutputs();
         } catch(Exception e) {
             sLogger.debug("Got an exception in safeSetOutputs",e);
         }
