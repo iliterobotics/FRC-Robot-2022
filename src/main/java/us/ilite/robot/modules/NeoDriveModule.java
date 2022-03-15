@@ -68,10 +68,7 @@ public class NeoDriveModule extends Module {
     // ========================================
     // DO NOT MODIFY THESE OTHER CONSTANTS
     // ========================================
-    private static double mLeftHoldPosition = 0;
-    private static double mRightHoldPosition = 0;
-    private static int mCyclesHolding = 0;
-    private static double kTurnSensitivity = 0.85;
+    public static double kTurnSensitivity = 0.85;
     private static double kInitialXPosition = 0;
     private static double kInitialYPosition = 0;
     private DifferentialDriveOdometry mOdometry;
@@ -173,7 +170,6 @@ public class NeoDriveModule extends Module {
             case VELOCITY:
                 mLeftCtrl.setReference(left * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
                 mRightCtrl.setReference(right * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-                mCyclesHolding = 0;
                 break;
             case TURN_TO:
                 mTurnToDegreePID.setSetpoint(db.drivetrain.get(DESIRED_TURN_ANGLE_deg));
