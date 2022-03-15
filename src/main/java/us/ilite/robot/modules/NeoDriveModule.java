@@ -52,10 +52,9 @@ public class NeoDriveModule extends Module {
     private static final int SMART_MOTION_PID_SLOT = 2;
     //TODO change the smart motion gains once we have tuned it
     public static ProfileGains kSmartMotionGains = new ProfileGains()
-            .p(0.00025)
             .f(0.00015)
             .maxVelocity(kMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
-            .maxAccel(1000d)
+            .maxAccel(5676d)
             .slot(SMART_MOTION_PID_SLOT)
             .velocityConversion(kDriveNEOPositionFactor);
     public static ProfileGains kVelocityGains = new ProfileGains()
@@ -188,6 +187,12 @@ public class NeoDriveModule extends Module {
                         CANSparkMax.ControlType.kSmartMotion, SMART_MOTION_PID_SLOT, 0 );
                 mRightCtrl.setReference(db.drivetrain.get(R_DESIRED_POS_FT) / kDriveNEOPositionFactor,
                         CANSparkMax.ControlType.kSmartMotion, SMART_MOTION_PID_SLOT, 0 );
+                break;
+            case POSITION:
+                mLeftCtrl.setReference(db.drivetrain.get(L_DESIRED_POS_FT) / kDriveNEOPositionFactor,
+                        CANSparkMax.ControlType.kPosition, SMART_MOTION_PID_SLOT, 0 );
+                mRightCtrl.setReference(db.drivetrain.get(R_DESIRED_POS_FT) / kDriveNEOPositionFactor,
+                        CANSparkMax.ControlType.kPosition, SMART_MOTION_PID_SLOT, 0 );
                 break;
             case PATH_FOLLOWING_RAMSETE:
                 mLeftMaster.set(db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / 24.0);
