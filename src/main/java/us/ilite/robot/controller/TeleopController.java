@@ -50,7 +50,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateHangerMotors() {
-        if (db.driverinput.isSet(InputMap.HANGER.POSITION_LOCK)) {
+        if (db.operatorinput.isSet(InputMap.HANGER.POSITION_LOCK)) {
             db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
             db.climber.set(EClimberModuleData.DESIRED_POS_deg, 90);
         } else {
@@ -66,7 +66,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
                 db.climber.set(EClimberModuleData.DESIRED_VEL_rpm, 0);
             }
 
-            if (db.driverinput.isSet(InputMap.HANGER.SET_COAST)) {
+            if (db.operatorinput.isSet(InputMap.HANGER.SET_COAST)) {
                 db.climber.set(EClimberModuleData.IS_COAST, 1d);
             }
         }
