@@ -122,7 +122,7 @@ public class BaseAutonController extends AbstractController {
     }
     @Override
     protected void updateImpl() {
-        execute();
+
     }
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;

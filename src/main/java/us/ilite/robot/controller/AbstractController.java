@@ -5,11 +5,10 @@ import us.ilite.common.*;
 
 
 import static us.ilite.common.types.EFeederData.*;
-import static us.ilite.common.types.EIntakeData.DESIRED_pct;
+import static us.ilite.common.types.EIntakeData.DESIRED_ROLLER_pct;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
-import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
@@ -107,7 +106,7 @@ public abstract class AbstractController {
 
     protected void placeCargo() {
         db.feeder.set(EFeederData.SET_FEEDER_pct, -0.2);
-        db.intake.set(EIntakeData.DESIRED_pct, -0.1);
+        db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
     }
 
     protected void reverseCargo() {
@@ -115,9 +114,9 @@ public abstract class AbstractController {
         mNumBalls = 0;
         db.feeder.set(EFeederData.NUM_BALLS, 0);
         if (db.intake.get(EIntakeData.PNEUMATIC_STATE) == 1.0) {
-            db.intake.set(DESIRED_pct, 0.0);
+            db.intake.set(DESIRED_ROLLER_pct, 0.0);
         } else {
-            db.intake.set(DESIRED_pct, -1.0);
+            db.intake.set(DESIRED_ROLLER_pct, -1.0);
         }
     }
 
