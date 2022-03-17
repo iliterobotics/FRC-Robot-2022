@@ -113,7 +113,7 @@ public class Enums {
         VELOCITY,
         PERCENT_OUTPUT,
         POSITION,
-        MOTION_MAGIC,
+        SMART_MOTION,
         TURN_TO,
         TURN_FOR,
         HOME,

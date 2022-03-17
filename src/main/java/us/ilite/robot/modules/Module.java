@@ -2,6 +2,8 @@ package us.ilite.robot.modules;
 
 import us.ilite.common.Data;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.logging.ELevel;
+import us.ilite.logging.Logger;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Clock;
 
@@ -11,6 +13,7 @@ import us.ilite.robot.hardware.Clock;
  * All methods are passed a time, which is expected to be consistent between all modules updated in the same [mode]Periodic() call.
  */
 public abstract class Module {
+    private static Logger sLogger = new Logger(Module.class, ELevel.ERROR);
 
     protected final Data db = Robot.DATA;
     protected final Clock clock = Robot.CLOCK;
@@ -27,14 +30,42 @@ public abstract class Module {
     }
 
     /**
+     * Method to call the readInputs method and wrap it in a try/catch in case there are any
+     * exceptions
+     */
+    public final void safeReadInputs() {
+        try {
+            readInputs();
+         } catch(Exception e) {
+            sLogger.debug("Got an exception in safeReadInputs",e);
+        }
+    }
+    /**
+     * Method to call the setOutputs method and wrap it in a try/catch in case there are any
+     * exceptions
+     */
+    public final void safeSetOutputs() {
+        try {
+            setOutputs();
+        } catch(Exception e) {
+            sLogger.debug("Got an exception in safeSetOutputs",e);
+        }
+    }
+
+
+    /**
      * The module's update function. Runs every time [mode]Periodic() is called (Roughly ~50Hz), or in a loop running at a custom frequency.
      */
-    public abstract void readInputs();
+    protected void readInputs() {
+
+    }
 
     /**
      * Optional design pattern to keep hardware outputs all in one place.
      */
-    public abstract void setOutputs();
+    protected void setOutputs() {
+
+    }
 
     /**
      * Shutdown/Cleanup tasks are performed here.

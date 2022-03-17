@@ -9,6 +9,7 @@ import static us.ilite.common.types.EIntakeData.DESIRED_pct;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
+import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
@@ -26,12 +27,8 @@ public abstract class AbstractController {
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
     protected double dt = 1d;
-    private boolean isBallAdded = false;
-    private boolean isBallOut = false;
-    private int numBalls = 0;
 
     private boolean mIsBallAdded = false;
-    private boolean mIsBallOut = false;
     private int mNumBalls = 0;
 
     public AbstractController(){
@@ -80,8 +77,9 @@ public abstract class AbstractController {
     }
 
     protected void fireCargo() {
-        db.intake.set(EIntakeData.DESIRED_pct, 1d);
         db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
+        mNumBalls = 0;
+        db.feeder.set(NUM_BALLS, 0);
     }
 
     protected void indexCargo() {
@@ -90,23 +88,20 @@ public abstract class AbstractController {
         } else {
             mNumBalls = (int)db.feeder.get(NUM_BALLS);
         }
-
-        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d) {
+        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
             if (!mIsBallAdded) {
                 mNumBalls++;
                 mIsBallAdded = true;
             }
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.2);
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.4);
         } else if (mIsBallAdded) {
             db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
             mIsBallAdded = false;
         } else if (mNumBalls > 0) {
             db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
         } else {
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
-            db.intake.set(EIntakeData.DESIRED_pct, 1d);
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
         }
-
         db.feeder.set(EFeederData.NUM_BALLS, mNumBalls);
     }
 
@@ -116,8 +111,14 @@ public abstract class AbstractController {
     }
 
     protected void reverseCargo() {
-        db.intake.set(DESIRED_pct, -1.0);
         db.feeder.set(SET_FEEDER_pct, -1.0);
+        mNumBalls = 0;
+        db.feeder.set(EFeederData.NUM_BALLS, 0);
+        if (db.intake.get(EIntakeData.PNEUMATIC_STATE) == 1.0) {
+            db.intake.set(DESIRED_pct, 0.0);
+        } else {
+            db.intake.set(DESIRED_pct, -1.0);
+        }
     }
 
     /**
