@@ -162,6 +162,7 @@ public class Robot extends TimedRobot {
     public void disabledInit() {
         MODE=DISABLED;
         mLogger.info("Disabled Initialization");
+        mRunningModules.modeInit(DISABLED);
 
         mRunningModules.shutdown();
 

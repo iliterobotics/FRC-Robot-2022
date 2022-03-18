@@ -49,10 +49,10 @@ public class Data {
     public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE , ELimelightData.class);
     public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
-            imu,
-            drivetrain,
             driverinput,
             operatorinput,
+            imu,
+            drivetrain,
             pdp,
             rawLimelight,
             feeder,
@@ -64,10 +64,12 @@ public class Data {
     public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
 
     public final RobotCodex[] mLoggedCodexes = new RobotCodex[]{
-            imu,
-            drivetrain,
+            // Order Matters for these 2
             driverinput,
             operatorinput,
+            // Order does not matter for the rest
+            imu,
+            drivetrain,
             feeder,
             pdp,
             intake,
@@ -84,11 +86,19 @@ public class Data {
      * @param pLogging
      */
     public Data(boolean pLogging) {
-        int i = 0;
-        for (RobotCodex rc : mLoggedCodexes) {
-            mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
+        for (int i = 0; i < mLoggedCodexes.length; i++){
+            RobotCodex rc = mLoggedCodexes[i];
+            switch(i) {
+                case 0:
+                    mMappedCodex.put("Driver Input", rc);
+                    break;
+                case 1:
+                    mMappedCodex.put("Operator Input", rc);
+                    break;
+                default:
+                    mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
+            }
             rc.meta().setGlobalId(i);
-            i++;
         }
     }
 
@@ -99,7 +109,7 @@ public class Data {
     public void registerAllWithShuffleboard() {
         if(mHasRegisteredWithShuffleboard) { return ; }
         for (String key : mMappedCodex.keySet()) {
-            ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
+            ShuffleboardTab tab = Shuffleboard.getTab(key);
             List<Enum<?>> enums = EnumUtils.getEnums(mMappedCodex.get(key).meta().getEnum(), true);
             enums.stream().forEach(
                     e -> {

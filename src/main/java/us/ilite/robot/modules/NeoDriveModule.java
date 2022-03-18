@@ -16,6 +16,7 @@ import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
+import us.ilite.robot.hardware.ECommonNeutralMode;
 import us.ilite.robot.hardware.HardwareUtils;
 import us.ilite.robot.hardware.Pigeon;
 import us.ilite.robot.hardware.SparkMaxFactory;
@@ -62,7 +63,9 @@ public class NeoDriveModule extends Module {
             .slot(SMART_MOTION_PID_SLOT)
             .velocityConversion(kDriveNEOPositionFactor);
     public static ProfileGains kPositionGains = new ProfileGains()
-            .p(0.25)
+            .maxVelocity(kMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier * 12)
+            .maxAccel(31*12d) // just under 1g
+            .p(0.025)
             .tolerance(0.2);
     public static ProfileGains kVelocityGains = new ProfileGains()
             .f(0.00015)
@@ -70,7 +73,8 @@ public class NeoDriveModule extends Module {
             .maxVelocity(kMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
             .slot(VELOCITY_PID_SLOT)
             .velocityConversion(kDriveNEOVelocityFactor);
-    public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.0285);
+//    public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.0285);
+    public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.02).f(0.1);
 
     // ========================================
     // DO NOT MODIFY THESE OTHER CONSTANTS
@@ -133,6 +137,17 @@ public class NeoDriveModule extends Module {
         resetOdometry(TrajectoryCommandUtils.getJSONTrajectory().getInitialPose());
         kInitialXPosition = mOdometry.getPoseMeters().getX();
         kInitialYPosition = mOdometry.getPoseMeters().getY();
+        if(pMode == EMatchMode.AUTONOMOUS) {
+            mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
+            mRightMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
+            mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
+            mRightFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        } else {
+            mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
+            mRightMaster.setIdleMode(CANSparkMax.IdleMode.kCoast);
+            mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
+            mRightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        }
     }
     @Override
     public void readInputs() {
@@ -141,8 +156,8 @@ public class NeoDriveModule extends Module {
         double odoY = mOdometry.getPoseMeters().getY() - kInitialYPosition;
         db.drivetrain.set(GET_X_OFFSET_METERS, odoX);
         db.drivetrain.set(GET_Y_OFFSET_METERS, odoY);
-        db.drivetrain.set(ACTUAL_HEADING_RADIANS, mGyro.getHeading().getRadians());
-        db.drivetrain.set(ACTUAL_HEADING_DEGREES, mGyro.getHeading().getDegrees());
+        db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getHeading().getRadians());
+        db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getHeading().getDegrees());
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getOutputCurrent());
@@ -170,6 +185,7 @@ public class NeoDriveModule extends Module {
         double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
         double left = throttle + turn;
         double right = throttle - turn;
+        ECommonNeutralMode neutralMode = db.drivetrain.get(NEUTRAL_MODE, ECommonNeutralMode.class);
         if (state == null) return;
         switch (state) {
             case RESET:
@@ -184,8 +200,6 @@ public class NeoDriveModule extends Module {
                 mRightCtrl.setReference(right * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
                 break;
             case TURN_TO:
-                mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                mRightMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
                 mTurnToDegreePID.setSetpoint(db.drivetrain.get(DESIRED_TURN_ANGLE_deg));
                 double output = mTurnToDegreePID.calculate(db.drivetrain.get(ACTUAL_HEADING_DEGREES), clock.getCurrentTimeInMillis());
                 db.drivetrain.set(DESIRED_TURN_PCT, output);
@@ -199,10 +213,6 @@ public class NeoDriveModule extends Module {
                         CANSparkMax.ControlType.kSmartMotion, SMART_MOTION_PID_SLOT, 0 );
                 break;
             case POSITION:
-                mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                mRightMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
-                mRightFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
                 mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS_FT));
                 mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS_FT));
                 double lMeasurement = db.drivetrain.get(L_ACTUAL_POS_FT);

@@ -66,6 +66,7 @@ public class IntakeModule extends Module {
         }
         switch (mode) {
             case DEFAULT:
+            case EXTEND:
                 mArmSolenoid.set(DoubleSolenoid.Value.kReverse);
                 db.intake.set(PNEUMATIC_STATE, 1.0);
                 break;
