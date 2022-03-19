@@ -221,9 +221,7 @@ public class Robot extends TimedRobot {
         CLOCK.update();
         if ( Settings.kIsLogging && MODE != DISABLED) {
             for ( RobotCodex c : DATA.mLoggedCodexes ) {
-                if ( c.hasChanged() ) {
-                    mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
-                }
+                mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
             }
         }
         for ( RobotCodex c : DATA.mAllCodexes ) {

@@ -56,11 +56,17 @@ public class CSVLogger {
     }
 
     public void logFromCodexToCSVLog( Log pLog ) {
+        boolean foundLog =false;
         for ( CSVWriter c : mCSVWriters ) {
             if ( c.getMetaDataOfAssociatedCodex().gid() == pLog.getmGlobalId() ) {
+                foundLog = true;
                 c.log( pLog.getmLogData() );
                 break;
             }
+        }
+
+        if(!foundLog) {
+            System.err.println("ERROR: FAILED TO FIND A LOG TO WRITE TO: " + pLog.getmGlobalId());
         }
     }
 
@@ -68,6 +74,7 @@ public class CSVLogger {
      * Opens the queue
      */
     public void start() {
+        System.err.println("PASSED: STARTING!!");
         mIsAcceptingToQueue = true;
     }
 
@@ -79,14 +86,9 @@ public class CSVLogger {
     }
 
     public void addToQueue( Log pLog ) {
-        if ( mIsAcceptingToQueue ) {
-            kCSVLoggerQueue.add( pLog );
-        }
-    }
-
-    public void closeWriters() {
-        for ( CSVWriter cw : mCSVWriters ) {
-            cw.close();
+        kCSVLoggerQueue.add( pLog );
+        if ( !mIsAcceptingToQueue ) {
+            System.err.println("FAILED: CANNOT ADD TO QUEUE");
         }
     }
 

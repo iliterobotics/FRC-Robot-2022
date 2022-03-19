@@ -8,15 +8,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import us.ilite.common.config.Settings;
 import us.ilite.robot.Robot;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.rmi.server.ExportException;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Optional;
 
 import static us.ilite.logging.CSVLogger.kCSVLoggerQueue;
 
@@ -26,8 +23,6 @@ public class CSVWriter {
     //public static final String USER_DIR = System.getProperty("user.home");
     private static final String LOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
     private static String eventName = DriverStation.getInstance().getEventName();
-    private Optional<BufferedWriter> bw;
-
     private final ILog mLog = Logger.createLog(CSVWriter.class);
     private static int mLogFailures;
 
@@ -43,13 +38,6 @@ public class CSVWriter {
         if ( file != null ) {
             handleCreation( file );
         }
-
-        bw = Optional.empty();
-        try  {
-            if ( file != null ) {
-                bw = Optional.of( new BufferedWriter( new FileWriter( file,true) ) );
-            }
-        } catch ( Exception e ) {}
 
         if ( eventName.length() <= 0 ) {
             // event name format: MM-DD-YYYY_HH-MM-SS
@@ -73,11 +61,11 @@ public class CSVWriter {
 
     public void log( String s ) {
         try {
-            if ( bw.isPresent() ) {
-                bw.get().append(s);
-                bw.get().newLine();
+            if ( file.exists()) {
+                Files.writeString(file.toPath(),s+System.lineSeparator(), StandardOpenOption.APPEND);
             }
             else {
+                System.err.println("ERROR: FILE: " +file + " does not exist!!");
                 if ( mLogFailures < Settings.kAcceptableLogFailures ) {
                     mLog.error("Failure with logging codex: " + mCodex.meta().getEnum().getSimpleName() );
                     mLog.error( "Could not find Path:  (Path to USB)  on roborio! Try plugging in the USB." );
@@ -91,17 +79,6 @@ public class CSVWriter {
             }
         } catch (IOException pE) {
             pE.printStackTrace();
-        }
-    }
-
-    public void close() {
-        if ( bw.isPresent() ) {
-            try {
-                bw.get().flush();
-                bw.get().close();
-            }
-            catch ( Exception e ) {}
-
         }
     }
 
