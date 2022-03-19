@@ -14,4 +14,10 @@ public enum EClimberModuleData {
     IS_COAST,
     BUS_VOLTAGE_RIGHT,
     BUS_VOLTAGE_LEFT,
+    L_ROTATIONS,
+    R_ROTATIONS,
+    L_DEGREES,
+    R_DEGREES,
+    L_TEMPERATURE,
+    R_TEMPERATURE,
     }

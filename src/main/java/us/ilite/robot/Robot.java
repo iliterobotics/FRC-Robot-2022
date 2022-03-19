@@ -138,7 +138,6 @@ public class Robot extends TimedRobot {
         if ( Settings.kIsLogging ){
             mCSVLogger.start();
         }
-
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFeeder);

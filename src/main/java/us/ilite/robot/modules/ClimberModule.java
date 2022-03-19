@@ -22,6 +22,7 @@ public class ClimberModule extends Module{
     public static final double kClimberRatio = (12.0 / 72.0) * (20.0 / 80.0) * (20.0 / 80.0) * (16.0 / 42.0);
     public static final double kMaxFalconSpeed = 6380 * kClimberRatio;
     public static final double kScaledUnitsToRPM = (600.0 / 2048.0) * kClimberRatio;
+    public static final double kScaledUnitsToRotations = (1.0 / 2048.0) * kClimberRatio;
 
     public ClimberModule() {
         mCLMR11 = new TalonFX(Settings.HW.CAN.kCLM1);
@@ -49,6 +50,13 @@ public class ClimberModule extends Module{
         db.climber.set(EClimberModuleData.R_OUTPUT_CURRENT, mCLMR11.getSupplyCurrent());
         db.climber.set(EClimberModuleData.BUS_VOLTAGE_LEFT, mCL12.getBusVoltage());
         db.climber.set(EClimberModuleData.BUS_VOLTAGE_RIGHT, mCLMR11.getBusVoltage());
+        db.climber.set(EClimberModuleData.L_DEGREES, mCL12.getSelectedSensorPosition() * kScaledUnitsToRotations * 360);
+        db.climber.set(EClimberModuleData.R_DEGREES, mCLMR11.getSelectedSensorPosition() * kScaledUnitsToRotations * 360);
+        db.climber.set(EClimberModuleData.L_ROTATIONS, mCL12.getSelectedSensorPosition() * kScaledUnitsToRotations);
+        db.climber.set(EClimberModuleData.R_ROTATIONS, mCLMR11.getSelectedSensorPosition() * kScaledUnitsToRotations);
+        //This is in celsius
+        db.climber.set(EClimberModuleData.L_TEMPERATURE, mCL12.getTemperature());
+        db.climber.set(EClimberModuleData.R_TEMPERATURE, mCLMR11.getTemperature());
     }
 
 
