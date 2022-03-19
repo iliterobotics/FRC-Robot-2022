@@ -5,15 +5,42 @@ public class Enums {
         VELOCITY,
         POSITION,
         PERCENT_OUTPUT,
+        BEGIN_HANG,
         DEFAULT
     }
 
-    public enum EHangerPneumaticMode {
-        DEFAULT,
-        B_CLAMPED,
-        A_RELEASED,
-        B_RELEASED,
-        IS_A_CLAMPED
+    public enum EClimberAngle {
+        // Rungs/Stages
+        VERTICAL(90, 0),
+        MID(90, 1),
+        HIGH(-15, 2),
+        TRAVERSAL(-195, 3),
+
+        // States
+        START(0),
+        END(45),
+        BALANCE(0);
+
+        final int kAngle;
+        final int kStage;
+
+        EClimberAngle(int pAngle) {
+            kAngle = pAngle;
+            kStage = -1;
+        }
+
+        EClimberAngle(int pAngle, int pStage) {
+            kAngle = pAngle;
+            kStage = pStage;
+        }
+
+        public int getAngle() {
+            return kAngle;
+        }
+
+        public int getStage() {
+            return kStage;
+        }
     }
 
     // =============================================================================

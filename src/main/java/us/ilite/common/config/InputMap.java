@@ -79,14 +79,17 @@ public class InputMap {
         public static final ELogitech310
         SPIN_DOUBLE = ELogitech310.RIGHT_TRIGGER_AXIS,
         SPIN_SINGLE = ELogitech310.RIGHT_TRIGGER_AXIS,
-        BOOST_MODE = ELogitech310.R_BTN,
-        SNAIL_MODE = ELogitech310.L_BTN,
+//        BOOST_MODE = ELogitech310.R_BTN,
+//        SNAIL_MODE = ELogitech310.L_BTN,
         POSITION_LOCK = ELogitech310.START,
-        SET_COAST = ELogitech310.BACK,
+//        SET_COAST = ELogitech310.BACK,
         CLAMP_DOUBLE = ELogitech310.DPAD_UP,
         RELEASE_DOUBLE = ELogitech310.DPAD_DOWN,
         CLAMP_SINGLE = ELogitech310.Y_BTN,
-        RELEASE_SINGLE = ELogitech310.A_BTN
+        RELEASE_SINGLE = ELogitech310.A_BTN,
+
+        // Experimental Inputs for automation
+        CLIMB_TO_NEXT_RUNG = ELogitech310.R_BTN
         ;
     }
 
