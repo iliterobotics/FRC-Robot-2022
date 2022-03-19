@@ -4,6 +4,8 @@ import com.flybotix.hfr.codex.CodexMetadata;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -51,6 +53,9 @@ public class CSVWriter {
      */
     private final File logfile;
 
+    private int logCounter = 0;
+    private final NetworkTable csvWriterTable;
+
     /**
      * Creates the {@link CSVWriter}
      * @param pParentLogger
@@ -59,6 +64,8 @@ public class CSVWriter {
      *  The codex that this writter is handling events for
      */
     CSVWriter(CSVLogger pParentLogger, RobotCodex<?> pCodex) {
+
+        csvWriterTable = NetworkTableInstance.getDefault().getTable("CSVWritter");
         mParentLogger = pParentLogger;
         mCodex = pCodex;
 
@@ -82,6 +89,7 @@ public class CSVWriter {
      *  The line of text to write to the file
      */
     private void write_line(String pLine) {
+        logCounter++;
         String logState = "";
         int logFails = -1;
         if(logfile != null && logfile.exists()) {
@@ -98,7 +106,7 @@ public class CSVWriter {
             logState = "Log Failed, log file null or does not exist";
         }
 
-//        SmartDashboard.putString("CSVLogger-"+mCodex.meta().getEnum(),logState);
+        csvWriterTable.getEntry(mCodex.meta().getEnum().toString()).setString(logCounter + ": "+logState);
     }
 
     void logCSVLine(String s ) {
