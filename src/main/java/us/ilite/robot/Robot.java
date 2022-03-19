@@ -140,7 +140,6 @@ public class Robot extends TimedRobot {
         if ( Settings.kIsLogging ){
             mCSVLogger.start();
         }
-
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFeeder);
@@ -175,9 +174,10 @@ public class Robot extends TimedRobot {
     public void disabledPeriodic() {
         mOI.safeReadInputs();
 //        mDrive.safeReadInputs();
-        mNeoDrive.safeReadInputs();
-        mIntake.safeReadInputs();
-        mFeeder.safeReadInputs();
+//        mNeoDrive.safeReadInputs();
+//        mIntake.safeReadInputs();
+//        mFeeder.safeReadInputs();
+        mClimber.safeReadInputs();
         //Shuffleboard.update();
     }
 
