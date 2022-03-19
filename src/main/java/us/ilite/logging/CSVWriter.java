@@ -85,7 +85,7 @@ public class CSVWriter {
         String logState = "";
         int logFails = -1;
         if(logfile != null && logfile.exists()) {
-            try(BufferedWriter bw = new BufferedWriter(new FileWriter(logfile))) {
+            try(BufferedWriter bw = new BufferedWriter(new FileWriter(logfile, true))) {
                 bw.append(pLine);
                 bw.newLine();
                 logState = "Log Written-"+System.currentTimeMillis();
