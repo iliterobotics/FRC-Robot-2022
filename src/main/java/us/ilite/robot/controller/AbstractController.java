@@ -62,6 +62,14 @@ public abstract class AbstractController {
         db.drivetrain.set(DESIRED_TURN_PCT,0.0);
     }
 
+    protected void setIntakeArmEnabled(boolean enabled) {
+        if (enabled) {
+            db.intake.set(EIntakeData.ARM_STATE, EArmState.EXTEND);
+        } else {
+            db.intake.set(EIntakeData.ARM_STATE, EArmState.RETRACT);
+        }
+    }
+
     protected abstract void updateImpl();
 
     protected void updateBalls() {
@@ -111,8 +119,7 @@ public abstract class AbstractController {
     }
 
     protected void intakeCargo() {
-
-        db.intake.set(EIntakeData.ARM_STATE, Enums.EArmState.EXTEND);
+        indexCargo();
         db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
         db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 1.0);
     }
