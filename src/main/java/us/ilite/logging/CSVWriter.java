@@ -55,7 +55,10 @@ public class CSVWriter {
         if(!pFile.exists()) {
             try {
                 pFile.createNewFile();
-            } catch (IOException e) {}
+                System.err.println("PASSED: CREATED FILE: " + pFile.toPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -120,7 +123,6 @@ public class CSVWriter {
                     DriverStation.getInstance().getMatchNumber()
             ));
         }
-        mLog.error("Creating log file at ", file.toPath());
 
         return file;
     }
