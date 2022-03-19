@@ -62,7 +62,7 @@ public class Settings {
             public static final int kEDTLB = 2;
             public static final int kEDTRA = 1;
             public static final int kEDTRB = 0;
-            public static final int kINEntryBeam = 9;
+            public static final int kINEntryBeam = 4;
             public static final int kINExitBeam = 10;
         }
 

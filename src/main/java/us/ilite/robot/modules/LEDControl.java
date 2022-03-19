@@ -33,12 +33,8 @@ public class LEDControl extends Module {
         this.mBlinkTimer.reset();
     }
 
-    public void readInputs() {
-
-    }
-
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
         //set the LED output to a color
         color = db.ledcontrol.get(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.class);
         if (db.ledcontrol.get(ELEDControlData.LED_STATE) == 1d) {

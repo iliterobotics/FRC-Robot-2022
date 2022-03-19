@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.Data;
-import us.ilite.common.Field2022;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
@@ -43,12 +42,12 @@ public class Robot extends TimedRobot {
     private ClimberModule mHanger;
     private Timer initTimer = new Timer();
 
-    private DriveModule mDrive;
     private LEDControl mLEDControl;
     private SimulationModule mSimulation;
     private FeederModule mFeeder;
     private IntakeModule mIntake;
     private ClimberModule mClimber;
+    private NeoDriveModule mNeoDrive;
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -56,6 +55,8 @@ public class Robot extends TimedRobot {
     private final AbstractController mTeleopController = TeleopController.getInstance();
     private BaseAutonController mBaseAutonController;
     private ShootMoveController mShootMoveController;
+    private ThreeBallController mThreeBallController;
+    private TwoBallController mTwoBallController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
@@ -68,7 +69,9 @@ public class Robot extends TimedRobot {
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
-        mDrive = new DriveModule();
+        mThreeBallController = new ThreeBallController();
+        mTwoBallController = new TwoBallController();
+//        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -77,6 +80,7 @@ public class Robot extends TimedRobot {
         mIntake = new IntakeModule();
         mLEDControl = new LEDControl();
         mClimber = new ClimberModule();
+        mNeoDrive = new NeoDriveModule();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -117,14 +121,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        MODE=AUTONOMOUS;
-        mActiveController = mShootMoveController;
-        mShootMoveController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        MODE = AUTONOMOUS;
+        mActiveController = mTwoBallController;
+        mTwoBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mNeoDrive);
         mRunningModules.modeInit(AUTONOMOUS);
     }
 
@@ -138,12 +142,11 @@ public class Robot extends TimedRobot {
         if ( Settings.kIsLogging ){
             mCSVLogger.start();
         }
-
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mNeoDrive);
         mRunningModules.addModule(mClimber);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
@@ -160,6 +163,7 @@ public class Robot extends TimedRobot {
     public void disabledInit() {
         MODE=DISABLED;
         mLogger.info("Disabled Initialization");
+        mRunningModules.modeInit(DISABLED);
 
         mRunningModules.shutdown();
 
@@ -170,11 +174,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        mOI.readInputs();
-        mDrive.readInputs();
-        mIntake.readInputs();
-        mFeeder.readInputs();
-        Shuffleboard.update();
+        mOI.safeReadInputs();
+//        mDrive.safeReadInputs();
+//        mNeoDrive.safeReadInputs();
+//        mIntake.safeReadInputs();
+//        mFeeder.safeReadInputs();
+        mClimber.safeReadInputs();
+        //Shuffleboard.update();
     }
 
     @Override
@@ -193,7 +199,7 @@ public class Robot extends TimedRobot {
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
         mRunningModules.addModule(mFeeder);
-        mRunningModules.addModule(mDrive);
+        mRunningModules.addModule(mNeoDrive);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mLEDControl);
         if(IS_SIMULATED) {
@@ -223,9 +229,9 @@ public class Robot extends TimedRobot {
             c.reset();
         }
 
-        mRunningModules.readInputs();
+        mRunningModules.safeReadInputs();
         mActiveController.update();
-        mRunningModules.setOutputs();
+        mRunningModules.safeSetOutputs();
         SmartDashboard.putNumber("common_periodic_dt", Timer.getFPGATimestamp() - start);
         SmartDashboard.putNumber("Clock Time", CLOCK.now());
     }

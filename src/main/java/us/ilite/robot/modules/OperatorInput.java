@@ -35,15 +35,10 @@ public class OperatorInput extends Module {
     }
 
     @Override
-    public void readInputs() {
+    protected void readInputs() {
         ELogitech310.map(db.driverinput, mDriverJoystick);
         ELogitech310.map(db.operatorinput, mOperatorJoystick);
         ELogitech310.map(db.tankinput, mTankJoystick);
-    }
-
-    @Override
-    public void setOutputs() {
-
     }
 
 }

@@ -27,14 +27,15 @@ public class SimulationModule extends Module {
     }
 
     @Override
-    public void readInputs() {
+    protected void readInputs() {
         doPhysics();
         currentAngle = 0;
         currentPositionDeg += currentAngle - lastAngle;
         currentVelocityDegPerSec = (currentAngle - lastAngle) / clock.dt();
         direction = Math.signum(currentAngle - lastAngle);
     }
-    public void setOutputs() {
+    @Override
+    protected void setOutputs() {
         lastAngle = currentAngle;
         SmartDashboard.putNumber("RAW POT", currentAngle);
         SmartDashboard.putNumber("POT POS", currentPositionDeg);

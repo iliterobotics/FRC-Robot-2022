@@ -1,0 +1,20 @@
+{
+  "NetworkTables": {
+    "SmartDashboard": {
+      "Field": {
+        "open": true
+      },
+      "open": true
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auton Configuration/Choose Auton Controller": "String Chooser",
+      "/SmartDashboard/Field": "Field2d"
+    }
+  },
+  "NetworkTables Settings": {
+    "dsClient": false,
+    "mode": "Client",
+    "serverTeam": "10.18.85.2"
+  }
+}

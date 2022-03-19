@@ -7,13 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.config.Settings;
@@ -26,7 +20,6 @@ import static us.ilite.common.types.ELimelightData.TV;
 import static us.ilite.common.types.ELimelightData.TX;
 import static us.ilite.common.types.drive.EDriveData.*;
 
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
 import static us.ilite.common.types.sensor.EPowerDistPanel.*;
@@ -41,7 +34,7 @@ import us.ilite.robot.hardware.*;
  * driver-control.
  */
 public class VioletDriveModule extends Module {
-    private final ILog mLogger = Logger.createLog(DriveModule.class);
+    private final ILog mLogger = Logger.createLog(FalconDriveModule.class);
 
     // DO NOT CHANGE THE GEAR RATIO
     public static double kGearboxRatio = (10.0 / 40.0) * (14.0 / 40.0);
@@ -311,7 +304,7 @@ public class VioletDriveModule extends Module {
     }
 
     @Override
-    public void readInputs() {
+    protected void readInputs() {
         mGyro.update();
         SmartDashboard.putNumber("VioletDrive::Gyro Heading",mGyro.getHeading().getDegrees());
         db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
@@ -344,7 +337,7 @@ public class VioletDriveModule extends Module {
     }
 
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
         mLastHeading = mGyro.getHeading().getDegrees();
         EDriveState mode = db.drivetrain.get(STATE, EDriveState.class);
         // Do this to prevent wonkiness while transitioning autonomous to teleop

@@ -5,15 +5,48 @@ public class Enums {
         VELOCITY,
         POSITION,
         PERCENT_OUTPUT,
+        BEGIN_HANG,
         DEFAULT
     }
 
-    public enum EHangerPneumaticMode {
-        DEFAULT,
-        B_CLAMPED,
-        A_RELEASED,
-        B_RELEASED,
-        IS_A_CLAMPED
+    public enum EClampMode {
+        NULL,
+        CLAMPED,
+        RELEASED
+    }
+
+    public enum EClimberAngle {
+        // Rungs/Stages
+        VERTICAL(90, 0),
+        MID(90, 1),
+        HIGH(-15, 2),
+        TRAVERSAL(-195, 3),
+
+        // States
+        START(0),
+        END(45),
+        BALANCE(0);
+
+        final int kAngle;
+        final int kStage;
+
+        EClimberAngle(int pAngle) {
+            kAngle = pAngle;
+            kStage = -1;
+        }
+
+        EClimberAngle(int pAngle, int pStage) {
+            kAngle = pAngle;
+            kStage = pStage;
+        }
+
+        public int getAngle() {
+            return kAngle;
+        }
+
+        public int getStage() {
+            return kStage;
+        }
     }
 
     // =============================================================================
@@ -103,6 +136,7 @@ public class Enums {
     // Drivetrain States
     // =============================================================================
     public enum EDriveState {
+        NULL,
         NORMAL,
         RESET,
         PATH_FOLLOWING_BASIC,
@@ -113,7 +147,7 @@ public class Enums {
         VELOCITY,
         PERCENT_OUTPUT,
         POSITION,
-        MOTION_MAGIC,
+        SMART_MOTION,
         TURN_TO,
         TURN_FOR,
         HOME,
@@ -126,16 +160,19 @@ public class Enums {
     // Intake Module States
     // =============================================================================
     public enum ERollerState {
+        NULL,
         PERCENT_OUTPUT,
         VELOCITY;
     }
 
     public enum EArmState {
+        NULL,
         EXTEND,
         RETRACT,
         DEFAULT;
     }
     public enum EFeederState {
+        NULL,
         PERCENT_OUTPUT,
         INDEXING_VELOCITY;
     }

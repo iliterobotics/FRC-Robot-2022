@@ -2,18 +2,18 @@ package us.ilite.robot.commands;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Angle;
 import us.ilite.common.Distance;
-import us.ilite.common.config.Settings;
-import us.ilite.common.lib.control.PIDController;
+import edu.wpi.first.math.controller.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 
-import static us.ilite.common.types.sensor.EGyro.HEADING_DEGREES;
-
 import static us.ilite.common.types.drive.EDriveData.*;
+
+import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.ECommonNeutralMode;
-import us.ilite.robot.modules.DriveModule;
+import us.ilite.robot.modules.NeoDriveModule;
 
 
 /**
@@ -21,10 +21,8 @@ import us.ilite.robot.modules.DriveModule;
  * Acceleration/deceleration can be controlled using either a custom implementation relying on
  * % output or the Talon's motion magic control mode.
  */
-@Deprecated
 public class DriveStraight implements ICommand {
 
-    private final EDriveControlMode mDriveControlMode;
 
     private Distance mDistanceToDrive;
     private Distance mInitialDistance;
@@ -35,15 +33,12 @@ public class DriveStraight implements ICommand {
     private double mRampDistance = 120.0;
     private double mLastTime = 0.0;
     private double mStartTime = 0.0;
-    private PIDController mHeadingController = new PIDController(
-            DriveModule.kDriveHeadingGains, -180.0, 180.0, Settings.kControlLoopPeriod);
+    private PIDController mHeadingController = NeoDriveModule.kTurnToProfileGains.generateWPIPIDController();
+    private ProfiledPIDController mDistanceController = NeoDriveModule.kPositionGains.generateController();
 
-//    private ProfiledPIDController mDistanceController = DriveModule.mPositionPID.getPIDGains().generateController();
-
-    public DriveStraight(EDriveControlMode pDriveControlMode, Distance pDistanceToDrive) {
+    public DriveStraight( Distance pDistanceToDrive) {
         mDistanceToDrive = pDistanceToDrive;
-        mDriveControlMode = pDriveControlMode;
-       // mDistanceController.setGoal(mDistanceToDrive.inches());
+        mDistanceController.setGoal(mDistanceToDrive.inches());
     }
 
     /**
@@ -62,38 +57,37 @@ public class DriveStraight implements ICommand {
     public void init(double pNow) {
         // Set target heading to current heading if setTargetHeading() wasn't called manually
         if(mTargetHeading == null) {
-            // TODO - was this inverted?
-            mTargetHeading = Rotation2d.fromDegrees(Robot.DATA.imu.get(HEADING_DEGREES));
+            mTargetHeading = Rotation2d.fromDegrees(Robot.DATA.drivetrain.get(ACTUAL_HEADING_DEGREES));
         }
         mInitialDistance = getAverageDriveDistance();
         mLastTime = pNow;
         mStartTime = pNow;
-
-        mHeadingController.setContinuous(true);
-        mHeadingController.setOutputRange(-1.0, 1.0);
+        mHeadingController.setSetpoint(getHeading().degrees());
         mHeadingController.reset();
     }
 
     @Override
     public boolean update(double pNow) {
 
-//        double turn = mHeadingController.calculate(getHeading().degrees(), pNow - mLastTime);
+        double turn = mHeadingController.calculate(getHeading().degrees());
 //        // TODO - the units here are probably incorrect
-//        double throttle = mDistanceController.calculate(getAverageDriveDistance().inches());
+        double throttle = mDistanceController.calculate(getAverageDriveDistance().inches());
+        SmartDashboard.putNumber("Distance Error", mDistanceController.getPositionError());
 //
-//        if(mDistanceController.atSetpoint()) {
-//            return true;
-//        } else {
-//            Robot.DATA.drivetrain.set(NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
-//            mLastTime = pNow;
-//            return false;
-//        }
-        return false;
-
+        if(mDistanceController.atSetpoint()) {
+            return true;
+        } else {
+            Robot.DATA.drivetrain.set(NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
+            Robot.DATA.drivetrain.set(STATE, Enums.EDriveState.PERCENT_OUTPUT);
+            Robot.DATA.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
+            Robot.DATA.drivetrain.set(DESIRED_TURN_PCT, turn);
+            mLastTime = pNow;
+            return false;
+        }
     }
 
     protected Angle getHeading() {
-        return Angle.fromDegrees(Robot.DATA.imu.get(HEADING_DEGREES));
+        return Angle.fromDegrees(Robot.DATA.drivetrain.get(ACTUAL_HEADING_DEGREES));
     }
 
     @Override
@@ -123,7 +117,7 @@ public class DriveStraight implements ICommand {
     }
 
     public DriveStraight setHeadingGains(ProfileGains pHeadingControlGains) {
-        mHeadingController.setPIDGains(pHeadingControlGains);
+        mHeadingController.setPID(pHeadingControlGains.P, pHeadingControlGains.I, pHeadingControlGains.D);
         return this;
     }
 

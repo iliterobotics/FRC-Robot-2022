@@ -16,6 +16,7 @@ public class IntakeModule extends Module {
     private final TalonFX mIntakeRoller;
     private final DoubleSolenoid mArmSolenoid;
     private final Compressor mCompressor;
+    private boolean mIntakeState = false;
 
     // ========================================
     // DO NOT MODIFY THESE CONSTANTS
@@ -38,12 +39,14 @@ public class IntakeModule extends Module {
         mArmSolenoid = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
         mCompressor = new Compressor(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH);
         mCompressor.enableAnalog(100, 110);
+        mArmSolenoid.set(DoubleSolenoid.Value.kForward);
+        db.intake.set(PNEUMATIC_STATE, 1.0);
     }
 
     @Override
-    public void readInputs() {
+    protected void readInputs() {
         db.intake.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
-        db.intake.set(FEEDER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
+        db.intake.set(ROLLER_PCT, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
         db.intake.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
         db.intake.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
         db.intake.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
@@ -51,7 +54,7 @@ public class IntakeModule extends Module {
     }
 
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
        setPneumaticState();
        setRollerState();
     }
@@ -63,10 +66,13 @@ public class IntakeModule extends Module {
         }
         switch (mode) {
             case DEFAULT:
+            case EXTEND:
                 mArmSolenoid.set(DoubleSolenoid.Value.kReverse);
+                db.intake.set(PNEUMATIC_STATE, 1.0);
                 break;
             case RETRACT:
                 mArmSolenoid.set(DoubleSolenoid.Value.kForward);
+                db.intake.set(PNEUMATIC_STATE, 2.0);
                 break;
         }
     }
@@ -78,7 +84,7 @@ public class IntakeModule extends Module {
         }
         switch (mode) {
             case PERCENT_OUTPUT:
-                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.intake.get(DESIRED_pct));
+                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.intake.get(DESIRED_ROLLER_pct));
                 break;
         }
     }

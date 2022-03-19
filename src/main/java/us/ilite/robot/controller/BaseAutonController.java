@@ -1,7 +1,6 @@
 package us.ilite.robot.controller;
 
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -19,12 +18,9 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
-import us.ilite.common.types.EFeederData;
-import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
-import us.ilite.robot.TrajectoryCommandUtils;
-import us.ilite.robot.modules.DriveModule;
+import us.ilite.robot.modules.FalconDriveModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +94,7 @@ public class BaseAutonController extends AbstractController {
         mMotorPidController = new PIDController(0.00051968,0,0);
         mTimer = new Timer();
         mFirstLeg = new Timer();
-        mDriveKinematics = new DifferentialDriveKinematics(Units.feet_to_meters(DriveModule.kTrackWidthFeet));
+        mDriveKinematics = new DifferentialDriveKinematics(Units.feet_to_meters(FalconDriveModule.kTrackWidthFeet));
         SmartDashboard.putNumber("trajectory-seconds",-1);
     }
 
@@ -117,9 +113,6 @@ public class BaseAutonController extends AbstractController {
         mMotorPidController.reset();
         mPrevTime = -1;
         mTrajectory = pTrajectory;
-//      Trajectory trajectory = TrajectoryCommandUtils.getJSONTrajectory();
-//      Transform2d transform = getRobotPose().minus(trajectory.getInitialPose());
-//      mTrajectory = trajectory.transformBy(transform);
         initialState = mTrajectory.sample(0);
         SmartDashboard.putNumber("Initial state x", initialState.poseMeters.getX());
         SmartDashboard.putNumber("Initial state y", initialState.poseMeters.getY());
@@ -129,32 +122,6 @@ public class BaseAutonController extends AbstractController {
     }
     @Override
     protected void updateImpl() {
-        db.drivetrain.set(EDriveData.NEUTRAL_MODE, NeutralMode.Brake);
-        if (mFirstLeg.get() < 0.5) {
-            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 1.0);
-            db.intake.set(EIntakeData.ARM_STATE, Enums.EArmState.DEFAULT);
-        } else if (mFirstLeg.get() == 0.5) {
-            mTimer.reset();
-        } else {
-            db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-            db.intake.set(EIntakeData.DESIRED_pct, 1.0);
-            execute();
-            if (isFinished()) {
-                if (db.drivetrain.get(EDriveData.ACTUAL_HEADING_DEGREES) >= 85 && db.drivetrain.get(EDriveData.ACTUAL_HEADING_DEGREES) <= 95) {
-                    mCycleCount++;
-                }
-                if (mCycleCount >= 5) {
-//                    initialize(TrajectoryCommandUtils.getOtherJSONTrajectory());
-//                    execute();
-                } else {
-                    db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.TURN_TO);
-                    db.drivetrain.set(EDriveData.DESIRED_TURN_ANGLE_deg, 120);
-                    db.drivetrain.set(EDriveData.DESIRED_THROTTLE_PCT, 0.05);
-                }
-            }
-
-        }
 
     }
     private static int EXEC_COUNT = 1;
@@ -204,10 +171,10 @@ public class BaseAutonController extends AbstractController {
         data.add(instActualAccelLeft);
         data.add(instActualAccelRight);
 
-        perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds, data);
+        ramseteFollow(curTime, dT, actualSpeeds, targetWheelSpeeds, data);
     }
 
-    private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds,
+    protected void ramseteFollow(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds,
                                  DifferentialDriveWheelSpeeds targetWheelSpeeds, List<Object>data) {
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         MutablePair<Double,Double> output = new MutablePair<>();
