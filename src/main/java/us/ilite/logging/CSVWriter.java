@@ -55,9 +55,10 @@ public class CSVWriter {
         if(!pFile.exists()) {
             try {
                 pFile.createNewFile();
-                System.err.println("PASSED: CREATED FILE: " + pFile.toPath());
             } catch (IOException e) {
-                e.printStackTrace();
+                if(Settings.kLogExceptions) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -68,7 +69,6 @@ public class CSVWriter {
                 Files.writeString(file.toPath(),s+System.lineSeparator(), StandardOpenOption.APPEND);
             }
             else {
-                System.err.println("ERROR: FILE: " +file + " does not exist!!");
                 if ( mLogFailures < Settings.kAcceptableLogFailures ) {
                     mLog.error("Failure with logging codex: " + mCodex.meta().getEnum().getSimpleName() );
                     mLog.error( "Could not find Path:  (Path to USB)  on roborio! Try plugging in the USB." );
@@ -81,7 +81,9 @@ public class CSVWriter {
                 }
             }
         } catch (IOException pE) {
-            pE.printStackTrace();
+            if(Settings.kLogExceptions) {
+                pE.printStackTrace();
+            }
         }
     }
 

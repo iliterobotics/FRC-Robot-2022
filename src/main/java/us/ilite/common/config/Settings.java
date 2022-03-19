@@ -17,6 +17,7 @@ public class Settings {
     public static double kNetworkTableUpdateRate = 0.01;
     public static boolean kIsLogging = true; // decide whether or not to log
     public static int sCODEX_COMMS_PORT = 5805;
+    public static boolean kLogExceptions = false;
 
 
     // ==================================================
