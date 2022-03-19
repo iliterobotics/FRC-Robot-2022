@@ -105,7 +105,21 @@ public class TeleopController extends BaseManualController { //copied from TestC
                 db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.4);
             } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
                 db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.4);
-            } else {
+            } else if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberModuleData.DESIRED_POS_deg, -90);
+                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+            }
+            else if (db.operatorinput.isSet(InputMap.HANGER.HIGH_RUNG)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 90);
+            }
+            else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 285);
+            }
+            else {
                 db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0);
             }
         }
@@ -114,23 +128,15 @@ public class TeleopController extends BaseManualController { //copied from TestC
     private void updateHangerPneumatics() {
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_DOUBLE)) {
-                db.climber.set(EClimberModuleData.DOUBLE_CLAMPED, 1d);
-                mCurrentDoubleClamp = 1d;
-            } else if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_DOUBLE)) {
-                db.climber.set(EClimberModuleData.DOUBLE_CLAMPED, 0d);
-                mCurrentDoubleClamp = 0d;
-            } else {
-                db.climber.set(EClimberModuleData.DOUBLE_CLAMPED, mCurrentDoubleClamp);
+                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+            } if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_DOUBLE)) {
+                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
             }
 
             if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_SINGLE)) {
-                db.climber.set(EClimberModuleData.SINGLE_CLAMPED, 1d);
-                mCurrentSingleClamp = 1d;
-            } else if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_SINGLE)) {
-                db.climber.set(EClimberModuleData.SINGLE_CLAMPED, 0d);
-                mCurrentSingleClamp = 0d;
-            } else {
-                db.climber.set(EClimberModuleData.SINGLE_CLAMPED, mCurrentDoubleClamp);
+                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+            } if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_SINGLE)) {
+                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
             }
         }
     }
@@ -155,24 +161,26 @@ public class TeleopController extends BaseManualController { //copied from TestC
     }
 
     private void updateCargo() {
-        db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
-        db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-        if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_CARGO)) {
-            fireCargo();
-            mResetCount = true;
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
-            db.intake.set(DESIRED_ROLLER_pct, 1.0);
-            db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
-            indexCargo();
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.PLACE_CARGO)) {
-            placeCargo();
-        } else if (db.operatorinput.isSet(InputMap.OPERATOR.RELEASE_BALLS)) {
-            reverseCargo();
-            mResetCount = true;
-        } else {
-            db.feeder.set(SET_FEEDER_pct, 0d);
-            db.intake.set(DESIRED_ROLLER_pct, 0d);
-            mResetCount = false;
+        if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
+            db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
+            if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_CARGO)) {
+                fireCargo();
+                mResetCount = true;
+            } else if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
+                db.intake.set(DESIRED_ROLLER_pct, 1.0);
+                db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
+                indexCargo();
+            } else if (db.operatorinput.isSet(InputMap.OPERATOR.PLACE_CARGO)) {
+                placeCargo();
+            } else if (db.operatorinput.isSet(InputMap.OPERATOR.RELEASE_BALLS)) {
+                reverseCargo();
+                mResetCount = true;
+            } else {
+                db.feeder.set(SET_FEEDER_pct, 0d);
+                db.intake.set(DESIRED_ROLLER_pct, 0d);
+                mResetCount = false;
+            }
         }
     }
 

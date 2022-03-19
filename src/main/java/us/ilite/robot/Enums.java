@@ -9,6 +9,12 @@ public class Enums {
         DEFAULT
     }
 
+    public enum EClampMode {
+        NULL,
+        CLAMPED,
+        RELEASED
+    }
+
     public enum EClimberAngle {
         // Rungs/Stages
         VERTICAL(90, 0),

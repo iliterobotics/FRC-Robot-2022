@@ -47,8 +47,8 @@ public class InputMap {
         BOOST_MODE = ELogitech310.LEFT_TRIGGER_AXIS,
         HOME_TO_DRIVER_STATION = ELogitech310.X_BTN,
         DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.A_BTN,
-        ACTIVATE_CLIMB = ELogitech310.START
-
+        ACTIVATE_CLIMB = ELogitech310.START,
+        MID_RUNG = ELogitech310.L_BTN
         ;
     }
 
@@ -59,45 +59,21 @@ public class InputMap {
         SPIN_ROLLERS = ELogitech310.A_BTN,
         REVERSE_ROLLERS = ELogitech310.B_BTN,
         SPIN_FEEDER = ELogitech310.X_BTN,
-        REVERSE_FEEDER = ELogitech310.Y_BTN
-//        RELEASE_BALLS = ELogitech310.DPAD_LEFT,
-//        SHOOT_CARGO = ELogitech310.R_BTN,
-//        PLACE_CARGO = ELogitech310.L_BTN,
-//        MANUAL_BALLS_UP = ELogitech310.DPAD_UP,
-//        MANUAL_BALLS_DOWN = ELogitech310.DPAD_DOWN
-//        MANUAL_REV_SLOW = ELogitech310.RIGHT_TRIGGER_AXIS,
-//        MANUAL_FWD_SLOW = ELogitech310.LEFT_TRIGGER_AXIS,
-//        TOP_CLAMPED = ELogitech310.DPAD_UP,
-//        TOP_RELEASED = ELogitech310.DPAD_DOWN,
-//        BOTTOM_CLAMPED = ELogitech310.Y_BTN,
-//        BOTTOM_RELEASED = ELogitech310.A_BTN,
-//        SET_COAST = ELogitech310.BACK
         REVERSE_FEEDER = ELogitech310.Y_BTN,
         RELEASE_BALLS = ELogitech310.DPAD_LEFT,
-
         SHOOT_CARGO = ELogitech310.R_BTN,
-        PLACE_CARGO = ELogitech310.L_BTN,
-        MANUAL_BALLS_UP = ELogitech310.DPAD_UP,
-        MANUAL_BALLS_DOWN = ELogitech310.DPAD_DOWN,
-
-        //CLIMBER MAPPINGS
-        MANUAL_REV_SLOW = ELogitech310.RIGHT_TRIGGER_AXIS,
-        MANUAL_FWD_SLOW = ELogitech310.LEFT_TRIGGER_AXIS,
-        TOP_CLAMPED = ELogitech310.DPAD_UP,
-        TOP_RELEASED = ELogitech310.DPAD_DOWN,
-        BOTTOM_CLAMPED = ELogitech310.Y_BTN,
-        BOTTOM_RELEASED = ELogitech310.A_BTN,
-        SET_COAST = ELogitech310.BACK
+        PLACE_CARGO = ELogitech310.L_BTN
         ;
     }
 
     public static class HANGER {
         public static final ELogitech310
         SPIN_DOUBLE = ELogitech310.RIGHT_TRIGGER_AXIS,
-        SPIN_SINGLE = ELogitech310.RIGHT_TRIGGER_AXIS,
+        SPIN_SINGLE = ELogitech310.LEFT_TRIGGER_AXIS,
 //        BOOST_MODE = ELogitech310.R_BTN,
 //        SNAIL_MODE = ELogitech310.L_BTN,
-        POSITION_LOCK = ELogitech310.START,
+        HIGH_RUNG = ELogitech310.L_BTN,
+        TRAVERSAL_RUNG = ELogitech310.R_BTN,
 //        SET_COAST = ELogitech310.BACK,
         CLAMP_DOUBLE = ELogitech310.DPAD_UP,
         RELEASE_DOUBLE = ELogitech310.DPAD_DOWN,
