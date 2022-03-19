@@ -103,6 +103,7 @@ public class Enums {
     // Drivetrain States
     // =============================================================================
     public enum EDriveState {
+        NULL,
         NORMAL,
         RESET,
         PATH_FOLLOWING_BASIC,
@@ -126,16 +127,19 @@ public class Enums {
     // Intake Module States
     // =============================================================================
     public enum ERollerState {
+        NULL,
         PERCENT_OUTPUT,
         VELOCITY;
     }
 
     public enum EArmState {
+        NULL,
         EXTEND,
         RETRACT,
         DEFAULT;
     }
     public enum EFeederState {
+        NULL,
         PERCENT_OUTPUT,
         INDEXING_VELOCITY;
     }

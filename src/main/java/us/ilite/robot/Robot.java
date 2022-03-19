@@ -55,6 +55,7 @@ public class Robot extends TimedRobot {
     private final AbstractController mTeleopController = TeleopController.getInstance();
     private BaseAutonController mBaseAutonController;
     private ShootMoveController mShootMoveController;
+    private ThreeBallController mThreeBallController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
@@ -67,6 +68,7 @@ public class Robot extends TimedRobot {
         mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
+        mThreeBallController = new ThreeBallController();
 //        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -118,8 +120,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         MODE=AUTONOMOUS;
-        mActiveController = mShootMoveController;
-        mShootMoveController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        mActiveController = mThreeBallController;
+        mThreeBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
@@ -160,6 +162,7 @@ public class Robot extends TimedRobot {
     public void disabledInit() {
         MODE=DISABLED;
         mLogger.info("Disabled Initialization");
+        mRunningModules.modeInit(DISABLED);
 
         mRunningModules.shutdown();
 
@@ -175,7 +178,7 @@ public class Robot extends TimedRobot {
         mNeoDrive.safeReadInputs();
         mIntake.safeReadInputs();
         mFeeder.safeReadInputs();
-        Shuffleboard.update();
+        //Shuffleboard.update();
     }
 
     @Override

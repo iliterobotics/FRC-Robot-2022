@@ -101,7 +101,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
         if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
                 db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-                db.intake.set(DESIRED_pct, -1.0);
+                db.intake.set(DESIRED_ROLLER_pct, -1.0);
             }
         }
     }
@@ -113,7 +113,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             fireCargo();
             mResetCount = true;
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
-            db.intake.set(DESIRED_pct, 1.0);
+            db.intake.set(DESIRED_ROLLER_pct, 1.0);
             db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
             indexCargo();
         } else if (db.operatorinput.isSet(InputMap.OPERATOR.PLACE_CARGO)) {
@@ -123,7 +123,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             mResetCount = true;
         } else {
             db.feeder.set(SET_FEEDER_pct, 0d);
-            db.intake.set(DESIRED_pct, 0d);
+            db.intake.set(DESIRED_ROLLER_pct, 0d);
             mResetCount = false;
         }
     }

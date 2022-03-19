@@ -10,7 +10,7 @@ public class DriveStraightVision extends DriveStraight {
 
 
     public DriveStraightVision(DriveStraight.EDriveControlMode pDriveControlMode, Distance pDistanceToDrive) {
-        super(pDriveControlMode, pDistanceToDrive);
+        super(pDistanceToDrive);
     }
 
     @Override

@@ -122,7 +122,7 @@ public class BaseAutonController extends AbstractController {
     }
     @Override
     protected void updateImpl() {
-        execute();
+
     }
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;
@@ -171,10 +171,10 @@ public class BaseAutonController extends AbstractController {
         data.add(instActualAccelLeft);
         data.add(instActualAccelRight);
 
-        perform_execute(curTime, dT, actualSpeeds, targetWheelSpeeds, data);
+        ramseteFollow(curTime, dT, actualSpeeds, targetWheelSpeeds, data);
     }
 
-    private void perform_execute(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds,
+    protected void ramseteFollow(double curTime, double dT, DifferentialDriveWheelSpeeds actualSpeeds,
                                  DifferentialDriveWheelSpeeds targetWheelSpeeds, List<Object>data) {
         db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         MutablePair<Double,Double> output = new MutablePair<>();
