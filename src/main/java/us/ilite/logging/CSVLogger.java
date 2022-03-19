@@ -1,4 +1,4 @@
-package us.ilite.robot;
+package us.ilite.logging;
 
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
@@ -6,6 +6,7 @@ import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.config.Settings;
 import us.ilite.logging.CSVWriter;
 import us.ilite.logging.Log;
+import us.ilite.robot.Robot;
 
 import java.util.ArrayList;
 import java.util.List;

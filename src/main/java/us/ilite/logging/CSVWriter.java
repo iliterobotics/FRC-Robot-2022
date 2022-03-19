@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Optional;
 
-import static us.ilite.robot.CSVLogger.kCSVLoggerQueue;
+import static us.ilite.logging.CSVLogger.kCSVLoggerQueue;
 
 public class CSVWriter {
 
