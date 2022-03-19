@@ -24,9 +24,9 @@ public class ShootMoveController extends BaseAutonController{
     }
     public void updateImpl() {
         if (mTimer.get() < 2) {
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.SMART_MOTION);
-            db.drivetrain.set(EDriveData.L_DESIRED_POS_FT, 5);
-            db.drivetrain.set(EDriveData.L_DESIRED_POS_FT, 5);
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.POSITION);
+            db.drivetrain.set(EDriveData.L_DESIRED_POS_FT, 10);
+            db.drivetrain.set(EDriveData.L_DESIRED_POS_FT, 10);
         }
 
     }

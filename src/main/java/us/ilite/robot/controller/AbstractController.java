@@ -5,14 +5,14 @@ import us.ilite.common.*;
 
 
 import static us.ilite.common.types.EFeederData.*;
-import static us.ilite.common.types.EIntakeData.DESIRED_pct;
+import static us.ilite.common.types.EIntakeData.DESIRED_ROLLER_pct;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
-import us.ilite.common.config.InputMap;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.hardware.Clock;
 
@@ -88,7 +88,7 @@ public abstract class AbstractController {
         } else {
             mNumBalls = (int)db.feeder.get(NUM_BALLS);
         }
-        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
+        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) { // is broken
             if (!mIsBallAdded) {
                 mNumBalls++;
                 mIsBallAdded = true;
@@ -107,7 +107,14 @@ public abstract class AbstractController {
 
     protected void placeCargo() {
         db.feeder.set(EFeederData.SET_FEEDER_pct, -0.2);
-        db.intake.set(EIntakeData.DESIRED_pct, -0.1);
+        db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
+    }
+
+    protected void intakeCargo() {
+
+        db.intake.set(EIntakeData.ARM_STATE, Enums.EArmState.EXTEND);
+        db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
+        db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 1.0);
     }
 
     protected void reverseCargo() {
@@ -115,9 +122,9 @@ public abstract class AbstractController {
         mNumBalls = 0;
         db.feeder.set(EFeederData.NUM_BALLS, 0);
         if (db.intake.get(EIntakeData.PNEUMATIC_STATE) == 1.0) {
-            db.intake.set(DESIRED_pct, 0.0);
+            db.intake.set(DESIRED_ROLLER_pct, 0.0);
         } else {
-            db.intake.set(DESIRED_pct, -1.0);
+            db.intake.set(DESIRED_ROLLER_pct, -1.0);
         }
     }
 

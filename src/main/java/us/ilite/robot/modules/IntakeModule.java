@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import us.ilite.common.config.Settings;
-import us.ilite.common.types.EIntakeData;
 import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EIntakeData.*;
@@ -47,7 +46,7 @@ public class IntakeModule extends Module {
     @Override
     protected void readInputs() {
         db.intake.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
-        db.intake.set(FEEDER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
+        db.intake.set(ROLLER_PCT, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
         db.intake.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
         db.intake.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
         db.intake.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
@@ -67,6 +66,7 @@ public class IntakeModule extends Module {
         }
         switch (mode) {
             case DEFAULT:
+            case EXTEND:
                 mArmSolenoid.set(DoubleSolenoid.Value.kReverse);
                 db.intake.set(PNEUMATIC_STATE, 1.0);
                 break;
@@ -84,7 +84,7 @@ public class IntakeModule extends Module {
         }
         switch (mode) {
             case PERCENT_OUTPUT:
-                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.intake.get(DESIRED_pct));
+                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.intake.get(DESIRED_ROLLER_pct));
                 break;
         }
     }
