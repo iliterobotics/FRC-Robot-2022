@@ -35,7 +35,7 @@ public class ThreeBallController extends BaseAutonController{
     public void updateImpl() {
         double time = mTimer.get();
         boolean fire = false;
-        if(time < 0.25) {
+        if (time < 0.25) {
             fire = true;
         } else if (time < 0.5) {
             fire = false;
@@ -43,15 +43,15 @@ public class ThreeBallController extends BaseAutonController{
             mFirstLegComplete = mFirstLeg.update(mTimer.get());
         } else if (time < kFirstLegTimeEnd + 0.1 || mFirstLegComplete) {
             mFirstTurn.init(mTimer.get());
-        }else if (time < kFirstTurnTimeEnd || mFirstLegComplete) {
+        } else if (time < kFirstTurnTimeEnd || mFirstLegComplete) {
             mFirstTurnComplete = mFirstTurn.update(mTimer.get());
-        }else if (time < kFirstTurnTimeEnd + 0.1 || (mFirstLegComplete && mFirstTurnComplete)) {
+        } else if (time < kFirstTurnTimeEnd + 0.1 || (mFirstLegComplete && mFirstTurnComplete)) {
             mSecondLeg.init(mTimer.get());
-        }else if (time < kSecondLegTimeEnd || (mFirstLegComplete && mFirstTurnComplete)) {
+        } else if (time < kSecondLegTimeEnd || (mFirstLegComplete && mFirstTurnComplete)) {
             mSecondLegComplete = mSecondLeg.update(mTimer.get());
         } // re-line up and fire
 
-        if(fire) {
+        if (fire) {
             fireCargo();
         } else {
             intakeCargo();

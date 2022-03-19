@@ -47,7 +47,6 @@ public class TwoBallController extends BaseAutonController {
             mSecondLegComplete = mSecondLeg.update(time) || time > kSecondLegTimeEnd;
             setIntakeArmEnabled(false);
             db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 0.0);
-
         }
         else if (time < kCargoFireTime) {
             SmartDashboard.putString("Auton State", "Firing");
