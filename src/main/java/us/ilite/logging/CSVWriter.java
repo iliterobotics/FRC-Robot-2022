@@ -47,7 +47,7 @@ public class CSVWriter {
         bw = Optional.empty();
         try  {
             if ( file != null ) {
-                bw = Optional.of( new BufferedWriter( new FileWriter( file ) ) );
+                bw = Optional.of( new BufferedWriter( new FileWriter( file,true) ) );
             }
         } catch ( Exception e ) {}
 
@@ -89,7 +89,9 @@ public class CSVWriter {
                     mLogFailures++;
                 }
             }
-        } catch (IOException pE) {}
+        } catch (IOException pE) {
+            pE.printStackTrace();
+        }
     }
 
     public void close() {
