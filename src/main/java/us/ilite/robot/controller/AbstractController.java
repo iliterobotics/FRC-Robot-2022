@@ -119,9 +119,10 @@ public abstract class AbstractController {
     }
 
     protected void intakeCargo() {
-        indexCargo();
+        setIntakeArmEnabled(true);
         db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
         db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 1.0);
+        indexCargo();
     }
 
     protected void reverseCargo() {

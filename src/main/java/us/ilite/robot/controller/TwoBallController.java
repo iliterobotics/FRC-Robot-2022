@@ -5,6 +5,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
+import us.ilite.common.types.EIntakeData;
 import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
 
@@ -29,20 +30,24 @@ public class TwoBallController extends BaseAutonController {
     public void updateImpl() {
         double time = mTimer.get();
         if (time < 0.5) {
-            setIntakeArmEnabled(true);
-        }
-        if (!mFirstLegComplete || (time > 1 && time < 3)) {
             intakeCargo();
-            mFirstLegComplete = mFirstLeg.update(mTimer.get());
+            SmartDashboard.putString("Auton State", "Intake Out");
         }
-        SmartDashboard.putBoolean("First leg complete", mFirstLegComplete);
-        if (mFirstLegComplete || (time > 4 && time < 6)) {
+        else if (!mFirstLegComplete) {
+            intakeCargo();
+            mFirstLegComplete = mFirstLeg.update(mTimer.get()) || time > 3;
+            SmartDashboard.putString("Auton State", "First Leg");
+        }
+        else if (mFirstLegComplete || (time > 4 && time < 6)) {
+            SmartDashboard.putString("Auton State", "Second Leg");
             indexCargo();
             mSecondLeg.update(mTimer.get());
             setIntakeArmEnabled(false);
+            db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 0.0);
+
         }
-        if (time > 8) {
-            fireCargo();
-        }
+//        else if (time > 8) {
+//            fireCargo();
+//        }
     }
 }
