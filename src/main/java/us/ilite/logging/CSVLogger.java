@@ -3,6 +3,8 @@ package us.ilite.logging;
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.config.Settings;
@@ -42,6 +44,10 @@ public class CSVLogger {
     private static final ScheduledExecutorService mExService =
             Executors.newSingleThreadScheduledExecutor((run)->new Thread(run, "CSVLogger-EventThread"));
     /**
+     * Network table for the CSV logger to log logging state
+     */
+    private final NetworkTable mCSVNetworkTable;
+    /**
      * The future used to monitor the event queue threads
      */
     private ScheduledFuture<?> scheduledFuture;
@@ -55,6 +61,7 @@ public class CSVLogger {
      * @param pIsLogging
      */
     public CSVLogger( boolean pIsLogging ) {
+        mCSVNetworkTable = NetworkTableInstance.getDefault().getTable("CSVLogger");
         LinkedBlockingDeque<ImmutablePair<String,RobotCodex>>queue = null;
         if ( pIsLogging ) {
             queue = new LinkedBlockingDeque<>();
@@ -104,10 +111,10 @@ public class CSVLogger {
         String type = ""+pLogEvent.getRight().meta().getEnum();
         CSVWriter writer = mCSVWriters.get(pLogEvent.getRight().meta().gid());
         if(writer != null) {
-            SmartDashboard.putBoolean("logFromCodexToCSVLog-"+type,true);
+            mCSVNetworkTable.getEntry("logFromCodexToCSVLog-"+type).setBoolean(true);
             writer.logCSVLine(pLogEvent.getLeft());
         } else {
-            SmartDashboard.putBoolean("logFromCodexToCSVLog-"+type,false);
+            mCSVNetworkTable.getEntry("logFromCodexToCSVLog-"+type).setBoolean(false);
         }
     }
     public void start() {
@@ -119,6 +126,7 @@ public class CSVLogger {
             mLogQueue.add(pLog);
             hasQueue = true;
         }
-        SmartDashboard.putBoolean("LoggerHasQueue-"+pLog.getRight().meta().getEnum(),hasQueue);
+//        SmartDashboard.putBoolean("LoggerHasQueue-"+pLog.getRight().meta().getEnum(),hasQueue);
+        mCSVNetworkTable.getEntry("LoggerHasQueue-"+pLog.getRight().meta().getEnum()).setBoolean(hasQueue);
     }
 }

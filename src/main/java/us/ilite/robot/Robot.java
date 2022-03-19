@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
     private BaseAutonController mBaseAutonController;
     private ShootMoveController mShootMoveController;
     private ThreeBallController mThreeBallController;
+    private TwoBallController mTwoBallController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
@@ -69,6 +70,7 @@ public class Robot extends TimedRobot {
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
+        mTwoBallController = new TwoBallController();
 //        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -119,9 +121,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        MODE=AUTONOMOUS;
-        mActiveController = mThreeBallController;
-        mThreeBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        MODE = AUTONOMOUS;
+        mActiveController = mTwoBallController;
+        mTwoBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
