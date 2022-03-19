@@ -126,7 +126,7 @@ public class CSVLogger {
             mLogQueue.add(pLog);
             hasQueue = true;
         }
-        SmartDashboard.putBoolean("LoggerHasQueue-"+pLog.getRight().meta().getEnum(),hasQueue);
+//        SmartDashboard.putBoolean("LoggerHasQueue-"+pLog.getRight().meta().getEnum(),hasQueue);
         mCSVNetworkTable.getEntry("LoggerHasQueue-"+pLog.getRight().meta().getEnum()).setBoolean(hasQueue);
     }
 }

@@ -65,7 +65,7 @@ public class NeoDriveModule extends Module {
     public static ProfileGains kPositionGains = new ProfileGains()
             .maxVelocity(kMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier * 12)
             .maxAccel(31*12d) // just under 1g
-            .p(0.025)
+            .p(0.0275)
             .tolerance(0.2);
     public static ProfileGains kVelocityGains = new ProfileGains()
             .f(0.00015)

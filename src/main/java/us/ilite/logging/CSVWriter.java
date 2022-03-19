@@ -98,7 +98,7 @@ public class CSVWriter {
             logState = "Log Failed, log file null or does not exist";
         }
 
-        SmartDashboard.putString("CSVLogger-"+mCodex.meta().getEnum(),logState);
+//        SmartDashboard.putString("CSVLogger-"+mCodex.meta().getEnum(),logState);
     }
 
     void logCSVLine(String s ) {
