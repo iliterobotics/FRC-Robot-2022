@@ -1,23 +1,25 @@
 package us.ilite.common.types;
 
 public enum EClimberModuleData {
+    // Actual
     L_VEL_rpm,R_VEL_rpm,
-    L_DESIRED_VEL_rpm, R_DESIRED_VEL_rpm,
-    L_POSITION_rot,R_POSITION_rot,
-    L_DESIRED_POSITION_rot, R_DESIRED_POSITION_rot,
+    L_POSITION_deg,R_POSITION_deg,
     L_OUTPUT_CURRENT,R_OUTPUT_CURRENT,
-    L_SET_pct, R_SET_pct,
+    BUS_VOLTAGE_RIGHT, BUS_VOLTAGE_LEFT,
+
+    // Desired
+    DESIRED_VEL_rpm,
+    DESIRED_VEL_deg_s,
+    DESIRED_POS_deg,
+    DESIRED_VEL_pct,
+
+    // States
     HANGER_STATE,
-    IS_A_CLAMPED,
-    IS_B_CLAMPED,
-    PNEUMATIC_STATE,
-    IS_COAST,
-    BUS_VOLTAGE_RIGHT,
-    BUS_VOLTAGE_LEFT,
-    L_ROTATIONS,
-    R_ROTATIONS,
-    L_DEGREES,
-    R_DEGREES,
-    L_TEMPERATURE,
-    R_TEMPERATURE,
+    DOUBLE_CLAMPED,
+    SINGLE_CLAMPED,
+    SET_COAST,
+    CURRENT_RUNG,
+    CURRENT_STAGE,
+    DESIRED_RUNG,
+    RUNG_CAPTURED
     }

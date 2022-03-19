@@ -21,6 +21,12 @@ public class TeleopController extends BaseManualController { //copied from TestC
     private boolean mAddBalls = false;
     private boolean mPrevAddBalls = false;
 
+    private boolean mRungUpdated = false;
+    private int mCurrentStage = 0;
+
+    private double mCurrentDoubleClamp = 0d;
+    private double mCurrentSingleClamp = 0d;
+
     public static TeleopController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new TeleopController();
@@ -45,44 +51,86 @@ public class TeleopController extends BaseManualController { //copied from TestC
         updateCargo();
         updateHangerMotors();
         updateHangerPneumatics();
+//        updateRungs();
     }
 
-    private void updateHangerMotors() {
-        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-            if (db.operatorinput.isSet(InputMap.OPERATOR.MANUAL_FWD_SLOW)) {
-                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-                db.climber.set(EClimberModuleData.L_SET_pct, 0.4);
-                db.climber.set(EClimberModuleData.R_SET_pct, 0.4);
-            }
-            else if (db.operatorinput.isSet(InputMap.OPERATOR.MANUAL_REV_SLOW)) {
-                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-                db.climber.set(EClimberModuleData.L_SET_pct, -0.4);
-                db.climber.set(EClimberModuleData.R_SET_pct, -0.4);
-            }
-            else {
-                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT.ordinal());
-                db.climber.set(EClimberModuleData.L_SET_pct, 0);
-                db.climber.set(EClimberModuleData.R_SET_pct, 0);
-            }
-        }
+    private void updateRungs() {
+//        Enums.EClimberAngle rung = db.climber.get(EClimberModuleData.CURRENT_RUNG, Enums.EClimberAngle.class);
+//        if (db.operatorinput.isSet(InputMap.HANGER.POSITION_LOCK)) {
+//            mCurrentStage = 0;
+//        } else if (db.operatorinput.isSet(InputMap.HANGER.CLIMB_TO_NEXT_RUNG)) {
+//            if (!mRungUpdated) {
+//                    mCurrentStage++;
+//            }
+//        } else {
+//
+//        }
+//
+//        db.climber.set(EClimberModuleData.CURRENT_RUNG, mCurrentStage);
+    }
 
-        if (db.driverinput.isSet(InputMap.OPERATOR.SET_COAST)) {
-            db.climber.set(EClimberModuleData.IS_COAST, 1d);
+//    private void updateHangerMotors() {
+//        if (db.operatorinput.isSet(InputMap.HANGER.POSITION_LOCK)) {
+//            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+//            db.climber.set(EClimberModuleData.DESIRED_POS_deg, 90);
+//        } else {
+//            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.VELOCITY);
+//        }
+//
+//        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+//            if (db.operatorinput.isSet(InputMap.HANGER.SPIN_SINGLE)) {
+//                db.climber.set(EClimberModuleData.DESIRED_VEL_rpm, 10);
+//            } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
+//                db.climber.set(EClimberModuleData.DESIRED_VEL_rpm, -10);
+//            } else {
+//                db.climber.set(EClimberModuleData.DESIRED_VEL_rpm, 0);
+//            }
+//
+////            if (db.operatorinput.isSet(InputMap.HANGER.SET_COAST)) {
+////                db.climber.set(EClimberModuleData.SET_COAST, 1d);
+////            }
+//        }
+//    }
+
+    private void updateHangerMotors() {
+//        if (db.operatorinput.isSet(InputMap.HANGER.POSITION_LOCK)) {
+//            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+//            db.climber.set(EClimberModuleData.DESIRED_POS_deg, 90);
+//        } else {
+            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+//        }
+
+        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.HANGER.SPIN_SINGLE)) {
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.4);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.4);
+            } else {
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0);
+            }
         }
     }
 
     private void updateHangerPneumatics() {
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-            if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_CLAMPED)) {
-                db.climber.set(EClimberModuleData.IS_A_CLAMPED, 1.0);
-            } if (db.operatorinput.isSet(InputMap.OPERATOR.TOP_RELEASED)) {
-                db.climber.set(EClimberModuleData.IS_A_CLAMPED, 2.0);
+            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_DOUBLE)) {
+                db.climber.set(EClimberModuleData.DOUBLE_CLAMPED, 1d);
+                mCurrentDoubleClamp = 1d;
+            } else if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_DOUBLE)) {
+                db.climber.set(EClimberModuleData.DOUBLE_CLAMPED, 0d);
+                mCurrentDoubleClamp = 0d;
+            } else {
+                db.climber.set(EClimberModuleData.DOUBLE_CLAMPED, mCurrentDoubleClamp);
             }
 
-            if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_CLAMPED)) {
-                db.climber.set(EClimberModuleData.IS_B_CLAMPED, 1.0);
-            } if (db.operatorinput.isSet(InputMap.OPERATOR.BOTTOM_RELEASED)) {
-                db.climber.set(EClimberModuleData.IS_B_CLAMPED, 2.0);
+            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_SINGLE)) {
+                db.climber.set(EClimberModuleData.SINGLE_CLAMPED, 1d);
+                mCurrentSingleClamp = 1d;
+            } else if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_SINGLE)) {
+                db.climber.set(EClimberModuleData.SINGLE_CLAMPED, 0d);
+                mCurrentSingleClamp = 0d;
+            } else {
+                db.climber.set(EClimberModuleData.SINGLE_CLAMPED, mCurrentDoubleClamp);
             }
         }
     }
