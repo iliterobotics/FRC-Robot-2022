@@ -108,9 +108,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_CARGO)) {
                 fireCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
-                db.intake.set(DESIRED_ROLLER_pct, 1.0);
-                db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
-                indexCargo();
+                intakeCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.PLACE_CARGO)) {
                 placeCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.RELEASE_BALLS)) {
