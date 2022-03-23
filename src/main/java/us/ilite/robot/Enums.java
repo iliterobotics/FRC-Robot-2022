@@ -2,6 +2,7 @@ package us.ilite.robot;
 
 public class Enums {
     public enum EClimberMode {
+        NULL,
         VELOCITY,
         POSITION,
         PERCENT_OUTPUT,
@@ -30,6 +31,7 @@ public class Enums {
     // 2 - Force LED blink
     // 3 - Force LED on
     public enum LimelightLedMode {
+        NULL,
         NO_CHANGE,
         LED_OFF,
         LED_BLINK,
@@ -38,6 +40,7 @@ public class Enums {
 
     // LED control and colors
     public enum LEDColorMode {
+        NULL(0,0,0),
         PURPLE( 255, 0, 200 ),
         RED( 255, 0, 0 ),
         LIGHT_BLUE( 0, 100, 220 ),
@@ -70,18 +73,13 @@ public class Enums {
             return blue;
         }
 
-
-//        Color clr = new Color(red, green, blue);
-//
-//        public Color getColor() {
-//            return this.clr;
-//        }
     }
 
     //  Limelight camera mode
     // 0 - Vision Processor
     // 1 - Driver Camera (Increases exposure, disables vision processing)
     public enum LimelightCamMode {
+        NULL,
         VISION_PROCESSOR,
         DRIVER_CAMERA;
     }
@@ -91,6 +89,7 @@ public class Enums {
     // 1 - PiP Main - The secondary camera stream is placed in the lower-right corner of the primary camera stream
     // 2 - PiP Secondary - The primary camera stream is placed in the lower-right corner of the secondary camera stream
     public enum LimelightStreamMode {
+        NULL,
         STANDARD,
         PIP_MAIN,
         PIP_SECONDARY;
@@ -100,6 +99,7 @@ public class Enums {
     // 0 - Stop taking snapshots
     // 1 - Take two snapshots per second
     public enum LimelightSnapshotMode {
+        NULL,
         STOP_SNAPSHOTS,
         START_SNAPSHOTS;
     }
