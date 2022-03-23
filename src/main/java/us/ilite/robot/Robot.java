@@ -174,6 +174,9 @@ public class Robot extends TimedRobot {
     public void disabledPeriodic() {
         mOI.safeReadInputs();
         mClimber.safeReadInputs();
+        mNeoDrive.safeReadInputs();
+        mIntake.safeReadInputs();
+        mFeeder.safeReadInputs();
     }
 
     @Override

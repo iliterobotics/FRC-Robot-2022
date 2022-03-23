@@ -345,8 +345,6 @@ public class VioletDriveModule extends Module {
         double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
         double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
 
-        double left = db.drivetrain.safeGet(DESIRED_LEFT_PCT, 0d);
-        double right = db.drivetrain.safeGet(DESIRED_RIGHT_PCT, 0d);
 
         switch (mode) {
             case RESET:
@@ -477,15 +475,15 @@ public class VioletDriveModule extends Module {
                 mRightMaster.set(rightOutputHome);
                 break;
             case TANK:
-                mLeftTankPID.setSetpoint((left)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
-                mRightTankPID.setSetpoint((right)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
-
-                double vLeftTank = mLeftTankPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
-                double vRightTank = mRightTankPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
-
-                mLeftMaster.set(vLeftTank);
-                mRightMaster.set(vRightTank);
-                break;
+//                mLeftTankPID.setSetpoint((left)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
+//                mRightTankPID.setSetpoint((right)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
+//
+//                double vLeftTank = mLeftTankPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
+//                double vRightTank = mRightTankPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
+//
+//                mLeftMaster.set(vLeftTank);
+//                mRightMaster.set(vRightTank);
+//                break;
         }
     }
     /**
