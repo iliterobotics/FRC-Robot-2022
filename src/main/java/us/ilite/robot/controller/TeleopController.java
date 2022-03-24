@@ -117,7 +117,10 @@ public class TeleopController extends BaseManualController { //copied from TestC
             }
             else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 285);
+                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 290); //  TODO Test this angle
+            } else if (db.operatorinput.isSet(InputMap.HANGER.BALANCE_CLIMBER)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 250); // TODO Test this angle
             }
             else {
                 db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0);

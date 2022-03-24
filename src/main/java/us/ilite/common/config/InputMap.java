@@ -74,6 +74,7 @@ public class InputMap {
 //        SNAIL_MODE = ELogitech310.L_BTN,
         HIGH_RUNG = ELogitech310.L_BTN,
         TRAVERSAL_RUNG = ELogitech310.R_BTN,
+        BALANCE_CLIMBER = ELogitech310.START,
 //        SET_COAST = ELogitech310.BACK,
         CLAMP_DOUBLE = ELogitech310.DPAD_UP,
         RELEASE_DOUBLE = ELogitech310.DPAD_DOWN,
