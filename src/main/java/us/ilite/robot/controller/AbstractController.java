@@ -59,7 +59,7 @@ public abstract class AbstractController {
     protected void stopDrivetrain() {
         db.drivetrain.set(EDriveData.STATE, EDriveState.PERCENT_OUTPUT);
         db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
-        db.drivetrain.set(DESIRED_TURN_PCT,0.0);
+        db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
     }
 
     protected void setIntakeArmEnabled(boolean enabled) {
@@ -71,18 +71,6 @@ public abstract class AbstractController {
     }
 
     protected abstract void updateImpl();
-
-    protected void updateBalls() {
-        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d) {
-            if (!mIsBallAdded) {
-                mNumBalls++;
-                mIsBallAdded = true;
-            }
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.2);
-        } else if (mIsBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
-            mIsBallAdded = false;
-        }
-    }
 
     protected void fireCargo() {
         db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
