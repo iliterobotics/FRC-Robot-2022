@@ -22,7 +22,7 @@ public class ThreeBallController extends BaseAutonController{
     private boolean mSecondLegComplete = false;
     private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-60), 2d);
     private boolean mSecondTurnComplete = false;
-    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-7.0));
+    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-6.4));
     private boolean mThirdLegComplete = false;
     public void initialize(Trajectory pTrajectory) {
         //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
@@ -67,8 +67,9 @@ public class ThreeBallController extends BaseAutonController{
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
         } else if (time < kThirdLegTimeEnd || (mSecondTurnComplete)) {
             mThirdLegComplete = mThirdLeg.update(mTimer.get());
-        } else if (time > 18) {
-            fireCargo();
+        } else if (time > kThirdLegTimeEnd + 0.1) {
+            setIntakeArmEnabled(false);
+            fire = true;
         }
 
         if (fire) {
