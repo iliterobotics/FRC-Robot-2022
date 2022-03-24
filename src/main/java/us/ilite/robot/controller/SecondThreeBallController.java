@@ -9,16 +9,22 @@ import us.ilite.common.types.EIntakeData;
 import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
 
-public class TwoBallController extends BaseAutonController {
+public class SecondThreeBallController extends BaseAutonController {
     private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(3.5));
     private Boolean mFirstLegComplete = false;
     private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(-3.0));
     private boolean mSecondLegComplete = false;
     private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(5.0));
     private boolean mThirdLegComplete = false;
+    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(60d), 2d);
+    private boolean mFirstTurnComplete = false;
+    private DriveStraight mFourthLeg = new DriveStraight(Distance.fromFeet(5));
+    private boolean mFourthLegComplete = false;
+    private DriveStraight mFifthLeg = new DriveStraight(Distance.fromFeet(-4.5));
+    private boolean mFifthLegComplete = false;
     private Timer mTimer;
+
     public void initialize(Trajectory pTrajectory) {
-        //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mTimer = new Timer();
         mTimer.reset();
         mTimer.start();
@@ -29,6 +35,7 @@ public class TwoBallController extends BaseAutonController {
             kFirstLegTimeEnd = 2.5,
             kSecondLegTimeEnd = kFirstLegTimeEnd + 2.5,
             kCargoFireTime = kSecondLegTimeEnd + 1.5,
+            kFirstTurTimeEnd = kCargoFireTime + 0.1 + 3.0,
             kThirdLegTimeEnd = kCargoFireTime + 3.0;
     public void updateImpl() {
         double time = mTimer.get();
@@ -52,10 +59,16 @@ public class TwoBallController extends BaseAutonController {
             SmartDashboard.putString("Auton State", "Firing");
             fireCargo();
         }
-        else if (time < kThirdLegTimeEnd) {
-            SmartDashboard.putString("Auton State", "Leaving Zone");
-            mThirdLeg.update(time);
-        } else {
+        else if (time < kCargoFireTime + 0.1) {
+            SmartDashboard.putString("Auton State", "Preparing for 1st turn");
+            mFirstTurn.init(time);
+        }
+        else if (time < kFirstLegTimeEnd) {
+            SmartDashboard.putString("Auton State", "Turning");
+            mFirstTurnComplete = mFirstTurn.update(time) || time > kFirstLegTimeEnd;
+            intakeCargo();
+        }
+        else {
             stopDrivetrain();
         }
     }

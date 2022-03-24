@@ -56,7 +56,7 @@ public class DriveStraight implements ICommand {
     @Override
     public void init(double pNow) {
         // Set target heading to current heading if setTargetHeading() wasn't called manually
-        if(mTargetHeading == null) {
+        if (mTargetHeading == null) {
             mTargetHeading = Rotation2d.fromDegrees(Robot.DATA.drivetrain.get(ACTUAL_HEADING_DEGREES));
         }
         mInitialDistance = getAverageDriveDistance();
