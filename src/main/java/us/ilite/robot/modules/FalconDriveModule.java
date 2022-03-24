@@ -285,7 +285,7 @@ public class FalconDriveModule extends Module {
 				}
 				mCyclesHolding++;
 				break;
-			case POSITION:
+			case PATH_FOLLOWING_BASIC:
 				mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS_FT));
 				mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS_FT));
 				double desiredLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());

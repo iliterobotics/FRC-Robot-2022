@@ -11,8 +11,6 @@ import static us.ilite.robot.Enums.*;
 
 import static us.ilite.common.config.InputMap.DRIVER.*;
 import static us.ilite.common.types.drive.EDriveData.*;
-import static us.ilite.common.types.drive.EDriveData.DESIRED_TURN_PCT;
-import static us.ilite.robot.Enums.EDriveState.POSITION;
 
 /**
  * This class is a wrapper for functions/methods that are common between the Test and Teleop controllers

@@ -208,7 +208,7 @@ public class NeoDriveModule extends Module {
                 mRightCtrl.setReference(db.drivetrain.get(R_DESIRED_POS_FT) / kDriveNEOPositionFactor,
                         CANSparkMax.ControlType.kSmartMotion, SMART_MOTION_PID_SLOT, 0 );
                 break;
-            case POSITION:
+            case PATH_FOLLOWING_BASIC:
                 mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS_FT));
                 mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS_FT));
                 double lMeasurement = db.drivetrain.get(L_ACTUAL_POS_FT);

@@ -18,13 +18,12 @@ public class BaseMainRedController extends BaseAutonController {
 
     @Override
     public void updateImpl() {
-        //TODO tune position control and fix how far the drive goes on each leg along with desired angle
         db.drivetrain.set(EDriveData.NEUTRAL_MODE, NeutralMode.Brake);
         db.intake.set(EIntakeData.ARM_STATE, Enums.EArmState.DEFAULT);
         db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
         if (mTimer.get() < 0.5) {
             db.feeder.set(EFeederData.SET_FEEDER_pct, 1.0);
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.POSITION);
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_BASIC);
             db.drivetrain.set(EDriveData.R_DESIRED_POS_FT, 5);
             db.drivetrain.set(EDriveData.L_DESIRED_POS_FT, 5);
             isFirstSequenceDone = true;
