@@ -31,8 +31,6 @@ public class TeleopController extends BaseManualController { //copied from TestC
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
         super.updateDrivetrain();
-        updateIntake();
-        updateRollers();
         updateCargo();
         updateHangerMotors();
         updateHangerPneumatics();
@@ -82,25 +80,6 @@ public class TeleopController extends BaseManualController { //copied from TestC
         }
     }
 
-    private void updateIntake() {
-        if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-            if (db.operatorinput.isSet(InputMap.OPERATOR.EXTEND_INTAKE)) {
-                db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
-            } else if (db.operatorinput.isSet(InputMap.OPERATOR.RETRACT_INTAKE)) {
-                db.intake.set(ARM_STATE, Enums.EArmState.RETRACT);
-            }
-        }
-    }
-
-    private void updateRollers() {
-        if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-            if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
-                db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-                db.intake.set(DESIRED_ROLLER_pct, -1.0);
-            }
-        }
-    }
-
     private void updateCargo() {
         if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
@@ -119,4 +98,24 @@ public class TeleopController extends BaseManualController { //copied from TestC
             }
         }
     }
+
+    //TODO Confirm if we need these methods or not
+//    private void updateIntake() {
+//        if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+//            if (db.operatorinput.isSet(InputMap.OPERATOR.EXTEND_INTAKE)) {
+//                db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
+//            } else if (db.operatorinput.isSet(InputMap.OPERATOR.RETRACT_INTAKE)) {
+//                db.intake.set(ARM_STATE, Enums.EArmState.RETRACT);
+//            }
+//        }
+//    }
+//
+//    private void updateRollers() {
+//        if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+//            if (db.operatorinput.isSet(InputMap.OPERATOR.REVERSE_ROLLERS)) {
+//                db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
+//                db.intake.set(DESIRED_ROLLER_pct, -1.0);
+//            }
+//        }
+//    }
 }
