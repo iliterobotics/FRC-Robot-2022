@@ -230,11 +230,12 @@ public class NeoDriveModule extends Module {
         }
     }
 
-    private void reset() {
+    public void reset() {
         mLeftEncoder.setPosition(0.0);
         mRightEncoder.setPosition(0.0);
         mLeftMaster.set(0.0);
         mRightMaster.set(0.0);
+        mGyro.zeroAll();
     }
 
     /**

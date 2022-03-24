@@ -10,15 +10,20 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
+import us.ilite.robot.modules.NeoDriveModule;
 
 public class ThreeBallController extends BaseAutonController{
     public Timer mTimer;
     private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(5.6));
     private boolean mFirstLegComplete = false;
-    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(110d), 2d);
+    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(105d), 2d);
     private boolean mFirstTurnComplete = false;
-    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(7.0));
+    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(7.7));
     private boolean mSecondLegComplete = false;
+    private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-60), 2d);
+    private boolean mSecondTurnComplete = false;
+    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-7.0));
+    private boolean mThirdLegComplete = false;
     public void initialize(Trajectory pTrajectory) {
         //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mTimer = new Timer();
@@ -28,10 +33,12 @@ public class ThreeBallController extends BaseAutonController{
     }
 
     private static double
-        kFirstLegTimeEnd = 4.0,
-        kFirstTurnTimeEnd = kFirstLegTimeEnd + 3.0,
-        kSecondLegTimeEnd = kFirstTurnTimeEnd + 3.0
-                ;
+        kFirstLegTimeEnd = 2.1,
+        kFirstTurnTimeEnd = kFirstLegTimeEnd + 1.0,
+        kSecondLegTimeEnd = kFirstTurnTimeEnd + 3.0,
+        kSecondTurnEnd = kSecondLegTimeEnd + 2.0,
+        kThirdLegTimeEnd = kSecondTurnEnd + 1.5;
+
     public void updateImpl() {
         double time = mTimer.get();
         boolean fire = false;
@@ -47,9 +54,22 @@ public class ThreeBallController extends BaseAutonController{
             mFirstTurnComplete = mFirstTurn.update(mTimer.get());
         } else if (time < kFirstTurnTimeEnd + 0.1 || (mFirstLegComplete && mFirstTurnComplete)) {
             mSecondLeg.init(mTimer.get());
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
         } else if (time < kSecondLegTimeEnd || (mFirstLegComplete && mFirstTurnComplete)) {
             mSecondLegComplete = mSecondLeg.update(mTimer.get());
-        } // re-line up and fire
+        } else if (time < kSecondLegTimeEnd + 0.1 || (mSecondLegComplete)) {
+            mSecondTurn.init(mTimer.get());
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+        } else if (time < kSecondTurnEnd || (mSecondLegComplete)) {
+            mSecondTurnComplete = mSecondTurn.update(mTimer.get());
+        } else if (time < kSecondTurnEnd + 0.1 || mSecondTurnComplete) {
+            mThirdLeg.init(mTimer.get());
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+        } else if (time < kThirdLegTimeEnd || (mSecondTurnComplete)) {
+            mThirdLegComplete = mThirdLeg.update(mTimer.get());
+        } else if (time > 18) {
+            fireCargo();
+        }
 
         if (fire) {
             fireCargo();
