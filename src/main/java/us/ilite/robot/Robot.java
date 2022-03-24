@@ -123,8 +123,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         MODE = AUTONOMOUS;
-        mActiveController = mTwoBallController;
-        mTwoBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        mActiveController = mThreeBallController;
+        mThreeBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
@@ -176,12 +176,10 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.safeReadInputs();
-//        mDrive.safeReadInputs();
-//        mNeoDrive.safeReadInputs();
-//        mIntake.safeReadInputs();
-//        mFeeder.safeReadInputs();
         mClimber.safeReadInputs();
-        //Shuffleboard.update();
+        mNeoDrive.safeReadInputs();
+        mIntake.safeReadInputs();
+        mFeeder.safeReadInputs();
     }
 
     @Override
