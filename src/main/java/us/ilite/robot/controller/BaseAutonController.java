@@ -306,19 +306,6 @@ public class BaseAutonController extends AbstractController {
     public boolean isFinished() {
         return mTimer.hasElapsed(mTrajectory.getTotalTimeSeconds());
     }
-    
-    /**
-     * Method to stop
-     * @param interrupted
-     *  If true, this will force stop
-     */
-    public void end(boolean interrupted) {
-        mTimer.stop();
-        if (interrupted) {
-            db.drivetrain.set(EDriveData.DESIRED_LEFT_VOLTAGE, 0);
-            db.drivetrain.set(EDriveData.DESIRED_RIGHT_VOLTAGE, 0);
-        }
-    }
 
 
     private void logDataToSmartDashboard(double dt,Trajectory.State sample, DifferentialDriveWheelSpeeds targetWheelSpeeds, DifferentialDriveWheelSpeeds actualSpeeds) {

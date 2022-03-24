@@ -166,10 +166,6 @@ public class NeoDriveModule extends Module {
         db.drivetrain.set(L_ACTUAL_VEL_FT_s, mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor);
         db.drivetrain.set(R_ACTUAL_POS_FT, mRightEncoder.getPosition() * kDriveNEOPositionFactor);
         db.drivetrain.set(R_ACTUAL_VEL_FT_s, mRightEncoder.getVelocity() * kDriveNEOVelocityFactor);
-        db.drivetrain.set(L_ACTUAL_POS_meters, Units.feet_to_meters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor));
-        db.drivetrain.set(L_ACTUAL_VEL_meters_s, Units.feet_to_meters(mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor));
-        db.drivetrain.set(R_ACTUAL_POS_meters, Units.feet_to_meters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
-        db.drivetrain.set(R_ACTUAL_VEL_meters_s, Units.feet_to_meters(mRightEncoder.getVelocity() * kDriveNEOVelocityFactor));
         db.imu.set(EGyro.ACCEL_X, mGyro.getAccelX());
         db.imu.set(EGyro.ACCEL_Y, mGyro.getAccelY());
         db.imu.set(EGyro.PITCH_DEGREES, mGyro.getPitch().getDegrees());
@@ -212,7 +208,7 @@ public class NeoDriveModule extends Module {
                 mRightCtrl.setReference(db.drivetrain.get(R_DESIRED_POS_FT) / kDriveNEOPositionFactor,
                         CANSparkMax.ControlType.kSmartMotion, SMART_MOTION_PID_SLOT, 0 );
                 break;
-            case POSITION:
+            case PATH_FOLLOWING_BASIC:
                 mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS_FT));
                 mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS_FT));
                 double lMeasurement = db.drivetrain.get(L_ACTUAL_POS_FT);
