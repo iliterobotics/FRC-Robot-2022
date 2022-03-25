@@ -18,6 +18,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.logging.CSVLogger;
+import us.ilite.logging.Log;
 import us.ilite.robot.auto.AutonSelection;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
@@ -218,9 +219,7 @@ public class Robot extends TimedRobot {
         CLOCK.update();
         if ( Settings.kIsLogging && MODE != DISABLED) {
             for ( RobotCodex c : DATA.mLoggedCodexes ) {
-                if ( c.hasChanged() ) {
-                    mCSVLogger.addToQueue( new ImmutablePair<String,RobotCodex>(c.toFormattedCSV(),c));
-                }
+                mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
             }
         }
         for ( RobotCodex c : DATA.mAllCodexes ) {
