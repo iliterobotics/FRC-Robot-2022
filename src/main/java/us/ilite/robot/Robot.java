@@ -125,7 +125,6 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         MODE = AUTONOMOUS;
-        mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
@@ -135,6 +134,8 @@ public class Robot extends TimedRobot {
 
         mActiveController = mTwoBallController;;
         mTwoBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        mActiveController.setEnabled(true);
+
     }
 
     @Override
