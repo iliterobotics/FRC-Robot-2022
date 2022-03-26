@@ -88,6 +88,8 @@ public abstract class AbstractController {
         } else if (mIsBallAdded) {
             db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
             mIsBallAdded = false;
+        } else {
+
         }
     }
 
