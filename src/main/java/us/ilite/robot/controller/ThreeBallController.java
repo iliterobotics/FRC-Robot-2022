@@ -35,7 +35,7 @@ public class ThreeBallController extends BaseAutonController{
         mFirstLeg.init(mTimer.get());
     }
 
-    private static double
+    public static double
         kFirstLegTimeEnd = 2.1,
         kFirstTurnTimeEnd = kFirstLegTimeEnd + 1.0,
         kSecondLegTimeEnd = kFirstTurnTimeEnd + 3.0,
