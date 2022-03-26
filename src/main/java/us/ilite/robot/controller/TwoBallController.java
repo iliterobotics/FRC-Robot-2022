@@ -12,7 +12,7 @@ import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
 
 public class TwoBallController extends BaseAutonController {
-    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(3.8));
+    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(3.6));
     private Boolean mFirstLegComplete = false;
     private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(-3.2));
     private boolean mSecondLegComplete = false;
@@ -49,6 +49,7 @@ public class TwoBallController extends BaseAutonController {
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
             intakeCargo();
             mSecondLegComplete = mSecondLeg.update(time) || time > kSecondLegTimeEnd;
+            db.drivetrain.set(EDriveData.DESIRED_TURN_PCT, 0.06);
 //            setIntakeArmEnabled(false);
 //            db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 0.0);
         }

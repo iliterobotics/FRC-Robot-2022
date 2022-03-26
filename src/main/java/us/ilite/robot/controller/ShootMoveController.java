@@ -26,11 +26,11 @@ public class ShootMoveController extends BaseAutonController{
         mSecondLeg = new Timer();
     }
     public void updateImpl() {
-        if (mTimer.get() < 0.5) {
+        if (mTimer.get() < 1.0) {
             fireCargo();
             mFirstLeg.init(mTimer.get());
         }
-        else if (mTimer.get() < 5) {
+        else {
             mFirstLeg.update(mTimer.get());
         }
 

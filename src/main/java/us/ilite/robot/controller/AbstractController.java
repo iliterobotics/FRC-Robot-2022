@@ -109,11 +109,7 @@ public abstract class AbstractController {
         db.feeder.set(SET_FEEDER_pct, -1.0);
         mNumBalls = 0;
         db.feeder.set(EFeederData.NUM_BALLS, 0);
-        if (db.intake.get(EIntakeData.PNEUMATIC_STATE) == 1.0) {
-            db.intake.set(DESIRED_ROLLER_pct, 0.0);
-        } else {
-            db.intake.set(DESIRED_ROLLER_pct, -1.0);
-        }
+        db.intake.set(DESIRED_ROLLER_pct, -1.0);
     }
 
     /**
