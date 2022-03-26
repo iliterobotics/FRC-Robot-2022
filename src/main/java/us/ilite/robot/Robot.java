@@ -125,14 +125,16 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         MODE = AUTONOMOUS;
-        mActiveController = mThreeBallController;
-        mThreeBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
         mRunningModules.modeInit(AUTONOMOUS);
+        mNeoDrive.readInputs();
+
+        mActiveController = mTwoBallController;;
+        mTwoBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
     }
 
     @Override

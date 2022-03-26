@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.types.EIntakeData;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Enums;
 import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
 
@@ -26,13 +28,14 @@ public class TwoBallController extends BaseAutonController {
     }
 
     private static double
-            kFirstLegTimeEnd = 2.5,
+            kFirstLegTimeEnd = 4.0,
             kSecondLegTimeEnd = kFirstLegTimeEnd + 2.5,
             kCargoFireTime = kSecondLegTimeEnd + 1.5,
             kThirdLegTimeEnd = kCargoFireTime + 3.0;
     public void updateImpl() {
         double time = mTimer.get();
         if (time < 0.5) {
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
             intakeCargo();
             SmartDashboard.putString("Auton State", "Intake Out");
         }
@@ -43,10 +46,10 @@ public class TwoBallController extends BaseAutonController {
         }
         else if (time < kSecondLegTimeEnd) {
             SmartDashboard.putString("Auton State", "Second Leg");
-            indexCargo();
+            intakeCargo();
             mSecondLegComplete = mSecondLeg.update(time) || time > kSecondLegTimeEnd;
-            setIntakeArmEnabled(false);
-            db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 0.0);
+//            setIntakeArmEnabled(false);
+//            db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 0.0);
         }
         else if (time < kCargoFireTime) {
             SmartDashboard.putString("Auton State", "Firing");

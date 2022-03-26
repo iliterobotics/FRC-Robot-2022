@@ -16,17 +16,17 @@ import us.ilite.robot.modules.NeoDriveModule;
 public class ThreeBallController extends BaseAutonController{
     public Timer mTimer;
     //Old - 5.6
-    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(5.1));
+    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(5.6));
     private boolean mFirstLegComplete = false;
     private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(105d), 2d);
     private boolean mFirstTurnComplete = false;
     //Old - 7.7
-    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(5.2));
+    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(7.7));
     private boolean mSecondLegComplete = false;
     private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-60), 2d);
     private boolean mSecondTurnComplete = false;
     //Old - -6.4
-    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-5.9));
+    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-6.4));
     private boolean mThirdLegComplete = false;
     public void initialize(Trajectory pTrajectory) {
         //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
@@ -34,13 +34,10 @@ public class ThreeBallController extends BaseAutonController{
         mTimer.reset();
         mTimer.start();
         mFirstLeg.init(mTimer.get());
-        if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-            mFirstLeg = new DriveStraight(Distance.fromFeet(4.6));
-        }
     }
 
     public static double
-        kFirstLegTimeEnd = 2.1,
+        kFirstLegTimeEnd = 4.1,
         kFirstTurnTimeEnd = kFirstLegTimeEnd + 1.0,
         kSecondLegTimeEnd = kFirstTurnTimeEnd + 3.0,
         kSecondTurnEnd = kSecondLegTimeEnd + 2.0,
