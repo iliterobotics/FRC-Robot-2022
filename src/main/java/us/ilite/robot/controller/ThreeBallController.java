@@ -14,15 +14,18 @@ import us.ilite.robot.modules.NeoDriveModule;
 
 public class ThreeBallController extends BaseAutonController{
     public Timer mTimer;
-    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(5.6));
+    //Old - 5.6
+    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(5.1));
     private boolean mFirstLegComplete = false;
     private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(105d), 2d);
     private boolean mFirstTurnComplete = false;
-    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(7.7));
+    //Old - 7.7
+    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(5.2));
     private boolean mSecondLegComplete = false;
     private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-60), 2d);
     private boolean mSecondTurnComplete = false;
-    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-6.4));
+    //Old - -6.4
+    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-5.9));
     private boolean mThirdLegComplete = false;
     public void initialize(Trajectory pTrajectory) {
         //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
