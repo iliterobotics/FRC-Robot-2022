@@ -175,6 +175,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
+        Shuffleboard.update();
         mOI.safeReadInputs();
         mClimber.safeReadInputs();
         mNeoDrive.safeReadInputs();
