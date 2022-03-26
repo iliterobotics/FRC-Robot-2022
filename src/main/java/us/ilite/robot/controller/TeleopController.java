@@ -42,9 +42,9 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.HANGER.SPIN_SINGLE)) {
-                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.4);
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.45);
             } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
-                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.4);
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.45);
             } else if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, -90);

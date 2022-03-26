@@ -46,6 +46,7 @@ public class TwoBallController extends BaseAutonController {
         }
         else if (time < kSecondLegTimeEnd) {
             SmartDashboard.putString("Auton State", "Second Leg");
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
             intakeCargo();
             mSecondLegComplete = mSecondLeg.update(time) || time > kSecondLegTimeEnd;
 //            setIntakeArmEnabled(false);
