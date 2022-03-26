@@ -2,6 +2,7 @@ package us.ilite.robot.controller;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.Distance;
 import us.ilite.common.types.EFeederData;
@@ -33,6 +34,9 @@ public class ThreeBallController extends BaseAutonController{
         mTimer.reset();
         mTimer.start();
         mFirstLeg.init(mTimer.get());
+        if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+            mFirstLeg = new DriveStraight(Distance.fromFeet(4.6));
+        }
     }
 
     public static double

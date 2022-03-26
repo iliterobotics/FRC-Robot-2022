@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
     private BaseAutonController mBaseAutonController;
     private ShootMoveController mShootMoveController;
     private ThreeBallController mThreeBallController;
+    private BlueThreeBallController mBlueThreeBallController;
     private TwoBallController mTwoBallController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
@@ -72,6 +73,7 @@ public class Robot extends TimedRobot {
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
         mTwoBallController = new TwoBallController();
+        mBlueThreeBallController = new BlueThreeBallController();
 //        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
