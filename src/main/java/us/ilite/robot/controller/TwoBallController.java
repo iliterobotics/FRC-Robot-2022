@@ -49,12 +49,13 @@ public class TwoBallController extends BaseAutonController {
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
             intakeCargo();
             mSecondLegComplete = mSecondLeg.update(time) || time > kSecondLegTimeEnd;
-            db.drivetrain.set(EDriveData.DESIRED_TURN_PCT, 0.06);
+            db.drivetrain.set(EDriveData.DESIRED_TURN_PCT, 0.02);
 //            setIntakeArmEnabled(false);
 //            db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 0.0);
         }
         else if (time < kCargoFireTime) {
             SmartDashboard.putString("Auton State", "Firing");
+            stopDrivetrain();
             fireCargo();
         }
         else if (time < kThirdLegTimeEnd) {
