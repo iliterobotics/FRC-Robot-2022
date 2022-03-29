@@ -116,10 +116,15 @@ public class TrajectoryCommandUtils {
         TrajectoryConfig config = new TrajectoryConfig(3 ,3);
         config.addConstraint(new CentripetalAccelerationConstraint(3));
         config.addConstraint(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(NeoDriveModule.kTrackWidthFeet), 3));
-        ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
-        waypoints.add(new Pose2d(1,1 ,new Rotation2d(30)));
-        waypoints.add(new Pose2d(new Translation2d(2, 2), new Rotation2d(30)));
-        return TrajectoryGenerator.generateTrajectory(waypoints, config);
+        config.setStartVelocity(2.0);
+        config.setEndVelocity(0.0);
+        ArrayList<Translation2d> waypoints = new ArrayList<Translation2d>();
+        waypoints.add(new Translation2d(1, 0));
+        waypoints.add( new Translation2d(2, 0));
+        return TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
+                waypoints,
+                new Pose2d(3, 0, new Rotation2d(0)),
+                config);
     }
 
     /**
