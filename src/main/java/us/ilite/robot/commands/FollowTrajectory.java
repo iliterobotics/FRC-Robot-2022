@@ -46,6 +46,9 @@ public class FollowTrajectory implements ICommand {
     }
     @Override
     public void init(double pNow) {
+        Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET_ODOMETRY);
+        Robot.DATA.drivetrain.set(EDriveData.X_DESIRED_ODOMETRY_METERS, mTrajectory.getInitialPose().getX());
+        Robot.DATA.drivetrain.set(EDriveData.Y_DESIRED_ODOMETRY_METERS, mTrajectory.getInitialPose().getY());
         mTrajectoryTimer.reset();
         mTrajectoryTimer.start();
         initialState = mTrajectory.sample(0);
@@ -94,6 +97,8 @@ public class FollowTrajectory implements ICommand {
             Robot.DATA.drivetrain.set(EDriveData.L_DESIRED_VEL_FT_s, Units.meters_to_feet(wheelSpeeds.leftMetersPerSecond));
             Robot.DATA.drivetrain.set(EDriveData.R_DESIRED_VEL_FT_s, Units.meters_to_feet(wheelSpeeds.rightMetersPerSecond));
         }
+        mPreviousSpeeds = wheelSpeeds;
+        mPreviousTime = curTime;
         if (mTrajectoryTimer.get() > mTrajectory.getTotalTimeSeconds()) {
             return true;
         }

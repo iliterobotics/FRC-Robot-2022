@@ -28,6 +28,8 @@ public enum EDriveData implements CodexOf<Double> {
     R_DESIRED_VEL_FT_s,
     X_ACTUAL_ODOMETRY_METERS,
     Y_ACTuAL_ODOMETRY_METERS,
+    X_DESIRED_ODOMETRY_METERS,
+    Y_DESIRED_ODOMETRY_METERS,
     ;
 
 }

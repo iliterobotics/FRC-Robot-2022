@@ -10,6 +10,7 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -148,13 +149,18 @@ public class NeoDriveModule extends Module {
             mRightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
         }
     }
+    /**
+     * Resets the odometry to the specified pose.
+     *
+     * @param pose The pose to which to set the odometry.
+     */
+    public void resetOdometry(Pose2d pose) {
+        reset();
+        mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()));
+    }
     @Override
     public void readInputs() {
         mGyro.update();
-        double odoX = mOdometry.getPoseMeters().getX() - kInitialXPosition;
-        double odoY = mOdometry.getPoseMeters().getY() - kInitialYPosition;
-        db.drivetrain.set(GET_X_OFFSET_METERS, odoX);
-        db.drivetrain.set(GET_Y_OFFSET_METERS, odoY);
         db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getHeading().getRadians());
         db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getHeading().getDegrees());
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
@@ -191,13 +197,18 @@ public class NeoDriveModule extends Module {
             case RESET:
                 reset();
                 break;
+            case RESET_ODOMETRY:
+                double x = db.drivetrain.get(X_DESIRED_ODOMETRY_METERS);
+                double y = db.drivetrain.get(X_DESIRED_ODOMETRY_METERS);
+                resetOdometry(new Pose2d(x, y, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees())));
+                break;
             case PERCENT_OUTPUT:
                 mLeftMaster.set(left);
                 mRightMaster.set(right);
                 break;
             case VELOCITY:
                 mLeftCtrl.setReference(left * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-                REVLibError revLibError = mRightCtrl.setReference(right * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+                mRightCtrl.setReference(right * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
                 break;
             case TURN_TO:
                 mTurnToDegreePID.setSetpoint(db.drivetrain.get(DESIRED_TURN_ANGLE_deg));
@@ -238,14 +249,5 @@ public class NeoDriveModule extends Module {
         mGyro.zeroAll();
     }
 
-    /**
-     * Resets the odometry to the specified pose.
-     *
-     * @param pose The pose to which to set the odometry.
-     */
-    public void resetOdometry(Pose2d pose) {
-        mLeftEncoder.setPosition(0);
-        mRightEncoder.setPosition(0);
-        mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()));
-    }
+
 }

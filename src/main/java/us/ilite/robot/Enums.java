@@ -111,6 +111,7 @@ public class Enums {
         NULL,
         NORMAL,
         RESET,
+        RESET_ODOMETRY,
         PATH_FOLLOWING_BASIC,
         PATH_FOLLOWING_RAMSETE,
         TARGET_ANGLE_LOCK,
