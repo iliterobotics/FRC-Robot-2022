@@ -1,6 +1,5 @@
 package us.ilite.robot.modules;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -11,7 +10,6 @@ import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EMatchMode;
-import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -48,6 +46,8 @@ public class NeoDriveModule extends Module {
     public static final double kMaxVelocityRPM = 5676;
     public static final double kPulsesPerRotation = 256.0;
     public static final double kCurrentLimitAmps = 60.0;
+    public static final double kTrackWidthFeet = 22.0 / 12.0;
+
 
     // ========================================
     // DO NOT MODIFY THESE PID CONSTANTS
@@ -73,7 +73,6 @@ public class NeoDriveModule extends Module {
             .maxVelocity(kMaxVelocityRPM * Settings.Input.kMaxAllowedVelocityMultiplier)
             .slot(VELOCITY_PID_SLOT)
             .velocityConversion(kDriveNEOVelocityFactor);
-//    public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.0285);
     public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.02).f(0.1);
 
     // ========================================
@@ -172,6 +171,11 @@ public class NeoDriveModule extends Module {
         db.imu.set(EGyro.ROLL_DEGREES, mGyro.getRoll().getDegrees());
         db.imu.set(EGyro.YAW_DEGREES, mGyro.getYaw().getDegrees());
         db.imu.set(EGyro.YAW_OMEGA_DEGREES, mGyro.getYawRate().getDegrees());
+        db.drivetrain.set(X_ACTUAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getX());
+        db.drivetrain.set(Y_ACTuAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getY());
+        mOdometry.update(Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()),
+                Units.feet_to_meters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
+                Units.feet_to_meters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
     }
 
     @Override
@@ -193,7 +197,7 @@ public class NeoDriveModule extends Module {
                 break;
             case VELOCITY:
                 mLeftCtrl.setReference(left * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-                mRightCtrl.setReference(right * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+                REVLibError revLibError = mRightCtrl.setReference(right * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
                 break;
             case TURN_TO:
                 mTurnToDegreePID.setSetpoint(db.drivetrain.get(DESIRED_TURN_ANGLE_deg));
@@ -219,8 +223,8 @@ public class NeoDriveModule extends Module {
                 mRightMaster.set(rightOutput);
                 break;
             case PATH_FOLLOWING_RAMSETE:
-                mLeftMaster.set(db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / 24.0);
-                mRightMaster.set(db.drivetrain.get(R_DESIRED_DRIVE_FT_SEC) / 24.0);
+                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / 24.0);
+                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / 24.0);
                 mDrive.feed();
                 break;
         }
@@ -242,6 +246,6 @@ public class NeoDriveModule extends Module {
     public void resetOdometry(Pose2d pose) {
         mLeftEncoder.setPosition(0);
         mRightEncoder.setPosition(0);
-        mOdometry.resetPosition(pose, mGyro.getHeading());
+        mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()));
     }
 }

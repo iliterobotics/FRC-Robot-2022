@@ -11,7 +11,6 @@ public enum EDriveData implements CodexOf<Double> {
     L_ACTUAL_VEL_RPM, R_ACTUAL_VEL_RPM,
     LEFT_CURRENT, RIGHT_CURRENT,
     LEFT_VOLTAGE, RIGHT_VOLTAGE,
-    DESIRED_LEFT_ft_s, DESIRED_RIGHT_ft_s,
     IS_CURRENT_LIMITING,
     DESIRED_TURN_ANGLE_deg,
     DESIRED_TURN_PCT, DESIRED_THROTTLE_PCT,
@@ -25,8 +24,10 @@ public enum EDriveData implements CodexOf<Double> {
 
     NEUTRAL_MODE,
     STATE,
-    L_DESIRED_DRIVE_FT_SEC,
-    R_DESIRED_DRIVE_FT_SEC
+    L_DESIRED_VEL_FT_s,
+    R_DESIRED_VEL_FT_s,
+    X_ACTUAL_ODOMETRY_METERS,
+    Y_ACTuAL_ODOMETRY_METERS,
     ;
 
 }
