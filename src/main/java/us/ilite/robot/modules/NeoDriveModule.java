@@ -161,7 +161,7 @@ public class NeoDriveModule extends Module {
     @Override
     public void readInputs() {
         mGyro.update();
-        db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getHeading().getRadians());
+        db.drivetrain.set(ACTUAL_HEADING_RADIANS, mGyro.getYaw().getRadians());
         db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getHeading().getDegrees());
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
@@ -179,6 +179,7 @@ public class NeoDriveModule extends Module {
         db.imu.set(EGyro.YAW_OMEGA_DEGREES, mGyro.getYawRate().getDegrees());
         db.drivetrain.set(X_ACTUAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getX());
         db.drivetrain.set(Y_ACTuAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getY());
+        Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
         mOdometry.update(Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()),
                 Units.feet_to_meters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
                 Units.feet_to_meters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
@@ -234,8 +235,8 @@ public class NeoDriveModule extends Module {
                 mRightMaster.set(rightOutput);
                 break;
             case PATH_FOLLOWING_RAMSETE:
-                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / 24.0);
-                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / 24.0);
+                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / 20.0);
+                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / 20.0);
                 mDrive.feed();
                 break;
         }

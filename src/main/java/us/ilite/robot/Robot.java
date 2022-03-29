@@ -131,8 +131,8 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mNeoDrive);
         mRunningModules.modeInit(AUTONOMOUS);
         mNeoDrive.readInputs();
-        mActiveController = mThreeBallController;
-        mThreeBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        mActiveController = mTrajectoryController;
+        mTrajectoryController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
     }
 

@@ -39,8 +39,9 @@ public class FollowTrajectory implements ICommand {
         mUsePid = pUsePid;
         mController = new RamseteController(Settings.kRamseteB, Settings.kRamseteZeta);
         mFeedForward = new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA);
-        mLeftDrivePID = new PIDController(0.00051968,0,0);
-        mRightDrivePID = new PIDController(0.00051968,0,0);
+        //kp = 0.00051968
+        mLeftDrivePID = new PIDController(0.1,0,0);
+        mRightDrivePID = new PIDController(0.1,0,0);
         mTrajectoryTimer = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet));
     }
@@ -70,6 +71,8 @@ public class FollowTrajectory implements ICommand {
         Trajectory.State setpoint = mTrajectory.sample(mTrajectoryTimer.get());
         ChassisSpeeds chassisSpeeds = mController.calculate(getRobotPose(), setpoint);
         DifferentialDriveWheelSpeeds wheelSpeeds = mDriveKinematics.toWheelSpeeds(chassisSpeeds);
+        SmartDashboard.putNumber("Left Wheel speed output", wheelSpeeds.leftMetersPerSecond);
+        SmartDashboard.putNumber("Right Wheel speed output", wheelSpeeds.rightMetersPerSecond);
         if (mUsePid) {
             double actualRightSpeed = Units.feet_to_meters(Robot.DATA.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
             double actualLeftSpeed = Units.feet_to_meters(Robot.DATA.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
@@ -99,9 +102,9 @@ public class FollowTrajectory implements ICommand {
         }
         mPreviousSpeeds = wheelSpeeds;
         mPreviousTime = curTime;
-        if (mTrajectoryTimer.get() > mTrajectory.getTotalTimeSeconds()) {
-            return true;
-        }
+//        if (mTrajectoryTimer.get() > mTrajectory.getTotalTimeSeconds()) {
+//            return true;
+//        }
         return false;
     }
 

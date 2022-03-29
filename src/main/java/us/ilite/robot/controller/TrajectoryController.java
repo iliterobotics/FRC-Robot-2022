@@ -2,6 +2,7 @@ package us.ilite.robot.controller;
 
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
+import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.commands.FollowTrajectory;
 

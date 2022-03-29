@@ -87,7 +87,7 @@ public class TrajectoryCommandUtils {
 
 
     public static Trajectory getJSONTrajectory() {
-        String trajectoryJSON = "paths/second_leg_five_ball.wpilib.json";
+        String trajectoryJSON = "paths/Unnamed_0.wpilib.json";
         Trajectory trajectory = new Trajectory();
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
@@ -113,8 +113,8 @@ public class TrajectoryCommandUtils {
     public static Trajectory buildExampleTrajectory() {
         // TODO Normally this method would build the trajectory based off of the waypoints and config that is passed in
         //  but I am going to keep it hard-coded for now
-        TrajectoryConfig config = new TrajectoryConfig(3 ,3);
-        config.addConstraint(new CentripetalAccelerationConstraint(3));
+        TrajectoryConfig config = new TrajectoryConfig(0.33 ,0.33);
+        config.addConstraint(new CentripetalAccelerationConstraint(0.33));
         config.addConstraint(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(NeoDriveModule.kTrackWidthFeet), 3));
         config.setStartVelocity(2.0);
         config.setEndVelocity(0.0);
