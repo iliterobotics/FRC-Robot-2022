@@ -161,7 +161,7 @@ public class NeoDriveModule extends Module {
     @Override
     public void readInputs() {
         mGyro.update();
-        db.drivetrain.set(ACTUAL_HEADING_RADIANS, mGyro.getYaw().getRadians());
+        db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getYaw().getRadians());
         db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getHeading().getDegrees());
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
@@ -201,7 +201,7 @@ public class NeoDriveModule extends Module {
             case RESET_ODOMETRY:
                 double x = db.drivetrain.get(X_DESIRED_ODOMETRY_METERS);
                 double y = db.drivetrain.get(X_DESIRED_ODOMETRY_METERS);
-                resetOdometry(new Pose2d(x, y, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees())));
+                resetOdometry(new Pose2d(x, y, new Rotation2d(-mGyro.getYaw().getRadians())));
                 break;
             case PERCENT_OUTPUT:
                 mLeftMaster.set(left);
