@@ -180,7 +180,7 @@ public class NeoDriveModule extends Module {
         db.drivetrain.set(X_ACTUAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getX());
         db.drivetrain.set(Y_ACTuAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getY());
         Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
-        mOdometry.update(Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()),
+        mOdometry.update(new Rotation2d(-mGyro.getYaw().getRadians()),
                 Units.feet_to_meters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
                 Units.feet_to_meters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
     }
