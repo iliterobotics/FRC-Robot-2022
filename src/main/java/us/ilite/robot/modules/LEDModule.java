@@ -12,12 +12,12 @@ import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Enums;
 
 
-public class LEDControl extends Module {
+public class LEDModule extends Module {
 
     private CANifier mLEDCan;
     private Timer mBlinkTimer;
 
-    public LEDControl() {
+    public LEDModule() {
         this.mBlinkTimer = new Timer();
         this.mBlinkTimer.reset();
         mLEDCan = new CANifier(Settings.HW.CAN.kLEDCanifier);
@@ -65,5 +65,10 @@ public class LEDControl extends Module {
         mLEDCan.setLEDOutput(b / 255, CANifier.LEDChannel.LEDChannelC);
     }
 
+    public void shutdown() {
+        mLEDCan.setLEDOutput(0, CANifier.LEDChannel.LEDChannelA);
+        mLEDCan.setLEDOutput(0, CANifier.LEDChannel.LEDChannelB);
+        mLEDCan.setLEDOutput(0, CANifier.LEDChannel.LEDChannelC);
+    }
 
 }

@@ -8,10 +8,8 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
@@ -43,7 +41,7 @@ public class Robot extends TimedRobot {
     private ClimberModule mHanger;
     private Timer initTimer = new Timer();
 
-    private LEDControl mLEDControl;
+    private LEDModule mLEDControl;
     private SimulationModule mSimulation;
     private FeederModule mFeeder;
     private IntakeModule mIntake;
@@ -79,7 +77,7 @@ public class Robot extends TimedRobot {
         mOI = new OperatorInput();
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
-        mLEDControl = new LEDControl();
+        mLEDControl = new LEDModule();
         mClimber = new ClimberModule();
         mNeoDrive = new NeoDriveModule();
         if(IS_SIMULATED) {
@@ -130,6 +128,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
+        mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
     }
 
@@ -149,6 +148,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
         mRunningModules.addModule(mClimber);
+        mRunningModules.addModule(mLEDControl);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);

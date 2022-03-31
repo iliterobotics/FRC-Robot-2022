@@ -3,6 +3,7 @@ package us.ilite.robot.controller;
 import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EIntakeData.*;
@@ -111,4 +112,5 @@ public class TeleopController extends BaseManualController { //copied from TestC
             }
         }
     }
+
 }

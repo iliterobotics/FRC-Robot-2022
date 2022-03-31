@@ -65,18 +65,13 @@ public class Enums {
     }
     // LED control and colors
     public enum LEDColorMode {
-        DEFAULT( 0, 0, 0 ),
-        PURPLE( 255, 0, 200 ),
+        NULL( 0, 0, 0 ),
+        PURPLE( 125, 0, 250 ),
         RED( 255, 0, 0 ),
-        LIGHT_BLUE( 0, 100, 220 ),
         WHITE( 255, 255, 255 ),
         GREEN( 0, 255, 0 ),
         YELLOW( 255, 255, 0 ),
-        GREEN_HSV( 84, 255, 255 ),
         BLUE( 0, 0, 255 ),
-        RED_HSV( 0, 255, 255 ),
-        YELLOW_HSV( 20, 255, 255 ),
-        PURPLE_HSV( 212, 255, 255 ),
         ORANGE( 255, 165, 0 );
         double red;
         double green;
