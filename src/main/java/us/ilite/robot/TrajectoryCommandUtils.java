@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import us.ilite.common.config.Settings;
+import us.ilite.common.lib.util.Units;
 import us.ilite.robot.modules.NeoDriveModule;
 import us.ilite.robot.modules.VioletDriveModule;
 
@@ -113,9 +114,11 @@ public class TrajectoryCommandUtils {
     public static Trajectory buildExampleTrajectory() {
         // TODO Normally this method would build the trajectory based off of the waypoints and config that is passed in
         //  but I am going to keep it hard-coded for now
-        TrajectoryConfig config = new TrajectoryConfig(0.33 ,0.33);
-        config.addConstraint(new CentripetalAccelerationConstraint(0.33));
-        config.addConstraint(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(NeoDriveModule.kTrackWidthFeet), 3));
+        TrajectoryConfig config = new TrajectoryConfig(3 ,3);
+        config.addConstraint(new DifferentialDriveVoltageConstraint(new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA),
+                new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 12));
+        config.addConstraint(new CentripetalAccelerationConstraint(3));
+        config.addConstraint(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 3));
         config.setStartVelocity(2.0);
         config.setEndVelocity(0.0);
         ArrayList<Translation2d> waypoints = new ArrayList<Translation2d>();
