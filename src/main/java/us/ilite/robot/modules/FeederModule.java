@@ -17,6 +17,7 @@ public class FeederModule extends Module {
     private final TalonFX mIntakeFeeder;
 
     private final DigitalBeamSensor mEntryBeamBreaker;
+    private final DigitalBeamSensor mExitBeamBreaker;
 
     // ========================================
     // DO NOT MODIFY THESE METHOD CONSTANTS
@@ -36,7 +37,9 @@ public class FeederModule extends Module {
         mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);
         mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_9_MotProfBuffer, 255);
         mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
+
         mEntryBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
+        mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
     }
 
     @Override
@@ -45,10 +48,16 @@ public class FeederModule extends Module {
     }
 
     @Override
-    protected void readInputs() {
+    public void readInputs() {
         db.feeder.set(ACTUAL_FEEDER_pct, (mIntakeFeeder.getSelectedSensorVelocity() * kScaledRPMConversion) / kMaxFalconSpeed);
         db.feeder.set(EXIT_BALL_VELOCITY_ft_s, mIntakeFeeder.getSelectedSensorVelocity() * kVelocityConversion);
         db.feeder.set(ENTRY_BEAM, mEntryBeamBreaker.isBroken());
+        db.feeder.set(ENTRY_BEAM, mExitBeamBreaker.isBroken());
+    }
+
+    @Override
+    public void setOutputs() {
+        mIntakeFeeder.set(TalonFXControlMode.PercentOutput, db.feeder.get(SET_FEEDER_pct));
     }
 
     @Override
