@@ -3,6 +3,7 @@ package us.ilite.robot.modules;
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifierStatusFrame;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 
 import static us.ilite.robot.Enums.*;
@@ -15,9 +16,6 @@ public class LEDControl extends Module {
 
     private CANifier mLEDCan;
     private Timer mBlinkTimer;
-    private LEDColorMode mColor = LEDColorMode.DEFAULT;
-    private Enums.LEDColorMode color;
-    private double kBlinkTime = 0.25;
 
     public LEDControl() {
         this.mBlinkTimer = new Timer();
@@ -35,23 +33,29 @@ public class LEDControl extends Module {
 
     @Override
     protected void setOutputs() {
-        //set the LED output to a color
-        color = db.ledcontrol.get(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.class);
-        if (db.ledcontrol.get(ELEDControlData.LED_STATE) == 1d) {
-            //start timer and turn off if mBlinkTimer < half of cycle time, and on if mBlinkTimer > half of cycle time
-            mBlinkTimer.start();
-            if(mBlinkTimer.hasElapsed(kBlinkTime / 2)) {
-                setLEDColor(color.getRed(), color.getGreen(), color.getBlue());
-                if (mBlinkTimer.hasElapsed(kBlinkTime)) {
-                    mBlinkTimer.reset();
-                }
-            }
-            else {
-                setLEDColor(0, 0, 0);
-            }
+        //set the LED output to a color and state (blinking/solid)
+        LEDColorMode color = db.ledcontrol.get(ELEDControlData.DESIRED_COLOR, LEDColorMode.class);
+        LEDState mode = db.ledcontrol.get(ELEDControlData.LED_STATE, LEDState.class);
+        if(mode == null || color == null) {
+            return;
         }
-        else {
-            setLEDColor(color.getRed(), color.getGreen(), color.getBlue());
+        switch(mode) {
+            case NULL:
+            case BLINKING:
+                //start timer and turn off if mBlinkTimer < half of cycle time, and on if mBlinkTimer > half of cycle time
+                mBlinkTimer.start();
+                if (mBlinkTimer.hasElapsed(db.ledcontrol.get(ELEDControlData.BLINK_SPEED) / 2)) {
+                    setLEDColor(color.getRed(), color.getGreen(), color.getBlue());
+                    if (mBlinkTimer.hasElapsed(db.ledcontrol.get(ELEDControlData.BLINK_SPEED))) {
+                        mBlinkTimer.reset();
+                    }
+                } else {
+                    setLEDColor(0, 0, 0);
+                }
+                break;
+            case SOLID:
+                setLEDColor(color.getRed(), color.getGreen(), color.getBlue());
+                break;
         }
     }
 
