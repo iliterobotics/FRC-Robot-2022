@@ -41,9 +41,15 @@ public class TeleopController extends BaseManualController {
 
     private void updateTargetLock() {
         if (db.driverinput.isSet(InputMap.DRIVER.TARGET_LOCK)) {
+            if (db.limelight.isSet(ELimelightData.TV)) {
+                setLED(Enums.LEDColorMode.GREEN, Enums.LEDState.SOLID);
+            } else {
+                setLED(Enums.LEDColorMode.RED, Enums.LEDState.SOLID);
+            }
             db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.HUB_UPPER.id());
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
         } else {
+            setLED(Enums.LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
             db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CAMERA.id());
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
         }

@@ -152,7 +152,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mNeoDrive);
         mRunningModules.addModule(mLimelight);
         //        mRunningModules.addModule(mClimber);
-        mRunningModules.addModule(mClimber);
+//        mRunningModules.addModule(mClimber);
         mRunningModules.addModule(mLEDControl);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;

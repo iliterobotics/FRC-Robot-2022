@@ -66,6 +66,7 @@ public class Enums {
     // LED control and colors
     public enum LEDColorMode {
         NULL( 0, 0, 0 ),
+        DEFAULT( 0, 0, 0 ),
         PURPLE( 125, 0, 250 ),
         RED( 255, 0, 0 ),
         WHITE( 255, 255, 255 ),
