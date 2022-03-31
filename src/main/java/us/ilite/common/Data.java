@@ -41,38 +41,37 @@ public class Data {
     public final RobotCodex<ELogitech310> tankinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
     public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
-    public final RobotCodex<EHangerModuleData> hanger = new RobotCodex(NULL_CODEX_VALUE, EHangerModuleData.class);
+    public final RobotCodex<EClimberModuleData> climber = new RobotCodex(NULL_CODEX_VALUE, EClimberModuleData.class);
     public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
-    public final RobotCodex<EIntakeData> cargo = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
+    public final RobotCodex<EIntakeData> intake = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
     public final RobotCodex<EFeederData> feeder = new RobotCodex(NULL_CODEX_VALUE, EFeederData.class);
-    public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
     public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE , ELimelightData.class);
     public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
-            imu,
-            drivetrain,
             driverinput,
             operatorinput,
+            imu,
+            drivetrain,
             pdp,
             rawLimelight,
             feeder,
-            cargo,
-            hanger,
-            color,
+            intake,
+            climber
     };
 
     public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
 
     public final RobotCodex[] mLoggedCodexes = new RobotCodex[]{
-            imu,
-            drivetrain,
+            // Order Matters for these 2
             driverinput,
             operatorinput,
+            // Order does not matter for the rest
+            imu,
+            drivetrain,
             feeder,
             pdp,
-            cargo,
-            hanger,
-            color,
+            intake,
+            climber,
     };
 
     //Stores writers per codex needed for CSV logging
@@ -84,11 +83,19 @@ public class Data {
      * @param pLogging
      */
     public Data(boolean pLogging) {
-        int i = 0;
-        for (RobotCodex rc : mLoggedCodexes) {
-            mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
+        for (int i = 0; i < mLoggedCodexes.length; i++){
+            RobotCodex rc = mLoggedCodexes[i];
+            switch(i) {
+                case 0:
+                    mMappedCodex.put("Driver Input", rc);
+                    break;
+                case 1:
+                    mMappedCodex.put("Operator Input", rc);
+                    break;
+                default:
+                    mMappedCodex.put(rc.meta().getEnum().getSimpleName(), rc);
+            }
             rc.meta().setGlobalId(i);
-            i++;
         }
     }
 
@@ -99,7 +106,7 @@ public class Data {
     public void registerAllWithShuffleboard() {
         if(mHasRegisteredWithShuffleboard) { return ; }
         for (String key : mMappedCodex.keySet()) {
-            ShuffleboardTab tab = Shuffleboard.getTab("TEST-" + key);
+            ShuffleboardTab tab = Shuffleboard.getTab(key);
             List<Enum<?>> enums = EnumUtils.getEnums(mMappedCodex.get(key).meta().getEnum(), true);
             enums.stream().forEach(
                     e -> {

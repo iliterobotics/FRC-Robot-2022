@@ -23,12 +23,7 @@ public class ExampleModule extends Module {
     }
 
     @Override
-    public void readInputs() {
-        
-    }
-
-    @Override
-    public void setOutputs() {
+    protected void setOutputs() {
 
 //        if(mTimer.hasPeriodPassed(kDelaySeconds)) {
 //            mOn = !mOn;

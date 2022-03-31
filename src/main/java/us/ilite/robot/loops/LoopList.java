@@ -22,12 +22,12 @@ public class LoopList extends Loop {
 
     @Override
     public void readInputs() {
-        mLoops.forEach(module -> module.readInputs());
+        mLoops.forEach(module -> module.safeReadInputs());
     }
 
     @Override
     public void setOutputs() {
-        mLoops.forEach(module -> module.setOutputs());
+        mLoops.forEach(module -> module.safeSetOutputs());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package us.ilite.robot.modules;
 
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -15,6 +16,7 @@ public class IntakeModule extends Module {
     private final TalonFX mIntakeRoller;
     private final DoubleSolenoid mArmSolenoid;
     private final Compressor mCompressor;
+    private boolean mIntakeState = false;
 
     // ========================================
     // DO NOT MODIFY THESE CONSTANTS
@@ -29,50 +31,60 @@ public class IntakeModule extends Module {
     public IntakeModule() {
         mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
         mIntakeRoller.setInverted(true);
+        mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
+        mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
+        mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);
+        mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_9_MotProfBuffer, 255);
+        mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
         mArmSolenoid = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, Settings.HW.PCH.kINPNIntakeForward, Settings.HW.PCH.kINPNIntakeReverse);
         mCompressor = new Compressor(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH);
         mCompressor.enableAnalog(100, 110);
+        mArmSolenoid.set(DoubleSolenoid.Value.kForward);
+        db.intake.set(PNEUMATIC_STATE, 1.0);
     }
 
     @Override
-    public void readInputs() {
-        db.cargo.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
-        db.cargo.set(FEEDER_pct, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
-        db.cargo.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
-        db.cargo.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
-        db.cargo.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
-        db.cargo.set(COMPRESSOR_PSI, mCompressor.getPressure());
+    protected void readInputs() {
+        db.intake.set(ROLLER_VEL_ft_s, mIntakeRoller.getSelectedSensorVelocity() * kFeetSpeedConversion);
+        db.intake.set(ROLLER_PCT, (mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM) / kMaxFalconSpeed);
+        db.intake.set(CURRENT_ROLLER_RPM, mIntakeRoller.getSelectedSensorVelocity() * kScaledUnitsToRPM);
+        db.intake.set(INTAKE_SUPPLY_CURRENT, mIntakeRoller.getSupplyCurrent());
+        db.intake.set(INTAKE_STATOR_CURRENT, mIntakeRoller.getSupplyCurrent());
+        db.intake.set(COMPRESSOR_PSI, mCompressor.getPressure());
     }
 
     @Override
-    public void setOutputs() {
+    protected void setOutputs() {
        setPneumaticState();
        setRollerState();
     }
 
     public void setPneumaticState() {
-        Enums.EArmState mode = db.cargo.get(ARM_STATE, Enums.EArmState.class);
+        Enums.EArmState mode = db.intake.get(ARM_STATE, Enums.EArmState.class);
         if (mode == null) {
            return;
         }
         switch (mode) {
             case DEFAULT:
+            case EXTEND:
                 mArmSolenoid.set(DoubleSolenoid.Value.kReverse);
+                db.intake.set(PNEUMATIC_STATE, 1.0);
                 break;
             case RETRACT:
                 mArmSolenoid.set(DoubleSolenoid.Value.kForward);
+                db.intake.set(PNEUMATIC_STATE, 2.0);
                 break;
         }
     }
 
     public void setRollerState() {
-        Enums.EIntakeState mode = db.cargo.get(ROLLER_STATE, Enums.EIntakeState.class);
+        Enums.ERollerState mode = db.intake.get(ROLLER_STATE, Enums.ERollerState.class);
         if (mode == null) {
-            mode = Enums.EIntakeState.PERCENT_OUTPUT;
+            mode = Enums.ERollerState.PERCENT_OUTPUT;
         }
         switch (mode) {
             case PERCENT_OUTPUT:
-                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.cargo.get(DESIRED_pct));
+                mIntakeRoller.set(TalonFXControlMode.PercentOutput, db.intake.get(DESIRED_ROLLER_pct));
                 break;
         }
     }

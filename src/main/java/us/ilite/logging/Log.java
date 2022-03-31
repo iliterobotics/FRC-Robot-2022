@@ -1,4 +1,4 @@
-package us.ilite.robot;
+package us.ilite.logging;
 
 import java.util.Objects;
 

@@ -96,7 +96,7 @@ public class DriveMessage {
      */
     public DriveMessage calculateCurvature() {
         if(!mIsDirect) {
-            mTurn = Math.abs(mThrottle) * mTurn * DriveModule.kTurnSensitivity;
+            mTurn = Math.abs(mThrottle) * mTurn * NeoDriveModule.kTurnSensitivity;
         }
         return this;
     }

@@ -162,6 +162,10 @@ bin/
 
 #intellij files
 .idea
+**/venv/**
+**/*.csv
+**/__pycache__/**
+**/logs/**
 
 # Python virtual environment
 venv

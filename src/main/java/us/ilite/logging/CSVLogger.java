@@ -1,9 +1,12 @@
-package us.ilite.robot;
+package us.ilite.logging;
 
 import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.config.Settings;
+import us.ilite.logging.CSVWriter;
+import us.ilite.logging.Log;
+import us.ilite.robot.Robot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +41,6 @@ public class CSVLogger {
             try {
                 ArrayList<Log> kTempCSVLogs = new ArrayList<>();
                 kCSVLoggerQueue.drainTo(kTempCSVLogs);
-                //mLogger.error( "Drained queue got: " + kTempCSVLogs.size() );
 
                 for ( Log log : kTempCSVLogs ) {
                     //TODO - fix the excessive exceptions
@@ -51,7 +53,7 @@ public class CSVLogger {
     public void logFromCodexToCSVHeader() {
         mCSVWriters.forEach(c -> c.writeHeader());
     }
-    
+
     public void logFromCodexToCSVLog( Log pLog ) {
         for ( CSVWriter c : mCSVWriters ) {
             if ( c.getMetaDataOfAssociatedCodex().gid() == pLog.getmGlobalId() ) {
@@ -76,14 +78,10 @@ public class CSVLogger {
     }
 
     public void addToQueue( Log pLog ) {
-        if ( mIsAcceptingToQueue ) {
+        if(mIsAcceptingToQueue) {
             kCSVLoggerQueue.add( pLog );
-        }
-    }
-
-    public void closeWriters() {
-        for ( CSVWriter cw : mCSVWriters ) {
-            cw.close();
+        } else {
+            System.err.println("FAILED: CANNOT ADD TO QUEUE");
         }
     }
 

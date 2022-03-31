@@ -1,18 +1,10 @@
 package us.ilite.robot.controller;
 
-import com.ctre.phoenix.CANifier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import us.ilite.common.types.EHangerModuleData;
-import us.ilite.common.types.ELEDControlData;
-import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
-import us.ilite.robot.Enums;
-import us.ilite.robot.modules.LEDControl;
 
-import static us.ilite.robot.Enums.*;
-import static us.ilite.common.types.EFeederData.*;
 import static us.ilite.common.types.drive.EDriveData.L_ACTUAL_VEL_FT_s;
 import static us.ilite.common.types.drive.EDriveData.R_ACTUAL_VEL_FT_s;
 
@@ -63,16 +55,5 @@ public class TestController extends BaseManualController {
         SmartDashboard.putNumber("Max Robot Omega (deg/s)", mMaxYaw);
     }
 
-    public void updateHanger() {
-        if(db.driverinput.isSet(ELogitech310.R_BTN) && db.operatorinput.isSet(ELogitech310.R_BTN)) {
-            db.hanger.set(EHangerModuleData.SET_pct, 0.3);
-        }
-        else if (db.driverinput.isSet(ELogitech310.L_BTN) && db.operatorinput.isSet(ELogitech310.L_BTN)) {
-            db.hanger.set(EHangerModuleData.SET_pct, -0.3);
-        }
-        else {
-            db.hanger.set(EHangerModuleData.SET_pct, 0);
-        }
-    }
-}
 
+}

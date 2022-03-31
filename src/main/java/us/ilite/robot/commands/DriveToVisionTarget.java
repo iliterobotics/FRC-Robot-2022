@@ -5,7 +5,7 @@ import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.util.Utils;
 import us.ilite.common.types.ELimelightData;
-import us.ilite.robot.modules.DriveModule;
+import us.ilite.robot.modules.FalconDriveModule;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
 
 /**
@@ -26,13 +26,13 @@ public class DriveToVisionTarget implements ICommand {
     private final PIDController mDistanceController = new PIDController(Settings.kTargetDistanceLockGains, kMinTargetArea, kMaxTargetAngle, Settings.kControlLoopPeriod);
 
     private ITargetDataProvider mTargetDataProvider;
-    private DriveModule mDrive;
+    private FalconDriveModule mDrive;
     private Data mData;
 
     private double mInitialTargetAngle;
     private boolean mHasAcquiredTarget = false;
 
-    public DriveToVisionTarget(ITargetDataProvider pTargetDataProvider, DriveModule mDrive, Data mData) {
+    public DriveToVisionTarget(ITargetDataProvider pTargetDataProvider, FalconDriveModule mDrive, Data mData) {
         this.mTargetDataProvider = pTargetDataProvider;
         this.mDrive = mDrive;
         this.mData = mData;
