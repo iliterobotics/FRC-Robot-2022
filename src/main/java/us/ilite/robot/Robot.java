@@ -49,6 +49,7 @@ public class Robot extends TimedRobot {
     private IntakeModule mIntake;
     private ClimberModule mClimber;
     private NeoDriveModule mNeoDrive;
+    private Limelight mLimelight;
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -82,6 +83,7 @@ public class Robot extends TimedRobot {
         mLEDControl = new LEDControl();
         mClimber = new ClimberModule();
         mNeoDrive = new NeoDriveModule();
+        mLimelight = new Limelight();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -127,9 +129,10 @@ public class Robot extends TimedRobot {
         mThreeBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mActiveController.setEnabled(true);
         mRunningModules.clearModules();
-        mRunningModules.addModule(mFeeder);
-        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mFeeder);
+//        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
+        mRunningModules.addModule(mLimelight);
         mRunningModules.modeInit(AUTONOMOUS);
     }
 
@@ -145,10 +148,11 @@ public class Robot extends TimedRobot {
         }
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mFeeder);
-        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mFeeder);
+//        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
-        mRunningModules.addModule(mClimber);
+        mRunningModules.addModule(mLimelight);
+        //        mRunningModules.addModule(mClimber);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);

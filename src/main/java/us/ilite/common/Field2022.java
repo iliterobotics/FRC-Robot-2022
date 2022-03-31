@@ -21,9 +21,10 @@ public class Field2022 {
      * Any trackable field component for 2020's game.
      */
     public enum FieldElement implements IFieldComponent {
-        HUB_UPPER               (104,48, 0),
+        NULL(0, 0, 0),
+        HUB_UPPER               (104,48, 1),
 //        TARGET_ZOOM             (0d,0d),
-        NONE                    (0,0, 1);
+        CAMERA(0,0, 0);
 
         // This is done in inches -- straight from game manual
         private final double height;
