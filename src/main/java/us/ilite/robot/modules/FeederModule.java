@@ -59,9 +59,4 @@ public class FeederModule extends Module {
     public void setOutputs() {
         mIntakeFeeder.set(TalonFXControlMode.PercentOutput, db.feeder.get(SET_FEEDER_pct));
     }
-
-    @Override
-    protected void setOutputs() {
-        mIntakeFeeder.set(TalonFXControlMode.PercentOutput, db.feeder.get(SET_FEEDER_pct));
-    }
 }
