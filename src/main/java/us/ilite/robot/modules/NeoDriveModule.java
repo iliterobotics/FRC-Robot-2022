@@ -134,7 +134,7 @@ public class NeoDriveModule extends Module {
     public void modeInit(EMatchMode pMode) {
         mGyro.zeroAll();
         reset();
-        resetOdometry(TrajectoryCommandUtils.getJSONTrajectory().getInitialPose());
+        resetOdometry(TrajectoryCommandUtils.buildExampleTrajectory().getInitialPose());
         kInitialXPosition = mOdometry.getPoseMeters().getX();
         kInitialYPosition = mOdometry.getPoseMeters().getY();
         if(pMode == EMatchMode.AUTONOMOUS) {
@@ -156,13 +156,13 @@ public class NeoDriveModule extends Module {
      */
     public void resetOdometry(Pose2d pose) {
         reset();
-        mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()));
+        mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getYaw().getDegrees()));
     }
     @Override
     public void readInputs() {
         mGyro.update();
         db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getYaw().getRadians());
-        db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getHeading().getDegrees());
+        db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getYaw().getDegrees());
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getOutputCurrent());
@@ -235,8 +235,8 @@ public class NeoDriveModule extends Module {
                 mRightMaster.set(rightOutput);
                 break;
             case PATH_FOLLOWING_RAMSETE:
-                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / 20.0);
-                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / 20.0);
+                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / 9.84);
+                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / 9.84);
                 mDrive.feed();
                 break;
         }

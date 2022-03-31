@@ -66,6 +66,7 @@ public class FollowTrajectory implements ICommand {
 
     @Override
     public boolean update(double pNow) {
+        Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
         double curTime = mTrajectoryTimer.get();
         double dt = curTime - mPreviousTime;
         Trajectory.State setpoint = mTrajectory.sample(mTrajectoryTimer.get());
@@ -91,7 +92,6 @@ public class FollowTrajectory implements ICommand {
             double rightOutput =
                     rightFeedforward
                             + mRightDrivePID.calculate(actualRightSpeed, wheelSpeeds.rightMetersPerSecond);
-            Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PATH_FOLLOWING_RAMSETE);
             Robot.DATA.drivetrain.set(EDriveData.L_DESIRED_VEL_FT_s, leftOutput);
             Robot.DATA.drivetrain.set(EDriveData.R_DESIRED_VEL_FT_s, rightOutput);
         }

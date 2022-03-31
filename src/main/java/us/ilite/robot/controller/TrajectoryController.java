@@ -8,7 +8,7 @@ import us.ilite.robot.commands.FollowTrajectory;
 
 public class TrajectoryController extends BaseAutonController {
     private Timer mTimer;
-    private FollowTrajectory mFirstTrajectory = new FollowTrajectory(TrajectoryCommandUtils.getJSONTrajectory(), false);
+    private FollowTrajectory mFirstTrajectory = new FollowTrajectory(TrajectoryCommandUtils.buildExampleTrajectory(), false);
     public void initialize(Trajectory pTrajectory) {
         //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mTimer = new Timer();
