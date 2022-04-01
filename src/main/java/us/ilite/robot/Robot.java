@@ -8,7 +8,6 @@ import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -61,12 +60,10 @@ public class Robot extends TimedRobot {
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
-
     @Override
     public void robotInit() {
         CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
-        mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
@@ -100,6 +97,9 @@ public class Robot extends TimedRobot {
 
         LiveWindow.disableAllTelemetry();
 
+        /* Some things need to wait until after the robot connects to the DS. So keep this thread here. */
+        new Thread(new DSConnectInitThread()).start();
+
         initTimer.stop();
         mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
 
@@ -107,6 +107,12 @@ public class Robot extends TimedRobot {
             mLogger.warn("------------Not Logging to CSV------------");
         }
 
+    }
+
+    /** These things rely on match metadata, so we need to wait for the DS to connect */
+    private void initAfterConnection() {
+        initMatchMetadata();
+        mCSVLogger = new CSVLogger( Settings.kIsLogging, mMatchMeta );
     }
 
     /**
@@ -175,39 +181,34 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         mOI.safeReadInputs();
-//        mDrive.safeReadInputs();
-//        mNeoDrive.safeReadInputs();
-//        mIntake.safeReadInputs();
-//        mFeeder.safeReadInputs();
+        mNeoDrive.safeReadInputs();
+        mIntake.safeReadInputs();
+        mFeeder.safeReadInputs();
         mClimber.safeReadInputs();
-        //Shuffleboard.update();
     }
 
     @Override
     public void testInit() {
-        if ( Settings.kIsLogging ){
-            mCSVLogger.start();
-        }
-
-        if(mTestController == null) {
-            mTestController = TestController.getInstance();
-        }
-        MODE = TEST;
-        mActiveController = mTestController;
-        mActiveController.setEnabled(true);
-
-        mRunningModules.clearModules();
-        mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mFeeder);
-        mRunningModules.addModule(mNeoDrive);
-        mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mLEDControl);
-        if(IS_SIMULATED) {
-            mRunningModules.addModule(mSimulation);
-        }
-        mRunningModules.addModule(mLEDControl);
-        mRunningModules.modeInit(TEST);
-        mRunningModules.checkModule();
+//        if(mTestController == null) {
+//            mTestController = TestController.getInstance();
+//        }
+//        MODE = TEST;
+//        mActiveController = mTestController;
+//        mActiveController.setEnabled(true);
+//
+//        mRunningModules.clearModules();
+//        mRunningModules.addModule(mOI);
+//        mRunningModules.addModule(mFeeder);
+//        mRunningModules.addModule(mNeoDrive);
+//        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mLEDControl);
+//        if(IS_SIMULATED) {
+//            mRunningModules.addModule(mSimulation);
+//        }
+//        mRunningModules.addModule(mLEDControl);
+//        mRunningModules.modeInit(TEST);
+//        mRunningModules.checkModule();
+        teleopInit();
     }
 
     @Override
@@ -273,5 +274,20 @@ public class Robot extends TimedRobot {
 
     }
 
+    private class DSConnectInitThread implements Runnable {
 
+        @Override
+        public void run() {
+
+            while(!DriverStation.isDSAttached()) {
+                try {
+                    mLogger.error("Waiting on Robot <--> DS Connection...");
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            initAfterConnection();
+        }
+    }
 }

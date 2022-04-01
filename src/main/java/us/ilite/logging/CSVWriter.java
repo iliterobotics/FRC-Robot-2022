@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.FMSInfoUtils;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.FileUtils;
 import us.ilite.robot.Robot;
 
@@ -30,10 +31,6 @@ public class CSVWriter {
      * The path to the file template
      */
     private static final String kLOG_PATH_FORMAT = "/logs/%s/%s-%s-%s.csv";
-    /**
-     * The name of the event
-     */
-    private static final String kEventName = DriverStation.getEventName();
     /**
      * Logger
      */
@@ -58,13 +55,13 @@ public class CSVWriter {
      * @param pCodex
      *  The codex that this writter is handling events for
      */
-    CSVWriter(CSVLogger pParentLogger, RobotCodex<?> pCodex) {
+    CSVWriter(CSVLogger pParentLogger, RobotCodex<?> pCodex, MatchMetadata pMatch) {
         mParentLogger = pParentLogger;
         mCodex = pCodex;
 
         BufferedWriter bw = null;
 
-        String fileName = getFileName(mCodex);
+        String fileName = getFileName(mCodex, pMatch);
         logfile = new File(fileName);
 
         boolean fileCreated = FileUtils.handleCreation(logfile);
@@ -109,7 +106,7 @@ public class CSVWriter {
         return mCodex;
     }
 
-    private static final String getFileName(RobotCodex<?>pCodex) {
+    private static final String getFileName(RobotCodex<?>pCodex, MatchMetadata pMatch) {
         String fileName = "";
         String logDir = "/"+kUSB_DIR;
 
@@ -119,23 +116,23 @@ public class CSVWriter {
             case "ELogitech310":
                 if (pCodex.meta().gid() == Robot.DATA.driverinput.meta().gid()) {
                     fileName = String.format(logDir + kLOG_PATH_FORMAT,
-                            kEventName,
+                            pMatch.mEventName,
                             "DriverInput",
-                            DriverStation.getMatchType().name(),
-                            DriverStation.getMatchNumber());
+                            pMatch.mMatchType.name(),
+                            pMatch.mMatchNumber);
                 } else {
                     fileName = String.format(logDir + kLOG_PATH_FORMAT,
-                            kEventName,
+                            pMatch.mEventName,
                             "DriverInput",
-                            DriverStation.getMatchType().name(),
-                            DriverStation.getMatchNumber());
+                            pMatch.mMatchType.name(),
+                            pMatch.mMatchNumber);
                 }
             default:
                 fileName = String.format(logDir + kLOG_PATH_FORMAT,
-                        kEventName,
+                        pMatch.mEventName,
                         pCodex.meta().getEnum().getSimpleName(),
-                        DriverStation.getMatchType().name(),
-                        DriverStation.getMatchNumber());
+                        pMatch.mMatchType.name(),
+                        pMatch.mMatchNumber);
         }
 
         return fileName;

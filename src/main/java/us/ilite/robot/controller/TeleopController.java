@@ -40,7 +40,6 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
     @Override
     protected void updateImpl() {
-        db.registerAllWithShuffleboard();
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================

@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.config.Settings;
+import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.Robot;
 
 import java.util.ArrayList;
@@ -60,13 +61,13 @@ public class CSVLogger {
      * Constructs the {@link CSVLogger} and sets the initial logging thread
      * @param pIsLogging
      */
-    public CSVLogger( boolean pIsLogging ) {
+    public CSVLogger(boolean pIsLogging, MatchMetadata pMatch) {
         mCSVNetworkTable = NetworkTableInstance.getDefault().getTable("CSVLogger");
         LinkedBlockingDeque<ImmutablePair<String,RobotCodex>>queue = null;
         if ( pIsLogging ) {
             queue = new LinkedBlockingDeque<>();
             for (RobotCodex c : Robot.DATA.mLoggedCodexes) {
-                mCSVWriters.put(c.meta().gid(),new CSVWriter(this,c));
+                mCSVWriters.put(c.meta().gid(),new CSVWriter(this,c, pMatch));
             }
             mIsAcceptingToQueue = false;
             logFromCodexToCSVHeader();
