@@ -148,13 +148,25 @@ public class Data {
             List<Enum<?>> enums = EnumUtils.getEnums(mMappedCodex.get(key).meta().getEnum(), true);
             enums.stream().forEach(
                 e -> {
-                    tab.addNumber(e.name(), () -> {
-                        if (mMappedCodex.get(key).isSet(e)) {
-                            return mMappedCodex.get(key).get(e);
-                        } else {
-                            return 0d;
-                        }
-                    });
+                    if(mConvertedFields.contains(e.name())) {
+                        tab.addString(
+                                e.name(), () -> {
+                                    if (mMappedCodex.get(key).isSet(e)) {
+                                        return mMappedCodex.get(key).toString(e);
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                        )
+                    } else {
+                        tab.addNumber(e.name(), () -> {
+                            if (mMappedCodex.get(key).isSet(e)) {
+                                return mMappedCodex.get(key).get(e);
+                            } else {
+                                return 0d;
+                            }
+                        });
+                    }
                 }
             );
         }
