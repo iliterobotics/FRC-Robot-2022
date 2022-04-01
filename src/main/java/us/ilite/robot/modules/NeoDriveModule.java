@@ -230,9 +230,9 @@ public class NeoDriveModule extends Module {
                 mRightMaster.set(rightOutput);
                 break;
             case PATH_FOLLOWING_RAMSETE:
-                //Divide by 9.84 since that is the max velocity in ft/s
-                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / 9.84);
-                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / 9.84);
+                //Divide by 6.56 since that is the max velocity in ft/s
+                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / 6.56);
+                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / 6.56);
                 mDrive.feed();
                 break;
         }
