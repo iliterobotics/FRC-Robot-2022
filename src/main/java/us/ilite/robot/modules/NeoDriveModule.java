@@ -209,18 +209,12 @@ public class NeoDriveModule extends Module {
                     if (db.limelight.isSet(ELimelightData.TV)) {
                         targetLockOutput = mTargetLockPID.calculate(-db.limelight.get(ELimelightData.TX), clock.dt());
                     }
-
                     leftOutput = targetLockOutput + throttle / 5;
                     rightOutput = -targetLockOutput + throttle / 5;
-
                     if (!db.limelight.isSet(ELimelightData.TX)) {
                         leftOutput += turn / 5;
                         rightOutput -= turn / 5;
                     }
-
-                    SmartDashboard.putNumber("Desired throttle addition", throttle/5);
-                    SmartDashboard.putNumber("Desired turn addition", turn/5);
-
                     mLeftMaster.set(leftOutput);
                     mRightMaster.set(rightOutput);
                 } else {

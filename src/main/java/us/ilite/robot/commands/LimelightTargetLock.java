@@ -9,7 +9,7 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.modules.Limelight;
 
-public class LimelightTargetLock {
+public class LimelightTargetLock implements ICommand {
 
     private ILog mLog = Logger.createLog(LimelightTargetLock.class);
 
@@ -30,16 +30,14 @@ public class LimelightTargetLock {
     }
 
     public void init(double pNow) {
-        super.init(pNow);
     }
 
     public boolean update(double pNow) {
-        super.update(pNow);
         return false;
     }
 
     public void shutdown(double pNow) {
-        super.shutdown(pNow);
+
     }
 
 }
