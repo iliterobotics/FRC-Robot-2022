@@ -31,62 +31,6 @@ import java.util.List;
 
 public class TrajectoryCommandUtils {
 
-    private static class TrajectoryWrapper extends Trajectory {
-        private Trajectory mTraj;
-        TrajectoryWrapper(Trajectory pTraj) {
-            mTraj = pTraj;
-        }
-
-        @Override
-        public List<State> getStates() {
-            return mTraj.getStates();
-        }
-
-        @Override
-        public Pose2d getInitialPose() {
-            return mTraj.getInitialPose();
-        }
-
-        @Override
-        public double getTotalTimeSeconds() {
-            return 4;
-        }
-
-        @Override
-        public State sample(double timeSeconds) {
-            return mTraj.sample(timeSeconds);
-        }
-
-        @Override
-        public Trajectory transformBy(Transform2d transform) {
-            return transformBy(transform);
-        }
-
-        @Override
-        public Trajectory relativeTo(Pose2d pose) {
-            return mTraj.relativeTo(pose);
-        }
-
-        @Override
-        public Trajectory concatenate(Trajectory other) {
-            return mTraj.concatenate(other);
-        }
-
-        @Override
-        public String toString() {
-            return mTraj.toString();
-        }
-
-        public int hashCode() {
-            return mTraj.hashCode();
-        }
-        public boolean equals(Object other) {
-            return mTraj.equals(other);
-        }
-
-    }
-
-
     public static Trajectory getJSONTrajectory() {
         String trajectoryJSON = "paths/Unnamed_0.wpilib.json";
         Trajectory trajectory = new Trajectory();
@@ -104,7 +48,7 @@ public class TrajectoryCommandUtils {
         Trajectory trajectory = new Trajectory();
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-            trajectory = new TrajectoryWrapper(TrajectoryUtil.fromPathweaverJson(trajectoryPath));
+            trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
         } catch (IOException ex) {
             System.out.println("Unable to open " + trajectoryJSON + " " + Arrays.toString(ex.getStackTrace()));
         }
@@ -114,10 +58,10 @@ public class TrajectoryCommandUtils {
     public static Trajectory buildExampleTrajectory() {
         // TODO Normally this method would build the trajectory based off of the waypoints and config that is passed in
         //  but I am going to keep it hard-coded for now
-        TrajectoryConfig config = new TrajectoryConfig(3 ,3);
+        TrajectoryConfig config = new TrajectoryConfig(2 ,2);
         config.addConstraint(new DifferentialDriveVoltageConstraint(new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA),
-                new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 12));
-        config.addConstraint(new CentripetalAccelerationConstraint(3));
+                new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 10));
+        config.addConstraint(new CentripetalAccelerationConstraint(1));
         config.addConstraint(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 3));
         config.setStartVelocity(2.0);
         config.setEndVelocity(0.0);

@@ -80,8 +80,6 @@ public class NeoDriveModule extends Module {
     // DO NOT MODIFY THESE OTHER CONSTANTS
     // ========================================
     public static double kTurnSensitivity = 0.85;
-    private static double kInitialXPosition = 0;
-    private static double kInitialYPosition = 0;
     private DifferentialDriveOdometry mOdometry;
     private DifferentialDrive mDrive;
 
@@ -134,9 +132,6 @@ public class NeoDriveModule extends Module {
     public void modeInit(EMatchMode pMode) {
         mGyro.zeroAll();
         reset();
-        resetOdometry(TrajectoryCommandUtils.buildExampleTrajectory().getInitialPose());
-        kInitialXPosition = mOdometry.getPoseMeters().getX();
-        kInitialYPosition = mOdometry.getPoseMeters().getY();
         if(pMode == EMatchMode.AUTONOMOUS) {
             mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
             mRightMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -156,13 +151,13 @@ public class NeoDriveModule extends Module {
      */
     public void resetOdometry(Pose2d pose) {
         reset();
-        mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getYaw().getDegrees()));
+        mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()));
     }
     @Override
     public void readInputs() {
         mGyro.update();
-        db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getYaw().getRadians());
-        db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getYaw().getDegrees());
+        db.drivetrain.set(ACTUAL_HEADING_RADIANS, -mGyro.getHeading().getRadians());
+        db.drivetrain.set(ACTUAL_HEADING_DEGREES, -mGyro.getHeading().getDegrees());
         db.drivetrain.set(LEFT_VOLTAGE, mLeftMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(RIGHT_VOLTAGE, mRightMaster.getVoltageCompensationNominalVoltage());
         db.drivetrain.set(LEFT_CURRENT, mLeftMaster.getOutputCurrent());
@@ -175,12 +170,12 @@ public class NeoDriveModule extends Module {
         db.imu.set(EGyro.ACCEL_Y, mGyro.getAccelY());
         db.imu.set(EGyro.PITCH_DEGREES, mGyro.getPitch().getDegrees());
         db.imu.set(EGyro.ROLL_DEGREES, mGyro.getRoll().getDegrees());
-        db.imu.set(EGyro.YAW_DEGREES, mGyro.getYaw().getDegrees());
-        db.imu.set(EGyro.YAW_OMEGA_DEGREES, mGyro.getYawRate().getDegrees());
+        db.imu.set(EGyro.YAW_DEGREES, -mGyro.getYaw().getDegrees());
+        db.imu.set(EGyro.YAW_OMEGA_DEGREES, -mGyro.getYawRate().getDegrees());
         db.drivetrain.set(X_ACTUAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getX());
         db.drivetrain.set(Y_ACTuAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getY());
         Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
-        mOdometry.update(new Rotation2d(-mGyro.getYaw().getRadians()),
+        mOdometry.update(new Rotation2d(-mGyro.getHeading().getRadians()),
                 Units.feet_to_meters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
                 Units.feet_to_meters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
     }
@@ -235,6 +230,7 @@ public class NeoDriveModule extends Module {
                 mRightMaster.set(rightOutput);
                 break;
             case PATH_FOLLOWING_RAMSETE:
+                //Divide by 9.84 since that is the max velocity in ft/s
                 mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / 9.84);
                 mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / 9.84);
                 mDrive.feed();
