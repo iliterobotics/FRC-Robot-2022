@@ -29,6 +29,7 @@ public abstract class AbstractController {
     protected double dt = 1d;
 
     private boolean mIsBallAdded = false;
+    private boolean mIsBallOut = false;
     private int mNumBalls = 0;
 
     public AbstractController(){
@@ -73,23 +74,36 @@ public abstract class AbstractController {
     protected abstract void updateImpl();
 
     protected void fireCargo() {
-        db.feeder.set(EFeederData.SET_FEEDER_pct, 0.8);
-        mNumBalls = 0;
+        db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
+        indexCargo();
         db.feeder.set(NUM_BALLS, 0);
     }
-
     protected void indexCargo() {
-        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) { // is broken
-            if (!mIsBallAdded) {
+        //Indexing balls coming in
+        if (db.feeder.get(ENTRY_BEAM) == 0d) {
+            if(!mIsBallAdded) {
                 mNumBalls++;
                 mIsBallAdded = true;
             }
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.4);
-        } else if (mIsBallAdded) {
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+        } else if (mIsBallAdded && db.feeder.get(ENTRY_BEAM) == 1d) {
             mIsBallAdded = false;
-        } else {
+        }
+        //Indexing balls coming out
+        else if (db.feeder.get(EXIT_BEAM) == 0d) {
+            if(!mIsBallOut) {
+                mNumBalls--;
+                mIsBallOut = true;
+            }
+        } else if (mIsBallOut && db.feeder.get(EXIT_BEAM) == 1d) {
+            mIsBallOut = false;
+        }
+        db.feeder.set(NUM_BALLS, mNumBalls);
+    }
 
+    protected void stageBalls() {
+        if(db.feeder.get(EXIT_BEAM) == 1d) {
+            db.feeder.set(SET_FEEDER_pct, 0.4);
         }
     }
 
