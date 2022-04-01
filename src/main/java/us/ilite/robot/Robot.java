@@ -129,8 +129,8 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         MODE = AUTONOMOUS;
         mRunningModules.clearModules();
-//        mRunningModules.addModule(mFeeder);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mFeeder);
+        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
@@ -155,12 +155,11 @@ public class Robot extends TimedRobot {
         }
         mRunningModules.clearModules();
         mRunningModules.addModule(mOI);
-//        mRunningModules.addModule(mFeeder);
-//        mRunningModules.addModule(mIntake);
+        mRunningModules.addModule(mFeeder);
+        mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
         mRunningModules.addModule(mLimelight);
-        //        mRunningModules.addModule(mClimber);
-//        mRunningModules.addModule(mClimber);
+        mRunningModules.addModule(mClimber);
         mRunningModules.addModule(mLEDControl);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
