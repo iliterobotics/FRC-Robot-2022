@@ -8,7 +8,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.config.Settings;
-import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.Robot;
 
 import java.util.ArrayList;
@@ -17,8 +16,8 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 /**
- * Class responsible for managing all of the {@link CSVWriter}s. Logging events 
- * are sent to this class in the form of {@link ImmutablePair} of the String to log, 
+ * Class responsible for managing all of the {@link CSVWriter}s. Logging events
+ * are sent to this class in the form of {@link ImmutablePair} of the String to log,
  * which is expected to be CSV format, and the {@link RobotCodex} in the {@link CSVLogger#logFromCodexToCSVLog(ImmutablePair)}
  *
  * This class will run a timer thread that will periodically look for log events and will pass them onto
@@ -61,13 +60,13 @@ public class CSVLogger {
      * Constructs the {@link CSVLogger} and sets the initial logging thread
      * @param pIsLogging
      */
-    public CSVLogger(boolean pIsLogging, MatchMetadata pMatch) {
+    public CSVLogger( boolean pIsLogging ) {
         mCSVNetworkTable = NetworkTableInstance.getDefault().getTable("CSVLogger");
         LinkedBlockingDeque<ImmutablePair<String,RobotCodex>>queue = null;
         if ( pIsLogging ) {
             queue = new LinkedBlockingDeque<>();
             for (RobotCodex c : Robot.DATA.mLoggedCodexes) {
-                mCSVWriters.put(c.meta().gid(),new CSVWriter(this,c, pMatch));
+                mCSVWriters.put(c.meta().gid(),new CSVWriter(this,c));
             }
             mIsAcceptingToQueue = false;
             logFromCodexToCSVHeader();
