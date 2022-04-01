@@ -3,13 +3,14 @@ package us.ilite.robot.controller;
 import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EIntakeData.*;
 import static us.ilite.common.types.EFeederData.*;
 
 
-public class TeleopController extends BaseManualController { //copied from TestController, needs editing
+public class TeleopController extends BaseManualController {
 
     private static TeleopController INSTANCE;
 
@@ -35,6 +36,23 @@ public class TeleopController extends BaseManualController { //copied from TestC
         updateHangerMotors();
         updateHangerPneumatics();
         updateIntake();
+        updateTargetLock();
+    }
+
+    private void updateTargetLock() {
+        if (db.driverinput.isSet(InputMap.DRIVER.TARGET_LOCK)) {
+            if (db.limelight.isSet(ELimelightData.TV)) {
+                setLED(Enums.LEDColorMode.GREEN, Enums.LEDState.SOLID);
+            } else {
+                setLED(Enums.LEDColorMode.RED, Enums.LEDState.SOLID);
+            }
+            db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.HUB_UPPER.id());
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
+        } else {
+            setLED(Enums.LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
+            db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CAMERA.id());
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
+        }
     }
 
     private void updateHangerMotors() {
@@ -113,4 +131,5 @@ public class TeleopController extends BaseManualController { //copied from TestC
             }
         }
     }
+
 }

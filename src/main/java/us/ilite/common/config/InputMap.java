@@ -21,10 +21,10 @@ public class InputMap {
         public static final ELogitech310
         TURN_AXIS = ELogitech310.RIGHT_X_AXIS,
         THROTTLE_AXIS = ELogitech310.LEFT_Y_AXIS,
-        SNAIL_MODE = ELogitech310.RIGHT_TRIGGER_AXIS, // TODO Experiment with increased and decreased acceleration rates for snail and boost mode
-        DRIVER_LIMELIGHT_LOCK_TARGET = ELogitech310.A_BTN,
+        SNAIL_MODE = ELogitech310.RIGHT_TRIGGER_AXIS, // TODO Experiment with increased or decreased acceleration rates for snail
         ACTIVATE_CLIMB = ELogitech310.START,
-        MID_RUNG = ELogitech310.L_BTN
+        MID_RUNG = ELogitech310.L_BTN,
+        TARGET_LOCK = ELogitech310.LEFT_TRIGGER_AXIS
         ;
     }
 

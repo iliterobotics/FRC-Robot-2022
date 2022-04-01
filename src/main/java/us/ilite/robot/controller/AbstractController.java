@@ -11,6 +11,7 @@ import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
+import us.ilite.common.types.ELEDControlData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -124,6 +125,21 @@ public abstract class AbstractController {
         mNumBalls = 0;
         db.feeder.set(EFeederData.NUM_BALLS, 0);
         db.intake.set(DESIRED_ROLLER_pct, -1.0);
+    }
+
+    protected void setLED(Enums.LEDColorMode pColor, Enums.LEDState pState) {
+        //pState is in seconds
+        db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, pColor);
+        db.ledcontrol.set(ELEDControlData.LED_STATE, pState);
+        if(pState == LEDState.BLINKING) {
+            db.ledcontrol.set(ELEDControlData.BLINK_SPEED, 0.5);
+        }
+    }
+    public void setLED(Enums.LEDColorMode pColor, double pBlinkRate) {
+        //pState is in seconds
+        db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, pColor);
+        db.ledcontrol.set(ELEDControlData.LED_STATE, LEDState.BLINKING);
+        db.ledcontrol.set(ELEDControlData.BLINK_SPEED,pBlinkRate);
     }
 
     /**
