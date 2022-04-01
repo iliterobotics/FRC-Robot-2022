@@ -63,11 +63,12 @@ public class TrajectoryCommandUtils {
                 new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 10));
         config.addConstraint(new CentripetalAccelerationConstraint(1));
         config.addConstraint(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 3));
-        config.setStartVelocity(2.0);
+        config.setStartVelocity(0.0);
         config.setEndVelocity(0.0);
         ArrayList<Translation2d> waypoints = new ArrayList<Translation2d>();
         waypoints.add(new Translation2d(1, 0));
         waypoints.add( new Translation2d(2, 0));
+        //TODO figure out how to fix the starting rotation 2d
         return TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
                 waypoints,
                 new Pose2d(3, 0, new Rotation2d(0)),
