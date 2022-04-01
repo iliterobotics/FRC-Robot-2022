@@ -96,6 +96,8 @@ public class TeleopController extends BaseManualController { //copied from TestC
                 placeCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.RELEASE_BALLS)) {
                 reverseCargo();
+            } else if (db.operatorinput.isSet(InputMap.OPERATOR.STAGE_BALLS)) {
+                stageBalls();
             } else {
                 db.feeder.set(SET_FEEDER_pct, 0d);
                 db.intake.set(DESIRED_ROLLER_pct, 0d);

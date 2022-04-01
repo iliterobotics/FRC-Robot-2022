@@ -66,7 +66,7 @@ public class Settings {
             public static final int kEDTRA = 1;
             public static final int kEDTRB = 0;
             public static final int kINEntryBeam = 4;
-            public static final int kINExitBeam = 10;
+            public static final int kINExitBeam = 3;
         }
 
         public static class PCH {

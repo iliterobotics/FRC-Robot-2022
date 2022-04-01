@@ -39,7 +39,7 @@ public class FeederModule extends Module {
         mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
 
         mEntryBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
-        mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
+        mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINExitBeam, kDebounceTime);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class FeederModule extends Module {
         db.feeder.set(ACTUAL_FEEDER_pct, (mIntakeFeeder.getSelectedSensorVelocity() * kScaledRPMConversion) / kMaxFalconSpeed);
         db.feeder.set(EXIT_BALL_VELOCITY_ft_s, mIntakeFeeder.getSelectedSensorVelocity() * kVelocityConversion);
         db.feeder.set(ENTRY_BEAM, mEntryBeamBreaker.isBroken());
-        db.feeder.set(ENTRY_BEAM, mExitBeamBreaker.isBroken());
+        db.feeder.set(EXIT_BEAM, mExitBeamBreaker.isBroken());
     }
 
     @Override

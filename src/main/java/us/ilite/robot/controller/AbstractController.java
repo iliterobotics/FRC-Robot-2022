@@ -29,6 +29,7 @@ public abstract class AbstractController {
     protected double dt = 1d;
 
     private boolean mIsBallAdded = false;
+    private boolean mIsBallOut = false;
     private int mNumBalls = 0;
 
     public AbstractController(){
@@ -74,29 +75,36 @@ public abstract class AbstractController {
 
     protected void fireCargo() {
         db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
-        mNumBalls = 0;
-        db.feeder.set(NUM_BALLS, 0);
+        indexCargo();
+        db.feeder.set(NUM_BALLS, mNumBalls);
     }
-    protected void updateBalls() {
+    protected void indexCargo() {
         //Indexing balls coming in
-        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d) {
-            if(!isBallAdded) {
-                numBalls++;
-                isBallAdded = true;
+        if (db.feeder.get(ENTRY_BEAM) == 0d) {
+            if(!mIsBallAdded) {
+                mNumBalls++;
+                mIsBallAdded = true;
             }
-        } else if (isBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
-            isBallAdded = false;
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+        } else if (mIsBallAdded && db.feeder.get(ENTRY_BEAM) == 1d) {
+            mIsBallAdded = false;
         }
         //Indexing balls coming out
-        else if (db.feeder.get(EFeederData.EXIT_BEAM) == 1d) {
-            if(!isBallOut) {
-                numBalls--;
-                isBallOut = true;
+        else if (db.feeder.get(EXIT_BEAM) == 0d) {
+            if(!mIsBallOut) {
+                mNumBalls--;
+                mIsBallOut = true;
             }
-        } else if (isBallOut && db.feeder.get(EFeederData.EXIT_BEAM) == 0d) {
-            isBallOut = false;
+        } else if (mIsBallOut && db.feeder.get(EXIT_BEAM) == 1d) {
+            mIsBallOut = false;
         }
-        db.feeder.set(EFeederData.NUM_BALLS, numBalls);
+        db.feeder.set(NUM_BALLS, mNumBalls);
+    }
+
+    protected void stageBalls() {
+        if(db.feeder.get(EXIT_BEAM) == 1d) {
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+        }
     }
 
     protected void placeCargo() {

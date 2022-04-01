@@ -50,6 +50,7 @@ public class InputMap {
         REVERSE_FEEDER = ELogitech310.Y_BTN,
         RELEASE_BALLS = ELogitech310.DPAD_LEFT,
         SHOOT_CARGO = ELogitech310.R_BTN,
+        STAGE_BALLS = ELogitech310.A_BTN,
         PLACE_CARGO = ELogitech310.L_BTN;
     }
 
