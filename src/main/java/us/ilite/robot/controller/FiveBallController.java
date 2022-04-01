@@ -9,36 +9,16 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
 
-public class FiveBallController extends BaseAutonController {
-    public Timer mTimer;
-    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(5.6));
-    private boolean mFirstLegComplete = false;
-    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(105d), 2d);
-    private boolean mFirstTurnComplete = false;
-    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(7.7));
-    private boolean mSecondLegComplete = false;
-    private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-60), 2d);
-    private boolean mSecondTurnComplete = false;
-    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-6.4));
-    private boolean mThirdLegComplete = false;
+public class FiveBallController extends ThreeBallController {
     private DriveStraight mFourthLeg = new DriveStraight(Distance.fromFeet(12d));
     private boolean mFourthLegComplete = false;
     private DriveStraight mFifthLeg = new DriveStraight(Distance.fromFeet(-12d));
     private boolean mFifthLegComplete = false;
     public void initialize(Trajectory pTrajectory) {
-        //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
-        mTimer = new Timer();
-        mTimer.reset();
-        mTimer.start();
-        mFirstLeg.init(mTimer.get());
+        super.initialize(null);
     }
 
     private static double
-            kFirstLegTimeEnd = 2.1,
-            kFirstTurnTimeEnd = kFirstLegTimeEnd + 1.1,
-            kSecondLegTimeEnd = kFirstTurnTimeEnd + 3.0,
-            kSecondTurnEnd = kSecondLegTimeEnd + 2.0,
-            kThirdLegTimeEnd = kSecondTurnEnd + 1.5,
             kFirstFireTime = kThirdLegTimeEnd + 1.0,
             kFourthLegTimeEnd = kFirstFireTime + 3.0,
             kHumanPlayerLoadTime = kFourthLegTimeEnd + 3.0,
@@ -46,56 +26,6 @@ public class FiveBallController extends BaseAutonController {
             kSecondFireTime = kFifthLegTime + 1.0;
 
     public void updateImpl() {
-        double time = mTimer.get();
-        boolean fire = false;
-        if (time < 0.25) {
-            fire = true;
-        } else if (time < 0.5) {
-            fire = false;
-        } else if (time < kFirstLegTimeEnd) {
-            mFirstLegComplete = mFirstLeg.update(mTimer.get());
-        } else if (time < kFirstLegTimeEnd + 0.1 || mFirstLegComplete) {
-            mFirstTurn.init(mTimer.get());
-        } else if (time < kFirstTurnTimeEnd || mFirstLegComplete) {
-            mFirstTurnComplete = mFirstTurn.update(mTimer.get());
-        } else if (time < kFirstTurnTimeEnd + 0.1 || (mFirstLegComplete && mFirstTurnComplete)) {
-            mSecondLeg.init(mTimer.get());
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
-        } else if (time < kSecondLegTimeEnd || (mFirstLegComplete && mFirstTurnComplete)) {
-            mSecondLegComplete = mSecondLeg.update(mTimer.get());
-        } else if (time < kSecondLegTimeEnd + 0.1 || (mSecondLegComplete)) {
-            mSecondTurn.init(mTimer.get());
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
-        } else if (time < kSecondTurnEnd || (mSecondLegComplete)) {
-            mSecondTurnComplete = mSecondTurn.update(mTimer.get());
-        } else if (time < kSecondTurnEnd + 0.1 || mSecondTurnComplete) {
-            mThirdLeg.init(mTimer.get());
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
-        } else if (time < kThirdLegTimeEnd || (mSecondTurnComplete)) {
-            mThirdLegComplete = mThirdLeg.update(mTimer.get());
-        } else if (time < kFirstFireTime || (mThirdLegComplete)) {
-            fire = true;
-        } else if (time < kFirstFireTime + 0.1) {
-            fire = false;
-            mFourthLeg.init(mTimer.get());
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
-        } else if (time < kFourthLegTimeEnd) {
-            mFourthLegComplete = mFourthLeg.update(mTimer.get());
-        } else if (time < kHumanPlayerLoadTime) {
-            mFifthLeg.init(mTimer.get());
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
-        } else if (time < kFifthLegTime) {
-            mFifthLegComplete = mFifthLeg.update(mTimer.get());
-        } else if (time < kSecondFireTime || (mFifthLegComplete)) {
-            fire = true;
-        }
-
-        if (fire) {
-            fireCargo();
-        } else {
-            intakeCargo();
-            indexCargo();
-        }
-
+        super.updateImpl();
     }
 }
