@@ -157,7 +157,7 @@ public class Data {
                                         return "";
                                     }
                                 }
-                        )
+                        );
                     } else {
                         tab.addNumber(e.name(), () -> {
                             if (mMappedCodex.get(key).isSet(e)) {
