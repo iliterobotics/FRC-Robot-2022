@@ -13,9 +13,12 @@ public class Settings {
     public static final String kFlywheelLimelightNetworkTable = "limelight-top";
     public static double kControlLoopPeriod = 0.02; // seconds
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
+    public static int kAcceptableLogFailures = 8;
     public static double kNetworkTableUpdateRate = 0.01;
     public static boolean kIsLogging = true; // decide whether or not to log
     public static int sCODEX_COMMS_PORT = 5805;
+    public static boolean kLogExceptions = false;
+
 
     // ==================================================
     // System ID's
@@ -63,7 +66,7 @@ public class Settings {
             public static final int kEDTRA = 1;
             public static final int kEDTRB = 0;
             public static final int kINEntryBeam = 4;
-            public static final int kINExitBeam = 10;
+            public static final int kINExitBeam = 3;
         }
 
         public static class PCH {

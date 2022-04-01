@@ -83,7 +83,7 @@ public class TurnToDegree implements ICommand {
     // Apply output, log, and return false for unfinished
     Robot.DATA.drivetrain.set(NEUTRAL_MODE, ECommonNeutralMode.BRAKE);
     Robot.DATA.drivetrain.set(STATE, Enums.EDriveState.PERCENT_OUTPUT);
-    Robot.DATA.drivetrain.set(DESIRED_THROTTLE_PCT, 0.05);
+   // Robot.DATA.drivetrain.set(DESIRED_THROTTLE_PCT, 0.05);
     Robot.DATA.drivetrain.set(DESIRED_TURN_PCT, mOutput);
     SmartDashboard.putNumber("Turn Power", mOutput);
     SmartDashboard.putNumber("Turn To Degree Error", pid.getPositionError());
