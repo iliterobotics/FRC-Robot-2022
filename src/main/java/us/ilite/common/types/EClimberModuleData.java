@@ -5,12 +5,8 @@ public enum EClimberModuleData {
     L_VEL_rpm,
     /**Actual left position in degrees**/
     L_POSITION_deg,
-    /**Right Position in degrees**/
-    R_POSITION_deg,
     /**Left output in current**/
     L_OUTPUT_CURRENT,
-    /**Right output in current**/
-    R_OUTPUT_CURRENT,
     /**Bus voltage left**/
     BUS_VOLTAGE_LEFT,
     /**Left position target**/
@@ -31,4 +27,5 @@ public enum EClimberModuleData {
     IS_SINGLE_CLAMPED,
     /**State if the coast is set**/
     SET_COAST,
+    L_ACTUAL_CLIMBER_PCT,
     }

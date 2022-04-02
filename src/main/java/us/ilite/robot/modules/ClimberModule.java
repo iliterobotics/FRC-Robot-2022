@@ -16,10 +16,11 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.hardware.HardwareUtils;
 
 import static us.ilite.common.types.EClimberModuleData.*;
+import static us.ilite.common.types.EFeederData.ACTUAL_FEEDER_pct;
 
 public class ClimberModule extends Module{
-    private final TalonFX mCL12;
     private final TalonFX mCLMR11;
+    private final TalonFX mCL12;
     private final DoubleSolenoid mCLPNDouble;
     private final DoubleSolenoid mCLPNSingle;
 
@@ -97,8 +98,9 @@ public class ClimberModule extends Module{
         db.climber.set(L_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
         db.climber.set(L_POSITION_TARGET, mCL12.getClosedLoopTarget());
         db.climber.set(L_POSITION_ERROR, mCL12.getClosedLoopError());
-        db.climber.set(L_OUTPUT_CURRENT, mCLMR11.getSupplyCurrent());
-        db.climber.set(BUS_VOLTAGE_LEFT, mCL12.getBusVoltage());
+        db.climber.set(L_OUTPUT_CURRENT, mCL12.getStatorCurrent());
+        db.climber.set(BUS_VOLTAGE_LEFT, mCL12.getMotorOutputVoltage());
+        db.climber.set(L_ACTUAL_CLIMBER_PCT, (mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM) / (6380 * kClimberRatio));
     }
 
     @Override

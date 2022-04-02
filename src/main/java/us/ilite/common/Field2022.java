@@ -22,7 +22,7 @@ public class Field2022 {
      */
     public enum FieldElement implements IFieldComponent {
         NULL(0, 0, 0),
-        HUB_UPPER               (104,48, 1),
+        HUB_UPPER (104,48, 1),
 //        TARGET_ZOOM             (0d,0d),
         CAMERA(0,0, 0);
 
