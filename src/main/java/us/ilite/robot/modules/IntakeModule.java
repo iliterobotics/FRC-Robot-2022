@@ -30,7 +30,7 @@ public class IntakeModule extends Module {
 
     public IntakeModule() {
         mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
-        mIntakeRoller.setInverted(true);
+//        mIntakeRoller.setInverted(true);
         mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
         mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
         mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);

@@ -2,6 +2,7 @@ package us.ilite.robot.controller;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.Distance;
 import us.ilite.common.types.EFeederData;
@@ -14,14 +15,17 @@ import us.ilite.robot.modules.NeoDriveModule;
 
 public class ThreeBallController extends BaseAutonController{
     public Timer mTimer;
+    //Old - 5.6
     private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(5.6));
     private boolean mFirstLegComplete = false;
     private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(105d), 2d);
     private boolean mFirstTurnComplete = false;
+    //Old - 7.7
     private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(7.7));
     private boolean mSecondLegComplete = false;
     private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-60), 2d);
     private boolean mSecondTurnComplete = false;
+    //Old - -6.4
     private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-6.4));
     private boolean mThirdLegComplete = false;
     public void initialize(Trajectory pTrajectory) {
@@ -32,8 +36,8 @@ public class ThreeBallController extends BaseAutonController{
         mFirstLeg.init(mTimer.get());
     }
 
-    private static double
-        kFirstLegTimeEnd = 2.1,
+    public static double
+        kFirstLegTimeEnd = 4.1,
         kFirstTurnTimeEnd = kFirstLegTimeEnd + 1.0,
         kSecondLegTimeEnd = kFirstTurnTimeEnd + 3.0,
         kSecondTurnEnd = kSecondLegTimeEnd + 2.0,

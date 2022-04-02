@@ -5,10 +5,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
@@ -34,6 +36,7 @@ public class NeoDriveModule extends Module {
     private PIDController mTurnToDegreePID;
     private PIDController mRightPositionPID;
     private PIDController mLeftPositionPID;
+    private PIDController mTargetLockPID;
     private Pigeon mGyro;
 
     // ========================================
@@ -48,6 +51,7 @@ public class NeoDriveModule extends Module {
     public static final double kPulsesPerRotation = 256.0;
     public static final double kCurrentLimitAmps = 60.0;
     public static final double kTrackWidthFeet = 22.0 / 12.0;
+    public static final int kMaxLimelightFOV = 22;
 
 
     // ========================================
@@ -75,6 +79,7 @@ public class NeoDriveModule extends Module {
             .slot(VELOCITY_PID_SLOT)
             .velocityConversion(kDriveNEOVelocityFactor);
     public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.02).f(0.1);
+    public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.005);
 
     // ========================================
     // DO NOT MODIFY THESE OTHER CONSTANTS
@@ -84,10 +89,16 @@ public class NeoDriveModule extends Module {
     private DifferentialDrive mDrive;
 
     public NeoDriveModule() {
-        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTML1);
-        mLeftFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTL3);
-        mRightMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTMR2);
-        mRightFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTR4);
+//        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTML1);
+//        mLeftFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTL3);
+//        mRightMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTMR2);
+//        mRightFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTR4);
+
+        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(3);
+        mLeftFollower = SparkMaxFactory.createDefaultSparkMax(4);
+        mRightMaster = SparkMaxFactory.createDefaultSparkMax(1);
+        mRightFollower = SparkMaxFactory.createDefaultSparkMax(2);
+
         mLeftFollower.follow(mLeftMaster);
         mRightFollower.follow(mRightMaster);
         mGyro = new Pigeon(Robot.CLOCK, Settings.HW.CAN.kDTGyro);
@@ -114,6 +125,9 @@ public class NeoDriveModule extends Module {
         mRightPositionPID.setOutputRange(-1 , 1);
         mLeftPositionPID = new PIDController(kPositionGains,0, 10, Settings.kControlLoopPeriod);
         mLeftPositionPID.setOutputRange(-1 , 1);
+
+        mTargetLockPID = new PIDController(kTargetAngleLockGains, -180, 180, Settings.kControlLoopPeriod);
+        mTargetLockPID.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 
         HardwareUtils.setGains(mLeftCtrl, kVelocityGains);
         HardwareUtils.setGains(mRightCtrl, kVelocityGains);
@@ -199,8 +213,25 @@ public class NeoDriveModule extends Module {
                 resetOdometry(new Pose2d(x, y, new Rotation2d(-mGyro.getYaw().getRadians())));
                 break;
             case PERCENT_OUTPUT:
-                mLeftMaster.set(left);
-                mRightMaster.set(right);
+                double leftOutput = 0;
+                double rightOutput = 0;
+                if (db.limelight.isSet(ELimelightData.TARGET_ID)) {
+                    double targetLockOutput = 0;
+                    if (db.limelight.isSet(ELimelightData.TV)) {
+                        targetLockOutput = mTargetLockPID.calculate(-db.limelight.get(ELimelightData.TX), clock.dt());
+                    }
+                    leftOutput = targetLockOutput + throttle / 5;
+                    rightOutput = -targetLockOutput + throttle / 5;
+                    if (!db.limelight.isSet(ELimelightData.TX)) {
+                        leftOutput += turn / 5;
+                        rightOutput -= turn / 5;
+                    }
+                    mLeftMaster.set(leftOutput);
+                    mRightMaster.set(rightOutput);
+                } else {
+                    mLeftMaster.set(throttle+turn);
+                    mRightMaster.set(throttle-turn);
+                }
                 break;
             case VELOCITY:
                 mLeftCtrl.setReference(left * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
@@ -208,10 +239,10 @@ public class NeoDriveModule extends Module {
                 break;
             case TURN_TO:
                 mTurnToDegreePID.setSetpoint(db.drivetrain.get(DESIRED_TURN_ANGLE_deg));
-                double output = mTurnToDegreePID.calculate(db.drivetrain.get(ACTUAL_HEADING_DEGREES), clock.getCurrentTimeInMillis());
-                db.drivetrain.set(DESIRED_TURN_PCT, output);
-                mLeftMaster.set(output);
-                mRightMaster.set(-output);
+                double turnOutput = mTurnToDegreePID.calculate(db.drivetrain.get(ACTUAL_HEADING_DEGREES), clock.getCurrentTimeInMillis());
+                db.drivetrain.set(DESIRED_TURN_PCT, turnOutput);
+                mLeftMaster.set(turnOutput);
+                mRightMaster.set(-turnOutput);
                 break;
             case SMART_MOTION:
                 mLeftCtrl.setReference(db.drivetrain.get(L_DESIRED_POS_FT) / kDriveNEOPositionFactor,
@@ -224,10 +255,10 @@ public class NeoDriveModule extends Module {
                 mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS_FT));
                 double lMeasurement = db.drivetrain.get(L_ACTUAL_POS_FT);
                 double rMeasurement = db.drivetrain.get(R_ACTUAL_POS_FT);
-                double leftOutput = mLeftPositionPID.calculate(lMeasurement, clock.getCurrentTimeInMillis());
-                double rightOutput = mRightPositionPID.calculate(rMeasurement, clock.getCurrentTimeInMillis());
-                mLeftMaster.set(leftOutput);
-                mRightMaster.set(rightOutput);
+                double leftPathOutput = mLeftPositionPID.calculate(lMeasurement, clock.getCurrentTimeInMillis());
+                double rightPathOutput = mRightPositionPID.calculate(rMeasurement, clock.getCurrentTimeInMillis());
+                mLeftMaster.set(leftPathOutput);
+                mRightMaster.set(rightPathOutput);
                 break;
             case PATH_FOLLOWING_RAMSETE:
                 //Divide by 6.56 since that is the max velocity in ft/s

@@ -2,5 +2,6 @@ package us.ilite.common.types;
 
 public enum ELEDControlData {
     LED_STATE, //0 for solid color, 1 for blinking
-    DESIRED_COLOR;
+    DESIRED_COLOR,
+    BLINK_SPEED;
 }

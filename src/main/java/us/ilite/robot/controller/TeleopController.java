@@ -3,13 +3,14 @@ package us.ilite.robot.controller;
 import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
+import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 
 import static us.ilite.common.types.EIntakeData.*;
 import static us.ilite.common.types.EFeederData.*;
 
 
-public class TeleopController extends BaseManualController { //copied from TestController, needs editing
+public class TeleopController extends BaseManualController {
 
     private static TeleopController INSTANCE;
 
@@ -35,6 +36,23 @@ public class TeleopController extends BaseManualController { //copied from TestC
         updateHangerMotors();
         updateHangerPneumatics();
         updateIntake();
+        updateTargetLock();
+    }
+
+    private void updateTargetLock() {
+        if (db.driverinput.isSet(InputMap.DRIVER.TARGET_LOCK)) {
+            if (db.limelight.isSet(ELimelightData.TV)) {
+                setLED(Enums.LEDColorMode.GREEN, Enums.LEDState.SOLID);
+            } else {
+                setLED(Enums.LEDColorMode.RED, Enums.LEDState.SOLID);
+            }
+            db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.HUB_UPPER.id());
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
+        } else {
+            setLED(Enums.LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
+            db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CAMERA.id());
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
+        }
     }
 
     private void updateHangerMotors() {
@@ -42,9 +60,9 @@ public class TeleopController extends BaseManualController { //copied from TestC
 
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.HANGER.SPIN_SINGLE)) {
-                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.4);
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.45);
             } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
-                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.4);
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.45);
             } else if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, -90);
@@ -57,7 +75,7 @@ public class TeleopController extends BaseManualController { //copied from TestC
             }
             else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 286);
+                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 287.5);
             } else if (db.operatorinput.isSet(InputMap.HANGER.BALANCE_CLIMBER)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, 250);
@@ -96,6 +114,8 @@ public class TeleopController extends BaseManualController { //copied from TestC
                 placeCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.RELEASE_BALLS)) {
                 reverseCargo();
+            } else if (db.operatorinput.isSet(InputMap.OPERATOR.STAGE_BALLS)) {
+                stageBalls();
             } else {
                 db.feeder.set(SET_FEEDER_pct, 0d);
                 db.intake.set(DESIRED_ROLLER_pct, 0d);
@@ -111,4 +131,5 @@ public class TeleopController extends BaseManualController { //copied from TestC
             }
         }
     }
+
 }
