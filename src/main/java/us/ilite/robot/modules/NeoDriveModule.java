@@ -89,15 +89,10 @@ public class NeoDriveModule extends Module {
     private DifferentialDrive mDrive;
 
     public NeoDriveModule() {
-//        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTML1);
-//        mLeftFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTL3);
-//        mRightMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTMR2);
-//        mRightFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTR4);
-
-        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(3);
-        mLeftFollower = SparkMaxFactory.createDefaultSparkMax(4);
-        mRightMaster = SparkMaxFactory.createDefaultSparkMax(1);
-        mRightFollower = SparkMaxFactory.createDefaultSparkMax(2);
+        mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTML1);
+        mLeftFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTL3);
+        mRightMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTMR2);
+        mRightFollower = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTR4);
 
         mLeftFollower.follow(mLeftMaster);
         mRightFollower.follow(mRightMaster);
