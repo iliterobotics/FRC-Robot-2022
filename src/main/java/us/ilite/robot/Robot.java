@@ -6,6 +6,9 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -60,6 +63,7 @@ public class Robot extends TimedRobot {
     private BlueThreeBallController mBlueThreeBallController;
     private ReverseFeederIntakeController mReverseController;
     private TwoBallController mTwoBallController;
+    private TwoBallTrajectoryController mTwoBalltrajectorycontroller;
     private TrajectoryController mTrajectoryController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
@@ -78,6 +82,7 @@ public class Robot extends TimedRobot {
         mTrajectoryController = new TrajectoryController();
         mBlueThreeBallController = new BlueThreeBallController();
         mReverseController = new ReverseFeederIntakeController();
+        mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
 //        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -124,7 +129,6 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         SmartDashboard.putData(FIELD);
-        FIELD.getObject("Current Trajectory").setTrajectory(TrajectoryCommandUtils.getJSONTrajectory());
     }
 
     @Override
@@ -137,9 +141,10 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
+        mNeoDrive.resetOdometry(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         mNeoDrive.readInputs();
-        mActiveController = mTrajectoryController;
-        mTrajectoryController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        mActiveController = mTwoBallController;
+        mTwoBallController.initialize();
         mActiveController.setEnabled(true);
     }
 

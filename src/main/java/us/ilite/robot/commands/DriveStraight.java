@@ -76,6 +76,9 @@ public class DriveStraight implements ICommand {
         double throttle = mDistanceController.calculate(getAverageDriveDistance().inches());
         SmartDashboard.putNumber("Distance Error", mDistanceController.getPositionError());
 //
+        SmartDashboard.putNumber("AUTON Turn Output", turn);
+        SmartDashboard.putNumber("AUTON Heading Degrees", Robot.DATA.drivetrain.get( ACTUAL_HEADING_DEGREES ));
+        SmartDashboard.putNumber("AUTON Drive Error", mDistanceController.getPositionError() );
         if(mDistanceController.atSetpoint()) {
             return true;
         } else {
@@ -86,6 +89,8 @@ public class DriveStraight implements ICommand {
             mLastTime = pNow;
             return false;
         }
+
+
     }
 
     protected Angle getHeading() {

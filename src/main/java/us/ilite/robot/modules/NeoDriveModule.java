@@ -3,6 +3,7 @@ package us.ilite.robot.modules;
 import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,8 +43,8 @@ public class NeoDriveModule extends Module {
     // ========================================
     // DO NOT MODIFY THESE PHYSICAL CONSTANTS
     // ========================================
-    public static final double kGearboxRatio = (12.0 / 40.0) * (14.0 / 40.0);
-    public static final double kWheelDiameterFeet = 3.7 / 12.0;
+    public static final double kGearboxRatio = (12.0 / 40.0) * (18.0 / 36.0);
+    public static final double kWheelDiameterFeet = 3.9 / 12.0;
     public static final double kWheelCircumferenceFeet = kWheelDiameterFeet * Math.PI;
     public static final double kDriveNEOPositionFactor = kGearboxRatio * kWheelCircumferenceFeet;
     public static final double kDriveNEOVelocityFactor = kDriveNEOPositionFactor / 60.0;
@@ -142,6 +143,7 @@ public class NeoDriveModule extends Module {
         mGyro.zeroAll();
         reset();
         if(pMode == EMatchMode.AUTONOMOUS) {
+            resetOdometry(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
             mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
             mRightMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
             mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -173,6 +175,8 @@ public class NeoDriveModule extends Module {
         db.drivetrain.set(RIGHT_CURRENT, mRightMaster.getOutputCurrent());
         db.drivetrain.set(L_ACTUAL_POS_FT, mLeftEncoder.getPosition() * kDriveNEOPositionFactor);
         db.drivetrain.set(L_ACTUAL_VEL_FT_s, mLeftEncoder.getVelocity() * kDriveNEOVelocityFactor);
+        db.drivetrain.set(R_ACTUAL_VEL_RPM, mRightEncoder.getVelocity() * kGearboxRatio);
+        db.drivetrain.set(L_ACTUAL_VEL_RPM, mLeftEncoder.getVelocity() * kGearboxRatio);
         db.drivetrain.set(R_ACTUAL_POS_FT, mRightEncoder.getPosition() * kDriveNEOPositionFactor);
         db.drivetrain.set(R_ACTUAL_VEL_FT_s, mRightEncoder.getVelocity() * kDriveNEOVelocityFactor);
         db.imu.set(EGyro.ACCEL_X, mGyro.getAccelX());
@@ -183,9 +187,9 @@ public class NeoDriveModule extends Module {
         db.imu.set(EGyro.YAW_OMEGA_DEGREES, -mGyro.getYawRate().getDegrees());
         db.drivetrain.set(X_ACTUAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getX());
         db.drivetrain.set(Y_ACTuAL_ODOMETRY_METERS, mOdometry.getPoseMeters().getY());
-        mOdometry.update(new Rotation2d(-mGyro.getHeading().getRadians()),
-                Units.feet_to_meters(mLeftEncoder.getPosition() * kDriveNEOPositionFactor),
-                Units.feet_to_meters(mRightEncoder.getPosition() * kDriveNEOPositionFactor));
+        mOdometry.update(new Rotation2d(db.drivetrain.get(ACTUAL_HEADING_RADIANS)),
+               Units.feet_to_meters(db.drivetrain.get(L_ACTUAL_POS_FT)),
+               Units.feet_to_meters( db.drivetrain.get(R_ACTUAL_POS_FT)));
         Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
     }
 
@@ -200,11 +204,13 @@ public class NeoDriveModule extends Module {
         if (state == null) return;
         switch (state) {
             case RESET:
+                mGyro.zeroAll();
                 reset();
                 break;
             case RESET_ODOMETRY:
                 double x = db.drivetrain.get(X_DESIRED_ODOMETRY_METERS);
                 double y = db.drivetrain.get(X_DESIRED_ODOMETRY_METERS);
+                mGyro.zeroAll();
                 resetOdometry(new Pose2d(x, y, new Rotation2d(-mGyro.getYaw().getRadians())));
                 break;
             case PERCENT_OUTPUT:
@@ -257,8 +263,9 @@ public class NeoDriveModule extends Module {
                 break;
             case PATH_FOLLOWING_RAMSETE:
                 //Divide by 6.56 since that is the max velocity in ft/s
-                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / 6.56);
-                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / 6.56);
+                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
+                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
+                mRightFollower.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
                 mDrive.feed();
                 break;
         }
@@ -269,7 +276,6 @@ public class NeoDriveModule extends Module {
         mRightEncoder.setPosition(0.0);
         mLeftMaster.set(0.0);
         mRightMaster.set(0.0);
-        mGyro.zeroAll();
     }
 
 

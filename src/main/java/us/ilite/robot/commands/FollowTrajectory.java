@@ -17,6 +17,7 @@ import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
+import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.modules.FalconDriveModule;
 import us.ilite.robot.modules.NeoDriveModule;
 
@@ -47,9 +48,10 @@ public class FollowTrajectory implements ICommand {
     }
     @Override
     public void init(double pNow) {
-        Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET_ODOMETRY);
-        Robot.DATA.drivetrain.set(EDriveData.X_DESIRED_ODOMETRY_METERS, mTrajectory.getInitialPose().getX());
-        Robot.DATA.drivetrain.set(EDriveData.Y_DESIRED_ODOMETRY_METERS, mTrajectory.getInitialPose().getY());
+//        Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET_ODOMETRY);
+//        Robot.DATA.drivetrain.set(EDriveData.X_DESIRED_ODOMETRY_METERS, mTrajectory.getInitialPose().getX());
+//        Robot.DATA.drivetrain.set(EDriveData.Y_DESIRED_ODOMETRY_METERS, mTrajectory.getInitialPose().getY());
+        Robot.FIELD.getObject("Current Trajectory").setTrajectory(mTrajectory);
         mTrajectoryTimer.reset();
         mTrajectoryTimer.start();
         initialState = mTrajectory.sample(0);
