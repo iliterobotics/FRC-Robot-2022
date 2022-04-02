@@ -27,7 +27,6 @@ public class TeleopController extends BaseManualController {
 
     @Override
     protected void updateImpl() {
-        db.registerAllWithShuffleboard();
         // ========================================
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
