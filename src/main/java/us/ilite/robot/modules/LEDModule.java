@@ -20,8 +20,7 @@ public class LEDModule extends Module {
     public LEDModule() {
         this.mBlinkTimer = new Timer();
         this.mBlinkTimer.reset();
-//        mLEDCan = new CANifier(Settings.HW.CAN.kLEDCanifier);
-        mLEDCan = new CANifier(22); // ACTUALLY PORT 31
+        mLEDCan = new CANifier(Settings.HW.CAN.kLEDCanifier);
         mLEDCan.setStatusFramePeriod(CANifierStatusFrame.Status_1_General, 20);
         mLEDCan.setStatusFramePeriod(CANifierStatusFrame.Status_2_General, 20);
     }

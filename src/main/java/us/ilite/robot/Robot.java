@@ -6,9 +6,11 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
@@ -60,22 +62,24 @@ public class Robot extends TimedRobot {
     private BlueThreeBallController mBlueThreeBallController;
     private ReverseFeederIntakeController mReverseController;
     private TwoBallController mTwoBallController;
+    private TwoBallTrajectoryController mTwoBalltrajectorycontroller;
+    private TrajectoryController mTrajectoryController;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
-
 
     @Override
     public void robotInit() {
         CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
-        mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
         mTwoBallController = new TwoBallController();
+        mTrajectoryController = new TrajectoryController();
         mBlueThreeBallController = new BlueThreeBallController();
         mReverseController = new ReverseFeederIntakeController();
+        mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
 //        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -106,6 +110,9 @@ public class Robot extends TimedRobot {
 
         LiveWindow.disableAllTelemetry();
 
+        /* Some things need to wait until after the robot connects to the DS. So keep this thread here. */
+        new Thread(new DSConnectInitThread()).start();
+
         initTimer.stop();
         mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
 
@@ -115,6 +122,12 @@ public class Robot extends TimedRobot {
 
     }
 
+    /** These things rely on match metadata, so we need to wait for the DS to connect */
+    private void initAfterConnection() {
+        initMatchMetadata();
+        mCSVLogger = new CSVLogger( Settings.kIsLogging, mMatchMeta );
+    }
+
     /**
      * This contains code run in ALL robot modes.
      * It's also important to note that this runs AFTER mode-specific code
@@ -122,7 +135,6 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         SmartDashboard.putData(FIELD);
-        FIELD.getObject("Current Trajectory").setTrajectory(TrajectoryCommandUtils.getJSONTrajectory());
     }
 
     @Override
@@ -135,12 +147,11 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
+        mNeoDrive.resetOdometry(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         mNeoDrive.readInputs();
-
         mActiveController = mTwoBallController;
-        mTwoBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+        mTwoBallController.initialize();
         mActiveController.setEnabled(true);
-
     }
 
     @Override
@@ -187,39 +198,31 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        Shuffleboard.update();
-        mOI.safeReadInputs();
-        mClimber.safeReadInputs();
-        mNeoDrive.safeReadInputs();
-        mIntake.safeReadInputs();
-        mFeeder.safeReadInputs();
+        mRunningModules.safeReadInputs();
     }
 
     @Override
     public void testInit() {
-        if ( Settings.kIsLogging ){
-            mCSVLogger.start();
-        }
-
-        if(mTestController == null) {
-            mTestController = TestController.getInstance();
-        }
-        MODE = TEST;
-        mActiveController = mTestController;
-        mActiveController.setEnabled(true);
-
-        mRunningModules.clearModules();
-        mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mFeeder);
-        mRunningModules.addModule(mNeoDrive);
-        mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mLEDControl);
-        if(IS_SIMULATED) {
-            mRunningModules.addModule(mSimulation);
-        }
-        mRunningModules.addModule(mLEDControl);
-        mRunningModules.modeInit(TEST);
-        mRunningModules.checkModule();
+//        if(mTestController == null) {
+//            mTestController = TestController.getInstance();
+//        }
+//        MODE = TEST;
+//        mActiveController = mTestController;
+//        mActiveController.setEnabled(true);
+//
+//        mRunningModules.clearModules();
+//        mRunningModules.addModule(mOI);
+//        mRunningModules.addModule(mFeeder);
+//        mRunningModules.addModule(mNeoDrive);
+//        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mLEDControl);
+//        if(IS_SIMULATED) {
+//            mRunningModules.addModule(mSimulation);
+//        }
+//        mRunningModules.addModule(mLEDControl);
+//        mRunningModules.modeInit(TEST);
+//        mRunningModules.checkModule();
+        teleopInit();
     }
 
     @Override
@@ -283,5 +286,20 @@ public class Robot extends TimedRobot {
 
     }
 
+    private class DSConnectInitThread implements Runnable {
 
+        @Override
+        public void run() {
+
+            while(!DriverStation.isDSAttached()) {
+                try {
+                    mLogger.error("Waiting on Robot <--> DS Connection...");
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            initAfterConnection();
+        }
+    }
 }

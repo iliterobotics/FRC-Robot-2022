@@ -4,14 +4,21 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import us.ilite.common.config.Settings;
-import us.ilite.logging.CSVWriter;
-import us.ilite.logging.Log;
+import us.ilite.common.types.MatchMetadata;
 import us.ilite.robot.Robot;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+/**
+ * Class responsible for managing all of the {@link CSVWriter}s. Logging events
+ * are sent to this class in the form of ImmutablePair of the String to log,
+ * which is expected to be CSV format, and the {@link RobotCodex} in the CSVLogger#logFromCodexToCSVLog(ImmutablePair)
+ *
+ * This class will run a timer thread that will periodically look for log events and will pass them onto
+ * the specific {@link CSVWriter} for the event's {@link RobotCodex}
+ */
 public class CSVLogger {
     public static LinkedBlockingDeque<Log> kCSVLoggerQueue = new LinkedBlockingDeque<>();
     private List<CSVWriter> mCSVWriters;
@@ -21,7 +28,7 @@ public class CSVLogger {
     private ScheduledFuture<?> scheduledFuture;
     private boolean mIsAcceptingToQueue;
 
-    public CSVLogger( boolean pIsLogging ) {
+    public CSVLogger(boolean pIsLogging, MatchMetadata pMetadata) {
         if ( pIsLogging ) {
             mCSVWriters = new ArrayList<>();
             for (RobotCodex c : Robot.DATA.mLoggedCodexes) {

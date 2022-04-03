@@ -294,8 +294,8 @@ public class BaseAutonController extends AbstractController {
         double leftFeet = Units.meters_to_feet(pOutput.getLeft());
         double rightFeet = Units.meters_to_feet(pOutput.getRight());
 
-        db.drivetrain.set(EDriveData.L_DESIRED_DRIVE_FT_SEC, leftFeet);
-        db.drivetrain.set(EDriveData.R_DESIRED_DRIVE_FT_SEC, rightFeet);
+        db.drivetrain.set(EDriveData.L_DESIRED_VEL_FT_s, leftFeet);
+        db.drivetrain.set(EDriveData.R_DESIRED_VEL_FT_s, rightFeet);
     }
 
     /**

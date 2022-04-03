@@ -296,8 +296,8 @@ public class FalconDriveModule extends Module {
 				mRightMaster.set(ControlMode.PercentOutput, desiredRight);
 				break;
 			case PATH_FOLLOWING_RAMSETE:
-				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);
-				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);
+				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_VEL_FT_s) / kMaxDriveVelocityFTs);
+				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_VEL_FT_s) / kMaxDriveVelocityFTs);
 				mDifferentialDrive.feed();
 				break;
 			case TURN_TO:

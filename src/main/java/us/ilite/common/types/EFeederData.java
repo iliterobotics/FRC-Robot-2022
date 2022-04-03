@@ -8,7 +8,7 @@ public enum EFeederData implements CodexOf<Double>{
     STATE,
     RESET_BALLS,
     NUM_BALLS,
-
+    SET_VELOCITY_ft_s,
     SET_FEEDER_pct,
     ACTUAL_FEEDER_pct,
     EXIT_BALL_VELOCITY_ft_s;

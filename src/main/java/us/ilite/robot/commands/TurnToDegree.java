@@ -61,6 +61,12 @@ public class TurnToDegree implements ICommand {
 
   public boolean update( double pNow ) {
     mOutput = pid.calculate(  Robot.DATA.drivetrain.get( ACTUAL_HEADING_DEGREES ) );
+
+    SmartDashboard.putNumber("AUTON Initial Yaw", this.mInitialYaw.getDegrees());
+    SmartDashboard.putNumber("AUTON Turn Angle", mTurnAngle.getDegrees());
+    SmartDashboard.putNumber("AUTON Turn Output", mOutput);
+    SmartDashboard.putNumber("AUTON Heading Degrees", Robot.DATA.drivetrain.get( ACTUAL_HEADING_DEGREES ));
+
 //    mOutput += Math.signum( mOutput ) * NeoDriveModule.kTurnToProfileGains.F;
 
     // Keep track of time on target
@@ -85,9 +91,8 @@ public class TurnToDegree implements ICommand {
     Robot.DATA.drivetrain.set(STATE, Enums.EDriveState.PERCENT_OUTPUT);
    // Robot.DATA.drivetrain.set(DESIRED_THROTTLE_PCT, 0.05);
     Robot.DATA.drivetrain.set(DESIRED_TURN_PCT, mOutput);
-    SmartDashboard.putNumber("Turn Power", mOutput);
-    SmartDashboard.putNumber("Turn To Degree Error", pid.getPositionError());
-    mLogger.info( "Target: " + mTargetYaw + " Yaw: " + getYaw() + "\n" );
+    SmartDashboard.putNumber("AUTON Turn To Degree Error", pid.getPositionError());
+
     return false;
   }
 

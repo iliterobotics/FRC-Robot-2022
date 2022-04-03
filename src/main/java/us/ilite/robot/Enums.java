@@ -137,10 +137,9 @@ public class Enums {
     // =============================================================================
     public enum EDriveState {
         NULL,
-        NORMAL,
         RESET,
+        RESET_ODOMETRY,
         PATH_FOLLOWING_BASIC,
-        PATH_FOLLOWING_HELIX,
         PATH_FOLLOWING_RAMSETE,
         TARGET_ANGLE_LOCK,
         HOLD,
@@ -149,9 +148,6 @@ public class Enums {
         POSITION,
         SMART_MOTION,
         TURN_TO,
-        TURN_FOR,
-        HOME,
-        TANK
     }
 
 
@@ -174,7 +170,7 @@ public class Enums {
     public enum EFeederState {
         NULL,
         PERCENT_OUTPUT,
-        INDEXING_VELOCITY;
+        VELOCITY;
     }
 
 }

@@ -434,8 +434,8 @@ public class VioletDriveModule extends Module {
 //                mLeftMaster.setVoltage(db.drivetrain.get(DESIRED_LEFT_VOLTAGE));
 //                mRightMaster.setVoltage(db.drivetrain.get(DESIRED_RIGHT_VOLTAGE));
 //                mDrive.feed();
-                mLeftMaster.set(db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC)/24);
-                mRightMaster.set(db.drivetrain.get(R_DESIRED_DRIVE_FT_SEC)/24);
+                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s)/24);
+                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s)/24);
                 mDrive.feed();
                 break;
             case TURN_TO:
@@ -449,18 +449,6 @@ public class VioletDriveModule extends Module {
 
                 mLeftMaster.set(leftOutputTo);
                 mRightMaster.set(rightOutputTo);
-                break;
-            case HOME:
-                double arcLengthHome = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * -mStartAngleDeg / 360.0;
-
-                mLeftPositionPID.setSetpoint(arcLengthHome);
-                mLeftPositionPID.setSetpoint(-arcLengthHome);
-
-                double leftOutputHome = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-                double rightOutputHome = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-
-                mLeftMaster.set(leftOutputHome);
-                mRightMaster.set(rightOutputHome);
                 break;
         }
     }
