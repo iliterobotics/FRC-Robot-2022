@@ -17,7 +17,8 @@ public class AutonSelection {
      */
     private Class<?>[] mAutonControllers = {
         ThreeBallController.class,
-        TwoBallController.class
+        TwoBallTrajectoryController.class,
+        FourBallTrajectoryAuton.class
     };
 
     public AutonSelection() {

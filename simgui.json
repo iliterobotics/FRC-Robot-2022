@@ -16,6 +16,11 @@
       "/SmartDashboard/Field": "Field2d"
     },
     "windows": {
+      "/Shuffleboard/Auton Configuration/Choose Auton Controller": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "Current Trajectory": {
           "arrows": false,
@@ -81,7 +86,6 @@
           "style": "Track"
         },
         "height": 8.229599952697754,
-        "image": "C:\\Users\\JesseK\\Documents\\workspace\\team1885\\FRC-Robot-2022\\PathWeaver\\Games\\2022-field-simulateJava.png",
         "units": "feet",
         "width": 16.459199905395508,
         "window": {
