@@ -450,18 +450,6 @@ public class VioletDriveModule extends Module {
                 mLeftMaster.set(leftOutputTo);
                 mRightMaster.set(rightOutputTo);
                 break;
-            case HOME:
-                double arcLengthHome = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * -mStartAngleDeg / 360.0;
-
-                mLeftPositionPID.setSetpoint(arcLengthHome);
-                mLeftPositionPID.setSetpoint(-arcLengthHome);
-
-                double leftOutputHome = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-                double rightOutputHome = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-
-                mLeftMaster.set(leftOutputHome);
-                mRightMaster.set(rightOutputHome);
-                break;
         }
     }
     /**

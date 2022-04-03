@@ -58,7 +58,6 @@ public class TargetLock implements ICommand {
 
     @Override
     public void shutdown(double pNow) {
-        Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.NORMAL);
     }
 
     public void setEndOnAlignment(boolean bool) {
