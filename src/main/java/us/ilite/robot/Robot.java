@@ -149,8 +149,10 @@ public class Robot extends TimedRobot {
         mRunningModules.modeInit(AUTONOMOUS);
         mNeoDrive.resetOdometry(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
         mNeoDrive.readInputs();
-        mActiveController = mTwoBallController;
-        mTwoBallController.initialize();
+//        mActiveController = mTwoBallController;
+//        mTwoBallController.initialize();
+        mActiveController = mTwoBalltrajectorycontroller;
+        mTwoBalltrajectorycontroller.initialize();
         mActiveController.setEnabled(true);
     }
 

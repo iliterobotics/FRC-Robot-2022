@@ -13,13 +13,14 @@ import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConst
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.config.Settings;
-import us.ilite.common.lib.util.Units;
+import static us.ilite.common.lib.util.Units.*;
 import us.ilite.robot.Robot;
 import us.ilite.robot.TrajectoryCommandUtils;
 import us.ilite.robot.commands.FollowTrajectory;
 import us.ilite.robot.modules.NeoDriveModule;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TwoBallTrajectoryController extends BaseAutonController {
     private Timer mTimer;
@@ -45,15 +46,24 @@ public class TwoBallTrajectoryController extends BaseAutonController {
         //  but I am going to keep it hard-coded for now
         TrajectoryConfig config = new TrajectoryConfig(0.5, 0.5);
         config.addConstraint(new DifferentialDriveVoltageConstraint(new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA),
-                new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 12));
+                new DifferentialDriveKinematics(feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 10));
         config.addConstraint(new CentripetalAccelerationConstraint(0.5));
-        config.addConstraint(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(Units.feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 3));
+        config.addConstraint(new DifferentialDriveKinematicsConstraint(new DifferentialDriveKinematics(feet_to_meters(NeoDriveModule.kTrackWidthFeet)), 3));
         config.setStartVelocity(0.0);
         config.setEndVelocity(0.0);
-        ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
-        waypoints.add(new Pose2d(new Translation2d(Units.inches_to_meters(12), Units.inches_to_meters(0)), new Rotation2d(0)));
-        waypoints.add(new Pose2d(new Translation2d(Units.inches_to_meters(36), Units.inches_to_meters(8)), new Rotation2d(14)));
-        return TrajectoryGenerator.generateTrajectory(waypoints, config);
+//        ArrayList<Pose2d> waypoints = new ArrayList<Pose2d>();
+//        waypoints.add(new Pose2d(new Translation2d(inches_to_meters(10), inches_to_meters(0)), new Rotation2d(0)));
+//        waypoints.add(new Pose2d(new Translation2d(inches_to_meters(36), inches_to_meters(8)), new Rotation2d(14)));
+//        return TrajectoryGenerator.generateTrajectory(waypoints, config);
+        return TrajectoryGenerator.generateTrajectory(
+                new Pose2d(0, 0, new Rotation2d(0d)),
+                List.of(
+                        new Translation2d(inches_to_meters(6), Rotation2d.fromDegrees(1)),
+                        new Translation2d(inches_to_meters(12), Rotation2d.fromDegrees(3))
+                ),
+                new Pose2d(inches_to_meters(36), inches_to_meters(12), Rotation2d.fromDegrees(14)),
+                config
+        );
     }
 }
 

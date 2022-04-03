@@ -1,1 +1,39 @@
-{}
+{
+  "HALProvider": {
+    "RoboRIO": {
+      "6V Rail": {
+        "open": true
+      },
+      "RoboRIO Input": {
+        "open": true
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auton Configuration/Choose Auton Controller": "String Chooser",
+      "/SmartDashboard/Field": "Field2d"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "Current Trajectory": {
+          "arrows": false,
+          "style": "Track"
+        },
+        "units": "feet",
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "SmartDashboard": {
+      "Field": {
+        "open": true
+      },
+      "open": true
+    }
+  }
+}
