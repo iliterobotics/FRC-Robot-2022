@@ -24,21 +24,19 @@ public class Field2022 {
         NULL(0, 0, 0),
         HUB_UPPER (104,48, 1),
 //        TARGET_ZOOM             (0d,0d),
-        CAMERA(0,0, 0);
+        CAMERA(24,0, 0);
 
-        // This is done in inches -- straight from game manual
+        // This is done in inches -- straight from the field and robot CAD via Onshape
         private final double height;
         private final double width;
         private int pipeline;
 
-        // Limelight-based FieldElement
         FieldElement(double pHeight, double pWidth, int pPipeline){
             width = pWidth;
             height = pHeight;
             pipeline = pPipeline;
         }
 
-        // Limelight-based FieldElement
         FieldElement(double pHeight, double pWidth){
             width = pWidth;
             height = pHeight;

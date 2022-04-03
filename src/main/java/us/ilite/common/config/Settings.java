@@ -18,6 +18,7 @@ public class Settings {
     public static boolean kIsLogging = true; // decide whether or not to log
     public static int sCODEX_COMMS_PORT = 5805;
     public static boolean kLogExceptions = false;
+    public static double kLimelightToShooterInches = 11.0; // Approximation based on the Robot CAD
 
 
     // ==================================================

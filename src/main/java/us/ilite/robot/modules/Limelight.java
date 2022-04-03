@@ -5,28 +5,21 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import us.ilite.common.Distance;
 import us.ilite.common.Field2022;
-import us.ilite.common.config.InputMap;
+import us.ilite.common.config.Settings;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.IFieldComponent;
 
 //import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_LOWER_CORNERS;
 //import static us.ilite.common.Field2022.FieldElement.OUTER_GOAL_UPPER_CORNERS;
-import static us.ilite.common.types.ELimelightData.T3D_TOP_Y_in;
 
-import us.ilite.robot.Enums;
 import us.ilite.robot.modules.targetData.ITargetDataProvider;
-import us.ilite.robot.vision.CameraConfig;
-import us.ilite.robot.vision.Ilite3DSolver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static us.ilite.common.types.ELimelightData.*;
-import static us.ilite.common.types.ERawLimelightData.TARGET_ID;
-import static us.ilite.robot.vision.CameraConfig.*;
 import static us.ilite.robot.vision.Ilite3DSolver.xSort;
 import static us.ilite.robot.vision.Ilite3DSolver.ySort;
 
@@ -63,6 +56,13 @@ public class Limelight extends Module implements ITargetDataProvider {
         db.limelight.set(TY,mTable.getEntry("ty").getDouble(Double.NaN));
         db.limelight.set(TS,mTable.getEntry("ts").getDouble(Double.NaN));
         db.limelight.set(TL,mTable.getEntry("tl").getDouble(Double.NaN));
+
+        if (db.limelight.isSet(TV)) {
+            double deltaHeight = Field2022.FieldElement.HUB_UPPER.height() - Field2022.FieldElement.CAMERA.height();
+            double cameraAngleTan = Math.tan(db.limelight.get(TY));
+
+            db.limelight.set(DISTANCE_TO_TARGET_in, (deltaHeight/cameraAngleTan) - Settings.kLimelightToShooterInches);
+        }
     }
 
     @Override

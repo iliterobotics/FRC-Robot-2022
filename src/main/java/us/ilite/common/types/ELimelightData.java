@@ -14,7 +14,7 @@ public enum ELimelightData {
     STREAM_MODE,    // Current stream mode
     SNAPSHOT_MODE,      // Current snapshot mode
 
-    TARGET_RANGE_in,    // The calculated distance to the current target
+    DISTANCE_TO_TARGET_in,    // The calculated distance to the current target
     TARGET_AZIMUTH_deg,   // The calculated angle to the current target
     T3D_TOP_X_in,          // The calculated x-position of the current target
     T3D_TOP_Y_in,          // The calculated y-position of the current target
