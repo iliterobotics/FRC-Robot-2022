@@ -63,22 +63,17 @@ public class Enums {
         LED_BLINK,
         LED_ON;
     }
-
     // LED control and colors
     public enum LEDColorMode {
-        PURPLE( 255, 0, 200 ),
+        NULL( 0, 0, 0 ),
+        DEFAULT( 0, 0, 0 ),
+        PURPLE( 125, 0, 250 ),
         RED( 255, 0, 0 ),
-        LIGHT_BLUE( 0, 100, 220 ),
         WHITE( 255, 255, 255 ),
         GREEN( 0, 255, 0 ),
         YELLOW( 255, 255, 0 ),
-        GREEN_HSV( 84, 255, 255 ),
         BLUE( 0, 0, 255 ),
-        RED_HSV( 0, 255, 255 ),
-        YELLOW_HSV( 20, 255, 255 ),
-        PURPLE_HSV( 212, 255, 255 ),
-        ORANGE( 255, 165, 0 ),
-        DEFAULT( 0, 0, 0 );
+        ORANGE( 255, 165, 0 );
         double red;
         double green;
         double blue;
@@ -87,7 +82,6 @@ public class Enums {
             green = pG;
             blue = pB;
         }
-
         public double getRed() {
             return red;
         }
@@ -104,6 +98,12 @@ public class Enums {
 //        public Color getColor() {
 //            return this.clr;
 //        }
+    }
+
+    public enum LEDState {
+        NULL,
+        BLINKING,
+        SOLID;
     }
 
     //  Limelight camera mode
@@ -137,10 +137,9 @@ public class Enums {
     // =============================================================================
     public enum EDriveState {
         NULL,
-        NORMAL,
         RESET,
+        RESET_ODOMETRY,
         PATH_FOLLOWING_BASIC,
-        PATH_FOLLOWING_HELIX,
         PATH_FOLLOWING_RAMSETE,
         TARGET_ANGLE_LOCK,
         HOLD,
@@ -149,9 +148,6 @@ public class Enums {
         POSITION,
         SMART_MOTION,
         TURN_TO,
-        TURN_FOR,
-        HOME,
-        TANK
     }
 
 
@@ -174,7 +170,7 @@ public class Enums {
     public enum EFeederState {
         NULL,
         PERCENT_OUTPUT,
-        INDEXING_VELOCITY;
+        VELOCITY;
     }
 
 }

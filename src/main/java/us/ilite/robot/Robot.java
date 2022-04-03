@@ -6,18 +6,20 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
 import us.ilite.common.config.Settings;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.MatchMetadata;
 import us.ilite.logging.CSVLogger;
+import us.ilite.logging.Log;
 import us.ilite.robot.auto.AutonSelection;
 import us.ilite.robot.controller.*;
 import us.ilite.robot.hardware.Clock;
@@ -42,12 +44,13 @@ public class Robot extends TimedRobot {
     private ClimberModule mHanger;
     private Timer initTimer = new Timer();
 
-    private LEDControl mLEDControl;
+    private LEDModule mLEDControl;
     private SimulationModule mSimulation;
     private FeederModule mFeeder;
     private IntakeModule mIntake;
     private ClimberModule mClimber;
     private NeoDriveModule mNeoDrive;
+    private Limelight mLimelight;
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -56,21 +59,29 @@ public class Robot extends TimedRobot {
     private BaseAutonController mBaseAutonController;
     private ShootMoveController mShootMoveController;
     private ThreeBallController mThreeBallController;
+    private BlueThreeBallController mBlueThreeBallController;
+    private ReverseFeederIntakeController mReverseController;
     private TwoBallController mTwoBallController;
+    private TwoBallTrajectoryController mTwoBalltrajectorycontroller;
+    private TrajectoryController mTrajectoryController;
+    private FourBallTrajectoryAuton mFourBallAuton;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
-
 
     @Override
     public void robotInit() {
         CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
-        mCSVLogger = new CSVLogger( Settings.kIsLogging );
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
         mTwoBallController = new TwoBallController();
+        mTrajectoryController = new TrajectoryController();
+        mBlueThreeBallController = new BlueThreeBallController();
+        mReverseController = new ReverseFeederIntakeController();
+        mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
+        mFourBallAuton = new FourBallTrajectoryAuton();
 //        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -78,9 +89,10 @@ public class Robot extends TimedRobot {
         mOI = new OperatorInput();
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
-        mLEDControl = new LEDControl();
+        mLEDControl = new LEDModule();
         mClimber = new ClimberModule();
         mNeoDrive = new NeoDriveModule();
+        mLimelight = new Limelight();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -100,6 +112,9 @@ public class Robot extends TimedRobot {
 
         LiveWindow.disableAllTelemetry();
 
+        /* Some things need to wait until after the robot connects to the DS. So keep this thread here. */
+        new Thread(new DSConnectInitThread()).start();
+
         initTimer.stop();
         mLogger.warn("Robot initialization finished. Took: ", initTimer.get(), " seconds");
 
@@ -109,6 +124,12 @@ public class Robot extends TimedRobot {
 
     }
 
+    /** These things rely on match metadata, so we need to wait for the DS to connect */
+    private void initAfterConnection() {
+        initMatchMetadata();
+        mCSVLogger = new CSVLogger( Settings.kIsLogging, mMatchMeta );
+    }
+
     /**
      * This contains code run in ALL robot modes.
      * It's also important to note that this runs AFTER mode-specific code
@@ -116,20 +137,25 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         SmartDashboard.putData(FIELD);
-        FIELD.getObject("Current Trajectory").setTrajectory(TrajectoryCommandUtils.getJSONTrajectory());
     }
 
     @Override
     public void autonomousInit() {
         MODE = AUTONOMOUS;
-        mActiveController = mAutonSelection.getSelectedAutonController();
-//        mTwoBallController.initialize(TrajectoryCommandUtils.getJSONTrajectory());
-        mActiveController.setEnabled(true);
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
+        mRunningModules.addModule(mLimelight);
+        mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
+        mNeoDrive.resetOdometry(FourBallTrajectoryAuton.ROBOT_START);
+        mNeoDrive.readInputs();
+//        mActiveController = mTwoBallController;
+//        mTwoBallController.initialize();
+        mActiveController = mFourBallAuton;
+        mFourBallAuton.initialize();
+        mActiveController.setEnabled(true);
     }
 
     @Override
@@ -147,7 +173,9 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
+        mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mClimber);
+        mRunningModules.addModule(mLEDControl);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -174,40 +202,31 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        mOI.safeReadInputs();
-//        mDrive.safeReadInputs();
-//        mNeoDrive.safeReadInputs();
-//        mIntake.safeReadInputs();
-//        mFeeder.safeReadInputs();
-        mClimber.safeReadInputs();
-        //Shuffleboard.update();
+        mRunningModules.safeReadInputs();
     }
 
     @Override
     public void testInit() {
-        if ( Settings.kIsLogging ){
-            mCSVLogger.start();
-        }
-
-        if(mTestController == null) {
-            mTestController = TestController.getInstance();
-        }
-        MODE = TEST;
-        mActiveController = mTestController;
-        mActiveController.setEnabled(true);
-
-        mRunningModules.clearModules();
-        mRunningModules.addModule(mOI);
-        mRunningModules.addModule(mFeeder);
-        mRunningModules.addModule(mNeoDrive);
-        mRunningModules.addModule(mIntake);
-        mRunningModules.addModule(mLEDControl);
-        if(IS_SIMULATED) {
-            mRunningModules.addModule(mSimulation);
-        }
-        mRunningModules.addModule(mLEDControl);
-        mRunningModules.modeInit(TEST);
-        mRunningModules.checkModule();
+//        if(mTestController == null) {
+//            mTestController = TestController.getInstance();
+//        }
+//        MODE = TEST;
+//        mActiveController = mTestController;
+//        mActiveController.setEnabled(true);
+//
+//        mRunningModules.clearModules();
+//        mRunningModules.addModule(mOI);
+//        mRunningModules.addModule(mFeeder);
+//        mRunningModules.addModule(mNeoDrive);
+//        mRunningModules.addModule(mIntake);
+//        mRunningModules.addModule(mLEDControl);
+//        if(IS_SIMULATED) {
+//            mRunningModules.addModule(mSimulation);
+//        }
+//        mRunningModules.addModule(mLEDControl);
+//        mRunningModules.modeInit(TEST);
+//        mRunningModules.checkModule();
+        teleopInit();
     }
 
     @Override
@@ -220,9 +239,7 @@ public class Robot extends TimedRobot {
         CLOCK.update();
         if ( Settings.kIsLogging && MODE != DISABLED) {
             for ( RobotCodex c : DATA.mLoggedCodexes ) {
-                if ( c.hasChanged() ) {
-                    mCSVLogger.addToQueue( new ImmutablePair<String,RobotCodex>(c.toFormattedCSV(),c));
-                }
+                mCSVLogger.addToQueue( new Log( c.toFormattedCSV(), c.meta().gid()) );
             }
         }
         for ( RobotCodex c : DATA.mAllCodexes ) {
@@ -273,5 +290,20 @@ public class Robot extends TimedRobot {
 
     }
 
+    private class DSConnectInitThread implements Runnable {
 
+        @Override
+        public void run() {
+
+            while(!DriverStation.isDSAttached()) {
+                try {
+                    mLogger.error("Waiting on Robot <--> DS Connection...");
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            initAfterConnection();
+        }
+    }
 }

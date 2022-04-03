@@ -8,10 +8,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
@@ -86,7 +88,7 @@ public class FalconDriveModule extends Module {
 	public static PIDController mRightVelocityPID;
 	public static PIDController mRightPositionPID;
 	public static PIDController mLeftPositionPID;
-	public static PIDController mTargetAngleLockPid;
+	public static PIDController mTargetLockPID;
 	public static PIDController mTurnToDegreePID;
 
 	private static DifferentialDriveOdometry mOdometry;
@@ -138,8 +140,8 @@ public class FalconDriveModule extends Module {
 		mRightPositionPID.setOutputRange(-1 * Settings.Input.kMaxAllowedVelocityMultiplier,
 				1 * Settings.Input.kMaxAllowedVelocityMultiplier);
 
-		mTargetAngleLockPid = new PIDController(kTargetAngleLockGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
-		mTargetAngleLockPid.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
+		mTargetLockPID = new PIDController(kTargetAngleLockGains, -kMaxDriveVelocityFTs, kMaxDriveVelocityFTs, Settings.kControlLoopPeriod);
+		mTargetLockPID.setOutputRange(Settings.kTargetAngleLockMinPower, Settings.kTargetAngleLockMaxPower);
 
 		mTurnToDegreePID = new PIDController(kTurnToProfileGains, -180, 180, Settings.kControlLoopPeriod);
 		mTurnToDegreePID.setContinuous(true);
@@ -200,12 +202,6 @@ public class FalconDriveModule extends Module {
 		db.drivetrain.set(R_ACTUAL_VEL_FT_s, mLeftMaster.getSelectedSensorVelocity() * kRPMtoFTs);
 		db.drivetrain.set(L_ACTUAL_POS_FT, ((mLeftMaster.getSelectedSensorPosition() - kInitialLeftPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet);
 		db.drivetrain.set(R_ACTUAL_POS_FT, ((mRightMaster.getSelectedSensorPosition() - kInitialRightPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet);
-		db.drivetrain.set(L_ACTUAL_VEL_meters_s, Units.feet_to_meters(mLeftMaster.getSelectedSensorVelocity() * kRPMtoFTs));
-		db.drivetrain.set(R_ACTUAL_VEL_meters_s, Units.feet_to_meters(mLeftMaster.getSelectedSensorVelocity() * kRPMtoFTs));
-		db.drivetrain.set(L_ACTUAL_POS_meters, Units.feet_to_meters(((mLeftMaster.getSelectedSensorPosition() - kInitialLeftPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet));
-		db.drivetrain.set(R_ACTUAL_POS_meters, Units.feet_to_meters(((mRightMaster.getSelectedSensorPosition() - kInitialRightPosition) / kUnitsToScaledRotationsPosition) * kWheelCircumferenceFeet));
-		db.drivetrain.set(ACTUAL_LEFT_PCT, (mLeftMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
-		db.drivetrain.set(ACTUAL_RIGHT_PCT, (mRightMaster.getSelectedSensorVelocity() * kUnitsToScaledRPM) / (kMaxDriveVelocity * kGearboxRatio));
 		db.imu.set(EGyro.ACCEL_X, mGyro.getAccelX());
 		db.imu.set(EGyro.ACCEL_Y, mGyro.getAccelY());
 		db.imu.set(EGyro.PITCH_DEGREES, mGyro.getPitch().getDegrees());
@@ -220,10 +216,6 @@ public class FalconDriveModule extends Module {
 		db.drivetrain.set(GET_X_OFFSET_METERS, odoX);
 		db.drivetrain.set(GET_Y_OFFSET_METERS, odoY);
 
-		db.drivetrain.set(GREYHILL_ACTUAL_LEFT_ft, (mLeftEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
-		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT_ft, (mRightEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
-		db.drivetrain.set(GREYHILL_ACTUAL_LEFT_meters, Units.feet_to_meters(mLeftEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
-		db.drivetrain.set(GREYHILL_ACTUAL_RIGHT_meters, Units.feet_to_meters(mRightEncoder.getDistance() / kPulsesPerRotation) * kWheelCircumferenceFeet);
 		mOdometry.update(mGyro.getHeading(), Units.feet_to_meters(db.drivetrain.get(L_ACTUAL_POS_FT)),
 				Units.feet_to_meters(db.drivetrain.get(R_ACTUAL_POS_FT)));
 		Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
@@ -295,7 +287,7 @@ public class FalconDriveModule extends Module {
 				}
 				mCyclesHolding++;
 				break;
-			case POSITION:
+			case PATH_FOLLOWING_BASIC:
 				mLeftPositionPID.setSetpoint(db.drivetrain.get(L_DESIRED_POS_FT));
 				mRightPositionPID.setSetpoint(db.drivetrain.get(R_DESIRED_POS_FT));
 				double desiredLeft = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
@@ -304,8 +296,8 @@ public class FalconDriveModule extends Module {
 				mRightMaster.set(ControlMode.PercentOutput, desiredRight);
 				break;
 			case PATH_FOLLOWING_RAMSETE:
-				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);
-				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC) / kMaxDriveVelocityFTs);
+				mLeftMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_VEL_FT_s) / kMaxDriveVelocityFTs);
+				mRightMaster.set(ControlMode.PercentOutput, db.drivetrain.get(L_DESIRED_VEL_FT_s) / kMaxDriveVelocityFTs);
 				mDifferentialDrive.feed();
 				break;
 			case TURN_TO:

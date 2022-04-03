@@ -13,10 +13,14 @@ import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.input.ELogitech310;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.common.types.sensor.EPowerDistPanel;
+import us.ilite.robot.Enums;
+import us.ilite.robot.hardware.ECommonNeutralMode;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +49,6 @@ public class Data {
     public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
     public final RobotCodex<EIntakeData> intake = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
     public final RobotCodex<EFeederData> feeder = new RobotCodex(NULL_CODEX_VALUE, EFeederData.class);
-    public final RobotCodex<EColorData> color = new RobotCodex(NULL_CODEX_VALUE, EColorData.class);
     public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE , ELimelightData.class);
     public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
@@ -57,8 +60,7 @@ public class Data {
             rawLimelight,
             feeder,
             intake,
-            climber,
-            color,
+            climber
     };
 
     public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
@@ -74,7 +76,6 @@ public class Data {
             pdp,
             intake,
             climber,
-            color,
     };
 
     //Stores writers per codex needed for CSV logging
@@ -100,7 +101,41 @@ public class Data {
             }
             rc.meta().setGlobalId(i);
         }
+
+
+        drivetrain.createSimpleBooleanConverter(EDriveData.IS_CURRENT_LIMITING);
+        drivetrain.createSimpleEnumConverter(EDriveData.STATE, Enums.EDriveState.class);
+        drivetrain.createSimpleEnumConverter(EDriveData.NEUTRAL_MODE, ECommonNeutralMode.class);
+
+        intake.createSimpleEnumConverter(EIntakeData.ARM_STATE, Enums.EArmState.class);
+        intake.createSimpleEnumConverter(EIntakeData.ROLLER_STATE, Enums.ERollerState.class);
+
+        feeder.createSimpleBooleanConverter(EFeederData.ENTRY_BEAM);
+
+        climber.createSimpleEnumConverter(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.class);
+        climber.createSimpleBooleanConverter(EClimberModuleData.SET_COAST);
+        climber.createSimpleEnumConverter(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.class);
+        climber.createSimpleEnumConverter(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.class);
+
+        ledcontrol.createSimpleEnumConverter(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.class);
+        ledcontrol.createSimpleBooleanConverter(ELEDControlData.LED_STATE);
+
+        // This should be temporary - will investigate adding something to RobotCodex directly
+        mConvertedFields.add(EDriveData.IS_CURRENT_LIMITING.name());
+        mConvertedFields.add(EDriveData.STATE.name());
+        mConvertedFields.add(EDriveData.NEUTRAL_MODE.name());
+        mConvertedFields.add(EIntakeData.ARM_STATE.name());
+        mConvertedFields.add(EIntakeData.ROLLER_STATE.name());
+        mConvertedFields.add(EFeederData.ENTRY_BEAM.name());
+        mConvertedFields.add(EClimberModuleData.HANGER_STATE.name());
+        mConvertedFields.add(EClimberModuleData.SET_COAST.name());
+        mConvertedFields.add(EClimberModuleData.IS_DOUBLE_CLAMPED.name());
+        mConvertedFields.add(EClimberModuleData.IS_SINGLE_CLAMPED.name());
+        mConvertedFields.add(ELEDControlData.DESIRED_COLOR.name());
+        mConvertedFields.add(ELEDControlData.LED_STATE.name());
     }
+
+    private List<String> mConvertedFields = new ArrayList<>();
 
     public Data() {
         this(true);
@@ -112,7 +147,18 @@ public class Data {
             ShuffleboardTab tab = Shuffleboard.getTab(key);
             List<Enum<?>> enums = EnumUtils.getEnums(mMappedCodex.get(key).meta().getEnum(), true);
             enums.stream().forEach(
-                    e -> {
+                e -> {
+                    if(mConvertedFields.contains(e.name())) {
+                        tab.addString(
+                                e.name(), () -> {
+                                    if (mMappedCodex.get(key).isSet(e)) {
+                                        return mMappedCodex.get(key).toString(e);
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                        );
+                    } else {
                         tab.addNumber(e.name(), () -> {
                             if (mMappedCodex.get(key).isSet(e)) {
                                 return mMappedCodex.get(key).get(e);
@@ -121,6 +167,7 @@ public class Data {
                             }
                         });
                     }
+                }
             );
         }
         mHasRegisteredWithShuffleboard = true;

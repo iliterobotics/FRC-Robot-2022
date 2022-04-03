@@ -16,14 +16,14 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.hardware.HardwareUtils;
 
 import static us.ilite.common.types.EClimberModuleData.*;
+import static us.ilite.common.types.EFeederData.ACTUAL_FEEDER_pct;
 
 public class ClimberModule extends Module{
-    private TalonFX mCL12;
-    private TalonFX mCLMR11;
-    private DoubleSolenoid mCLPNDouble;
-    private DoubleSolenoid mCLPNSingle;
+    private final TalonFX mCLMR11;
+    private final TalonFX mCL12;
+    private final DoubleSolenoid mCLPNDouble;
+    private final DoubleSolenoid mCLPNSingle;
 
-    private PIDController mPositionPID;
     private PIDController mVelocityPID;
 
     // ========================================
@@ -33,31 +33,20 @@ public class ClimberModule extends Module{
     private final int POSITION_SLOT = 0;
 
     private ProfileGains kVelocityGains = new ProfileGains().p(0.0).f(0.0001);
-    private ProfileGains kPositionGains = new ProfileGains().p(0.015).f(0.0005).slot(POSITION_SLOT);
+    private ProfileGains kPositionGains = new ProfileGains().p(0.0175).f(0.00075).slot(POSITION_SLOT);
 
     // ========================================
     // DO NOT MODIFY THESE PHYSICAL CONSTANTS
     // ========================================
-
     public static final double kClimberRatio = (12.0 / 72.0) * (20.0 / 80.0) * (20.0 / 80.0) * (16.0 / 42.0);
     public static final double kMaxClimberSpeed = 6380 * kClimberRatio;
     public static final double kScaledUnitsToRPM = (600.0 / 2048.0) * kClimberRatio;
-    public static final double kScaledUnitsToRotations = kClimberRatio / 2048;
-    public static final double kVerticalAngleDeg = 90;
-    public static final double kMaxAllowedVelocity = 0.75;
-    public static final double kMaxScaledVelocity = kMaxClimberSpeed * kMaxAllowedVelocity;
-    public static final double kWindmillCircumferenceFt = 2; // TODO Confirm if this is true
-    public static final int kClimberToleranceDeg = 5; // Experiment with this to find the perfect tolerance range
-
-    private double mInitialAngleDeg = 0;
 
     public ClimberModule() {
         mCLMR11 = new TalonFX(Settings.HW.CAN.kCLM1);
         mCL12 = new TalonFX(Settings.HW.CAN.kCL2);
         mCLMR11.setNeutralMode(NeutralMode.Brake);
         mCL12.setNeutralMode(NeutralMode.Brake);
-//        mCL12.configOpenloopRamp(0.5);
-//        mCLMR11.configOpenloopRamp(0.5);
         mCL12.configClosedloopRamp(0.5);
         mCLMR11.configClosedloopRamp(0.5);
 
@@ -75,7 +64,6 @@ public class ClimberModule extends Module{
         mCL12.configAllowableClosedloopError(1, climberDegreesToTicks(2));
 
         mVelocityPID = new PIDController(kVelocityGains, -kMaxClimberSpeed, kMaxClimberSpeed, Settings.kControlLoopPeriod);
-        mPositionPID = new PIDController(kPositionGains, -kMaxClimberSpeed, kMaxClimberSpeed, Settings.kControlLoopPeriod);
 
         mCL12.configNominalOutputForward(0, 20);
         mCLMR11.configNominalOutputForward(0, 20);
@@ -98,43 +86,21 @@ public class ClimberModule extends Module{
 
     @Override
     public void modeInit(EMatchMode mode) {
-//        mPositionPID.setSetpoint(kVerticalAngleDeg);
-//        mPositionPID.setOutputRange(-kMaxScaledVelocity, kMaxScaledVelocity);
-//        mPositionPID.setContinuous(true);
-
-//        mVelocityPID.setSetpoint(0d);
-//        mVelocityPID.setOutputRange(-kMaxScaledVelocity, kMaxScaledVelocity);
-
         if (mode == EMatchMode.TELEOPERATED) {
-//            db.climber.set(CURRENT_RUNG, Enums.EClimberAngle.START);
-//            db.climber.set(DESIRED_RUNG, Enums.EClimberAngle.START);
             mCLMR11.configClearPositionOnQuadIdx(true, 20);
             db.climber.set(L_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
         }
-
-//        mInitialAngleDeg = ticksToClimberDegrees(mCL12.getSelectedSensorPosition());
     }
 
     @Override
     public void readInputs() {
         db.climber.set(L_VEL_rpm, mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM);
-//        db.climber.set(R_VEL_rpm, mCLMR11.getSelectedSensorVelocity() * kScaledUnitsToRPM);
-
         db.climber.set(L_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
-//        db.climber.set(R_POSITION_deg, ticksToClimberDegrees(mCLMR11.getSelectedSensorPosition()) - mInitialAngleDeg);
-//
         db.climber.set(L_POSITION_TARGET, mCL12.getClosedLoopTarget());
-//        db.climber.set(R_POSITION_TARGET, mCLMR11.getClosedLoopTarget());
         db.climber.set(L_POSITION_ERROR, mCL12.getClosedLoopError());
-//        db.climber.set(R_POSITION_TICKS, mCLMR11.getSelectedSensorPosition());
-
-        db.climber.set(L_OUTPUT_CURRENT, mCLMR11.getSupplyCurrent());
-//        db.climber.set(R_OUTPUT_CURRENT, mCLMR11.getSupplyCurrent());
-
-        db.climber.set(BUS_VOLTAGE_LEFT, mCL12.getBusVoltage());
-//        db.climber.set(BUS_VOLTAGE_RIGHT, mCLMR11.getBusVoltage());
-
-//        updateRung();
+        db.climber.set(L_OUTPUT_CURRENT, mCL12.getStatorCurrent());
+        db.climber.set(BUS_VOLTAGE_LEFT, mCL12.getMotorOutputVoltage());
+        db.climber.set(L_ACTUAL_CLIMBER_PCT, (mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM) / (6380 * kClimberRatio));
     }
 
     @Override
@@ -161,18 +127,8 @@ public class ClimberModule extends Module{
                 mCLMR11.set(ControlMode.Velocity, desiredVel);
                 break;
             case POSITION:
-//                mPositionPID.setSetpoint(db.climber.get(EClimberModuleData.DESIRED_POS_deg));
-//                double desiredPos = mPositionPID.calculate(db.climber.get(EClimberModuleData.L_POSITION_deg), clock.getCurrentTimeInMillis());
-//                mCL12.set(ControlMode.Velocity, desiredPos);
-//                mCLMR11.set(ControlMode.Velocity, desiredPos);
                 mCL12.set(ControlMode.Position, climberDegreesToTicks(db.climber.get(DESIRED_POS_deg)));
                 mCLMR11.set(ControlMode.Position, climberDegreesToTicks(db.climber.get(DESIRED_POS_deg)));
-                break;
-            case BEGIN_HANG:
-//                mPositionPID.setSetpoint(90);
-//                double desiredOutput = mPositionPID.calculate(db.climber.get(EClimberModuleData.L_POSITION_deg), clock.getCurrentTimeInMillis());
-//                mCL12.set(ControlMode.Velocity, desiredOutput);
-//                mCLMR11.set(ControlMode.Velocity, desiredOutput);
                 break;
         }
 
@@ -192,34 +148,9 @@ public class ClimberModule extends Module{
         }
     }
 
-//    private void updateRung() {
-//        Enums.EClimberAngle desiredRung = db.climber.get(DESIRED_RUNG, Enums.EClimberAngle.class);
-//        if (desiredRung == null) return;
-//        if (desiredRung.getStage() < 0) return; // Do not pass this point if the climber isn't looking for a rung
-//
-//        double angle = db.climber.get(L_POSITION_deg);
-//
-//        switch(desiredRung) {
-//            case VERTICAL:
-//                if (Math.abs(desiredRung.getAngle() - angle) < kClimberToleranceDeg && db.climber.get(DOUBLE_CLAMPED) == 1d && db.climber.get(SINGLE_CLAMPED) == 0d) {
-//                    db.climber.set(DESIRED_RUNG, Enums.EClimberAngle.MID);
-//                } else {
-//                    db.climber.set(DESIRED_POS_deg, desiredRung.getAngle());
-//                }
-//                break;
-//            case MID:
-//                break;
-//            case HIGH:
-//                break;
-//            case TRAVERSAL:
-//                break;
-//        }
-//    }
-
     private double ticksToClimberDegrees(double pTicks) {
         return pTicks / 2048 * kClimberRatio * 360;
     }
-
     private double climberDegreesToTicks(double pDegrees) {
         return pDegrees * 2048 / kClimberRatio / 360;
     }

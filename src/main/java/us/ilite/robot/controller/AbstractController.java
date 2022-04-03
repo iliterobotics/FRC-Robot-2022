@@ -11,6 +11,7 @@ import static us.ilite.common.types.drive.EDriveData.*;
 
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
+import us.ilite.common.types.ELEDControlData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -29,6 +30,7 @@ public abstract class AbstractController {
     protected double dt = 1d;
 
     private boolean mIsBallAdded = false;
+    private boolean mIsBallOut = false;
     private int mNumBalls = 0;
 
     public AbstractController(){
@@ -59,7 +61,7 @@ public abstract class AbstractController {
     protected void stopDrivetrain() {
         db.drivetrain.set(EDriveData.STATE, EDriveState.PERCENT_OUTPUT);
         db.drivetrain.set(DESIRED_THROTTLE_PCT, 0.0);
-        db.drivetrain.set(DESIRED_TURN_PCT,0.0);
+        db.drivetrain.set(DESIRED_TURN_PCT, 0.0);
     }
 
     protected void setIntakeArmEnabled(boolean enabled) {
@@ -72,45 +74,38 @@ public abstract class AbstractController {
 
     protected abstract void updateImpl();
 
-    protected void updateBalls() {
-        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 1d) {
-            if (!mIsBallAdded) {
-                mNumBalls++;
-                mIsBallAdded = true;
-            }
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.2);
-        } else if (mIsBallAdded && db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) {
-            mIsBallAdded = false;
-        }
-    }
-
     protected void fireCargo() {
         db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
-        mNumBalls = 0;
+        indexCargo();
         db.feeder.set(NUM_BALLS, 0);
     }
-
     protected void indexCargo() {
-        if (db.feeder.get(RESET_BALLS) == 1d) {
-            mNumBalls = 0;
-        } else {
-            mNumBalls = (int)db.feeder.get(NUM_BALLS);
-        }
-        if (db.feeder.get(EFeederData.ENTRY_BEAM) == 0d) { // is broken
-            if (!mIsBallAdded) {
+        //Indexing balls coming in
+        if (db.feeder.get(ENTRY_BEAM) == 0d) {
+            if(!mIsBallAdded) {
                 mNumBalls++;
                 mIsBallAdded = true;
             }
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.4);
-        } else if (mIsBallAdded) {
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+        } else if (mIsBallAdded && db.feeder.get(ENTRY_BEAM) == 1d) {
             mIsBallAdded = false;
-        } else if (mNumBalls > 0) {
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
-        } else {
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0d);
         }
-        db.feeder.set(EFeederData.NUM_BALLS, mNumBalls);
+        //Indexing balls coming out
+        else if (db.feeder.get(EXIT_BEAM) == 0d) {
+            if(!mIsBallOut) {
+                mNumBalls--;
+                mIsBallOut = true;
+            }
+        } else if (mIsBallOut && db.feeder.get(EXIT_BEAM) == 1d) {
+            mIsBallOut = false;
+        }
+        db.feeder.set(NUM_BALLS, mNumBalls);
+    }
+
+    protected void stageBalls() {
+        if(db.feeder.get(EXIT_BEAM) == 1d) {
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+        }
     }
 
     protected void placeCargo() {
@@ -129,11 +124,22 @@ public abstract class AbstractController {
         db.feeder.set(SET_FEEDER_pct, -1.0);
         mNumBalls = 0;
         db.feeder.set(EFeederData.NUM_BALLS, 0);
-        if (db.intake.get(EIntakeData.PNEUMATIC_STATE) == 1.0) {
-            db.intake.set(DESIRED_ROLLER_pct, 0.0);
-        } else {
-            db.intake.set(DESIRED_ROLLER_pct, -1.0);
+        db.intake.set(DESIRED_ROLLER_pct, -1.0);
+    }
+
+    protected void setLED(Enums.LEDColorMode pColor, Enums.LEDState pState) {
+        //pState is in seconds
+        db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, pColor);
+        db.ledcontrol.set(ELEDControlData.LED_STATE, pState);
+        if(pState == LEDState.BLINKING) {
+            db.ledcontrol.set(ELEDControlData.BLINK_SPEED, 0.5);
         }
+    }
+    public void setLED(Enums.LEDColorMode pColor, double pBlinkRate) {
+        //pState is in seconds
+        db.ledcontrol.set(ELEDControlData.DESIRED_COLOR, pColor);
+        db.ledcontrol.set(ELEDControlData.LED_STATE, LEDState.BLINKING);
+        db.ledcontrol.set(ELEDControlData.BLINK_SPEED,pBlinkRate);
     }
 
     /**

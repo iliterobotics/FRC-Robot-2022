@@ -56,13 +56,15 @@ public class DriveStraight implements ICommand {
     @Override
     public void init(double pNow) {
         // Set target heading to current heading if setTargetHeading() wasn't called manually
-        if(mTargetHeading == null) {
-            mTargetHeading = Rotation2d.fromDegrees(Robot.DATA.drivetrain.get(ACTUAL_HEADING_DEGREES));
+        if (mTargetHeading == null) {
+//            mTargetHeading = Rotation2d.fromDegrees(Robot.DATA.drivetrain.get(ACTUAL_HEADING_DEGREES));
+            mTargetHeading = Rotation2d.fromDegrees(getHeading().degrees());
         }
         mInitialDistance = getAverageDriveDistance();
         mLastTime = pNow;
         mStartTime = pNow;
-        mHeadingController.setSetpoint(getHeading().degrees());
+        mHeadingController.setSetpoint(mTargetHeading.getDegrees());
+
         mHeadingController.reset();
     }
 
@@ -74,6 +76,9 @@ public class DriveStraight implements ICommand {
         double throttle = mDistanceController.calculate(getAverageDriveDistance().inches());
         SmartDashboard.putNumber("Distance Error", mDistanceController.getPositionError());
 //
+        SmartDashboard.putNumber("AUTON Turn Output", turn);
+        SmartDashboard.putNumber("AUTON Heading Degrees", Robot.DATA.drivetrain.get( ACTUAL_HEADING_DEGREES ));
+        SmartDashboard.putNumber("AUTON Drive Error", mDistanceController.getPositionError() );
         if(mDistanceController.atSetpoint()) {
             return true;
         } else {
@@ -84,6 +89,8 @@ public class DriveStraight implements ICommand {
             mLastTime = pNow;
             return false;
         }
+
+
     }
 
     protected Angle getHeading() {

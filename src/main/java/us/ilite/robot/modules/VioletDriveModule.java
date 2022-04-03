@@ -345,8 +345,6 @@ public class VioletDriveModule extends Module {
         double turn = db.drivetrain.safeGet(DESIRED_TURN_PCT, 0.0);
         double throttle = db.drivetrain.safeGet(DESIRED_THROTTLE_PCT, 0.0);
 
-        double left = db.drivetrain.safeGet(DESIRED_LEFT_PCT, 0d);
-        double right = db.drivetrain.safeGet(DESIRED_RIGHT_PCT, 0d);
 
         switch (mode) {
             case RESET:
@@ -436,21 +434,9 @@ public class VioletDriveModule extends Module {
 //                mLeftMaster.setVoltage(db.drivetrain.get(DESIRED_LEFT_VOLTAGE));
 //                mRightMaster.setVoltage(db.drivetrain.get(DESIRED_RIGHT_VOLTAGE));
 //                mDrive.feed();
-                mLeftMaster.set(db.drivetrain.get(L_DESIRED_DRIVE_FT_SEC)/24);
-                mRightMaster.set(db.drivetrain.get(R_DESIRED_DRIVE_FT_SEC)/24);
+                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s)/24);
+                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s)/24);
                 mDrive.feed();
-                break;
-            case TURN_FOR:
-                double arcLengthFor = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * db.drivetrain.get(DESIRED_TURN_ANGLE_deg) / 360.0;
-
-                mLeftPositionPID.setSetpoint(arcLengthFor);
-                mRightPositionPID.setSetpoint(-arcLengthFor);
-
-                double leftOutputFor = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-                double rightOutputFor = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-
-                mLeftMaster.set(leftOutputFor);
-                mRightMaster.set(rightOutputFor);
                 break;
             case TURN_TO:
                 double arcLengthTo = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * (db.drivetrain.get(DESIRED_TURN_ANGLE_deg) - mStartAngleDeg) / 360.0;
@@ -463,28 +449,6 @@ public class VioletDriveModule extends Module {
 
                 mLeftMaster.set(leftOutputTo);
                 mRightMaster.set(rightOutputTo);
-                break;
-            case HOME:
-                double arcLengthHome = kWheelbaseDiagonalFeet * kGearboxRatio * Math.PI * -mStartAngleDeg / 360.0;
-
-                mLeftPositionPID.setSetpoint(arcLengthHome);
-                mLeftPositionPID.setSetpoint(-arcLengthHome);
-
-                double leftOutputHome = mLeftPositionPID.calculate(db.drivetrain.get(L_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-                double rightOutputHome = mRightPositionPID.calculate(db.drivetrain.get(R_ACTUAL_POS_FT), clock.getCurrentTimeInMillis());
-
-                mLeftMaster.set(leftOutputHome);
-                mRightMaster.set(rightOutputHome);
-                break;
-            case TANK:
-                mLeftTankPID.setSetpoint((left)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
-                mRightTankPID.setSetpoint((right)*kDriveTrainMaxVelocityRPM*Settings.Input.kMaxAllowedVelocityMultiplier);
-
-                double vLeftTank = mLeftTankPID.calculate(db.drivetrain.get(L_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
-                double vRightTank = mRightTankPID.calculate(db.drivetrain.get(R_ACTUAL_VEL_RPM), clock.getCurrentTimeInMillis());
-
-                mLeftMaster.set(vLeftTank);
-                mRightMaster.set(vRightTank);
                 break;
         }
     }
