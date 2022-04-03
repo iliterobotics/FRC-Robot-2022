@@ -64,6 +64,7 @@ public class Robot extends TimedRobot {
     private TwoBallController mTwoBallController;
     private TwoBallTrajectoryController mTwoBalltrajectorycontroller;
     private TrajectoryController mTrajectoryController;
+    private FourBallTrajectoryAuton mFourBallAuton;
     public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
@@ -80,6 +81,7 @@ public class Robot extends TimedRobot {
         mBlueThreeBallController = new BlueThreeBallController();
         mReverseController = new ReverseFeederIntakeController();
         mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
+        mFourBallAuton = new FourBallTrajectoryAuton();
 //        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -147,12 +149,12 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
-        mNeoDrive.resetOdometry(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+        mNeoDrive.resetOdometry(FourBallTrajectoryAuton.ROBOT_START);
         mNeoDrive.readInputs();
 //        mActiveController = mTwoBallController;
 //        mTwoBallController.initialize();
-        mActiveController = mTwoBalltrajectorycontroller;
-        mTwoBalltrajectorycontroller.initialize();
+        mActiveController = mFourBallAuton;
+        mFourBallAuton.initialize();
         mActiveController.setEnabled(true);
     }
 
