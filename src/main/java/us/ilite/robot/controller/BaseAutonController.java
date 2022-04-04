@@ -154,6 +154,11 @@ public class BaseAutonController extends AbstractController {
     protected void updateImpl() {
 
     }
+
+    public Pose2d getStartPose() {
+        return new Pose2d(0, 0, new Rotation2d(0));
+    }
+
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;
     private double startTime = 0;

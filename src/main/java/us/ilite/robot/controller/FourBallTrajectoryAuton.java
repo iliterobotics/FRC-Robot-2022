@@ -60,4 +60,9 @@ public class FourBallTrajectoryAuton extends BaseAutonController{
         SECOND_BALL = new Pose2d(feet_to_meters(18.444), feet_to_meters(5.732), Rotation2d.fromDegrees(180)),
         THIRD_BALL = new Pose2d(feet_to_meters(5.361), feet_to_meters(4.581), Rotation2d.fromDegrees(225))
     ;
+
+    @Override
+    public Pose2d getStartPose() {
+        return ROBOT_START;
+    }
 }
