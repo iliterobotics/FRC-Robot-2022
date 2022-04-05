@@ -46,12 +46,12 @@ public class InputMap {
         RETRACT_INTAKE = ELogitech310.RIGHT_TRIGGER_AXIS,
         EXTEND_INTAKE = ELogitech310.LEFT_TRIGGER_AXIS,
         REVERSE_ROLLERS = ELogitech310.B_BTN,
-        SPIN_FEEDER = ELogitech310.X_BTN,
-        REVERSE_FEEDER = ELogitech310.Y_BTN,
-        RELEASE_BALLS = ELogitech310.DPAD_LEFT,
-        SHOOT_CARGO = ELogitech310.R_BTN,
-        STAGE_BALLS = ELogitech310.A_BTN,
-        PLACE_CARGO = ELogitech310.L_BTN;
+        SPIN_FEEDER = ELogitech310.A_BTN,
+        REVERSE_FEEDER = ELogitech310.R_BTN,
+        RELEASE_BALLS = ELogitech310.L_BTN,
+        SHOOT_CARGO = ELogitech310. Y_BTN,
+        STAGE_BALLS = ELogitech310.X_BTN,
+        PLACE_CARGO = ELogitech310.DPAD_LEFT;
     }
 
     /**
