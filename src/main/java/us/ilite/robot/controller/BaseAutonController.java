@@ -11,6 +11,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -21,10 +25,13 @@ import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.modules.FalconDriveModule;
+import us.ilite.robot.modules.NeoDriveModule;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static us.ilite.common.lib.util.Units.feet_to_meters;
 
 /**
  * Class responsible for executing {@link Trajectory} and moving the
@@ -84,6 +91,8 @@ public class BaseAutonController extends AbstractController {
     public Trajectory.State initialState;
     public int mCycleCount = 0;
 
+    protected final TrajectoryConfig mTrajectoryConfig;
+
     /**
      * Default constructor. This will instantiate the variables that are not dependent on the init
      * state of autonomous. For those components, those will be initialized in the initialized method
@@ -96,6 +105,25 @@ public class BaseAutonController extends AbstractController {
         mFirstLeg = new Timer();
         mDriveKinematics = new DifferentialDriveKinematics(Units.feet_to_meters(FalconDriveModule.kTrackWidthFeet));
         SmartDashboard.putNumber("trajectory-seconds",-1);
+
+
+        mTrajectoryConfig = new TrajectoryConfig(0.5, 0.5);
+        DifferentialDriveKinematics k = new DifferentialDriveKinematics(feet_to_meters(NeoDriveModule.kTrackWidthFeet));
+        mTrajectoryConfig.addConstraint(
+                new DifferentialDriveVoltageConstraint(
+                        new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA),
+                        k,
+                        10
+                )
+        );
+        mTrajectoryConfig.addConstraint(new CentripetalAccelerationConstraint(0.5));
+        mTrajectoryConfig.addConstraint(new DifferentialDriveKinematicsConstraint(k,feet_to_meters(NeoDriveModule.kMaxVelocityRPM * NeoDriveModule.kDriveNEOVelocityFactor * 0.25)));
+        mTrajectoryConfig.setStartVelocity(0.0);
+        mTrajectoryConfig.setEndVelocity(0.0);
+    }
+
+    public void initialize() {
+        initialize(null);
     }
 
     /**
@@ -113,17 +141,24 @@ public class BaseAutonController extends AbstractController {
         mMotorPidController.reset();
         mPrevTime = -1;
         mTrajectory = pTrajectory;
-        initialState = mTrajectory.sample(0);
-        SmartDashboard.putNumber("Initial state x", initialState.poseMeters.getX());
-        SmartDashboard.putNumber("Initial state y", initialState.poseMeters.getY());
+        if(mTrajectory != null) {
+            initialState = mTrajectory.sample(0);
+            SmartDashboard.putNumber("Initial state x", initialState.poseMeters.getX());
+            SmartDashboard.putNumber("Initial state y", initialState.poseMeters.getY());
+            SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
+        }
         mPrevTargetWheelSpeeds = new DifferentialDriveWheelSpeeds(0,0);
         mPrevActualSpeed = new DifferentialDriveWheelSpeeds(0,0);
-        SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
     }
     @Override
     protected void updateImpl() {
 
     }
+
+    public Pose2d getStartPose() {
+        return new Pose2d(0, 0, new Rotation2d(0));
+    }
+
     private static int EXEC_COUNT = 1;
     private static boolean HAS_FINISHED = false;
     private double startTime = 0;

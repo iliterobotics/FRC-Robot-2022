@@ -1,1 +1,105 @@
-{}
+{
+  "HALProvider": {
+    "RoboRIO": {
+      "6V Rail": {
+        "open": true
+      },
+      "RoboRIO Input": {
+        "open": true
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auton Configuration/Choose Auton Controller": "String Chooser",
+      "/SmartDashboard/Field": "Field2d"
+    },
+    "windows": {
+      "/Shuffleboard/Auton Configuration/Choose Auton Controller": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "Current Trajectory": {
+          "arrows": false,
+          "style": "Track"
+        },
+        "Final Shot": {
+          "arrowSize": 10,
+          "color": [
+            0.0,
+            255.0,
+            232.33326721191406,
+            255.0
+          ],
+          "style": "Track"
+        },
+        "First Leg": {
+          "arrowSize": 10,
+          "color": [
+            0.0,
+            255.0,
+            237.9999542236328,
+            255.0
+          ],
+          "style": "Track"
+        },
+        "First Shoot": {
+          "arrowSize": 11,
+          "color": [
+            0.0,
+            243.66664123535156,
+            255.0,
+            255.0
+          ],
+          "style": "Track"
+        },
+        "Robot": {
+          "color": [
+            0.6090424060821533,
+            0.11149521172046661,
+            0.9407407641410828,
+            255.0
+          ],
+          "style": "Box/Image"
+        },
+        "Second Leg Ball 3": {
+          "arrowSize": 10,
+          "color": [
+            0.0,
+            255.0,
+            203.99998474121094,
+            255.0
+          ],
+          "style": "Track"
+        },
+        "Second Leg Ball 4": {
+          "arrowSize": 10,
+          "color": [
+            0.0,
+            255.0,
+            237.9999542236328,
+            255.0
+          ],
+          "style": "Track"
+        },
+        "height": 8.229599952697754,
+        "units": "feet",
+        "width": 16.459199905395508,
+        "window": {
+          "name": "Rapid React Field",
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "SmartDashboard": {
+      "Field": {
+        "open": true
+      }
+    }
+  }
+}

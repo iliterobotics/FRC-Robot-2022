@@ -42,6 +42,10 @@ public class Pigeon extends IMU{
 		//mAccelerationX = new FilteredAverage(kCollisionGains);
 		//mAccelerationY = new FilteredAverage(kCollisionGains);
 	}
+
+	public void resetAngle(Rotation2d pAngle) {
+		mPigeon.setFusedHeading(pAngle.getDegrees(), 20);
+	}
 	
 	/**
 	 * Pre-populates the filters & calculated values so it's done only once per cycle

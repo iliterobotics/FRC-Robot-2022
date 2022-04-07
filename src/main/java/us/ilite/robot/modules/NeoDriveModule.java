@@ -162,6 +162,7 @@ public class NeoDriveModule extends Module {
      */
     public void resetOdometry(Pose2d pose) {
         reset();
+        mGyro.resetAngle(pose.getRotation());
         mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()));
     }
     @Override
