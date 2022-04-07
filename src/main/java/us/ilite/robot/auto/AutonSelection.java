@@ -16,7 +16,7 @@ public class AutonSelection {
      * Update these Auton Controllers whenever new ones are added
      */
     private Class<?>[] mAutonControllers = {
-        ThreeBallController.class,
+        ThreeBallController.class, TwoBallController.class,
         TwoBallTrajectoryController.class,
         FourBallTrajectoryAuton.class
     };
@@ -29,7 +29,7 @@ public class AutonSelection {
                .getDouble(0.0)))
                .intValue();
 
-        mSendableAutonControllers.setDefaultOption("Default - BaseAuton", BaseAutonController.class);
+        mSendableAutonControllers.setDefaultOption("Default - Two ball", TwoBallController.class);
         for (Class<?> c : mAutonControllers) {
             mSendableAutonControllers.addOption(c.getSimpleName(), c);
         }

@@ -48,6 +48,7 @@ public class Robot extends TimedRobot {
     private ClimberModule mClimber;
     private NeoDriveModule mNeoDrive;
     private Limelight mLimelight;
+    private AutonSelection mAutonSelection;
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -63,7 +64,6 @@ public class Robot extends TimedRobot {
     private ThreeBallTrajectoryAuton mThreeBallAuton;
     private TrajectoryController mTrajectoryController;
     private FourBallTrajectoryAuton mFourBallAuton;
-    public AutonSelection mAutonSelection;
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
@@ -71,6 +71,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
+        mAutonSelection = new AutonSelection();
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
@@ -81,7 +82,6 @@ public class Robot extends TimedRobot {
         mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
         mThreeBallAuton = new ThreeBallTrajectoryAuton();
         mFourBallAuton = new FourBallTrajectoryAuton();
-//        mDrive = new FalconDriveModule();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
         mAutonSelection = new AutonSelection();
@@ -151,7 +151,7 @@ public class Robot extends TimedRobot {
         mActiveController = mThreeBallAuton;
         mNeoDrive.resetOdometry(mThreeBallAuton.getStartPose());
         mNeoDrive.readInputs();
-        mActiveController = mTwoBallController;
+        mActiveController = mAutonSelection.getSelectedAutonController();
         mTwoBallController.initialize();;
         mActiveController.setEnabled(true);
     }
