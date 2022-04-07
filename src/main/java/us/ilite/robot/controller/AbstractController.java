@@ -75,11 +75,13 @@ public abstract class AbstractController {
     protected abstract void updateImpl();
 
     protected void fireCargo() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
         indexCargo();
         db.feeder.set(NUM_BALLS, 0);
     }
     protected void indexCargo() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         //Indexing balls coming in
         if (db.feeder.get(ENTRY_BEAM) == 0d) {
             if(!mIsBallAdded) {
@@ -103,12 +105,14 @@ public abstract class AbstractController {
     }
 
     protected void stageBalls() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         if(db.feeder.get(EXIT_BEAM) == 1d) {
             db.feeder.set(SET_FEEDER_pct, 0.4);
         }
     }
 
     protected void placeCargo() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(EFeederData.SET_FEEDER_pct, -0.2);
         db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
     }
@@ -121,6 +125,7 @@ public abstract class AbstractController {
     }
 
     protected void reverseCargo() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(SET_FEEDER_pct, -1.0);
         mNumBalls = 0;
         db.feeder.set(EFeederData.NUM_BALLS, 0);
