@@ -148,11 +148,12 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
-        mActiveController = mThreeBallAuton;
-        mNeoDrive.resetOdometry(mThreeBallAuton.getStartPose());
+        BaseAutonController mAutoController = mAutonSelection.getSelectedAutonController();
+        mActiveController = mAutoController;
+        mNeoDrive.resetOdometry(mAutoController.getStartPose());
         mNeoDrive.readInputs();
         mActiveController = mAutonSelection.getSelectedAutonController();
-        mTwoBallController.initialize();;
+        mAutoController.initialize();
         mActiveController.setEnabled(true);
     }
 
