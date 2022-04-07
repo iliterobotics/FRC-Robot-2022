@@ -17,6 +17,9 @@ public class AutonSelection {
      */
     private Class<?>[] mAutonControllers = {
         ThreeBallController.class, TwoBallController.class,
+            ShootMoveController.class,
+            FiveBallController.class,
+            FourBallController.class,
         TwoBallTrajectoryController.class,
         FourBallTrajectoryAuton.class
     };
@@ -35,8 +38,8 @@ public class AutonSelection {
         }
 
         mAutonConfiguration.add("Choose Auton Controller", mSendableAutonControllers)
-            .withPosition(0, 0)
-            .withSize(2, 1);
+            .withPosition(3, 3)
+            .withSize(4, 2);
     }
 
     public BaseAutonController getSelectedAutonController() {

@@ -84,7 +84,6 @@ public class Robot extends TimedRobot {
         mFourBallAuton = new FourBallTrajectoryAuton();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
-        mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
@@ -152,7 +151,6 @@ public class Robot extends TimedRobot {
         mActiveController = mAutoController;
         mNeoDrive.resetOdometry(mAutoController.getStartPose());
         mNeoDrive.readInputs();
-        mActiveController = mAutonSelection.getSelectedAutonController();
         mAutoController.initialize();
         mActiveController.setEnabled(true);
     }
