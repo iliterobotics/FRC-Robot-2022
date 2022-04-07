@@ -15,7 +15,7 @@ import us.ilite.robot.commands.TurnToDegree;
 
 public class TwoBallController extends BaseAutonController {
     //This was -10 initially
-    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(-8), 2);
+    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(-6), 2);
     private boolean mFirstTurnComplete = false;
     private DriveStraight mFirstLeg = new DriveStraight(Distance.fromInches(50));
     private boolean mFirstLegComplete = false;
