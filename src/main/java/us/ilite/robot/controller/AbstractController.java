@@ -108,7 +108,7 @@ public abstract class AbstractController {
             mIsBallAdded = false;
         }
         //Indexing balls coming out
-        //Got rid of else if heret 
+        //Got rid of else if heret
         if (db.feeder.get(EXIT_BEAM) == 0d) {
             if(!mIsBallOut) {
                 mNumBalls--;
