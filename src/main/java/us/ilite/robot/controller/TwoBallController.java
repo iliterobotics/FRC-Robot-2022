@@ -91,13 +91,12 @@ public class TwoBallController extends BaseAutonController {
             db.intake.set(EIntakeData.ROLLER_PCT, 0.0);
         }
         else if (time < kSecondTurnTimeEnd + 1.1) {
-            System.out.println("About to drive backwards");
             db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
             db.feeder.set(EFeederData.SET_FEEDER_pct, 0.0);
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
             mLeaveTarmac.init(time);
         }
-        else if (time > kSecondTurnTimeEnd + 3) {
+        else {
             mLeaveTarmac.update(time);
         }
 

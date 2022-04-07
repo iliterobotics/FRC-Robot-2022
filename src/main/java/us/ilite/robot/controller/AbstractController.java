@@ -12,6 +12,7 @@ import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.ELEDControlData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -49,15 +50,17 @@ public abstract class AbstractController {
         mLastTime = clock.now();
     }
     public void updateBallCount() {
-        db.feeder.set(NUM_BALLS, mNumBalls);
-        if (mNumBalls == 0) {
-            setLED(Enums.LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
-        }
-        else if (mNumBalls == 1) {
-            setLED(LEDColorMode.YELLOW, Enums.LEDState.SOLID);
-        }
-        else if (mNumBalls == 2) {
-            setLED(LEDColorMode.PURPLE, Enums.LEDState.SOLID);
+        if (!db.limelight.isSet(ELimelightData.TV)) {
+            if (mNumBalls == 0) {
+                setLED(LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
+            }
+            else if (mNumBalls == 1) {
+                setLED(LEDColorMode.YELLOW, Enums.LEDState.SOLID);
+            }
+            else if (mNumBalls == 2) {
+                setLED(LEDColorMode.PURPLE, Enums.LEDState.SOLID);
+            }
+            db.feeder.set(NUM_BALLS, mNumBalls);
         }
     }
 
@@ -105,7 +108,8 @@ public abstract class AbstractController {
             mIsBallAdded = false;
         }
         //Indexing balls coming out
-        else if (db.feeder.get(EXIT_BEAM) == 0d) {
+        //Got rid of else if heret 
+        if (db.feeder.get(EXIT_BEAM) == 0d) {
             if(!mIsBallOut) {
                 mNumBalls--;
                 mIsBallOut = true;

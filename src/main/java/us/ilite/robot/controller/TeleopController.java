@@ -32,8 +32,8 @@ public class TeleopController extends BaseManualController {
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
         super.updateDrivetrain();
-        super.updateBallCount();
         updateCargo();
+        super.updateBallCount();
         updateHangerMotors();
         updateHangerPneumatics();
         updateIntake();
@@ -55,7 +55,6 @@ public class TeleopController extends BaseManualController {
             }
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
         } else {
-            setLED(Enums.LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
             db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CAMERA.id());
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
         }
