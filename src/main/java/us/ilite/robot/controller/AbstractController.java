@@ -48,6 +48,18 @@ public abstract class AbstractController {
         }
         mLastTime = clock.now();
     }
+    public void updateBalls() {
+        db.feeder.set(NUM_BALLS, mNumBalls);
+        if (mNumBalls == 0) {
+            setLED(Enums.LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
+        }
+        else if (mNumBalls == 1) {
+            setLED(LEDColorMode.YELLOW, Enums.LEDState.SOLID);
+        }
+        else if (mNumBalls == 2) {
+            setLED(LEDColorMode.PURPLE, Enums.LEDState.SOLID);
+        }
+    }
 
     /**
      * Enables / Disables this controller.
