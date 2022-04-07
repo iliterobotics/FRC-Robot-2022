@@ -34,7 +34,7 @@ public class TwoBallController extends BaseAutonController {
             kFirstTurnTimeEnd =  2.5,
             kFirstLegTimeEnd = kFirstTurnTimeEnd+ 4.0,
             kSecondLegTimeEnd = kFirstLegTimeEnd + 2.5,
-            kSecondTurnTimeEnd = kFirstTurnTimeEnd + 2.5;
+            kSecondTurnTimeEnd = kSecondLegTimeEnd + 2.5;
 
 
     public void updateImpl() {
@@ -84,17 +84,20 @@ public class TwoBallController extends BaseAutonController {
         else if (time < kSecondTurnTimeEnd) {
             mSecondTurn.update(time);
         }
-        else if (time < kSecondTurnTimeEnd + 0.5){
+        else if (time < kSecondTurnTimeEnd + 1.0){
             fireCargo();
             setIntakeArmEnabled(false);
+            db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
+            db.intake.set(EIntakeData.ROLLER_PCT, 0.0);
         }
-        else if (time < kSecondTurnTimeEnd + 0.6) {
+        else if (time < kSecondTurnTimeEnd + 1.1) {
+            System.out.println("About to drive backwards");
             db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
             db.feeder.set(EFeederData.SET_FEEDER_pct, 0.0);
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
             mLeaveTarmac.init(time);
         }
-        else if (time > kSecondTurnTimeEnd + 1.0) {
+        else if (time > kSecondTurnTimeEnd + 3) {
             mLeaveTarmac.update(time);
         }
 
