@@ -32,10 +32,10 @@ public class TwoBallController extends BaseAutonController {
     }
 
     private static double
-            kFirstTurnTimeEnd =  2.5,
-            kFirstLegTimeEnd = kFirstTurnTimeEnd+ 4.0,
+            kFirstTurnTimeEnd = 1.5,
+            kFirstLegTimeEnd = kFirstTurnTimeEnd + 3.0,
             kSecondLegTimeEnd = kFirstLegTimeEnd + 2.5,
-            kSecondTurnTimeEnd = kSecondLegTimeEnd + 2.5;
+            kSecondTurnTimeEnd = kSecondLegTimeEnd + 1.0;
 
 
     public void updateImpl() {

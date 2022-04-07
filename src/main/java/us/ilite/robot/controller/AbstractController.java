@@ -93,13 +93,12 @@ public abstract class AbstractController {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(EFeederData.SET_FEEDER_pct, 0.9d);
         indexCargo();
-        db.feeder.set(NUM_BALLS, 0);
     }
     protected void indexCargo() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         //Indexing balls coming in
         if (db.feeder.get(ENTRY_BEAM) == 0d) {
-            if(!mIsBallAdded) {
+            if (!mIsBallAdded) {
                 mNumBalls++;
                 mIsBallAdded = true;
             }
@@ -108,9 +107,9 @@ public abstract class AbstractController {
             mIsBallAdded = false;
         }
         //Indexing balls coming out
-        //Got rid of else if heret
+        //Got rid of else if here
         if (db.feeder.get(EXIT_BEAM) == 0d) {
-            if(!mIsBallOut) {
+            if (!mIsBallOut) {
                 mNumBalls--;
                 mIsBallOut = true;
             }
@@ -122,7 +121,7 @@ public abstract class AbstractController {
 
     protected void stageBalls() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
-        if(db.feeder.get(EXIT_BEAM) == 1d) {
+        if (db.feeder.get(EXIT_BEAM) == 1d) {
             db.feeder.set(SET_FEEDER_pct, 0.4);
         }
     }
@@ -131,6 +130,8 @@ public abstract class AbstractController {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(EFeederData.SET_FEEDER_pct, -0.2);
         db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
+        mNumBalls = 0;
+        db.feeder.set(NUM_BALLS, mNumBalls);
     }
 
     protected void intakeCargo() {
@@ -144,7 +145,7 @@ public abstract class AbstractController {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(SET_FEEDER_pct, -1.0);
         mNumBalls = 0;
-        db.feeder.set(EFeederData.NUM_BALLS, 0);
+        db.feeder.set(EFeederData.NUM_BALLS, mNumBalls);
         db.intake.set(DESIRED_ROLLER_pct, -1.0);
     }
 
