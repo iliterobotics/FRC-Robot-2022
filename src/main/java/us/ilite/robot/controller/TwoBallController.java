@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Angle;
 import us.ilite.common.Distance;
+import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
@@ -21,6 +22,7 @@ public class TwoBallController extends BaseAutonController {
     private boolean mSecondLegComplete = false;
     private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-10), 2);
     private boolean mSecondTurnComplete = false;
+    private DriveStraight mLeaveTarmac = new DriveStraight(Distance.fromFeet(7));
     private Timer mTimer;
     public void initialize() {
         mTimer = new Timer();
@@ -82,8 +84,18 @@ public class TwoBallController extends BaseAutonController {
         else if (time < kSecondTurnTimeEnd) {
             mSecondTurn.update(time);
         }
-        else {
+        else if (time < kSecondTurnTimeEnd + 0.5){
             fireCargo();
+            setIntakeArmEnabled(false);
+        }
+        else if (time < kSecondTurnTimeEnd + 0.6) {
+            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
+            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.0);
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+            mLeaveTarmac.init(time);
+        }
+        else if (time > kSecondTurnTimeEnd + 1.0) {
+            mLeaveTarmac.update(time);
         }
 
     }
