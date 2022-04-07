@@ -48,7 +48,7 @@ public abstract class AbstractController {
         }
         mLastTime = clock.now();
     }
-    public void updateBalls() {
+    public void updateBallCount() {
         db.feeder.set(NUM_BALLS, mNumBalls);
         if (mNumBalls == 0) {
             setLED(Enums.LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
@@ -88,7 +88,7 @@ public abstract class AbstractController {
 
     protected void fireCargo() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
-        db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
+        db.feeder.set(EFeederData.SET_FEEDER_pct, 0.9d);
         indexCargo();
         db.feeder.set(NUM_BALLS, 0);
     }

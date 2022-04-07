@@ -32,7 +32,7 @@ public class TeleopController extends BaseManualController {
         // DO NOT COMMENT OUT THESE METHOD CALLS
         // ========================================
         super.updateDrivetrain();
-        super.updateBalls();
+        super.updateBallCount();
         updateCargo();
         updateHangerMotors();
         updateHangerPneumatics();
