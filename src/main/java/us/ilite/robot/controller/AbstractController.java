@@ -50,6 +50,9 @@ public abstract class AbstractController {
         mLastTime = clock.now();
     }
     public void updateBallCount() {
+        if (mNumBalls < 0) {
+            mNumBalls = 0;
+        }
         if (!db.limelight.isSet(ELimelightData.TV)) {
             if (mNumBalls == 0) {
                 setLED(LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
@@ -60,8 +63,8 @@ public abstract class AbstractController {
             else if (mNumBalls == 2) {
                 setLED(LEDColorMode.PURPLE, Enums.LEDState.SOLID);
             }
-            db.feeder.set(NUM_BALLS, mNumBalls);
         }
+        db.feeder.set(NUM_BALLS, mNumBalls);
     }
 
     /**
@@ -92,6 +95,7 @@ public abstract class AbstractController {
     protected void fireCargo() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(EFeederData.SET_FEEDER_pct, 0.9d);
+        setLED(LEDColorMode.DEFAULT, LEDState.SOLID);
         indexCargo();
     }
     protected void indexCargo() {
@@ -131,7 +135,6 @@ public abstract class AbstractController {
         db.feeder.set(EFeederData.SET_FEEDER_pct, -0.2);
         db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
         mNumBalls = 0;
-        db.feeder.set(NUM_BALLS, mNumBalls);
     }
 
     protected void intakeCargo() {
@@ -145,7 +148,6 @@ public abstract class AbstractController {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(SET_FEEDER_pct, -1.0);
         mNumBalls = 0;
-        db.feeder.set(EFeederData.NUM_BALLS, mNumBalls);
         db.intake.set(DESIRED_ROLLER_pct, -1.0);
     }
 
