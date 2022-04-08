@@ -50,8 +50,7 @@ public class Data {
     public final RobotCodex<EFeederData> feeder = new RobotCodex(NULL_CODEX_VALUE, EFeederData.class);
     public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE , ELimelightData.class);
     public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
-    public final RobotCodex<ELargestPixyData> largestpixydata = new RobotCodex(NULL_CODEX_VALUE, ELargestPixyData.class);
-    public final RobotCodex<ESecondLargestPixyData> secondlargestpixydata = new RobotCodex(NULL_CODEX_VALUE, ESecondLargestPixyData.class);
+    public final RobotCodex<EPixyData> pixydata = new RobotCodex(NULL_CODEX_VALUE, EPixyData.class);
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
             driverinput,
             operatorinput,
@@ -61,7 +60,8 @@ public class Data {
             rawLimelight,
             feeder,
             intake,
-            climber
+            climber,
+            pixydata,
     };
 
     public final Map<String, RobotCodex> mMappedCodex = new HashMap<>();
@@ -77,6 +77,7 @@ public class Data {
             pdp,
             intake,
             climber,
+            pixydata,
     };
 
     //Stores writers per codex needed for CSV logging

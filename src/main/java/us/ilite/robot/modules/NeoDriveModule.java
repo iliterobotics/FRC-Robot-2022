@@ -105,6 +105,11 @@ public class NeoDriveModule extends Module {
         mRightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mRightMaster.setInverted(true);
 
+        mRightMaster.setSmartCurrentLimit(60);
+        mRightFollower.setSmartCurrentLimit(60);
+        mLeftMaster.setSmartCurrentLimit(60);
+        mLeftFollower.setSmartCurrentLimit(60);
+        
         mRightEncoder = mRightMaster.getEncoder();
         mLeftEncoder = mLeftMaster.getEncoder();
 

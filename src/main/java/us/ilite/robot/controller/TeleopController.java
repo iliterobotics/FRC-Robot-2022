@@ -23,7 +23,6 @@ public class TeleopController extends BaseManualController {
     }
 
     private TeleopController() {
-        db.registerAllWithShuffleboard();
     }
 
     @Override
