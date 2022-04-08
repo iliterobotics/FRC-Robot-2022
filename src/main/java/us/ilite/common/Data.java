@@ -19,7 +19,6 @@ import us.ilite.robot.hardware.ECommonNeutralMode;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +50,8 @@ public class Data {
     public final RobotCodex<EFeederData> feeder = new RobotCodex(NULL_CODEX_VALUE, EFeederData.class);
     public final RobotCodex<ELimelightData> limelight = new RobotCodex(NULL_CODEX_VALUE , ELimelightData.class);
     public final RobotCodex<ELEDControlData> ledcontrol = new RobotCodex(NULL_CODEX_VALUE, ELEDControlData.class);
+    public final RobotCodex<ELargestPixyData> largestpixydata = new RobotCodex(NULL_CODEX_VALUE, ELargestPixyData.class);
+    public final RobotCodex<ESecondLargestPixyData> secondlargestpixydata = new RobotCodex(NULL_CODEX_VALUE, ESecondLargestPixyData.class);
     public final RobotCodex[] mAllCodexes = new RobotCodex[]{
             driverinput,
             operatorinput,
