@@ -32,6 +32,7 @@ public abstract class AbstractController {
 
     private boolean mIsBallAdded = false;
     private boolean mIsBallOut = false;
+    private boolean mIsReverseBallAdded = false;
     private int mNumBalls = 0;
 
     public AbstractController(){
@@ -62,6 +63,9 @@ public abstract class AbstractController {
             }
             else if (mNumBalls == 2) {
                 setLED(LEDColorMode.PURPLE, Enums.LEDState.SOLID);
+            }
+            else {
+                setLED(LEDColorMode.ORANGE, LEDState.SOLID);
             }
         }
         db.feeder.set(NUM_BALLS, mNumBalls);
@@ -120,7 +124,20 @@ public abstract class AbstractController {
         } else if (mIsBallOut && db.feeder.get(EXIT_BEAM) == 1d) {
             mIsBallOut = false;
         }
-        db.feeder.set(NUM_BALLS, mNumBalls);
+        updateBallCount();
+    }
+
+    protected void reverseIndex() {
+        //Indexing balls leaving
+        if (db.feeder.get(ENTRY_BEAM) == 0d) {
+            if (!mIsReverseBallAdded) {
+                mNumBalls--;
+                mIsReverseBallAdded = true;
+            }
+        } else if (mIsReverseBallAdded && db.feeder.get(ENTRY_BEAM) == 1d) {
+            mIsReverseBallAdded = false;
+        }
+        updateBallCount();
     }
 
     protected void stageBalls() {
@@ -134,7 +151,7 @@ public abstract class AbstractController {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(EFeederData.SET_FEEDER_pct, -0.2);
         db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
-        mNumBalls = 0;
+        reverseIndex();
     }
 
     protected void intakeCargo() {
@@ -147,8 +164,8 @@ public abstract class AbstractController {
     protected void reverseCargo() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(SET_FEEDER_pct, -1.0);
-        mNumBalls = 0;
         db.intake.set(DESIRED_ROLLER_pct, -1.0);
+        reverseIndex();
     }
 
     protected void setLED(Enums.LEDColorMode pColor, Enums.LEDState pState) {

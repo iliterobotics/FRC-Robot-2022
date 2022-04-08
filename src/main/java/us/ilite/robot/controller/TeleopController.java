@@ -122,6 +122,7 @@ public class TeleopController extends BaseManualController {
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.STAGE_BALLS)) {
                 stageBalls();
             } else {
+                indexCargo();
                 db.feeder.set(SET_FEEDER_pct, 0d);
                 db.intake.set(DESIRED_ROLLER_pct, 0d);
             }
