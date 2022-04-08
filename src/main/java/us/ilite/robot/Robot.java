@@ -62,9 +62,9 @@ public class Robot extends TimedRobot {
     private ReverseFeederIntakeController mReverseController;
     private TwoBallController mTwoBallController;
     private TwoBallTrajectoryController mTwoBalltrajectorycontroller;
-    private ThreeBallTrajectoryAuton mThreeBallAuton;
     private TrajectoryController mTrajectoryController;
     private FourBallTrajectoryAuton mFourBallAuton;
+    private ThreeBallTrajectoryController mThreeBallAuton;
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
         mBlueThreeBallController = new BlueThreeBallController();
         mReverseController = new ReverseFeederIntakeController();
         mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
-        mThreeBallAuton = new ThreeBallTrajectoryAuton();
+        mThreeBallAuton = new ThreeBallTrajectoryController();
         mFourBallAuton = new FourBallTrajectoryAuton();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");

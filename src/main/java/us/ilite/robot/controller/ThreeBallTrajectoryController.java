@@ -22,7 +22,6 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
     private Trajectory mSecondBallPath = TrajectoryGenerator.generateTrajectory(List.of(FIRST_BALL, SECOND_BALL), super.mTrajectoryConfig.setReversed(false));
     private Trajectory mThreeBallPath = TrajectoryGenerator.generateTrajectory(List.of(SECOND_BALL, ROBOT_START), super.mTrajectoryConfig.setReversed(true));
 
-
     //ROBOT COMMANDS
     private FollowTrajectory mFirstTrajectoryCommand = new FollowTrajectory(mFirstBallPath, false);
     private FollowTrajectory mSecondTrajectoryCommand = new FollowTrajectory(mSecondBallPath, false);
@@ -67,5 +66,9 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
         else if (time > mThirdPathTimeEnd + 1.5) {
             fireCargo = true;
         }
+    }
+
+    public Pose2d getStartPose() {
+        return ROBOT_START;
     }
 }

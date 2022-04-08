@@ -97,10 +97,19 @@
     }
   },
   "NetworkTables": {
+    "Shuffleboard": {
+      "Auton Configuration": {
+        "open": true
+      },
+      "open": true
+    },
     "SmartDashboard": {
       "Field": {
         "open": true
       }
     }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
