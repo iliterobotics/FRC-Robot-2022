@@ -7,6 +7,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.EFeederData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.commands.FollowTrajectory;
 
@@ -56,11 +57,14 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
             fireCargo();
         }
         else if (time < mThreeBallPath.getTotalTimeSeconds() + 0.5) { // Move to Ball #1 (in the direction of human player station)
+            intakeCargo();
             mFollower.update(time);
         } else if (time < mThreeBallPath.getTotalTimeSeconds() + 0.6) {
+            intakeCargo();
             mFollower = new FollowTrajectory(mThreeBallReturnPath, false);
             mFollower.init(time);
         } else if (time < (mThreeBallPath.getTotalTimeSeconds() + mThreeBallReturnPath.getTotalTimeSeconds() + 2)) {
+            intakeCargo();
             mFollower.update(time);
         } else {
             fireCargo();
