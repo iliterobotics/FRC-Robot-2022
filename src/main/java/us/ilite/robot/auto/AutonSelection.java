@@ -16,14 +16,14 @@ public class AutonSelection {
      * Update these Auton Controllers whenever new ones are added
      */
     private Class<?>[] mAutonControllers = {
-            ThreeBallController.class,
-            TwoBallController.class,
             ShootMoveController.class,
-            FiveBallController.class,
-            FourBallController.class,
-            TwoBallTrajectoryController.class,
-            FourBallTrajectoryAuton.class,
-            ThreeBallTrajectoryController.class
+            TwoBallController.class,
+            ThreeBallController.class,
+//            FiveBallController.class,
+//            FourBallController.class,
+//            TwoBallTrajectoryController.class,
+//            FourBallTrajectoryAuton.class,
+//            ThreeBallTrajectoryController.class
     };
 
     public AutonSelection() {
