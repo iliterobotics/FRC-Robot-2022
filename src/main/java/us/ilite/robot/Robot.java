@@ -62,7 +62,6 @@ public class Robot extends TimedRobot {
     private ReverseFeederIntakeController mReverseController;
     private TwoBallController mTwoBallController;
     private TwoBallTrajectoryController mTwoBalltrajectorycontroller;
-    private TrajectoryController mTrajectoryController;
     private FourBallTrajectoryAuton mFourBallAuton;
     private ThreeBallTrajectoryController mThreeBallAuton;
     private AbstractController mActiveController = null;
@@ -78,7 +77,6 @@ public class Robot extends TimedRobot {
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
         mTwoBallController = new TwoBallController();
-        mTrajectoryController = new TrajectoryController();
         mBlueThreeBallController = new BlueThreeBallController();
         mReverseController = new ReverseFeederIntakeController();
         mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
@@ -155,7 +153,6 @@ public class Robot extends TimedRobot {
         mAutoController.initialize();
         mNeoDrive.resetOdometry((mAutoController.getStartPose()));
         mNeoDrive.readInputs();
-
         mActiveController.setEnabled(true);
     }
 

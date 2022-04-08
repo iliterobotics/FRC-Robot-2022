@@ -2,10 +2,10 @@
   "HALProvider": {
     "RoboRIO": {
       "6V Rail": {
-        "open": true
+        "open": false
       },
       "RoboRIO Input": {
-        "open": true
+        "open": false
       }
     }
   },
@@ -22,75 +22,30 @@
         }
       },
       "/SmartDashboard/Field": {
-        "Current Trajectory": {
-          "arrows": false,
-          "style": "Track"
-        },
         "Final Shot": {
-          "arrowSize": 10,
-          "color": [
-            0.0,
-            255.0,
-            232.33326721191406,
-            255.0
-          ],
-          "style": "Track"
+          "arrowSize": 10
         },
         "First Leg": {
-          "arrowSize": 10,
-          "color": [
-            0.0,
-            255.0,
-            237.9999542236328,
-            255.0
-          ],
-          "style": "Track"
-        },
-        "First Shoot": {
-          "arrowSize": 11,
-          "color": [
-            0.0,
-            243.66664123535156,
-            255.0,
-            255.0
-          ],
-          "style": "Track"
-        },
-        "Robot": {
-          "color": [
-            0.6090424060821533,
-            0.11149521172046661,
-            0.9407407641410828,
-            255.0
-          ],
-          "style": "Box/Image"
+          "arrowSize": 14
         },
         "Second Leg Ball 3": {
-          "arrowSize": 10,
-          "color": [
-            0.0,
-            255.0,
-            203.99998474121094,
-            255.0
-          ],
+          "arrowSize": 12,
           "style": "Track"
         },
         "Second Leg Ball 4": {
-          "arrowSize": 10,
-          "color": [
-            0.0,
-            255.0,
-            237.9999542236328,
-            255.0
-          ],
+          "arrowSize": 14,
           "style": "Track"
         },
-        "height": 8.229599952697754,
-        "image": "C:\\Users\\Agrim\\Documents\\FRC-Robot-2022\\PathWeaver\\Games\\2022-field-simulateJava.png",
-        "units": "feet",
-        "width": 16.459199905395508,
+        "Second path": {
+          "arrowSize": 10,
+          "style": "Track"
+        },
+        "Third path": {
+          "arrowSize": 15,
+          "style": "Track"
+        },
+        "image": "C:\\Users\\Agrim\\Documents\\FRC-Robot-2022\\PathWeaver\\Games\\2022-field.png",
         "window": {
-          "name": "Rapid React Field",
           "visible": true
         }
       }
@@ -99,17 +54,13 @@
   "NetworkTables": {
     "Shuffleboard": {
       "Auton Configuration": {
-        "open": true
-      },
-      "open": true
+        "open": false
+      }
     },
     "SmartDashboard": {
       "Field": {
-        "open": true
+        "open": false
       }
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }
