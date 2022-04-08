@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.EFeederData;
 import us.ilite.robot.Robot;
@@ -35,8 +36,9 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
   //  private FollowTrajectory mSecondTrajectoryCommand = new FollowTrajectory(mSecondBallPath, false);
 
     //ROBOT PATH TIME ENDS
-    private double mFirstPathTimeEnd = 3.0;
-    private double mSecondPathTimeEnd = mFirstPathTimeEnd + 3.0;
+    private  double mShotTime = 0.5;
+    private double m2ndBallLegTime = 0;
+    private double mReturnShootLeg = 0;
 
 
     private Timer mTimer;
@@ -48,22 +50,26 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
         Robot.FIELD.getObject("Third path").setTrajectory(mThreeBallPath);
         Robot.FIELD.getObject("Fourth path").setTrajectory(mThreeBallReturnPath);
 
+        m2ndBallLegTime = mShotTime + mThreeBallPath.getTotalTimeSeconds();
+        mReturnShootLeg = m2ndBallLegTime + mThreeBallReturnPath.getTotalTimeSeconds();
+
         mFollower = new FollowTrajectory(mThreeBallPath, false);
         mFollower.init(mTimer.get());
     }
     public void updateImpl() {
+        SmartDashboard.putString("Current Trajectory", mFollower.getCurrentTrajectory().toString());
         double time = mTimer.get();
         if (time < 0.5) {
             fireCargo();
         }
-        else if (time < mThreeBallPath.getTotalTimeSeconds() + 0.5) { // Move to Ball #1 (in the direction of human player station)
+        else if (time < m2ndBallLegTime) { // Move to Ball #1 (in the direction of human player station)
             intakeCargo();
             mFollower.update(time);
-        } else if (time < mThreeBallPath.getTotalTimeSeconds() + 0.6) {
+        } else if (time < m2ndBallLegTime + 0.1) {
             intakeCargo();
             mFollower = new FollowTrajectory(mThreeBallReturnPath, false);
             mFollower.init(time);
-        } else if (time < (mThreeBallPath.getTotalTimeSeconds() + mThreeBallReturnPath.getTotalTimeSeconds() + 2)) {
+        } else if (time < mReturnShootLeg) {
             intakeCargo();
             mFollower.update(time);
         } else {
