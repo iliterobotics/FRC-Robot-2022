@@ -264,10 +264,14 @@ public class NeoDriveModule extends Module {
                 break;
             case PATH_FOLLOWING_RAMSETE:
                 //Divide by 6.56 since that is the max velocity in ft/s
-                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
-                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
-                mRightFollower.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
-                mDrive.feed();
+                double vleft = db.drivetrain.get(L_DESIRED_VEL_FT_s);
+                double vright = db.drivetrain.get(R_DESIRED_VEL_FT_s);
+//                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
+//                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
+//                mRightFollower.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
+//                mDrive.feed();
+                mLeftCtrl.setReference((vleft / kWheelCircumferenceFeet) * 60, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+                mRightCtrl.setReference((vright / kWheelCircumferenceFeet) * 60, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
                 break;
         }
     }

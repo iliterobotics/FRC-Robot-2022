@@ -7,6 +7,7 @@ import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -69,7 +70,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        CameraServer.startAutomaticCapture();
+        UsbCamera camera = CameraServer.startAutomaticCapture();
+        camera.setFPS(30);
         CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         mAutonSelection = new AutonSelection();
