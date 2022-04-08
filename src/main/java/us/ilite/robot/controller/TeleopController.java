@@ -1,5 +1,6 @@
 package us.ilite.robot.controller;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
@@ -32,6 +33,7 @@ public class TeleopController extends BaseManualController {
         // ========================================
         super.updateDrivetrain();
         updateCargo();
+        super.updateBallCount();
         updateHangerMotors();
         updateHangerPneumatics();
         updateIntake();
@@ -45,10 +47,14 @@ public class TeleopController extends BaseManualController {
             } else {
                 setLED(Enums.LEDColorMode.RED, Enums.LEDState.SOLID);
             }
-            db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.HUB_UPPER.id());
+            if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+                //These pipelines were tuned at DCMP, and pipeline 2 has the blue alliance one and red has 1
+                db.limelight.set(ELimelightData.TARGET_ID, 2);
+            } else {
+                db.limelight.set(ELimelightData.TARGET_ID, 1);
+            }
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
         } else {
-            setLED(Enums.LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
             db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CAMERA.id());
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
         }

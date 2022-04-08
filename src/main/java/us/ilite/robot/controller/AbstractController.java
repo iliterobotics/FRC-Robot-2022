@@ -12,6 +12,7 @@ import static us.ilite.common.types.drive.EDriveData.*;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.ELEDControlData;
+import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -48,6 +49,23 @@ public abstract class AbstractController {
         }
         mLastTime = clock.now();
     }
+    public void updateBallCount() {
+        if (mNumBalls < 0) {
+            mNumBalls = 0;
+        }
+        if (!db.limelight.isSet(ELimelightData.TV)) {
+            if (mNumBalls == 0) {
+                setLED(LEDColorMode.DEFAULT, Enums.LEDState.SOLID);
+            }
+            else if (mNumBalls == 1) {
+                setLED(LEDColorMode.YELLOW, Enums.LEDState.SOLID);
+            }
+            else if (mNumBalls == 2) {
+                setLED(LEDColorMode.PURPLE, Enums.LEDState.SOLID);
+            }
+        }
+        db.feeder.set(NUM_BALLS, mNumBalls);
+    }
 
     /**
      * Enables / Disables this controller.
@@ -75,14 +93,16 @@ public abstract class AbstractController {
     protected abstract void updateImpl();
 
     protected void fireCargo() {
-        db.feeder.set(EFeederData.SET_FEEDER_pct, 1d);
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        db.feeder.set(EFeederData.SET_FEEDER_pct, 0.9d);
+        setLED(LEDColorMode.DEFAULT, LEDState.SOLID);
         indexCargo();
-        db.feeder.set(NUM_BALLS, 0);
     }
     protected void indexCargo() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         //Indexing balls coming in
         if (db.feeder.get(ENTRY_BEAM) == 0d) {
-            if(!mIsBallAdded) {
+            if (!mIsBallAdded) {
                 mNumBalls++;
                 mIsBallAdded = true;
             }
@@ -91,8 +111,9 @@ public abstract class AbstractController {
             mIsBallAdded = false;
         }
         //Indexing balls coming out
-        else if (db.feeder.get(EXIT_BEAM) == 0d) {
-            if(!mIsBallOut) {
+        //Got rid of else if here
+        if (db.feeder.get(EXIT_BEAM) == 0d) {
+            if (!mIsBallOut) {
                 mNumBalls--;
                 mIsBallOut = true;
             }
@@ -103,14 +124,17 @@ public abstract class AbstractController {
     }
 
     protected void stageBalls() {
-        if(db.feeder.get(EXIT_BEAM) == 1d) {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        if (db.feeder.get(EXIT_BEAM) == 1d) {
             db.feeder.set(SET_FEEDER_pct, 0.4);
         }
     }
 
     protected void placeCargo() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(EFeederData.SET_FEEDER_pct, -0.2);
         db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
+        mNumBalls = 0;
     }
 
     protected void intakeCargo() {
@@ -121,9 +145,9 @@ public abstract class AbstractController {
     }
 
     protected void reverseCargo() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         db.feeder.set(SET_FEEDER_pct, -1.0);
         mNumBalls = 0;
-        db.feeder.set(EFeederData.NUM_BALLS, 0);
         db.intake.set(DESIRED_ROLLER_pct, -1.0);
     }
 

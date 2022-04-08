@@ -6,9 +6,7 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -51,6 +49,7 @@ public class Robot extends TimedRobot {
     private ClimberModule mClimber;
     private NeoDriveModule mNeoDrive;
     private Limelight mLimelight;
+    private AutonSelection mAutonSelection;
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -63,15 +62,18 @@ public class Robot extends TimedRobot {
     private ReverseFeederIntakeController mReverseController;
     private TwoBallController mTwoBallController;
     private TwoBallTrajectoryController mTwoBalltrajectorycontroller;
+    private ThreeBallTrajectoryAuton mThreeBallAuton;
     private TrajectoryController mTrajectoryController;
-    public AutonSelection mAutonSelection;
+    private FourBallTrajectoryAuton mFourBallAuton;
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
     @Override
     public void robotInit() {
+        CameraServer.startAutomaticCapture();
         CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
+        mAutonSelection = new AutonSelection();
         mBaseAutonController = new BaseAutonController();
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
@@ -80,10 +82,10 @@ public class Robot extends TimedRobot {
         mBlueThreeBallController = new BlueThreeBallController();
         mReverseController = new ReverseFeederIntakeController();
         mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
-//        mDrive = new FalconDriveModule();
+        mThreeBallAuton = new ThreeBallTrajectoryAuton();
+        mFourBallAuton = new FourBallTrajectoryAuton();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
-        mAutonSelection = new AutonSelection();
         mOI = new OperatorInput();
         mFeeder = new FeederModule();
         mIntake = new IntakeModule();
@@ -147,10 +149,11 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
-        mNeoDrive.resetOdometry(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+        BaseAutonController mAutoController = mAutonSelection.getSelectedAutonController();
+        mActiveController = mAutoController;
+        mNeoDrive.resetOdometry(mAutoController.getStartPose());
         mNeoDrive.readInputs();
-        mActiveController = mTwoBallController;
-        mTwoBallController.initialize();
+        mAutoController.initialize();
         mActiveController.setEnabled(true);
     }
 
