@@ -7,6 +7,7 @@ import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -50,6 +51,7 @@ public class Robot extends TimedRobot {
     private NeoDriveModule mNeoDrive;
     private Limelight mLimelight;
     private AutonSelection mAutonSelection;
+    private BallTracking mPixy;
 
     private OperatorInput mOI;
     private MatchMetadata mMatchMeta = null;
@@ -62,15 +64,15 @@ public class Robot extends TimedRobot {
     private ReverseFeederIntakeController mReverseController;
     private TwoBallController mTwoBallController;
     private TwoBallTrajectoryController mTwoBalltrajectorycontroller;
-    private ThreeBallTrajectoryAuton mThreeBallAuton;
-    private TrajectoryController mTrajectoryController;
     private FourBallTrajectoryAuton mFourBallAuton;
+    private ThreeBallTrajectoryController mThreeBallAuton;
     private AbstractController mActiveController = null;
     private TestController mTestController;
 
     @Override
     public void robotInit() {
-        CameraServer.startAutomaticCapture();
+        UsbCamera camera = CameraServer.startAutomaticCapture();
+        camera.setFPS(30);
         CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         mAutonSelection = new AutonSelection();
@@ -78,11 +80,10 @@ public class Robot extends TimedRobot {
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
         mTwoBallController = new TwoBallController();
-        mTrajectoryController = new TrajectoryController();
         mBlueThreeBallController = new BlueThreeBallController();
         mReverseController = new ReverseFeederIntakeController();
         mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
-        mThreeBallAuton = new ThreeBallTrajectoryAuton();
+        mThreeBallAuton = new ThreeBallTrajectoryController();
         mFourBallAuton = new FourBallTrajectoryAuton();
         MODE = INITIALIZING;
         mLogger.warn("===> ROBOT INIT Starting");
@@ -93,6 +94,7 @@ public class Robot extends TimedRobot {
         mClimber = new ClimberModule();
         mNeoDrive = new NeoDriveModule();
         mLimelight = new Limelight();
+        mPixy = new BallTracking();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
         }
@@ -142,6 +144,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         MODE = AUTONOMOUS;
+        //Robot.DATA.registerAllWithShuffleboard();
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
@@ -149,11 +152,12 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
+
         BaseAutonController mAutoController = mAutonSelection.getSelectedAutonController();
         mActiveController = mAutoController;
-        mNeoDrive.resetOdometry(mAutoController.getStartPose());
-        mNeoDrive.readInputs();
         mAutoController.initialize();
+        mNeoDrive.resetOdometry((mAutoController.getStartPose()));
+        mNeoDrive.readInputs();
         mActiveController.setEnabled(true);
     }
 
@@ -175,6 +179,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mClimber);
         mRunningModules.addModule(mLEDControl);
+        mRunningModules.addModule(mPixy);
         MODE=TELEOPERATED;
         mActiveController = mTeleopController;
         mActiveController.setEnabled(true);
@@ -225,6 +230,7 @@ public class Robot extends TimedRobot {
 //        mRunningModules.addModule(mLEDControl);
 //        mRunningModules.modeInit(TEST);
 //        mRunningModules.checkModule();
+        Robot.DATA.registerAllWithShuffleboard();
         teleopInit();
     }
 

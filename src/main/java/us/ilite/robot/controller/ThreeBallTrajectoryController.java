@@ -6,66 +6,74 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Timer;
+import us.ilite.common.lib.util.Units;
+import us.ilite.common.types.EFeederData;
 import us.ilite.robot.Robot;
 import us.ilite.robot.commands.FollowTrajectory;
 
 import java.util.List;
 
+import static us.ilite.common.lib.util.Units.feet_to_meters;
+
 public class ThreeBallTrajectoryController extends BaseAutonController {
     //ROBOT POSES
-    public static final Pose2d ROBOT_START = new Pose2d(new Translation2d(28.415, 17.214), Rotation2d.fromDegrees(67.641));
-    public static final Pose2d FIRST_BALL = new Pose2d(new Translation2d(29.083, 25.782), Rotation2d.fromDegrees(45.923));
-    public static final Pose2d SECOND_BALL = new Pose2d(new Translation2d(37.572, 20.987), Rotation2d.fromDegrees(-70.364));
+    public static final Pose2d ROBOT_START = new Pose2d(new Translation2d(Units.feet_to_meters(28.415), Units.feet_to_meters(17.214)), Rotation2d.fromDegrees(67.641));
+ //   public static final Pose2d FIRST_BALL = new Pose2d(new Translation2d(Units.feet_to_meters(29.083), Units.feet_to_meters(24.782)), Rotation2d.fromDegrees(90d));
+    public static final Pose2d SECOND_BALL = new Pose2d(new Translation2d(Units.feet_to_meters(36.572), Units.feet_to_meters(20.987)), Rotation2d.fromDegrees(0d));
 
     //ROBOT TRAJECTORIES
-    private Trajectory mFirstBallPath = TrajectoryGenerator.generateTrajectory(List.of(ROBOT_START, FIRST_BALL), super.mTrajectoryConfig.setReversed(false));
-    private Trajectory mSecondBallPath = TrajectoryGenerator.generateTrajectory(List.of(FIRST_BALL, SECOND_BALL), super.mTrajectoryConfig.setReversed(false));
-    private Trajectory mThreeBallPath = TrajectoryGenerator.generateTrajectory(List.of(SECOND_BALL, ROBOT_START), super.mTrajectoryConfig.setReversed(true));
+  //  private Trajectory mFirstBallPath = TrajectoryGenerator.generateTrajectory(List.of(ROBOT_START, FIRST_BALL), super.mTrajectoryConfig.setReversed(false));
+  //  private Trajectory mSecondBallPath = TrajectoryGenerator.generateTrajectory(List.of(FIRST_BALL, ROBOT_START), super.mTrajectoryConfig.setReversed(true));
+    private Trajectory mThreeBallPath = TrajectoryGenerator.generateTrajectory(List.of(ROBOT_START, SECOND_BALL), super.mTrajectoryConfig.setReversed(false));
+    private Trajectory mThreeBallReturnPath = TrajectoryGenerator.generateTrajectory(List.of(SECOND_BALL, ROBOT_START), super.mTrajectoryConfig.setReversed(true));
 
+    //command that will actually drive the robot
+    private FollowTrajectory mFollower;
 
     //ROBOT COMMANDS
-    private FollowTrajectory mFirstTrajectoryCommand = new FollowTrajectory(mFirstBallPath, false);
-    private FollowTrajectory mSecondTrajectoryCommand = new FollowTrajectory(mSecondBallPath, false);
-    private FollowTrajectory mThirdTrajectoryCommand = new FollowTrajectory(mThreeBallPath, false);
+  //  private FollowTrajectory mFirstTrajectoryCommand = new FollowTrajectory(mFirstBallPath, false);
+  //  private FollowTrajectory mSecondTrajectoryCommand = new FollowTrajectory(mSecondBallPath, false);
 
     //ROBOT PATH TIME ENDS
     private double mFirstPathTimeEnd = 3.0;
     private double mSecondPathTimeEnd = mFirstPathTimeEnd + 3.0;
-    private double mThirdPathTimeEnd = mSecondPathTimeEnd + 3.0;
-    private boolean fireCargo = false;
+
+
     private Timer mTimer;
     public void initialize() {
         mTimer = new Timer();
         mTimer.reset();
-        Robot.FIELD.getObject("First path").setTrajectory(mFirstBallPath);
-        Robot.FIELD.getObject("Second path").setTrajectory(mSecondBallPath);
+        mTimer.start();
+
         Robot.FIELD.getObject("Third path").setTrajectory(mThreeBallPath);
-        mFirstTrajectoryCommand.init(mTimer.get());
+        Robot.FIELD.getObject("Fourth path").setTrajectory(mThreeBallReturnPath);
+
+        mFollower = new FollowTrajectory(mThreeBallPath, false);
+        mFollower.init(mTimer.get());
     }
     public void updateImpl() {
         double time = mTimer.get();
-        if (fireCargo) {
+        if (time < 0.5) {
             fireCargo();
         }
-        else {
+        else if (time < mThreeBallPath.getTotalTimeSeconds() + 0.5) { // Move to Ball #1 (in the direction of human player station)
             intakeCargo();
+            mFollower.update(time);
+        } else if (time < mThreeBallPath.getTotalTimeSeconds() + 0.6) {
+            intakeCargo();
+            mFollower = new FollowTrajectory(mThreeBallReturnPath, false);
+            mFollower.init(time);
+        } else if (time < (mThreeBallPath.getTotalTimeSeconds() + mThreeBallReturnPath.getTotalTimeSeconds() + 2)) {
+            intakeCargo();
+            mFollower.update(time);
+        } else {
+            fireCargo();
         }
-        if (time < 0.5) {
-            fireCargo = true;
-        } else if (time < mFirstPathTimeEnd) {
-            fireCargo = false;
-            mFirstTrajectoryCommand.update(time);
-        } else if (time < mFirstPathTimeEnd + 0.1) {
-            mSecondTrajectoryCommand.init(time);
-        } else if (time < mSecondPathTimeEnd) {
-            mSecondTrajectoryCommand.update(time);
-        } else if (time < mSecondPathTimeEnd + 0.1) {
-            mThirdTrajectoryCommand.init(time);
-        } else if (time < mThirdPathTimeEnd) {
-            mThirdTrajectoryCommand.update(time);
-        }
-        else if (time > mThirdPathTimeEnd + 1.5) {
-            fireCargo = true;
-        }
+
+
+    }
+
+    public Pose2d getStartPose() {
+        return ROBOT_START;
     }
 }

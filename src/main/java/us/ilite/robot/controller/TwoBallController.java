@@ -21,7 +21,7 @@ public class TwoBallController extends BaseAutonController {
     private boolean mFirstLegComplete = false;
     private DriveStraight mSecondLeg = new DriveStraight(Distance.fromInches(-45));
     private boolean mSecondLegComplete = false;
-    private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-10), 2);
+    private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-6), 2);
     private boolean mSecondTurnComplete = false;
     private DriveStraight mLeaveTarmac = new DriveStraight(Distance.fromFeet(7.5));
     private Timer mTimer;

@@ -117,7 +117,7 @@ public class BaseAutonController extends AbstractController {
                 )
         );
         mTrajectoryConfig.addConstraint(new CentripetalAccelerationConstraint(0.5));
-        mTrajectoryConfig.addConstraint(new DifferentialDriveKinematicsConstraint(k,feet_to_meters(NeoDriveModule.kMaxVelocityRPM * NeoDriveModule.kDriveNEOVelocityFactor * 0.25)));
+        mTrajectoryConfig.addConstraint(new DifferentialDriveKinematicsConstraint(k,0.5));
         mTrajectoryConfig.setStartVelocity(0.0);
         mTrajectoryConfig.setEndVelocity(0.0);
     }

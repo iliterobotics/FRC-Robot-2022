@@ -2,50 +2,63 @@ package us.ilite.robot.modules;
 
 import io.github.pseudoresonance.pixy2api.*;
 import io.github.pseudoresonance.pixy2api.links.SPILink;
+import io.github.pseudoresonance.pixy2api.links.Link;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC.*;
-import us.ilite.common.types.ELargestPixyData;
-import us.ilite.common.types.ESecondLargestPixyData;
+import us.ilite.common.types.EPixyData;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 
 public class BallTracking extends Module {
-    SPILink link = new SPILink();
+    Link link = new SPILink();
     Pixy2 pixy = Pixy2.createInstance(link);
-    Block largestBlock = findLargestBLock();
-    Block secondLargestBlock = findSecondLargestBLock();
+    Block largestBlock = null;
+    Block secondLargestBlock = null;
+
+    public BallTracking() {
+        pixy.init();
+        System.out.println("pixy ccc " + pixy.getCCC());
+        largestBlock = findLargestBLock();
+        secondLargestBlock = findSecondLargestBLock();
+    }
 
     public void readInputs() {
-        db.largestpixydata.set(ELargestPixyData.XCoorinate, largestBlock.getX());
-        db.largestpixydata.set(ELargestPixyData.YCoordniate, largestBlock.getY());
-        db.largestpixydata.set(ELargestPixyData.WIDTH, largestBlock.getWidth());
-        db.largestpixydata.set(ELargestPixyData.HEIGHT, largestBlock.getHeight());
-        db.largestpixydata.set(ELargestPixyData.SIGNATURE, largestBlock.getSignature());
-        db.largestpixydata.set(ELargestPixyData.ANGLE_FROM_CAMERA, largestBlock.getAngle());
+        db.pixydata.set(EPixyData.LARGEST_XCoorinate, largestBlock.getX());
+        db.pixydata.set(EPixyData.LARGEST_YCoordniate, largestBlock.getY());
+        db.pixydata.set(EPixyData.LARGEST_WIDTH, largestBlock.getWidth());
+        db.pixydata.set(EPixyData.LARGEST_HEIGHT, largestBlock.getHeight());
+        db.pixydata.set(EPixyData.LARGEST_SIGNATURE, largestBlock.getSignature());
+        db.pixydata.set(EPixyData.LARGEST_ANGLE_FROM_CAMERA, largestBlock.getAngle());
 
-        db.secondlargestpixydata.set(ESecondLargestPixyData.XCoorinate, secondLargestBlock.getX());
-        db.secondlargestpixydata.set(ESecondLargestPixyData.YCoordniate, secondLargestBlock.getY());
-        db.secondlargestpixydata.set(ESecondLargestPixyData.WIDTH, secondLargestBlock.getWidth());
-        db.secondlargestpixydata.set(ESecondLargestPixyData.HEIGHT, secondLargestBlock.getHeight());
-        db.secondlargestpixydata.set(ESecondLargestPixyData.SIGNATURE, secondLargestBlock.getSignature());
-        db.secondlargestpixydata.set(ESecondLargestPixyData.ANGLE_FROM_CAMERA, secondLargestBlock.getAngle());
+        db.pixydata.set(EPixyData.SECOND_LARGEST_XCoorinate, secondLargestBlock.getX());
+        db.pixydata.set(EPixyData.SECOND_LARGEST_YCoordniate, secondLargestBlock.getY());
+        db.pixydata.set(EPixyData.SECOND_LARGEST_WIDTH, secondLargestBlock.getWidth());
+        db.pixydata.set(EPixyData.SECOND_LARGEST_HEIGHT, secondLargestBlock.getHeight());
+        db.pixydata.set(EPixyData.SECOND_LARGEST_SIGNATURE, secondLargestBlock.getSignature());
+        db.pixydata.set(EPixyData.SECOND_LARGEST_ANGLE_FROM_CAMERA, secondLargestBlock.getAngle());
     }
 
 
     public Block findLargestBLock() {
-//        int numBlocks = pixy.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG1, 25);
+        pixy.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG1, 50);
         final ArrayList<Block> blocks = pixy.getCCC().getBlockCache();
         blocks.sort(new Sorter());
-        Block largestBlock = blocks.get(blocks.size() - 1);
-        return largestBlock;
+        if (blocks.size() > 0) {
+            return blocks.get(blocks.size() - 1);
+        } else {
+            return null;
+        }
     }
 
     public Block findSecondLargestBLock() {
-//        int numBlocks = pixy.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG1, 25);
+        pixy.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG1, 50);
         final ArrayList<Block> blocks = pixy.getCCC().getBlockCache();
         blocks.sort(new Sorter());
-        Block largestBlock = blocks.get(blocks.size() - 2);
-        return largestBlock;
+        if (blocks.size() > 1) {
+            return blocks.get(blocks.size() - 2);
+        } else {
+            return null;
+        }
     }
 
     private final class Sorter implements Comparator<Block> {
