@@ -87,8 +87,6 @@ public class CSVLogger {
     public void addToQueue( Log pLog ) {
         if(mIsAcceptingToQueue) {
             kCSVLoggerQueue.add( pLog );
-        } else {
-            System.err.println("FAILED: CANNOT ADD TO QUEUE");
         }
     }
 
