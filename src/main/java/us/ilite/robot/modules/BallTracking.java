@@ -21,13 +21,13 @@ public class BallTracking extends Module {
     public void readInputs() {
 
         if(!isCamera) {
-            state = pixy.init(0);
+            state = pixy.init(1);
             isCamera = state >=0;
             System.out.println("state: " + state);
         }
-        if (!isCamera) {
-            return;
-        }
+//        if (!isCamera) {
+//            return;
+//        }
 
         Block largestBlock = findLargestBLock();
         Block secondLargestBlock = findSecondLargestBLock();
