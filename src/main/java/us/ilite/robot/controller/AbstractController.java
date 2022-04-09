@@ -94,7 +94,7 @@ public abstract class AbstractController {
 
     protected void fireCargo() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
-        db.feeder.set(EFeederData.SET_FEEDER_pct, 0.9d);
+        db.feeder.set(EFeederData.SET_FEEDER_pct, 0.85d);
         setLED(LEDColorMode.DEFAULT, LEDState.SOLID);
         indexCargo();
     }
