@@ -24,6 +24,8 @@ public class Field2022 {
         NULL(0, 0, 0),
         HUB_UPPER (104,48, 1),
 //        TARGET_ZOOM             (0d,0d),
+        RED_BALL(0 , 0, 3),
+        BLUE_BALL(0, 0, 4),
         CAMERA(0,0, 0);
 
         // This is done in inches -- straight from game manual

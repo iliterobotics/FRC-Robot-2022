@@ -49,9 +49,9 @@ public class TeleopController extends BaseManualController {
             if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
                 //These pipelines were tuned at DCMP, and pipeline 2 has the blue alliance one and red has 1
                 //We want to use the opposite, meaning that when we're on the blue alliance use pipeline 1 and vice versa
-                db.limelight.set(ELimelightData.TARGET_ID, 4);
+                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.BLUE_BALL.pipeline());
             } else {
-                db.limelight.set(ELimelightData.TARGET_ID, 3);
+                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.RED_BALL.pipeline());
             }
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
         } else {
