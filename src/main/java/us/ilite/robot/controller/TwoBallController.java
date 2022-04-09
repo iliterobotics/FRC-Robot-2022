@@ -17,9 +17,9 @@ public class TwoBallController extends BaseAutonController {
     //This was -10 initially
     private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(-6), 2);
     private boolean mFirstTurnComplete = false;
-    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromInches(50));
+    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromInches(56));
     private boolean mFirstLegComplete = false;
-    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromInches(-45));
+    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromInches(-51));
     private boolean mSecondLegComplete = false;
     private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-6), 2);
     private boolean mSecondTurnComplete = false;
@@ -32,7 +32,7 @@ public class TwoBallController extends BaseAutonController {
     }
 
     private static double
-            kFirstTurnTimeEnd = 1.5,
+            kFirstTurnTimeEnd = 2.0,
             kFirstLegTimeEnd = kFirstTurnTimeEnd + 3.0,
             kSecondLegTimeEnd = kFirstLegTimeEnd + 2.5,
             kSecondTurnTimeEnd = kSecondLegTimeEnd + 1.0;
@@ -85,21 +85,21 @@ public class TwoBallController extends BaseAutonController {
         else if (time < kSecondTurnTimeEnd) {
             mSecondTurn.update(time);
         }
-        else if (time < kSecondTurnTimeEnd + 1.0){
+        else {
             fireCargo();
             setIntakeArmEnabled(false);
             db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
             db.intake.set(EIntakeData.ROLLER_PCT, 0.0);
         }
-        else if (time < kSecondTurnTimeEnd + 1.1) {
-            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
-            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.0);
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
-            mLeaveTarmac.init(time);
-        }
-        else {
-            mLeaveTarmac.update(time);
-        }
+//        else if (time < kSecondTurnTimeEnd + 1.1) {
+//            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
+//            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.0);
+//            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+//            mLeaveTarmac.init(time);
+//        }
+//        else {
+//            mLeaveTarmac.update(time);
+//        }
 
     }
 }
