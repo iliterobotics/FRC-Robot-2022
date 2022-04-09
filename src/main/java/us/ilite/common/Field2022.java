@@ -63,4 +63,10 @@ public class Field2022 {
 
         public int id() { return ordinal(); }
     }
+
+    public static void main(String[] args) {
+        for(FieldElement anElement: FieldElement.values()) {
+            System.out.println(anElement.name()+" id: " + anElement.id()+", pipeline: "+ anElement.pipeline());
+        }
+    }
 }
