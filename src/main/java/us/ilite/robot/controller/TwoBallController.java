@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Angle;
 import us.ilite.common.Distance;
+import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
@@ -13,14 +14,16 @@ import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
 
 public class TwoBallController extends BaseAutonController {
-    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(-10), 2);
+    //This was -10 initially
+    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(-6), 2);
     private boolean mFirstTurnComplete = false;
-    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromInches(50));
+    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromInches(56));
     private boolean mFirstLegComplete = false;
-    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromInches(-45));
+    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromInches(-51));
     private boolean mSecondLegComplete = false;
-    private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-10), 2);
+    private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(-6), 2);
     private boolean mSecondTurnComplete = false;
+    private DriveStraight mLeaveTarmac = new DriveStraight(Distance.fromFeet(7.5));
     private Timer mTimer;
     public void initialize() {
         mTimer = new Timer();
@@ -29,10 +32,10 @@ public class TwoBallController extends BaseAutonController {
     }
 
     private static double
-            kFirstTurnTimeEnd =  2.5,
-            kFirstLegTimeEnd = kFirstTurnTimeEnd+ 4.0,
+            kFirstTurnTimeEnd = 2.0,
+            kFirstLegTimeEnd = kFirstTurnTimeEnd + 3.0,
             kSecondLegTimeEnd = kFirstLegTimeEnd + 2.5,
-            kSecondTurnTimeEnd = kFirstTurnTimeEnd + 2.5;
+            kSecondTurnTimeEnd = kSecondLegTimeEnd + 1.0;
 
 
     public void updateImpl() {
@@ -84,7 +87,19 @@ public class TwoBallController extends BaseAutonController {
         }
         else {
             fireCargo();
+            setIntakeArmEnabled(false);
+            db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
+            db.intake.set(EIntakeData.ROLLER_PCT, 0.0);
         }
+//        else if (time < kSecondTurnTimeEnd + 1.1) {
+//            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);
+//            db.feeder.set(EFeederData.SET_FEEDER_pct, 0.0);
+//            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+//            mLeaveTarmac.init(time);
+//        }
+//        else {
+//            mLeaveTarmac.update(time);
+//        }
 
     }
 }

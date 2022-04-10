@@ -51,8 +51,8 @@ public class ClimberModule extends Module{
         mCLMR11.configClosedloopRamp(0.5);
 
         //Add 10 ms for current limit
-        mCL12.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 19, 20, 0.01));
-        mCLMR11.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 19, 20, 0.01));
+        mCL12.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 21, 0.01));
+        mCLMR11.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 21, 0.01));
 
         mCLPNDouble = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, 2, 3);
         mCLPNSingle = new DoubleSolenoid(Settings.HW.PCH.kPCHCompressorModule, PneumaticsModuleType.REVPH, 4, 5);

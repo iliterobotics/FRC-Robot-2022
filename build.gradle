@@ -57,11 +57,13 @@ def includeDesktopSupport = false
                 dirs 'lib'
             }
 	    maven { url 'https://jitpack.io' }
+        maven { url 'https://nexus.otake.pw/repository/maven-public/' }
     }
 
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 4.
 dependencies {
+    implementation 'pw.otake.pseudoresonance:pixy2-java-api:1.4.1'
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
     implementation name: 'BobTrajectory'
@@ -70,7 +72,7 @@ dependencies {
     implementation 'com.github.flybotix:highfrequencyrobots:' + HFRVER
     implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
-    implementation 'org.json:json:+'
+   // implementation 'org.json:json:+'
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)

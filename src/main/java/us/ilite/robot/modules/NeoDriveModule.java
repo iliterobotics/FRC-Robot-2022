@@ -80,7 +80,7 @@ public class NeoDriveModule extends Module {
             .slot(VELOCITY_PID_SLOT)
             .velocityConversion(kDriveNEOVelocityFactor);
     public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.02).f(0.1);
-    public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.005);
+    public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.0075);
 
     // ========================================
     // DO NOT MODIFY THESE OTHER CONSTANTS
@@ -105,6 +105,11 @@ public class NeoDriveModule extends Module {
         mRightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mRightMaster.setInverted(true);
 
+        mRightMaster.setSmartCurrentLimit(60);
+        mRightFollower.setSmartCurrentLimit(60);
+        mLeftMaster.setSmartCurrentLimit(60);
+        mLeftFollower.setSmartCurrentLimit(60);
+        
         mRightEncoder = mRightMaster.getEncoder();
         mLeftEncoder = mLeftMaster.getEncoder();
 
@@ -162,6 +167,7 @@ public class NeoDriveModule extends Module {
      */
     public void resetOdometry(Pose2d pose) {
         reset();
+        mGyro.resetAngle(pose.getRotation());
         mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()));
     }
     @Override
@@ -220,15 +226,14 @@ public class NeoDriveModule extends Module {
                     double targetLockOutput = 0;
                     if (db.limelight.isSet(ELimelightData.TV)) {
                         targetLockOutput = mTargetLockPID.calculate(-db.limelight.get(ELimelightData.TX), clock.dt());
+                        turn = targetLockOutput * 0.75;
                     }
-                    leftOutput = targetLockOutput + throttle / 5;
-                    rightOutput = -targetLockOutput + throttle / 5;
-                    if (!db.limelight.isSet(ELimelightData.TX)) {
-                        leftOutput += turn / 5;
-                        rightOutput -= turn / 5;
-                    }
-                    mLeftMaster.set(leftOutput);
-                    mRightMaster.set(rightOutput);
+//                    if (!db.limelight.isSet(ELimelightData.TX)) {
+//                        leftOutput += turn / 5;
+//                        rightOutput -= turn / 5;
+//                    }
+                    mLeftMaster.set(throttle+turn);
+                    mRightMaster.set(throttle-turn);
                 } else {
                     mLeftMaster.set(throttle+turn);
                     mRightMaster.set(throttle-turn);
@@ -263,10 +268,14 @@ public class NeoDriveModule extends Module {
                 break;
             case PATH_FOLLOWING_RAMSETE:
                 //Divide by 6.56 since that is the max velocity in ft/s
-                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
-                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
-                mRightFollower.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
-                mDrive.feed();
+                double vleft = db.drivetrain.get(L_DESIRED_VEL_FT_s);
+                double vright = db.drivetrain.get(R_DESIRED_VEL_FT_s);
+//                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
+//                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
+//                mRightFollower.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
+//                mDrive.feed();
+                mLeftCtrl.setReference((vleft / kWheelCircumferenceFeet) * 60, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+                mRightCtrl.setReference((vright / kWheelCircumferenceFeet) * 60, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
                 break;
         }
     }

@@ -1,6 +1,7 @@
 package us.ilite.robot.modules;
 
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -30,6 +31,7 @@ public class IntakeModule extends Module {
 
     public IntakeModule() {
         mIntakeRoller = new TalonFX(Settings.HW.CAN.kINRoller);
+        mIntakeRoller.configGetSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 14, 15, 0.01));
 //        mIntakeRoller.setInverted(true);
         mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
         mIntakeRoller.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
