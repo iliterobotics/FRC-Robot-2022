@@ -3,17 +3,15 @@ package us.ilite.robot.controller;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
-import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.commands.TurnToDegree;
 
-public class ReverseFeederIntakeController extends BaseAutonController {
+public class TexasSwitchController extends BaseAutonController {
     private Timer mTimer;
     private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(90), 2d);
-    public void initialize(Trajectory pTrajectory) {
-        //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+    public void initialize() {
         mTimer = new Timer();
         mTimer.reset();
         mTimer.start();

@@ -55,7 +55,7 @@ public abstract class AbstractController {
     }
     public void activateFeeder() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
-        //Entry beam has been tripped and then untripped (ball has gone past the entry)
+        //Entry beam has been tripped and has not been untripped (ball has just hit beam break but not entered system)
         if (mEntryGate.get() == XorLatch.State.XOR)  {
             db.feeder.set(SET_FEEDER_pct, 0.4);
             mNumBalls++;
@@ -68,7 +68,7 @@ public abstract class AbstractController {
         }
         //Cargo has past the entrance however there is only one ball so don't do anything yet
         else if (mEntryGate.get() == XorLatch.State.BOTH && mExitGate.get() == XorLatch.State.NONE
-                && mNumBalls < 2) {
+                && mNumBalls == 1) {
             db.feeder.set(SET_FEEDER_pct, 0.0);
             mEntryGate.reset();
         }
@@ -90,11 +90,31 @@ public abstract class AbstractController {
             db.feeder.set(SET_FEEDER_pct, 0.0);
         }
     }
-    public void fireFeeder() {
+    public void fireFeeder(double pSpeed) {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
-        db.feeder.set(SET_FEEDER_pct, 0.9);
+        db.feeder.set(SET_FEEDER_pct, pSpeed);
         if (mExitGate.get() == XorLatch.State.BOTH) {
             mExitGate.reset();
+            mNumBalls--;
+        }
+    }
+    public void placeFeeder() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        db.intake.set(EIntakeData.ROLLER_STATE, ERollerState.PERCENT_OUTPUT);
+        db.feeder.set(SET_FEEDER_pct, -0.2);
+        db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
+        if (mEntryGate.get() == XorLatch.State.BOTH) {
+            mEntryGate.reset();
+            mNumBalls--;
+        }
+    }
+    public void reverseFeeder() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        db.intake.set(EIntakeData.ROLLER_STATE, ERollerState.PERCENT_OUTPUT);
+        db.feeder.set(SET_FEEDER_pct, -1.0);
+        db.intake.set(DESIRED_ROLLER_pct, -1.0);
+        if (mEntryGate.get() == XorLatch.State.BOTH) {
+            mEntryGate.reset();
             mNumBalls--;
         }
     }
