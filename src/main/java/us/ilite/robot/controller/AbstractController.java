@@ -9,6 +9,7 @@ import static us.ilite.common.types.EIntakeData.DESIRED_ROLLER_pct;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
+import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.ELEDControlData;
@@ -33,6 +34,8 @@ public abstract class AbstractController {
     private boolean mIsBallAdded = false;
     private boolean mIsBallOut = false;
     private int mNumBalls = 0;
+    public XorLatch mEntryGate  = new XorLatch();
+    public XorLatch mExitGate = new XorLatch();
 
     public AbstractController(){
         super();
@@ -43,11 +46,42 @@ public abstract class AbstractController {
         if(mEnabled) {
             // split this out so we can put additional common elements here
             updateImpl();
-
+            mExitGate.update(db.feeder.isSet(EXIT_BEAM));
+            mEntryGate.update(db.feeder.isSet(ENTRY_BEAM));
             // Every 10s or so
             mCycleCount++;
         }
         mLastTime = clock.now();
+    }
+    public void activateFeeder() {
+        //TODO figure out how what happens when there is only one ball and we need to stage
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        //Entry beam has been tripped and then untripped (ball has gone past the entry)
+        if (mEntryGate.get() == XorLatch.State.XOR)  {
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+            mNumBalls++;
+        }
+        //Cargo has past the entrance and hasn't reached the exit beam yet and there are two balls
+        else if (mEntryGate.get() == XorLatch.State.BOTH && mExitGate.get() == XorLatch.State.NONE
+                && mNumBalls == 2) {
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+            mEntryGate.reset();
+        }
+        //Cargo has past the entrance however there is only one ball so don't do anything yet
+        else if (mEntryGate.get() == XorLatch.State.BOTH && mExitGate.get() == XorLatch.State.NONE
+                && mNumBalls < 2) {
+            db.feeder.set(SET_FEEDER_pct, 0.0);
+            mEntryGate.reset();
+        } else {
+            db.feeder.set(SET_FEEDER_pct, 0.0);
+        }
+        //Stop indexing if we have hit the exit beam (make sure no balls get shot out prematurely)
+        if (mExitGate.get() == XorLatch.State.XOR) {
+            db.feeder.set(SET_FEEDER_pct, 0.0);
+        } else if (mExitGate.get() == XorLatch.State.BOTH) {
+            mNumBalls--;
+            mExitGate.reset();
+        }
     }
     public void updateBallCount() {
         if (mNumBalls < 0) {
