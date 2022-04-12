@@ -54,14 +54,13 @@ public abstract class AbstractController {
         mLastTime = clock.now();
     }
     public void activateFeeder() {
-        //TODO figure out how what happens when there is only one ball and we need to stage
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         //Entry beam has been tripped and then untripped (ball has gone past the entry)
         if (mEntryGate.get() == XorLatch.State.XOR)  {
             db.feeder.set(SET_FEEDER_pct, 0.4);
             mNumBalls++;
         }
-        //Cargo has past the entrance and hasn't reached the exit beam yet and there are two balls
+        //Cargo has past the entrance and hasn't reached the exit beam yet and another has entered
         else if (mEntryGate.get() == XorLatch.State.BOTH && mExitGate.get() == XorLatch.State.NONE
                 && mNumBalls == 2) {
             db.feeder.set(SET_FEEDER_pct, 0.4);
@@ -72,15 +71,31 @@ public abstract class AbstractController {
                 && mNumBalls < 2) {
             db.feeder.set(SET_FEEDER_pct, 0.0);
             mEntryGate.reset();
-        } else {
+        }
+        //This only happens when there is one ball and another ball has not entered
+        // OR the beam was never tripped in the first place
+        else {
             db.feeder.set(SET_FEEDER_pct, 0.0);
         }
         //Stop indexing if we have hit the exit beam (make sure no balls get shot out prematurely)
         if (mExitGate.get() == XorLatch.State.XOR) {
             db.feeder.set(SET_FEEDER_pct, 0.0);
-        } else if (mExitGate.get() == XorLatch.State.BOTH) {
-            mNumBalls--;
+        }
+    }
+    public void stageFeeder() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        if (mExitGate.get() == XorLatch.State.NONE) {
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+        } else if (mExitGate.get() == XorLatch.State.XOR) {
+            db.feeder.set(SET_FEEDER_pct, 0.0);
+        }
+    }
+    public void fireFeeder() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        db.feeder.set(SET_FEEDER_pct, 0.9);
+        if (mExitGate.get() == XorLatch.State.BOTH) {
             mExitGate.reset();
+            mNumBalls--;
         }
     }
     public void updateBallCount() {
