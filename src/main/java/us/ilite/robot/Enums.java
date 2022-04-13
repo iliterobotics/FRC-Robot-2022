@@ -16,36 +16,18 @@ public class Enums {
     }
 
     public enum EClimberAngle {
-        // Rungs/Stages
-        VERTICAL(90, 0),
-        MID(90, 1),
-        HIGH(-15, 2),
-        TRAVERSAL(-195, 3),
+        //Angles at desired rung
+        MID(90),
+        HIGH(-90),
+        TRAVERSAL(287.5);
 
-        // States
-        START(0),
-        END(45),
-        BALANCE(0);
+        final double kAngle;
 
-        final int kAngle;
-        final int kStage;
-
-        EClimberAngle(int pAngle) {
+        EClimberAngle(double pAngle) {
             kAngle = pAngle;
-            kStage = -1;
         }
-
-        EClimberAngle(int pAngle, int pStage) {
-            kAngle = pAngle;
-            kStage = pStage;
-        }
-
-        public int getAngle() {
+        public double getAngle() {
             return kAngle;
-        }
-
-        public int getStage() {
-            return kStage;
         }
     }
 
