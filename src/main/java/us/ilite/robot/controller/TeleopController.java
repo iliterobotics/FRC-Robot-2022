@@ -120,6 +120,8 @@ public class TeleopController extends BaseManualController {
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.STAGE_BALLS)) {
                 stageBalls();
             } else {
+                mBallsShot = 0;
+                mShotTimer.reset();
                 db.feeder.set(SET_FEEDER_pct, 0d);
                 db.intake.set(DESIRED_ROLLER_pct, 0d);
             }
@@ -128,9 +130,9 @@ public class TeleopController extends BaseManualController {
     private void updateIntake() {
         if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.OPERATOR.EXTEND_INTAKE)) {
-                db.intake.set(ARM_STATE, Enums.EArmState.DEFAULT);
+                setIntakeArmEnabled(true);
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.RETRACT_INTAKE)) {
-                db.intake.set(ARM_STATE, Enums.EArmState.RETRACT);
+                setIntakeArmEnabled(false);
             }
         }
     }

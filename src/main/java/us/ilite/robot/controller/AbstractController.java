@@ -1,6 +1,7 @@
 package us.ilite.robot.controller;
 
 import com.flybotix.hfr.codex.RobotCodex;
+import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.*;
 
 
@@ -26,16 +27,19 @@ import java.util.List;
 public abstract class AbstractController {
     protected final Data db = Robot.DATA;
     protected final Clock clock = Robot.CLOCK;
-    private boolean mEnabled = false;
+    protected boolean mEnabled = false;
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
     protected double dt = 1d;
 
-    private boolean mIsBallAdded = false;
-    private boolean mIsBallOut = false;
-    private int mNumBalls = 0;
-    public XorLatch mEntryGate  = new XorLatch();
-    public XorLatch mExitGate = new XorLatch();
+    protected boolean mIsBallAdded = false;
+    protected boolean mIsBallOut = false;
+    protected int mNumBalls = 0;
+    protected int mBallsShot = 0;
+    protected XorLatch mEntryGate  = new XorLatch();
+    protected XorLatch mExitGate = new XorLatch();
+    protected Timer mShotTimer = new Timer();
+    protected boolean mFireWanted = false;
 
     public AbstractController(){
         super();
@@ -92,9 +96,27 @@ public abstract class AbstractController {
     }
     public void fireFeeder(double pSpeed) {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
-        db.feeder.set(SET_FEEDER_pct, pSpeed);
-        if (mExitGate.get() == XorLatch.State.BOTH) {
+        setIntakeArmEnabled(false);
+        if (mExitGate.get() == XorLatch.State.XOR) {
+            mShotTimer.start();
+            //If there haven't been any balls shot during the fire period go ahead and fire
+            // (no collision is going to occur)
+            if (mBallsShot == 0) {
+                db.feeder.set(SET_FEEDER_pct, pSpeed);
+            }
+            //Otherwise, make sure that you don't potentially hit any other ball
+            else {
+                if (mShotTimer.get() % 2.0 == 0) {
+                    db.feeder.set(SET_FEEDER_pct, pSpeed);
+                }
+                else {
+                    db.feeder.set(SET_FEEDER_pct, 0.0);
+                }
+            }
+        }
+        else if (mExitGate.get() == XorLatch.State.BOTH) {
             mExitGate.reset();
+            mBallsShot++;
             mNumBalls--;
         }
     }
@@ -152,9 +174,11 @@ public abstract class AbstractController {
     }
 
     protected void setIntakeArmEnabled(boolean enabled) {
+        db.intake.set(EIntakeData.ROLLER_STATE, ERollerState.PERCENT_OUTPUT);
         if (enabled) {
             db.intake.set(EIntakeData.ARM_STATE, EArmState.EXTEND);
         } else {
+            db.intake.set(DESIRED_ROLLER_pct, 0.0);
             db.intake.set(EIntakeData.ARM_STATE, EArmState.RETRACT);
         }
     }
