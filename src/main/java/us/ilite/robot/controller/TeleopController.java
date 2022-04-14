@@ -65,11 +65,12 @@ public class TeleopController extends BaseManualController {
         }
     }
     private void updateHangerManual() {
-        db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.HANGER.SPIN_SINGLE)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
                 db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.45);
             } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
                 db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.45);
             }
             if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_DOUBLE)) {
@@ -104,10 +105,11 @@ public class TeleopController extends BaseManualController {
                     db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 }
             } else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
-                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
                 if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) >= 285.5 && db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) <= 289.5) {
                     db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                } else {
+                    db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
                 }
             }
         }
