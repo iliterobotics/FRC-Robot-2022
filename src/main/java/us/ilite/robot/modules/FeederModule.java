@@ -24,7 +24,7 @@ public class FeederModule extends Module {
     private final DigitalBeamSensor mExitBeamBreaker;
 
     // ========================================
-    // DO NOT MODIFY THESE METHOD CONSTANTS
+    // DO NOT MODIFY THESE HARDWARE CONSTANTS
     // ========================================
     public static final double kFeederGearRatio = (12.0 / 64.0) * (30.0 / 80.0);
     public static final double kFeederWheelDiameterInches = 2.5 / 12.0;
@@ -39,14 +39,11 @@ public class FeederModule extends Module {
 
     public FeederModule () {
         mIntakeFeeder = new TalonFX(Settings.HW.CAN.kINFeeder);
-        mIntakeFeeder.setStatusFramePeriod(StatusFrame.Status_1_General, 20);
-        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
-        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);
-        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_9_MotProfBuffer, 255);
-        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
-
         mEntryBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
         mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINExitBeam, kDebounceTime);
+        mIntakeFeeder.configPeakOutputForward(1.0, 20);
+        mIntakeFeeder.configPeakOutputReverse(1.0, 20);
+        setStatusFrames();
         HardwareUtils.setGains(mIntakeFeeder, kVelocityGains);
     }
 
@@ -74,12 +71,17 @@ public class FeederModule extends Module {
                 mIntakeFeeder.set(TalonFXControlMode.PercentOutput, db.feeder.get(SET_FEEDER_pct));
                 break;
             case VELOCITY:
-                mIntakeFeeder.set(TalonFXControlMode.Velocity, feetPerSecondToTicksPerHundredMS(db.feeder.get(SET_VELOCITY_ft_s)));
+                mIntakeFeeder.set(TalonFXControlMode.Velocity, rpmToTicksPer100ms(db.feeder.get(SET_VELOCITY_rpm)));
                 break;
         }
     }
-
-    private double feetPerSecondToTicksPerHundredMS(double pFps) {
-        return pFps / kVelocityConversion;
+    private void setStatusFrames() {
+        mIntakeFeeder.setStatusFramePeriod(StatusFrame.Status_1_General, 20);
+        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255);
+        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 255);
+        mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
+    }
+    private double rpmToTicksPer100ms(double pRPM) {
+        return pRPM / kScaledRPMConversion;
     }
 }
