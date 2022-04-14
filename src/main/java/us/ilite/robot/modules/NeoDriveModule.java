@@ -166,6 +166,7 @@ public class NeoDriveModule extends Module {
      * @param pose The pose to which to set the odometry.
      */
     public void resetOdometry(Pose2d pose) {
+        //TODO figure out when to invert the heading of the gyro
         reset();
         mGyro.resetAngle(pose.getRotation());
         mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()));
@@ -214,10 +215,11 @@ public class NeoDriveModule extends Module {
                 reset();
                 break;
             case RESET_ODOMETRY:
+                //TODO figure out when to invert the heading of the gyro
                 double x = db.drivetrain.get(X_DESIRED_ODOMETRY_METERS);
-                double y = db.drivetrain.get(X_DESIRED_ODOMETRY_METERS);
-                mGyro.zeroAll();
-                resetOdometry(new Pose2d(x, y, new Rotation2d(-mGyro.getYaw().getRadians())));
+                double y = db.drivetrain.get(Y_DESIRED_ODOMETRY_METERS);
+                mGyro.resetAngle(Rotation2d.fromDegrees(db.drivetrain.get(DESIRED_HEADING_deg)));
+                resetOdometry(new Pose2d(x, y, mGyro.getHeading()));
                 break;
             case PERCENT_OUTPUT:
                 double leftOutput = 0;
