@@ -2,30 +2,52 @@ package us.ilite.common.types;
 
 public enum EClimberModuleData {
     /**Actual left velocity in rpm**/
-    L_VEL_rpm,
+    ACTUAL_VEL_rpm,
+
     /**Actual left position in degrees**/
-    L_POSITION_deg,
+    ACTUAL_POSITION_deg,
+
     /**Left output in current**/
-    L_OUTPUT_CURRENT,
+    ACTUAL_OUTPUT_CURRENT,
+
     /**Bus voltage left**/
-    BUS_VOLTAGE_LEFT,
+    ACTUAL_BUS_VOLTAGE,
+
     /**Left position target**/
-    L_POSITION_TARGET,
+    ACTUAL_POSITION_TARGET,
+
     /**Left position error**/
-    L_POSITION_ERROR,
+    ACTUAL_POSITION_ERROR,
+
     /**Desired velocity in rpm**/
     DESIRED_VEL_rpm,
+
     /**Desired position in degrees**/
     DESIRED_POS_deg,
+
     /**Desired velocity in percent of maximum velocity**/
     DESIRED_VEL_pct,
+
     /**State of the hanger**/
     HANGER_STATE,
-    /**State if the double clamp is clamped**/
+
+    /**State of the double-sided clamp**/
     IS_DOUBLE_CLAMPED,
-    /**State if the single clamp is clamped**/
+
+    /**State of the single-sided clamp**/
     IS_SINGLE_CLAMPED,
+
     /**State if the coast is set**/
     SET_COAST,
-    L_ACTUAL_CLIMBER_PCT,
+
+    /**Applied velocity in percent of maximum velocity**/
+    ACTUAL_CLIMBER_PCT,
+
+    // ========================== //
+    // ====== Experimental ====== //
+    // ========================== //
+
+    DESIRED_RUNG,
+    CURRENT_RUNG,
+    STAGE
     }

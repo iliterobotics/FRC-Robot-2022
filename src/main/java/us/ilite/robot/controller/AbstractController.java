@@ -9,10 +9,7 @@ import static us.ilite.common.types.EIntakeData.DESIRED_ROLLER_pct;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
-import us.ilite.common.types.EFeederData;
-import us.ilite.common.types.EIntakeData;
-import us.ilite.common.types.ELEDControlData;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -65,6 +62,12 @@ public abstract class AbstractController {
             }
         }
         db.feeder.set(NUM_BALLS, mNumBalls);
+    }
+
+    protected boolean climberWithinTolerance(double pTolerance) {
+        Enums.EClimberAngle current = db.climber.get(EClimberModuleData.CURRENT_RUNG, Enums.EClimberAngle.class);
+        Enums.EClimberAngle desired = db.climber.get(EClimberModuleData.DESIRED_RUNG, Enums.EClimberAngle.class);
+        return Math.abs(current.getAngle() - desired.getAngle()) < pTolerance;
     }
 
     /**

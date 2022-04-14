@@ -17,9 +17,12 @@ public class Enums {
 
     public enum EClimberAngle {
         //Angles at desired rung
-        MID(90),
-        HIGH(-90),
-        TRAVERSAL(287.5);
+        NULL(0.0),
+        MID(-90.0),
+        HIGH(90.0),
+        BALANCED(60.0),
+        TRAVERSAL(287.5),
+        SCORE(250.0);
 
         final double kAngle;
 

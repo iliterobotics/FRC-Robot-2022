@@ -1,6 +1,7 @@
 package us.ilite.robot.controller;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
@@ -15,6 +16,8 @@ public class TeleopController extends BaseManualController {
 
     private static TeleopController INSTANCE;
 
+    private Timer mClimbTimer;
+
     public static TeleopController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new TeleopController();
@@ -23,6 +26,9 @@ public class TeleopController extends BaseManualController {
     }
 
     private TeleopController() {
+        mClimbTimer = new Timer();
+        mClimbTimer.reset();
+        mClimbTimer.start();
     }
 
     @Override
@@ -36,7 +42,8 @@ public class TeleopController extends BaseManualController {
         updateHangerManual();
         updateIntake();
         updateTargetLock();
-        updateAutomaticHanger();
+//        updateAutomaticHanger();
+        updateRungs(); // TODO Fix experimental balancing values and test timer and overall logic
     }
 
     private void updateTargetLock() {
@@ -86,23 +93,80 @@ public class TeleopController extends BaseManualController {
             if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.MID.getAngle());
                 //Clamp within two degrees of the desired angle (two is the closed loop error)
-                if (db.climber.get(EClimberModuleData.L_POSITION_deg) <= -88
-                        && db.climber.get(EClimberModuleData.L_POSITION_deg) >= -92) {
+                if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) <= -88
+                        && db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) >= -92) {
                     db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 }
             } else if (db.operatorinput.isSet(InputMap.HANGER.HIGH_RUNG)) {
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.HIGH.getAngle());
-                if (db.climber.get(EClimberModuleData.L_POSITION_deg) >= 88
+                if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) >= 88
                         && db.climber.get(EClimberModuleData.DESIRED_POS_deg) <= 92) {
                     db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 }
             } else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
                 db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
-                if (db.climber.get(EClimberModuleData.L_POSITION_deg) >= 285.5 && db.climber.get(EClimberModuleData.L_POSITION_deg) <= 289.5) {
+                if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) >= 285.5 && db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) <= 289.5) {
                     db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 }
             }
+        }
+    }
+
+    private void updateRungs() {
+        double angle = db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg);
+        if (Math.abs(angle - Enums.EClimberAngle.MID.getAngle()) < 2.0) {
+            db.climber.set(EClimberModuleData.CURRENT_RUNG, Enums.EClimberAngle.MID);
+        } else if (Math.abs(angle - Enums.EClimberAngle.HIGH.getAngle()) < 2.0) {
+            db.climber.set(EClimberModuleData.CURRENT_RUNG, Enums.EClimberAngle.HIGH);
+        } else if (Math.abs(angle - Enums.EClimberAngle.TRAVERSAL.getAngle()) < 2.0) {
+            db.climber.set(EClimberModuleData.CURRENT_RUNG, Enums.EClimberAngle.TRAVERSAL);
+        }
+
+        Enums.EClimberAngle desiredRung = db.climber.get(EClimberModuleData.DESIRED_RUNG, Enums.EClimberAngle.class);
+
+        int stage = (int)db.climber.get(EClimberModuleData.STAGE);
+        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) { // If DRIVER is holding [START]
+            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+            if (db.operatorinput.isSet(InputMap.HANGER.CLIMB_TO_NEXT_RUNG)) { // If OPERATOR is holding [RB]
+                if (stage == 0) { // Heading towards Mid-Bar
+                    desiredRung = Enums.EClimberAngle.MID;
+                    if (climberWithinTolerance(2.0)) { // If the climber error is less than 2 degrees
+                        db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                        db.climber.set(EClimberModuleData.STAGE, 1);
+                        mClimbTimer.reset();
+                    }
+                } else if (stage == 1) { // Heading towards High-Bar
+                    desiredRung = Enums.EClimberAngle.HIGH;
+                    if (climberWithinTolerance(2.0)) { // If the climber error is less than 2 degrees
+                        db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                        db.climber.set(EClimberModuleData.STAGE, 2);
+                        mClimbTimer.reset();
+                    }
+                } else if (stage == 2) { // Balancing out at High-Bar
+                    desiredRung = Enums.EClimberAngle.BALANCED;
+                    if (climberWithinTolerance(2.0)) { // If the climber error is less than 2 degrees
+                        db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+                        db.climber.set(EClimberModuleData.STAGE, 3);
+                        mClimbTimer.reset();
+                    }
+                } else if (stage == 3) { // Heading towards Traversal-Bar
+                    desiredRung = Enums.EClimberAngle.TRAVERSAL;
+                    if (climberWithinTolerance(2.0)) { // If the climber error is less than 2 degrees
+                        db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                        db.climber.set(EClimberModuleData.STAGE, 4);
+                        mClimbTimer.reset();
+                    }
+                } else if (stage == 4) { // Score the climb
+                    desiredRung = Enums.EClimberAngle.SCORE;
+                    db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+                }
+
+                if (mClimbTimer.get() > 0.25) { // Give a quarter of a second for pneumatics to properly actuate before moving on the the next rung
+                    db.climber.set(EClimberModuleData.DESIRED_POS_deg, desiredRung.getAngle());
+                }
+            }
+
         }
     }
 

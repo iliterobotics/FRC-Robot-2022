@@ -16,7 +16,6 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.hardware.HardwareUtils;
 
 import static us.ilite.common.types.EClimberModuleData.*;
-import static us.ilite.common.types.EFeederData.ACTUAL_FEEDER_pct;
 
 public class ClimberModule extends Module{
     private final TalonFX mCLMR11;
@@ -88,19 +87,19 @@ public class ClimberModule extends Module{
     public void modeInit(EMatchMode mode) {
         if (mode == EMatchMode.TELEOPERATED) {
             mCLMR11.configClearPositionOnQuadIdx(true, 20);
-            db.climber.set(L_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
+            db.climber.set(ACTUAL_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
         }
     }
 
     @Override
     public void readInputs() {
-        db.climber.set(L_VEL_rpm, mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM);
-        db.climber.set(L_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
-        db.climber.set(L_POSITION_TARGET, mCL12.getClosedLoopTarget());
-        db.climber.set(L_POSITION_ERROR, mCL12.getClosedLoopError());
-        db.climber.set(L_OUTPUT_CURRENT, mCL12.getStatorCurrent());
-        db.climber.set(BUS_VOLTAGE_LEFT, mCL12.getMotorOutputVoltage());
-        db.climber.set(L_ACTUAL_CLIMBER_PCT, (mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM) / (6380 * kClimberRatio));
+        db.climber.set(ACTUAL_VEL_rpm, mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM);
+        db.climber.set(ACTUAL_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
+        db.climber.set(ACTUAL_POSITION_TARGET, mCL12.getClosedLoopTarget());
+        db.climber.set(ACTUAL_POSITION_ERROR, mCL12.getClosedLoopError());
+        db.climber.set(ACTUAL_OUTPUT_CURRENT, mCL12.getStatorCurrent());
+        db.climber.set(ACTUAL_BUS_VOLTAGE, mCL12.getMotorOutputVoltage());
+        db.climber.set(ACTUAL_CLIMBER_PCT, (mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM) / (6380 * kClimberRatio));
     }
 
     @Override
@@ -122,7 +121,7 @@ public class ClimberModule extends Module{
                 mCLMR11.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.DESIRED_VEL_pct));
                 break;
             case VELOCITY:
-                double desiredVel = mVelocityPID.calculate(db.climber.get(EClimberModuleData.L_VEL_rpm), clock.getCurrentTimeInMillis());
+                double desiredVel = mVelocityPID.calculate(db.climber.get(EClimberModuleData.ACTUAL_VEL_rpm), clock.getCurrentTimeInMillis());
                 mCL12.set(ControlMode.Velocity, desiredVel);
                 mCLMR11.set(ControlMode.Velocity, desiredVel);
                 break;
