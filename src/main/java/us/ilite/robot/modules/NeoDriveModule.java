@@ -224,9 +224,12 @@ public class NeoDriveModule extends Module {
                     double targetLockOutput = 0;
                     if (db.limelight.isSet(ELimelightData.TV)) {
                         targetLockOutput = mTargetLockPID.calculate(-db.limelight.get(ELimelightData.TX), clock.dt());
-                        turn = targetLockOutput * 0.75;
+                        turn = targetLockOutput;
                     }
+
+                    turn *= (1/(1-throttle)) * 0.5;
                 }
+
                 mLeftMaster.set(throttle+turn);
                 mRightMaster.set(throttle-turn);
                 break;

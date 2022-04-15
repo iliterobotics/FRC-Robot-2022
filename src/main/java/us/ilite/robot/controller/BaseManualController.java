@@ -34,8 +34,13 @@ public abstract class BaseManualController extends AbstractController {
         rotate = Math.abs(rotate) > 0.02 ? rotate : 0.0; //Handling Deadband
         throttle = Math.abs(throttle) > 0.02 ? throttle : 0.0; //Handling Deadband
 
+        if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
+            throttle *= Settings.Input.kSnailModePercentThrottleReduction;
+            rotate *= Settings.Input.kSnailModePercentRotateReduction;
+        }
+
         if (db.driverinput.isSet(TARGET_LOCK)) {
-            db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
+            db.drivetrain.set(DESIRED_THROTTLE_PCT, Math.min(throttle, 0.75));
             db.drivetrain.set(DESIRED_TURN_PCT, rotate);
         } else {
             if (throttle == 0.0 && rotate != 0.0) {
@@ -44,10 +49,10 @@ public abstract class BaseManualController extends AbstractController {
             DriveMessage d = new DriveMessage().throttle(throttle).turn(rotate).normalize();
             throttle = d.getThrottle();
             rotate = d.getTurn();
-            if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
-                throttle *= Settings.Input.kSnailModePercentThrottleReduction;
-                rotate *= Settings.Input.kSnailModePercentRotateReduction;
-            }
+//            if (db.driverinput.isSet(SNAIL_MODE) && db.driverinput.get(SNAIL_MODE) > DRIVER_SUB_WARP_AXIS_THRESHOLD) {
+//                throttle *= Settings.Input.kSnailModePercentThrottleReduction;
+//                rotate *= Settings.Input.kSnailModePercentRotateReduction;
+//            }
             db.drivetrain.set(DESIRED_THROTTLE_PCT, throttle);
             db.drivetrain.set(DESIRED_TURN_PCT, rotate);
         }
