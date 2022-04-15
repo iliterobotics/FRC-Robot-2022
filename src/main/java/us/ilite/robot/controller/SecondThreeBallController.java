@@ -19,15 +19,22 @@ public class SecondThreeBallController extends BaseAutonController {
     private DriveStraight mFirstLeg = new DriveStraight(Distance.fromInches(118.75));
     private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(104.5937), 2.0);
     private DriveStraight mSecondLeg = new DriveStraight(Distance.fromInches(117.470));
+    //TODO play with the distances on the last turn and last leg
+    private TurnToDegree mThirdTurn = new TurnToDegree(Rotation2d.fromDegrees(-120), 2.0);
+    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromInches(-120));
     private double mFirstTurnTime = 2.0,
                    mFirstLegTime = mFirstTurnTime + 4.0,
                    mSecondTurnTime = mFirstLegTime + 2.0,
-                   mSecondLegTime = mSecondTurnTime + 4.0;
+                   mSecondLegTime = mSecondTurnTime + 4.0,
+                   mThirdTurnTime = mSecondLegTime + 2.0,
+                   mThirdLegTime = mThirdTurnTime + 4.0;
     private boolean fire = false;
     private boolean mFirstTurnDone = false;
     private boolean mFirstLegDone = false;
     private boolean mSecondTurnDone = false;
     private boolean mSecondLegDone = false;
+    private boolean mThirdTurnDone = false;
+    private boolean mThirdLegDone = false;
     public SecondThreeBallController() {
         mTimer = new Timer();
     }
@@ -36,11 +43,6 @@ public class SecondThreeBallController extends BaseAutonController {
         mTimer.start();
     }
     public void updateImpl() {
-        if (fire) {
-            fireCargo();
-        } else {
-            intakeCargo();
-        }
         double time = mTimer.get();
         if (mTimer.get() < 0.5) {
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
@@ -73,6 +75,27 @@ public class SecondThreeBallController extends BaseAutonController {
             if (mSecondLegDone) {
                 db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
             }
+        } else if (time < mSecondLegTime + 0.1) {
+            mThirdTurn.init(time);
+        } else if (time < mThirdTurnTime) {
+            mThirdTurnDone = mThirdTurn.update(time) || time > mThirdTurnTime;
+            if (mThirdTurnDone) {
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+            }
+        } else if (time < mThirdTurnTime + 0.1) {
+            mThirdLeg.init(time);
+        } else if (time < mThirdLegTime) {
+            mThirdLegDone = mThirdLeg.update(time) || time > mThirdLegTime;
+            if (mThirdTurnDone) {
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+            }
+        } else {
+            fire = true;
+        }
+        if (fire) {
+            fireCargo();
+        } else {
+            intakeCargo();
         }
     }
 }
