@@ -13,7 +13,8 @@ import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
 import us.ilite.robot.modules.NeoDriveModule;
 
-public class ThreeBallController extends BaseAutonController{
+public class ThreeBallController extends BaseAutonController {
+    //Note that positive is clockwise and that negative is counter clockwise
     public Timer mTimer;
     //Old - 5.6
     private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(5.6));
@@ -28,8 +29,7 @@ public class ThreeBallController extends BaseAutonController{
     //Old - -6.4
     private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(-6.4));
     private boolean mThirdLegComplete = false;
-    public void initialize(Trajectory pTrajectory) {
-        //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
+    public void initialize() {
         mTimer = new Timer();
         mTimer.reset();
         mTimer.start();

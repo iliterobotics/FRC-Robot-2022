@@ -6,70 +6,73 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
 import us.ilite.common.types.EIntakeData;
+import us.ilite.common.types.drive.EDriveData;
+import us.ilite.robot.Enums;
 import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
 
 public class SecondThreeBallController extends BaseAutonController {
-    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(3.5));
-    private Boolean mFirstLegComplete = false;
-    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromFeet(-3.0));
-    private boolean mSecondLegComplete = false;
-    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromFeet(5.0));
-    private boolean mThirdLegComplete = false;
-    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(60d), 2d);
-    private boolean mFirstTurnComplete = false;
-    private DriveStraight mFourthLeg = new DriveStraight(Distance.fromFeet(5));
-    private boolean mFourthLegComplete = false;
-    private DriveStraight mFifthLeg = new DriveStraight(Distance.fromFeet(-4.5));
-    private boolean mFifthLegComplete = false;
     private Timer mTimer;
-
-    public void initialize(Trajectory pTrajectory) {
+    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(-14.5937), 2.0);
+    //TODO actual distance from right up the hub to 1st ball is 118.75 inches, but that might be too much.
+    // Play with the distance
+    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromInches(118.75));
+    private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(104.5937), 2.0);
+    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromInches(117.470));
+    private double mFirstTurnTime = 2.0,
+                   mFirstLegTime = mFirstTurnTime + 4.0,
+                   mSecondTurnTime = mFirstLegTime + 2.0,
+                   mSecondLegTime = mSecondTurnTime + 4.0;
+    private boolean fire = false;
+    private boolean mFirstTurnDone = false;
+    private boolean mFirstLegDone = false;
+    private boolean mSecondTurnDone = false;
+    private boolean mSecondLegDone = false;
+    public SecondThreeBallController() {
         mTimer = new Timer();
+    }
+    public void initialize() {
         mTimer.reset();
         mTimer.start();
-        mFirstLeg.init(mTimer.get());
     }
-
-    private static double
-            kFirstLegTimeEnd = 2.5,
-            kSecondLegTimeEnd = kFirstLegTimeEnd + 2.5,
-            kCargoFireTime = kSecondLegTimeEnd + 1.5,
-            kFirstTurTimeEnd = kCargoFireTime + 0.1 + 3.0,
-            kThirdLegTimeEnd = kCargoFireTime + 3.0;
     public void updateImpl() {
-        double time = mTimer.get();
-        if (time < 0.5) {
-            intakeCargo();
-            SmartDashboard.putString("Auton State", "Intake Out");
-        }
-        else if (time < kFirstLegTimeEnd) {
-            intakeCargo();
-            mFirstLegComplete = mFirstLeg.update(time) || time > kFirstLegTimeEnd;
-            SmartDashboard.putString("Auton State", "First Leg " + mFirstLegComplete);
-        }
-        else if (time < kSecondLegTimeEnd) {
-            SmartDashboard.putString("Auton State", "Second Leg");
-            indexCargo();
-            mSecondLegComplete = mSecondLeg.update(time) || time > kSecondLegTimeEnd;
-            setIntakeArmEnabled(false);
-            db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 0.0);
-        }
-        else if (time < kCargoFireTime) {
-            SmartDashboard.putString("Auton State", "Firing");
+        if (fire) {
             fireCargo();
-        }
-        else if (time < kCargoFireTime + 0.1) {
-            SmartDashboard.putString("Auton State", "Preparing for 1st turn");
-            mFirstTurn.init(time);
-        }
-        else if (time < kFirstLegTimeEnd) {
-            SmartDashboard.putString("Auton State", "Turning");
-            mFirstTurnComplete = mFirstTurn.update(time) || time > kFirstLegTimeEnd;
+        } else {
             intakeCargo();
         }
-        else {
-            stopDrivetrain();
+        double time = mTimer.get();
+        if (mTimer.get() < 0.5) {
+            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+            mFirstTurn.init(time);
+            fire = true;
+        } else if (time < mFirstTurnTime) {
+            fire = false;
+            mFirstTurnDone = mFirstTurn.update(time) || time > mFirstTurnTime;
+            if (mFirstTurnDone) {
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+            }
+        } else if (time < mFirstTurnTime + 0.1) {
+            mFirstLeg.init(time);
+        } else if (time < mFirstLegTime) {
+            mFirstLegDone = mFirstLeg.update(time) || time > mFirstLegTime;
+            if (mFirstLegDone) {
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+            }
+        } else if (time < mFirstLegTime + 0.1) {
+            mSecondTurn.init(time);
+        } else if (time < mSecondTurnTime) {
+            mSecondTurnDone = mSecondTurn.update(time) || time > mSecondTurnTime;
+            if (mSecondTurnDone) {
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+            }
+        } else if (time < mSecondTurnTime + 0.1) {
+            mSecondLeg.init(time);
+        } else if (time < mSecondLegTime) {
+            mSecondLegDone = mSecondLeg.update(time) || time > mSecondLegTime;
+            if (mSecondLegDone) {
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
+            }
         }
     }
 }
