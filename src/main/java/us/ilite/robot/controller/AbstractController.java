@@ -94,7 +94,8 @@ public abstract class AbstractController {
             db.feeder.set(SET_FEEDER_pct, 0.0);
         }
     }
-    public void fireFeeder(double pSpeed) {
+    public void fireFeeder(double pSpeed, double pPulseSpeed) {
+        //TODO eventually move this to velocity mode and use rpm
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         setIntakeArmEnabled(false);
         if (mExitGate.get() == XorLatch.State.XOR) {
@@ -106,7 +107,7 @@ public abstract class AbstractController {
             }
             //Otherwise, make sure that you don't potentially hit any other ball
             else {
-                if (mShotTimer.get() % 2.0 == 0) {
+                if (mShotTimer.get() % pPulseSpeed == 0) {
                     db.feeder.set(SET_FEEDER_pct, pSpeed);
                 }
                 else {
