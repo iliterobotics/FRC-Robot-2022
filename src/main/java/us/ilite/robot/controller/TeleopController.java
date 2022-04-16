@@ -14,6 +14,7 @@ import static us.ilite.common.types.EFeederData.*;
 public class TeleopController extends BaseManualController {
 
     private static TeleopController INSTANCE;
+    private boolean mPressed = false, mPrevPressed = false;
 
     public static TeleopController getInstance() {
         if (INSTANCE == null) {
@@ -105,28 +106,22 @@ public class TeleopController extends BaseManualController {
         }
     }
 
-
-    private boolean mPressed = false, mPrevPressed = false;
     private void updateCargo() {
         db.feeder.set(ADJUSTABLE_FEEDER_PCT, mFeederFireSpeed);
-
         if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-
-            if (db.operatorinput.isSet(InputMap.OPERATOR.INCREASE_FEEDER_SPEED) || db.operatorinput.isSet(InputMap.OPERATOR.DECREASE_FEEDER_SPEED)) {
+            if (db.operatorinput.isSet(InputMap.OPERATOR.INCREASE_FEEDER_SPEED) ||
+                    db.operatorinput.isSet(InputMap.OPERATOR.DECREASE_FEEDER_SPEED)) {
                 mPressed = true;
             } else {
                 mPressed = false;
             }
-
             if (mPressed && !mPrevPressed && db.operatorinput.isSet(InputMap.OPERATOR.INCREASE_FEEDER_SPEED)) {
-                mFeederFireSpeed += 0.05;
+                mFeederFireSpeed += 500d;
             } else if (mPressed && !mPrevPressed && db.operatorinput.isSet(InputMap.OPERATOR.DECREASE_FEEDER_SPEED)) {
-                mFeederFireSpeed -= 0.05;
+                mFeederFireSpeed -= 500d;
             }
-
             if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_CARGO)) {
-//                fireFeeder(db.feeder.get(SET_FEEDER_pct), 0.25);
                 fireCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
                 db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
@@ -148,7 +143,6 @@ public class TeleopController extends BaseManualController {
                 db.intake.set(DESIRED_ROLLER_pct, 0d);
             }
         }
-
         mPrevPressed = mPressed;
     }
     private void updateIntake() {
