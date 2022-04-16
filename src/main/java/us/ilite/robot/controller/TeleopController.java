@@ -105,27 +105,51 @@ public class TeleopController extends BaseManualController {
         }
     }
 
+
+    private boolean mPressed = false, mPrevPressed = false;
     private void updateCargo() {
+        db.feeder.set(ADJUSTABLE_FEEDER_PCT, mFeederFireSpeed);
+
         if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-            db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
             db.intake.set(ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
+
+            if (db.operatorinput.isSet(InputMap.OPERATOR.INCREASE_FEEDER_SPEED) || db.operatorinput.isSet(InputMap.OPERATOR.DECREASE_FEEDER_SPEED)) {
+                mPressed = true;
+            } else {
+                mPressed = false;
+            }
+
+            if (mPressed && !mPrevPressed && db.operatorinput.isSet(InputMap.OPERATOR.INCREASE_FEEDER_SPEED)) {
+                mFeederFireSpeed += 0.05;
+            } else if (mPressed && !mPrevPressed && db.operatorinput.isSet(InputMap.OPERATOR.DECREASE_FEEDER_SPEED)) {
+                mFeederFireSpeed -= 0.05;
+            }
+
             if (db.operatorinput.isSet(InputMap.OPERATOR.SHOOT_CARGO)) {
+//                fireFeeder(db.feeder.get(SET_FEEDER_pct), 0.25);
                 fireCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.SPIN_FEEDER)) {
+                db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
                 intakeCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.PLACE_CARGO)) {
+                db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
                 placeCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.RELEASE_BALLS)) {
+                db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
                 reverseCargo();
             } else if (db.operatorinput.isSet(InputMap.OPERATOR.STAGE_BALLS)) {
+                db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
                 stageBalls();
             } else {
+                db.feeder.set(STATE, Enums.EFeederState.PERCENT_OUTPUT);
                 mBallsShot = 0;
                 mShotTimer.reset();
                 db.feeder.set(SET_FEEDER_pct, 0d);
                 db.intake.set(DESIRED_ROLLER_pct, 0d);
             }
         }
+
+        mPrevPressed = mPressed;
     }
     private void updateIntake() {
         if (!db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {

@@ -41,6 +41,8 @@ public abstract class AbstractController {
     protected Timer mShotTimer = new Timer();
     protected boolean mFireWanted = false;
 
+    protected double mFeederFireSpeed = 0.9;
+
     public AbstractController(){
         super();
     }
@@ -86,6 +88,7 @@ public abstract class AbstractController {
             db.feeder.set(SET_FEEDER_pct, 0.0);
         }
     }
+
     public void stageFeeder() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         if (mExitGate.get() == XorLatch.State.NONE) {
@@ -94,11 +97,12 @@ public abstract class AbstractController {
             db.feeder.set(SET_FEEDER_pct, 0.0);
         }
     }
+
     public void fireFeeder(double pSpeed, double pPulseSpeed) {
         //TODO eventually move this to velocity mode and use rpm
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         setIntakeArmEnabled(false);
-        if (mExitGate.get() == XorLatch.State.XOR) {
+        if (db.feeder.get(EXIT_BEAM) == 0) {
             mShotTimer.start();
             //If there haven't been any balls shot during the fire period go ahead and fire
             // (no collision is going to occur)
@@ -115,7 +119,7 @@ public abstract class AbstractController {
                 }
             }
         }
-        else if (mExitGate.get() == XorLatch.State.BOTH) {
+        else if (db.feeder.get(EXIT_BEAM) == 1) {
             mExitGate.reset();
             mBallsShot++;
             mNumBalls--;
@@ -187,10 +191,10 @@ public abstract class AbstractController {
     protected abstract void updateImpl();
 
     protected void fireCargo() {
-        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
-        db.feeder.set(EFeederData.SET_FEEDER_pct, 0.9d);
+        db.feeder.set(EFeederData.STATE, EFeederState.VELOCITY);
+        db.feeder.set(EFeederData.SET_VELOCITY_rpm, 5000);
         setLED(LEDColorMode.DEFAULT, LEDState.SOLID);
-        indexCargo();
+//        indexCargo();
     }
     protected void indexCargo() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
@@ -236,6 +240,7 @@ public abstract class AbstractController {
         db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
         db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 1.0);
         indexCargo();
+//        activateFeeder();
     }
 
     protected void reverseCargo() {

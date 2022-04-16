@@ -113,6 +113,7 @@ public class Data {
         intake.createSimpleEnumConverter(EIntakeData.ROLLER_STATE, Enums.ERollerState.class);
 
         feeder.createSimpleBooleanConverter(EFeederData.ENTRY_BEAM);
+        feeder.createSimpleEnumConverter(EFeederData.STATE, Enums.EFeederState.class);
 
         climber.createSimpleEnumConverter(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.class);
         climber.createSimpleBooleanConverter(EClimberModuleData.SET_COAST);
@@ -129,6 +130,7 @@ public class Data {
         mConvertedFields.add(EIntakeData.ARM_STATE.name());
         mConvertedFields.add(EIntakeData.ROLLER_STATE.name());
         mConvertedFields.add(EFeederData.ENTRY_BEAM.name());
+        mConvertedFields.add(EFeederData.STATE.name());
         mConvertedFields.add(EClimberModuleData.HANGER_STATE.name());
         mConvertedFields.add(EClimberModuleData.SET_COAST.name());
         mConvertedFields.add(EClimberModuleData.IS_DOUBLE_CLAMPED.name());
