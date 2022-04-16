@@ -42,8 +42,8 @@ public class TeleopController extends BaseManualController {
         updateHangerManual();
         updateIntake();
         updateTargetLock();
-//        updateAutomaticHanger();
-        updateRungs(); // TODO Fix experimental balancing values and test timer and overall logic
+        updateAutomaticHanger();
+//        updateRungs(); // TODO Fix experimental balancing values and test timer and overall logic
     }
 
     private void updateTargetLock() {
@@ -124,9 +124,7 @@ public class TeleopController extends BaseManualController {
         } else if (Math.abs(angle - Enums.EClimberAngle.TRAVERSAL.getAngle()) < 2.0) {
             db.climber.set(EClimberModuleData.CURRENT_RUNG, Enums.EClimberAngle.TRAVERSAL);
         }
-
         Enums.EClimberAngle desiredRung = db.climber.get(EClimberModuleData.DESIRED_RUNG, Enums.EClimberAngle.class);
-
         int stage = (int)db.climber.get(EClimberModuleData.STAGE);
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) { // If DRIVER is holding [START]
             db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
