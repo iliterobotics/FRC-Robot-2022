@@ -26,10 +26,8 @@ public class BallTracking extends Module {
     public void modeInit(EMatchMode mode) {
         if(!isCamera) {
             pixy = Pixy2.createInstance(new SPILink());
-            state = pixy.init(1);
+            state = pixy.init(4);
             isCamera = state >=0;
-            System.out.println("state: " + state);
-            System.out.println("version: " + pixy.getVersion());
         }
     }
 
@@ -37,11 +35,11 @@ public class BallTracking extends Module {
 //        if (!isCamera) {
 //            return;
 //        }
-
         Block largestBlock = findLargestBLock();
         Block secondLargestBlock = findSecondLargestBLock();
 
         if (largestBlock != null) {
+            System.out.println("largest block: " + largestBlock);
             db.pixydata.set(EPixyData.LARGEST_XCoorinate, largestBlock.getX());
             db.pixydata.set(EPixyData.LARGEST_YCoordniate, largestBlock.getY());
             db.pixydata.set(EPixyData.LARGEST_WIDTH, largestBlock.getWidth());
@@ -66,14 +64,14 @@ public class BallTracking extends Module {
 
     public void setOutputs() {
         pixy.setLamp((byte) 1, (byte) 1);
-        pixy.setLED(200, 30, 255);
+        pixy.setLED(255,255,255);
     }
 
 
     public Block findLargestBLock() {
         Pixy2CCC pixyccc = pixy.getCCC();
-        pixyccc.getBlocks(true, Pixy2CCC.CCC_SIG2, 25);
-//        System.out.println("found " + blockCount + " blocks");
+        int blockCount = pixyccc.getBlocks(false, Pixy2CCC.CCC_SIG2, 25);
+        System.out.println("found " + blockCount + " blocks");
         final ArrayList<Block> blocks = pixy.getCCC().getBlockCache();
         blocks.sort(new Sorter());
         if (blocks.size() > 0) {
@@ -84,7 +82,7 @@ public class BallTracking extends Module {
     }
 
     public Block findSecondLargestBLock() {
-        pixy.getCCC().getBlocks(true, Pixy2CCC.CCC_SIG2, 25);
+        pixy.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG2, 25);
         final ArrayList<Block> blocks = pixy.getCCC().getBlockCache();
         blocks.sort(new Sorter());
         if (blocks.size() > 1) {

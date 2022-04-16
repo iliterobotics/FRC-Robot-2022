@@ -6,8 +6,6 @@ import com.flybotix.hfr.codex.RobotCodex;
 import com.flybotix.hfr.util.log.ELevel;
 import com.flybotix.hfr.util.log.ILog;
 import com.flybotix.hfr.util.log.Logger;
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -49,7 +47,7 @@ public class Robot extends TimedRobot {
     private IntakeModule mIntake;
     private ClimberModule mClimber;
     private NeoDriveModule mNeoDrive;
-    private Limelight mLimelight;
+//    private Limelight mLimelight;
     private AutonSelection mAutonSelection;
     private BallTracking mPixy;
 
@@ -71,8 +69,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        UsbCamera camera = CameraServer.startAutomaticCapture();
-        camera.setFPS(30);
         CLOCK.update();
         Arrays.stream(EForwardableConnections.values()).forEach(EForwardableConnections::addPortForwarding);
         mAutonSelection = new AutonSelection();
@@ -93,7 +89,7 @@ public class Robot extends TimedRobot {
         mLEDControl = new LEDModule();
         mClimber = new ClimberModule();
         mNeoDrive = new NeoDriveModule();
-        mLimelight = new Limelight();
+//        mLimelight = new Limelight();
         mPixy = new BallTracking();
         if(IS_SIMULATED) {
             mSimulation = new SimulationModule();
@@ -149,7 +145,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
-        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
         BaseAutonController mAutoController = mAutonSelection.getSelectedAutonController();
@@ -175,7 +171,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
         mRunningModules.addModule(mNeoDrive);
-        mRunningModules.addModule(mLimelight);
+//        mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mClimber);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.addModule(mPixy);
