@@ -14,6 +14,8 @@ public class TexasSwitchController extends BaseAutonController {
     private Timer mTimer;
     private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(-45), 2d);
     private DriveStraight mTaxi = new DriveStraight(Distance.fromFeet(4.5));
+    private double mFirstTurnTime = 3.0,
+                    mFirstLegTime = mFirstTurnTime + 3.0;
     public void initialize() {
         mTimer = new Timer();
         mTimer.reset();
@@ -25,12 +27,12 @@ public class TexasSwitchController extends BaseAutonController {
             setIntakeArmEnabled(true);
         } else if (mTimer.get() < 1.1) {
             mFirstTurn.init(mTimer.get());
-        } else if (mTimer.get() < 3.0) {
+        } else if (mTimer.get() < mFirstTurnTime) {
             setIntakeArmEnabled(false);
             mFirstTurn.update(mTimer.get());
-        } else if (mTimer.get() < 3.1) {
+        } else if (mTimer.get() < mFirstTurnTime + 0.1) {
             mTaxi.init(mTimer.get());
-        } else if (mTimer.get() < 6.0) {
+        } else if (mTimer.get() < mFirstLegTime) {
             mTaxi.update(mTimer.get());
         }
     }
