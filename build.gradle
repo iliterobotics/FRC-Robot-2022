@@ -3,6 +3,7 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2022.4.1"
+    id "com.kauailabs.first.GradleRIO" version "2020.3.2.18"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11

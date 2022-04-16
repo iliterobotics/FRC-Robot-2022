@@ -1,10 +1,14 @@
 package us.ilite.robot.modules;
 
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
 import io.github.pseudoresonance.pixy2api.*;
 import io.github.pseudoresonance.pixy2api.links.SPILink;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC.*;
+import us.ilite.common.types.EMatchMode;
 import us.ilite.common.types.EPixyData;
 
+import javax.sound.sampled.TargetDataLine;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -15,16 +19,21 @@ public class BallTracking extends Module {
 
     public BallTracking() {
 //        pixy.init();
-        pixy = Pixy2.createInstance(Pixy2.LinkType.SPI);
+
     }
 
-    public void readInputs() {
-
+    @Override
+    public void modeInit(EMatchMode mode) {
         if(!isCamera) {
+            pixy = Pixy2.createInstance(new SPILink());
             state = pixy.init(1);
             isCamera = state >=0;
             System.out.println("state: " + state);
+            System.out.println("version: " + pixy.getVersion());
         }
+    }
+
+    public void readInputs() {
 //        if (!isCamera) {
 //            return;
 //        }
@@ -56,7 +65,8 @@ public class BallTracking extends Module {
     }
 
     public void setOutputs() {
-        pixy.setCameraBrightness(255);
+        pixy.setLamp((byte) 1, (byte) 1);
+        pixy.setLED(200, 30, 255);
     }
 
 
