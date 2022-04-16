@@ -21,9 +21,12 @@ public class Field2022 {
      * Any trackable field component for 2020's game.
      */
     public enum FieldElement implements IFieldComponent {
+        //Do not switch order
         NULL(0, 0, 0),
         HUB_UPPER (104,48, 1),
 //        TARGET_ZOOM             (0d,0d),
+        RED_BALL(0 , 0, 3),
+        BLUE_BALL(0, 0, 4),
         CAMERA(0,0, 0);
 
         // This is done in inches -- straight from game manual
@@ -59,5 +62,11 @@ public class Field2022 {
         }
 
         public int id() { return ordinal(); }
+    }
+
+    public static void main(String[] args) {
+        for(FieldElement anElement: FieldElement.values()) {
+            System.out.println(anElement.name()+" id: " + anElement.id()+", pipeline: "+ anElement.pipeline());
+        }
     }
 }

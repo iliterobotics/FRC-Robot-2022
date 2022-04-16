@@ -15,7 +15,7 @@ public class Settings {
     public static int kSecondsToUpdateCSVLogger = 1; //seconds
     public static int kAcceptableLogFailures = 8;
     public static double kNetworkTableUpdateRate = 0.01;
-    public static boolean kIsLogging = true; // decide whether or not to log
+    public static boolean kIsLogging = false; // decide whether or not to log
     public static int sCODEX_COMMS_PORT = 5805;
     public static boolean kLogExceptions = false;
 

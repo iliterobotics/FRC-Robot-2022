@@ -80,7 +80,7 @@ public class NeoDriveModule extends Module {
             .slot(VELOCITY_PID_SLOT)
             .velocityConversion(kDriveNEOVelocityFactor);
     public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.02).f(0.1);
-    public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.005);
+    public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.0075);
 
     // ========================================
     // DO NOT MODIFY THESE OTHER CONSTANTS
@@ -226,15 +226,14 @@ public class NeoDriveModule extends Module {
                     double targetLockOutput = 0;
                     if (db.limelight.isSet(ELimelightData.TV)) {
                         targetLockOutput = mTargetLockPID.calculate(-db.limelight.get(ELimelightData.TX), clock.dt());
+                        turn = targetLockOutput * 0.75;
                     }
-                    leftOutput = targetLockOutput + throttle / 5;
-                    rightOutput = -targetLockOutput + throttle / 5;
-                    if (!db.limelight.isSet(ELimelightData.TX)) {
-                        leftOutput += turn / 5;
-                        rightOutput -= turn / 5;
-                    }
-                    mLeftMaster.set(leftOutput);
-                    mRightMaster.set(rightOutput);
+//                    if (!db.limelight.isSet(ELimelightData.TX)) {
+//                        leftOutput += turn / 5;
+//                        rightOutput -= turn / 5;
+//                    }
+                    mLeftMaster.set(throttle+turn);
+                    mRightMaster.set(throttle-turn);
                 } else {
                     mLeftMaster.set(throttle+turn);
                     mRightMaster.set(throttle-turn);

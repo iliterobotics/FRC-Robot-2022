@@ -107,7 +107,7 @@ public class BaseAutonController extends AbstractController {
         SmartDashboard.putNumber("trajectory-seconds",-1);
 
 
-        mTrajectoryConfig = new TrajectoryConfig(0.5, 0.5);
+        mTrajectoryConfig = new TrajectoryConfig(1.0, 1.0);
         DifferentialDriveKinematics k = new DifferentialDriveKinematics(feet_to_meters(NeoDriveModule.kTrackWidthFeet));
         mTrajectoryConfig.addConstraint(
                 new DifferentialDriveVoltageConstraint(
@@ -116,8 +116,8 @@ public class BaseAutonController extends AbstractController {
                         10
                 )
         );
-        mTrajectoryConfig.addConstraint(new CentripetalAccelerationConstraint(0.5));
-        mTrajectoryConfig.addConstraint(new DifferentialDriveKinematicsConstraint(k,0.5));
+        mTrajectoryConfig.addConstraint(new CentripetalAccelerationConstraint(1.0));
+        mTrajectoryConfig.addConstraint(new DifferentialDriveKinematicsConstraint(k,1.0));
         mTrajectoryConfig.setStartVelocity(0.0);
         mTrajectoryConfig.setEndVelocity(0.0);
     }

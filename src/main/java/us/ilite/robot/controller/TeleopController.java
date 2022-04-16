@@ -47,11 +47,9 @@ public class TeleopController extends BaseManualController {
                 setLED(Enums.LEDColorMode.RED, Enums.LEDState.SOLID);
             }
             if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                //These pipelines were tuned at DCMP, and pipeline 2 has the blue alliance one and red has 1
-                //We want to use the opposite, meaning that when we're on the blue alliance use pipeline 1 and vice versa
-                db.limelight.set(ELimelightData.TARGET_ID, 1);
+                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.BLUE_BALL.id());
             } else {
-                db.limelight.set(ELimelightData.TARGET_ID, 2);
+                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.RED_BALL.id());
             }
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
         } else {
@@ -71,8 +69,8 @@ public class TeleopController extends BaseManualController {
             } else if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, -90);
-                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
-                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+//                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+//                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
             }
             else if (db.operatorinput.isSet(InputMap.HANGER.HIGH_RUNG)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);

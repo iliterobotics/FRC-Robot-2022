@@ -123,4 +123,8 @@ public class FollowTrajectory implements ICommand {
         double heading = Robot.DATA.drivetrain.get(EDriveData.ACTUAL_HEADING_RADIANS);
         return new Pose2d(new Translation2d(x, y), new Rotation2d(heading));
     }
+
+    public Trajectory getCurrentTrajectory() {
+        return mTrajectory;
+    }
 }
