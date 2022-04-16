@@ -31,9 +31,10 @@ public class TwoBallController extends BaseAutonController {
         mTimer.start();
     }
 
+    //First leg time was 3.0 seconds shaved to 1.5 (1.5 second taken off)
     private static double
             kFirstTurnTimeEnd = 2.0,
-            kFirstLegTimeEnd = kFirstTurnTimeEnd + 3.0,
+            kFirstLegTimeEnd = kFirstTurnTimeEnd + 1.5,
             kSecondLegTimeEnd = kFirstLegTimeEnd + 2.5,
             kSecondTurnTimeEnd = kSecondLegTimeEnd + 1.0;
 
