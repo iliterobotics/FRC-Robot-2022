@@ -35,7 +35,7 @@ public class FeederModule extends Module {
     public static final double kMaxFalconSpeed = 6380 * kFeederGearRatio;
 
     private int VELOCITY_SLOT = 0;
-    private ProfileGains kVelocityGains = new ProfileGains().p(0.0001).f(0.0001).slot(VELOCITY_SLOT);
+    private ProfileGains kVelocityGains = new ProfileGains().p(0.02).f(0.045).slot(VELOCITY_SLOT);
 
     public FeederModule () {
         mIntakeFeeder = new TalonFX(Settings.HW.CAN.kINFeeder);
@@ -56,6 +56,7 @@ public class FeederModule extends Module {
     public void readInputs() {
         db.feeder.set(ACTUAL_FEEDER_pct, (mIntakeFeeder.getSelectedSensorVelocity() * kScaledRPMConversion) / kMaxFalconSpeed);
         db.feeder.set(EXIT_BALL_VELOCITY_ft_s, mIntakeFeeder.getSelectedSensorVelocity() * kVelocityConversion);
+        db.feeder.set(EXIT_BALL_VELOCITY_rpm, mIntakeFeeder.getSelectedSensorVelocity() * 600.0 / 2048.0);
         db.feeder.set(ENTRY_BEAM, mEntryBeamBreaker.isBroken());
         db.feeder.set(EXIT_BEAM, mExitBeamBreaker.isBroken());
     }
@@ -82,6 +83,6 @@ public class FeederModule extends Module {
         mIntakeFeeder.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 255);
     }
     private double rpmToTicksPer100ms(double pRPM) {
-        return pRPM / kScaledRPMConversion;
+        return pRPM * 2048.0 / 600.0;
     }
 }
