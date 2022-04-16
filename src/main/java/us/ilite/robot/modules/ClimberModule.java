@@ -32,7 +32,8 @@ public class ClimberModule extends Module{
     private final int POSITION_SLOT = 0;
 
     private ProfileGains kVelocityGains = new ProfileGains().p(0.0).f(0.0001);
-    private ProfileGains kPositionGains = new ProfileGains().p(0.0175).f(0.00075).slot(POSITION_SLOT);
+    //Old P was 0.0175
+    private ProfileGains kPositionGains = new ProfileGains().p(0.0225).f(0.00075).slot(POSITION_SLOT);
 
     // ========================================
     // DO NOT MODIFY THESE PHYSICAL CONSTANTS
@@ -59,8 +60,8 @@ public class ClimberModule extends Module{
         mCL12.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 20);
         mCLMR11.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor,0, 20);
 
-        mCLMR11.configAllowableClosedloopError(1, climberDegreesToTicks(2));
-        mCL12.configAllowableClosedloopError(1, climberDegreesToTicks(2));
+        mCLMR11.configAllowableClosedloopError(1, climberDegreesToTicks(1));
+        mCL12.configAllowableClosedloopError(1, climberDegreesToTicks(1));
 
         mVelocityPID = new PIDController(kVelocityGains, -kMaxClimberSpeed, kMaxClimberSpeed, Settings.kControlLoopPeriod);
 

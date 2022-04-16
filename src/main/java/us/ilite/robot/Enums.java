@@ -19,11 +19,12 @@ public class Enums {
         //Angles at desired rung
         NULL(0.0),
         MID(-90.0),
-        HIGH(90.0),
-        BALANCED(60.0),
-        TRAVERSAL(287.5),
+        HIGH(91.0),
+        BALANCED(41.0),
+        TRAVERSAL(267.5),
         SCORE(250.0);
 
+        //Old traversal angle is 287.5
         final double kAngle;
 
         EClimberAngle(double pAngle) {

@@ -72,6 +72,9 @@ public class TeleopController extends BaseManualController {
             } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
                 db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.45);
+            } else {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.0);
             }
             if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_DOUBLE)) {
                 db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
@@ -85,28 +88,35 @@ public class TeleopController extends BaseManualController {
             if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_SINGLE)) {
                 db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
             }
+        } else {
+            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+            db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.0);
         }
     }
+    private boolean mBalanced = false;
     private void updateAutomaticHanger() {
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-            db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-            //TODO figure out if we want to give mid-rung back to the operator
             if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.MID.getAngle());
-                //Clamp within two degrees of the desired angle (two is the closed loop error)
-                if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) <= -88
-                        && db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) >= -92) {
-                    db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
-                }
             } else if (db.operatorinput.isSet(InputMap.HANGER.HIGH_RUNG)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.HIGH.getAngle());
-                if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) >= 88
+                if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) >= 90
                         && db.climber.get(EClimberModuleData.DESIRED_POS_deg) <= 92) {
                     db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 }
             } else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
-                db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
-                if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) >= 285.5 && db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) <= 289.5) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                if (!mBalanced) {
+                    db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.BALANCED.getAngle());
+                } else {
+                    db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
+                }
+                if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) <= Enums.EClimberAngle.BALANCED.getAngle()) {
+                    mBalanced = true;
+                }
+                if (db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg) >= Enums.EClimberAngle.HIGH.getAngle()) {
                     db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 } else {
                     db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
