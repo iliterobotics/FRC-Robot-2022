@@ -42,7 +42,7 @@ public class FeederModule extends Module {
         mEntryBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
         mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINExitBeam, kDebounceTime);
         mIntakeFeeder.configPeakOutputForward(1.0, 20);
-        mIntakeFeeder.configPeakOutputReverse(1.0, 20);
+        mIntakeFeeder.configPeakOutputReverse(-1.0, 20);
         setStatusFrames();
         HardwareUtils.setGains(mIntakeFeeder, kVelocityGains);
     }
