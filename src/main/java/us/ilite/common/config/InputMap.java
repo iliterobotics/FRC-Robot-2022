@@ -51,7 +51,10 @@ public class InputMap {
         RELEASE_BALLS = ELogitech310.DPAD_LEFT,
         SHOOT_CARGO = ELogitech310.R_BTN,
         STAGE_BALLS = ELogitech310.A_BTN,
-        PLACE_CARGO = ELogitech310.L_BTN;
+        PLACE_CARGO = ELogitech310.L_BTN,
+
+        INCREASE_FEEDER_SPEED = ELogitech310.DPAD_UP,
+        DECREASE_FEEDER_SPEED = ELogitech310.DPAD_DOWN;
     }
 
     /**

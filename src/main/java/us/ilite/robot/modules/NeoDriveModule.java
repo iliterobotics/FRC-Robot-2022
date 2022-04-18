@@ -220,24 +220,18 @@ public class NeoDriveModule extends Module {
                 resetOdometry(new Pose2d(x, y, new Rotation2d(-mGyro.getYaw().getRadians())));
                 break;
             case PERCENT_OUTPUT:
-                double leftOutput = 0;
-                double rightOutput = 0;
                 if (db.limelight.isSet(ELimelightData.TARGET_ID)) {
                     double targetLockOutput = 0;
                     if (db.limelight.isSet(ELimelightData.TV)) {
                         targetLockOutput = mTargetLockPID.calculate(-db.limelight.get(ELimelightData.TX), clock.dt());
-                        turn = targetLockOutput * 0.75;
+                        turn = targetLockOutput;
                     }
-//                    if (!db.limelight.isSet(ELimelightData.TX)) {
-//                        leftOutput += turn / 5;
-//                        rightOutput -= turn / 5;
-//                    }
-                    mLeftMaster.set(throttle+turn);
-                    mRightMaster.set(throttle-turn);
-                } else {
-                    mLeftMaster.set(throttle+turn);
-                    mRightMaster.set(throttle-turn);
+
+                    turn *= (1/(1-throttle)) * 0.5;
                 }
+
+                mLeftMaster.set(throttle+turn);
+                mRightMaster.set(throttle-turn);
                 break;
             case VELOCITY:
                 mLeftCtrl.setReference(left * kMaxVelocityRPM, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);

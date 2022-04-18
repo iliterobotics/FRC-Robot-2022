@@ -60,8 +60,7 @@ public class Robot extends TimedRobot {
     private BaseAutonController mBaseAutonController;
     private ShootMoveController mShootMoveController;
     private ThreeBallController mThreeBallController;
-    private BlueThreeBallController mBlueThreeBallController;
-    private ReverseFeederIntakeController mReverseController;
+    private TexasSwitchController mReverseController;
     private TwoBallController mTwoBallController;
     private TwoBallTrajectoryController mTwoBalltrajectorycontroller;
     private FourBallTrajectoryAuton mFourBallAuton;
@@ -80,8 +79,7 @@ public class Robot extends TimedRobot {
         mShootMoveController = new ShootMoveController();
         mThreeBallController = new ThreeBallController();
         mTwoBallController = new TwoBallController();
-        mBlueThreeBallController = new BlueThreeBallController();
-        mReverseController = new ReverseFeederIntakeController();
+        mReverseController = new TexasSwitchController();
         mTwoBalltrajectorycontroller = new TwoBallTrajectoryController();
         mThreeBallAuton = new ThreeBallTrajectoryController();
         mFourBallAuton = new FourBallTrajectoryAuton();
