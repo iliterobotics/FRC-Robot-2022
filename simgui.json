@@ -54,7 +54,7 @@
       },
       "/SmartDashboard/Field": {
         "Active Path": {
-          "arrows": false,
+          "arrowSize": 12,
           "style": "Line"
         },
         "Final Shot": {
@@ -93,10 +93,7 @@
           "width": 0.0
         },
         "image": "C:\\Users\\Agrim\\Documents\\FRC-Robot-2022\\PathWeaver\\Games\\2022-field.png",
-        "units": "feet",
-        "window": {
-          "visible": true
-        }
+        "units": "feet"
       }
     }
   },

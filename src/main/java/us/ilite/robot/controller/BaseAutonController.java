@@ -42,11 +42,10 @@ import static us.ilite.common.lib.util.Units.feet_to_meters;
 public class BaseAutonController extends AbstractController {
 
     protected DifferentialDriveKinematics k = new DifferentialDriveKinematics(feet_to_meters(NeoDriveModule.kTrackWidthFeet));
-    protected final TrajectoryConfig mTrajectoryConfig = new TrajectoryConfig(1, 1).
-            addConstraint( new DifferentialDriveVoltageConstraint(
-                    new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA), k, 12)).
-            addConstraint(new CentripetalAccelerationConstraint(0.5)).
-            addConstraint(new DifferentialDriveKinematicsConstraint(k, 1)).
+    protected final TrajectoryConfig mTrajectoryConfig = new TrajectoryConfig(3, 3).
+            addConstraint(new DifferentialDriveVoltageConstraint(new SimpleMotorFeedforward(Settings.kS, Settings.kV, Settings.kA), k, 12)).
+            addConstraint(new CentripetalAccelerationConstraint(1)).
+            addConstraint(new DifferentialDriveKinematicsConstraint(k, 3)).
             setStartVelocity(0.0).
             setEndVelocity(0.0);
 

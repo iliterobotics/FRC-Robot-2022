@@ -15,6 +15,8 @@ import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 import us.ilite.robot.commands.FollowTrajectory;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static us.ilite.common.lib.util.Units.feet_to_meters;
@@ -25,16 +27,23 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
     public static final Pose2d FIRST_BALL = new Pose2d(new Translation2d(Units.feet_to_meters(34.858), Units.feet_to_meters(20.018)), Rotation2d.fromDegrees(0d));
     public static final Pose2d SECOND_BALL = new Pose2d(new Translation2d(Units.feet_to_meters(46.532), Units.feet_to_meters(21.699)), Rotation2d.fromDegrees(40.681));
     //Fix these waypoints to ensure that we have an ACTUAL feasible path to follow on thet way back...
-    public static final Translation2d RETURN_WAYPOINT = new Translation2d(Units.feet_to_meters(40.549), Units.feet_to_meters(19.409));
-    public static final Translation2d RETURN_WAYPOINT_TWO = new Translation2d(Units.feet_to_meters(31.044), Units.feet_to_meters(19.222));
-
+    public static final Translation2d RETURN_WAYPOINT = new Translation2d(Units.feet_to_meters(43.828), Units.feet_to_meters(20.380));
+    public static final Translation2d RETURN_WAYPOINT_TWO = new Translation2d(Units.feet_to_meters(39.034), Units.feet_to_meters(19.358));
+    public static final Translation2d RETURN_WAYPOINT_THREE = new Translation2d(Units.feet_to_meters(32.475), Units.feet_to_meters(18.544));
+    public LinkedList<Translation2d> waypoints = new LinkedList<Translation2d>() {
+        {
+            add(RETURN_WAYPOINT);
+            add(RETURN_WAYPOINT_TWO);
+            add(RETURN_WAYPOINT_THREE);
+        }
+    };
 
     //ROBOT TRAJECTORIES
     //About 3.658323 seconds for both
     private Trajectory mFirstBallPath = TrajectoryGenerator.generateTrajectory(List.of(ROBOT_START, FIRST_BALL), super.mTrajectoryConfig.setReversed(false));
     private Trajectory mFirstReturnPath = TrajectoryGenerator.generateTrajectory(List.of(FIRST_BALL, ROBOT_START), super.mTrajectoryConfig.setReversed(true));
     private Trajectory mHumanStationPath = TrajectoryGenerator.generateTrajectory(List.of(ROBOT_START, SECOND_BALL), super.mTrajectoryConfig.setReversed(false));
-    private Trajectory mHumanStationReturnPath = TrajectoryGenerator.generateTrajectory(ROBOT_START, List.of(RETURN_WAYPOINT, RETURN_WAYPOINT_TWO), SECOND_BALL, super.mTrajectoryConfig.setReversed(true));
+    private Trajectory mHumanStationReturnPath = TrajectoryGenerator.generateTrajectory(List.of(SECOND_BALL, ROBOT_START), super.mTrajectoryConfig.setReversed(true));
 
     //   private Trajectory mSecondBallPath = TrajectoryGenerator.generateTrajectory()
     private Trajectory mActiveTrajectory;
@@ -66,9 +75,7 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
         mReturnShootLeg = m2ndBallLegTime + mFirstReturnPath.getTotalTimeSeconds();
         mSecondShotTime = mReturnShootLeg + 0.5;
         mHumanStationPathTime = mSecondShotTime + mHumanStationPath.getTotalTimeSeconds();
-        mHumanStationReturnPathTime = mHumanStationPathTime + mHumanStationReturnPath.getTotalTimeSeconds();
-        mFollower = new FollowTrajectory(mFirstBallPath, false);
-        mFollower.init(mTimer.get());
+        mHumanStationReturnPathTime = mHumanStationPathTime + 2.0 + mHumanStationReturnPath.getTotalTimeSeconds();
         mActiveTrajectory = new Trajectory();
     }
     public void updateImpl() {
@@ -80,10 +87,12 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
             intakeCargo();
         }
         if (time < mShotTime) {
-            mActiveTrajectory = mFirstReturnPath;
+            mActiveTrajectory = mFirstBallPath;
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET_ODOMETRY);
             db.drivetrain.set(EDriveData.X_DESIRED_ODOMETRY_METERS, mActiveTrajectory.getInitialPose().getX());
             db.drivetrain.set(EDriveData.Y_DESIRED_ODOMETRY_METERS, mActiveTrajectory.getInitialPose().getY());
+            mFollower = new FollowTrajectory(mActiveTrajectory, false);
+            mFollower.init(time);
             fire = true;
         }
         else if (time < m2ndBallLegTime) { // Move to Ball #1 (in the direction of human player station)
@@ -109,7 +118,9 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
             fire = true;
         } else if (time < mHumanStationPathTime) {
             mFollower.update(time);
-        } else if (time < mHumanStationPathTime + 0.05) {
+        }
+        //Wait here for about 2 second to get human player load
+        else if (time < mHumanStationPathTime + 2.0) {
             mActiveTrajectory = mHumanStationReturnPath;
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET_ODOMETRY);
             db.drivetrain.set(EDriveData.X_DESIRED_ODOMETRY_METERS, mActiveTrajectory.getInitialPose().getX());
@@ -125,10 +136,11 @@ public class ThreeBallTrajectoryController extends BaseAutonController {
         }
         Robot.FIELD.setRobotPose(getRobotPose());
     }
-
+    @Override
     public Pose2d getStartPose() {
         return ROBOT_START;
     }
+
     public Pose2d getRobotPose() {
         double x = Robot.DATA.drivetrain.get(EDriveData.X_ACTUAL_ODOMETRY_METERS);
         double y = Robot.DATA.drivetrain.get(EDriveData.Y_ACTuAL_ODOMETRY_METERS);
