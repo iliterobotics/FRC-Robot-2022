@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.drive.EDriveData;
@@ -48,10 +49,7 @@ public class FollowTrajectory implements ICommand {
     }
     @Override
     public void init(double pNow) {
-//        Robot.DATA.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET_ODOMETRY);
-//        Robot.DATA.drivetrain.set(EDriveData.X_DESIRED_ODOMETRY_METERS, mTrajectory.getInitialPose().getX());
-//        Robot.DATA.drivetrain.set(EDriveData.Y_DESIRED_ODOMETRY_METERS, mTrajectory.getInitialPose().getY());
-        Robot.FIELD.getObject("Current Trajectory").setTrajectory(mTrajectory);
+       // Robot.FIELD.getObject("Current Trajectory").setTrajectory(mTrajectory);
         mTrajectoryTimer.reset();
         mTrajectoryTimer.start();
         initialState = mTrajectory.sample(0);
@@ -61,9 +59,6 @@ public class FollowTrajectory implements ICommand {
                                 initialState.velocityMetersPerSecond,
                                 0,
                                 initialState.curvatureRadPerMeter * initialState.velocityMetersPerSecond));
-        SmartDashboard.putNumber("Initial state X", initialState.poseMeters.getX());
-        SmartDashboard.putNumber("Initial state Y", initialState.poseMeters.getY());
-        SmartDashboard.putNumber("Trajectory Total Time in Seconds", mTrajectory.getTotalTimeSeconds());
     }
 
     @Override
@@ -74,8 +69,8 @@ public class FollowTrajectory implements ICommand {
         Trajectory.State setpoint = mTrajectory.sample(mTrajectoryTimer.get());
         ChassisSpeeds chassisSpeeds = mController.calculate(getRobotPose(), setpoint);
         DifferentialDriveWheelSpeeds wheelSpeeds = mDriveKinematics.toWheelSpeeds(chassisSpeeds);
-        SmartDashboard.putNumber("Left Wheel speed output", wheelSpeeds.leftMetersPerSecond);
-        SmartDashboard.putNumber("Right Wheel speed output", wheelSpeeds.rightMetersPerSecond);
+        SmartDashboard.putNumber("Left Wheel speed output", Units.meters_to_feet(wheelSpeeds.leftMetersPerSecond));
+        SmartDashboard.putNumber("Right Wheel speed output", Units.meters_to_feet(wheelSpeeds.rightMetersPerSecond));
         if (mUsePid) {
             double actualRightSpeed = Units.feet_to_meters(Robot.DATA.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));
             double actualLeftSpeed = Units.feet_to_meters(Robot.DATA.drivetrain.get(EDriveData.L_ACTUAL_VEL_FT_s));

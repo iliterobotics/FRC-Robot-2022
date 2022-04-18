@@ -17,6 +17,32 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/DifferentialDrive[1]": "DifferentialDrive",
+      "/LiveWindow/Ungrouped/DigitalInput[3]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[4]": "Digital Input",
+      "/LiveWindow/Ungrouped/PIDControllerOfIlite[0]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDControllerOfIlite[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDControllerOfIlite[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDControllerOfIlite[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDControllerOfIlite[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[12]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[13]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[14]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[15]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[16]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[27]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[28]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/Shuffleboard/Auton Configuration/Choose Auton Controller": "String Chooser",
       "/SmartDashboard/Field": "Field2d"
     },
@@ -27,6 +53,10 @@
         }
       },
       "/SmartDashboard/Field": {
+        "Active Path": {
+          "arrows": false,
+          "style": "Line"
+        },
         "Final Shot": {
           "arrowSize": 10
         },
@@ -72,17 +102,12 @@
   },
   "NetworkTables": {
     "Shuffleboard": {
-      "Auton Configuration": {
-        "open": false
+      "EDriveData": {
+        "open": true
       }
     },
     "SmartDashboard": {
-      "Field": {
-        "open": false
-      }
+      "open": true
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

@@ -194,7 +194,6 @@ public class NeoDriveModule extends Module {
         mOdometry.update(new Rotation2d(db.drivetrain.get(ACTUAL_HEADING_RADIANS)),
                Units.feet_to_meters(db.drivetrain.get(L_ACTUAL_POS_FT)),
                Units.feet_to_meters( db.drivetrain.get(R_ACTUAL_POS_FT)));
-        Robot.FIELD.setRobotPose(mOdometry.getPoseMeters());
     }
 
     @Override
