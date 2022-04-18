@@ -1,6 +1,7 @@
 package us.ilite.robot.controller;
 
 import com.flybotix.hfr.codex.RobotCodex;
+import edu.wpi.first.wpilibj.Timer;
 import us.ilite.common.*;
 
 
@@ -9,6 +10,7 @@ import static us.ilite.common.types.EIntakeData.DESIRED_ROLLER_pct;
 import static us.ilite.common.types.drive.EDriveData.*;
 
 
+import us.ilite.common.lib.util.XorLatch;
 import us.ilite.common.types.EFeederData;
 import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.ELEDControlData;
@@ -25,14 +27,21 @@ import java.util.List;
 public abstract class AbstractController {
     protected final Data db = Robot.DATA;
     protected final Clock clock = Robot.CLOCK;
-    private boolean mEnabled = false;
+    protected boolean mEnabled = false;
     protected int mCycleCount = 0;
     protected double mLastTime = 0d;
     protected double dt = 1d;
 
-    private boolean mIsBallAdded = false;
-    private boolean mIsBallOut = false;
-    private int mNumBalls = 0;
+    protected boolean mIsBallAdded = false;
+    protected boolean mIsBallOut = false;
+    protected int mNumBalls = 0;
+    protected int mBallsShot = 0;
+    protected XorLatch mEntryGate  = new XorLatch();
+    protected XorLatch mExitGate = new XorLatch();
+    protected Timer mShotTimer = new Timer();
+    protected boolean mFireWanted = false;
+
+    protected double mFeederFireSpeed = 5000d;
 
     public AbstractController(){
         super();
@@ -43,7 +52,8 @@ public abstract class AbstractController {
         if(mEnabled) {
             // split this out so we can put additional common elements here
             updateImpl();
-
+            mExitGate.update(db.feeder.isSet(EXIT_BEAM));
+            mEntryGate.update(db.feeder.isSet(ENTRY_BEAM));
             // Every 10s or so
             mCycleCount++;
         }
@@ -83,9 +93,11 @@ public abstract class AbstractController {
     }
 
     protected void setIntakeArmEnabled(boolean enabled) {
+        db.intake.set(EIntakeData.ROLLER_STATE, ERollerState.PERCENT_OUTPUT);
         if (enabled) {
             db.intake.set(EIntakeData.ARM_STATE, EArmState.EXTEND);
         } else {
+            db.intake.set(DESIRED_ROLLER_pct, 0.0);
             db.intake.set(EIntakeData.ARM_STATE, EArmState.RETRACT);
         }
     }
@@ -93,11 +105,11 @@ public abstract class AbstractController {
     protected abstract void updateImpl();
 
     protected void fireCargo() {
-        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
-        db.feeder.set(EFeederData.SET_FEEDER_pct, 0.9d);
+        db.feeder.set(EFeederData.STATE, EFeederState.VELOCITY);
+        db.feeder.set(EFeederData.SET_VELOCITY_rpm, mFeederFireSpeed);
         setLED(LEDColorMode.DEFAULT, LEDState.SOLID);
-        indexCargo();
     }
+
     protected void indexCargo() {
         db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
         //Indexing balls coming in
@@ -142,6 +154,7 @@ public abstract class AbstractController {
         db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
         db.intake.set(EIntakeData.DESIRED_ROLLER_pct, 1.0);
         indexCargo();
+//        activateFeeder();
     }
 
     protected void reverseCargo() {
@@ -165,7 +178,91 @@ public abstract class AbstractController {
         db.ledcontrol.set(ELEDControlData.LED_STATE, LEDState.BLINKING);
         db.ledcontrol.set(ELEDControlData.BLINK_SPEED,pBlinkRate);
     }
+    public void activateFeeder() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        //Entry beam has been tripped and has not been untripped (ball has just hit beam break but not entered system)
+        if (mEntryGate.get() == XorLatch.State.XOR)  {
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+            mNumBalls++;
+        }
+        //Cargo has past the entrance and hasn't reached the exit beam yet and another has entered
+        else if (mEntryGate.get() == XorLatch.State.BOTH && mExitGate.get() == XorLatch.State.NONE
+                && mNumBalls == 2) {
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+            mEntryGate.reset();
+        }
+        //Cargo has past the entrance however there is only one ball so don't do anything yet
+        else if (mEntryGate.get() == XorLatch.State.BOTH && mExitGate.get() == XorLatch.State.NONE
+                && mNumBalls == 1) {
+            db.feeder.set(SET_FEEDER_pct, 0.0);
+            mEntryGate.reset();
+        }
+        //This only happens when there is one ball and another ball has not entered
+        // OR the beam was never tripped in the first place
+        else {
+            db.feeder.set(SET_FEEDER_pct, 0.0);
+        }
+        //Stop indexing if we have hit the exit beam (make sure no balls get shot out prematurely)
+        if (mExitGate.get() == XorLatch.State.XOR) {
+            db.feeder.set(SET_FEEDER_pct, 0.0);
+        }
+    }
 
+    public void stageFeeder() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        if (mExitGate.get() == XorLatch.State.NONE) {
+            db.feeder.set(SET_FEEDER_pct, 0.4);
+        } else if (mExitGate.get() == XorLatch.State.XOR) {
+            db.feeder.set(SET_FEEDER_pct, 0.0);
+        }
+    }
+
+    public void fireFeeder(double pSpeed, double pPulseSpeed) {
+        db.feeder.set(EFeederData.STATE, EFeederState.VELOCITY);
+        setIntakeArmEnabled(false);
+        if (mExitGate.get() == XorLatch.State.XOR) {
+            mShotTimer.start();
+            //If there haven't been any balls shot during the fire period go ahead and fire
+            // (no collision is going to occur)
+            if (mBallsShot == 0) {
+                db.feeder.set(SET_VELOCITY_rpm, pSpeed);
+            }
+            //Otherwise, make sure that you don't potentially hit any other ball
+            else {
+                if (mShotTimer.get() % pPulseSpeed == 0) {
+                    db.feeder.set(SET_VELOCITY_rpm, pSpeed);
+                }
+                else {
+                    db.feeder.set(SET_FEEDER_pct, 0.0);
+                }
+            }
+        }
+        else if (db.feeder.get(EXIT_BEAM) == 1) {
+            mExitGate.reset();
+            mBallsShot++;
+            mNumBalls--;
+        }
+    }
+    public void placeFeeder() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        db.intake.set(EIntakeData.ROLLER_STATE, ERollerState.PERCENT_OUTPUT);
+        db.feeder.set(SET_FEEDER_pct, -0.2);
+        db.intake.set(EIntakeData.DESIRED_ROLLER_pct, -0.1);
+        if (mEntryGate.get() == XorLatch.State.BOTH) {
+            mEntryGate.reset();
+            mNumBalls--;
+        }
+    }
+    public void reverseFeeder() {
+        db.feeder.set(EFeederData.STATE, EFeederState.PERCENT_OUTPUT);
+        db.intake.set(EIntakeData.ROLLER_STATE, ERollerState.PERCENT_OUTPUT);
+        db.feeder.set(SET_FEEDER_pct, -1.0);
+        db.intake.set(DESIRED_ROLLER_pct, -1.0);
+        if (mEntryGate.get() == XorLatch.State.BOTH) {
+            mEntryGate.reset();
+            mNumBalls--;
+        }
+    }
     /**
      * Provides a way to report on what is used in our codex vs not used. This should help reduce the
      * amount of raw null values we log.

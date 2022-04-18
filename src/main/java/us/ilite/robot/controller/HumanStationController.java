@@ -1,41 +1,43 @@
 package us.ilite.robot.controller;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Distance;
-import us.ilite.common.types.EIntakeData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.commands.DriveStraight;
 import us.ilite.robot.commands.TurnToDegree;
 
-public class SecondThreeBallController extends BaseAutonController {
+public class HumanStationController extends BaseAutonController {
     private Timer mTimer;
-    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(-14.5937), 2.0);
-    //TODO actual distance from right up the hub to 1st ball is 118.75 inches, but that might be too much.
-    // Play with the distance
-    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromInches(118.75));
-    private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(104.5937), 2.0);
-    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromInches(117.470));
-    //TODO play with the distances on the last turn and last leg
-    private TurnToDegree mThirdTurn = new TurnToDegree(Rotation2d.fromDegrees(-120), 2.0);
-    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromInches(-120));
-    private double mFirstTurnTime = 2.0,
-                   mFirstLegTime = mFirstTurnTime + 4.0,
-                   mSecondTurnTime = mFirstLegTime + 2.0,
-                   mSecondLegTime = mSecondTurnTime + 4.0,
-                   mThirdTurnTime = mSecondLegTime + 2.0,
-                   mThirdLegTime = mThirdTurnTime + 4.0;
-    private boolean fire = false;
+    private boolean fire =  false;
+    private TurnToDegree mFirstTurn = new TurnToDegree(Rotation2d.fromDegrees(43.0262), 2d);
     private boolean mFirstTurnDone = false;
+    private DriveStraight mFirstLeg = new DriveStraight(Distance.fromInches(124.046));
     private boolean mFirstLegDone = false;
+    private TurnToDegree mSecondTurn = new TurnToDegree(Rotation2d.fromDegrees(15.315), 2d);
     private boolean mSecondTurnDone = false;
+    private DriveStraight mSecondLeg = new DriveStraight(Distance.fromInches(159.947));
     private boolean mSecondLegDone = false;
-    private boolean mThirdTurnDone = false;
+    private DriveStraight mThirdLeg = new DriveStraight(Distance.fromInches(-159.947));
     private boolean mThirdLegDone = false;
-    public SecondThreeBallController() {
+    private TurnToDegree mThirdTurn = new TurnToDegree(Rotation2d.fromDegrees(-15.315), 2d);
+    private boolean mThirdTurnDone = false;
+    private DriveStraight mFourthLeg = new DriveStraight(Distance.fromInches(-124.046));
+    private boolean mFourthLegDone = false;
+    private TurnToDegree mFourthTurn = new TurnToDegree(Rotation2d.fromDegrees(-43.0262), 2d);
+    private boolean mFourthTurnDone = false;
+
+    private double mFirstTurnTime = 2.0,
+                    mFirstLegTime = mFirstTurnTime + 4.0,
+                    mSecondTurnTime = mFirstLegTime + 2.0,
+                    mSecondLegTime = mSecondTurnTime + 4.0,
+                    mThirdLegTime = mSecondLegTime + 4.0,
+                    mFourthTurnTime = mThirdLegTime + 2.0,
+                    mFourthLegTime = mFourthTurnTime + 4.0,
+                    mFifthTurnTime = mFourthLegTime + 2.0;
+
+    public HumanStationController() {
         mTimer = new Timer();
     }
     public void initialize() {
@@ -44,10 +46,10 @@ public class SecondThreeBallController extends BaseAutonController {
     }
     public void updateImpl() {
         double time = mTimer.get();
-        if (mTimer.get() < 0.5) {
+        if (time < 0.5) {
+            fire = true;
             db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
             mFirstTurn.init(time);
-            fire = true;
         } else if (time < mFirstTurnTime) {
             fire = false;
             mFirstTurnDone = mFirstTurn.update(time) || time > mFirstTurnTime;
@@ -75,22 +77,6 @@ public class SecondThreeBallController extends BaseAutonController {
             if (mSecondLegDone) {
                 db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
             }
-        } else if (time < mSecondLegTime + 0.1) {
-            mThirdTurn.init(time);
-        } else if (time < mThirdTurnTime) {
-            mThirdTurnDone = mThirdTurn.update(time) || time > mThirdTurnTime;
-            if (mThirdTurnDone) {
-                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
-            }
-        } else if (time < mThirdTurnTime + 0.1) {
-            mThirdLeg.init(time);
-        } else if (time < mThirdLegTime) {
-            mThirdLegDone = mThirdLeg.update(time) || time > mThirdLegTime;
-            if (mThirdTurnDone) {
-                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.RESET);
-            }
-        } else {
-            fire = true;
         }
         if (fire) {
             fireCargo();
