@@ -142,7 +142,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         MODE = AUTONOMOUS;
-        //Robot.DATA.registerAllWithShuffleboard();
+        //Always have this commented unless testing
+        Robot.DATA.registerAllWithShuffleboard();
         mRunningModules.clearModules();
         mRunningModules.addModule(mFeeder);
         mRunningModules.addModule(mIntake);
@@ -153,7 +154,6 @@ public class Robot extends TimedRobot {
         BaseAutonController mAutoController = mAutonSelection.getSelectedAutonController();
         mActiveController = mAutoController;
         mAutoController.initialize();
-        mNeoDrive.resetOdometry((mAutoController.getStartPose()));
         mNeoDrive.readInputs();
         mActiveController.setEnabled(true);
     }

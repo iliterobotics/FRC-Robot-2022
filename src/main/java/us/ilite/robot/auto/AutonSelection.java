@@ -24,7 +24,7 @@ public class AutonSelection {
 //            FourBallController.class,
 //            TwoBallTrajectoryController.class,
 //            FourBallTrajectoryAuton.class,
-//            ThreeBallTrajectoryController.class
+            ThreeBallTrajectoryController.class
     };
 
     public AutonSelection() {

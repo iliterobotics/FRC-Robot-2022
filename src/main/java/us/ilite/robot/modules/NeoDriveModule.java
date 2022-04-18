@@ -145,10 +145,8 @@ public class NeoDriveModule extends Module {
     }
     @Override
     public void modeInit(EMatchMode pMode) {
-        mGyro.zeroAll();
         reset();
-        if(pMode == EMatchMode.AUTONOMOUS) {
-            resetOdometry(new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
+        if (pMode == EMatchMode.AUTONOMOUS) {
             mLeftMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
             mRightMaster.setIdleMode(CANSparkMax.IdleMode.kBrake);
             mLeftFollower.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -166,9 +164,8 @@ public class NeoDriveModule extends Module {
      * @param pose The pose to which to set the odometry.
      */
     public void resetOdometry(Pose2d pose) {
-        //TODO figure out when to invert the heading of the gyro
         reset();
-        mGyro.resetAngle(pose.getRotation());
+//        mGyro.resetAngle(pose.getRotation());
         mOdometry.resetPosition(pose, Rotation2d.fromDegrees(-mGyro.getHeading().getDegrees()));
     }
     @Override
@@ -215,10 +212,9 @@ public class NeoDriveModule extends Module {
                 reset();
                 break;
             case RESET_ODOMETRY:
-                //TODO figure out when to invert the heading of the gyro
                 double x = db.drivetrain.get(X_DESIRED_ODOMETRY_METERS);
                 double y = db.drivetrain.get(Y_DESIRED_ODOMETRY_METERS);
-                mGyro.resetAngle(Rotation2d.fromDegrees(db.drivetrain.get(DESIRED_HEADING_deg)));
+                reset();
                 resetOdometry(new Pose2d(x, y, mGyro.getHeading()));
                 break;
             case PERCENT_OUTPUT:
@@ -229,7 +225,7 @@ public class NeoDriveModule extends Module {
                         turn = targetLockOutput;
                     }
 
-                    turn *= (1/(1-throttle)) * 0.5;
+                    turn *= (1 / (1 - throttle)) * 0.5;
                 }
 
                 mLeftMaster.set(throttle+turn);
@@ -263,15 +259,14 @@ public class NeoDriveModule extends Module {
                 mRightMaster.set(rightPathOutput);
                 break;
             case PATH_FOLLOWING_RAMSETE:
-                //Divide by 6.56 since that is the max velocity in ft/s
                 double vleft = db.drivetrain.get(L_DESIRED_VEL_FT_s);
                 double vright = db.drivetrain.get(R_DESIRED_VEL_FT_s);
 //                mLeftMaster.set(db.drivetrain.get(L_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
 //                mRightMaster.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
 //                mRightFollower.set(db.drivetrain.get(R_DESIRED_VEL_FT_s) / Units.meters_to_feet(0.5));
 //                mDrive.feed();
-                mLeftCtrl.setReference((vleft / kWheelCircumferenceFeet) * 60, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
-                mRightCtrl.setReference((vright / kWheelCircumferenceFeet) * 60, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+                mLeftCtrl.setReference(vleft / kDriveNEOVelocityFactor, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
+                mRightCtrl.setReference(vright / kDriveNEOVelocityFactor, CANSparkMax.ControlType.kVelocity, VELOCITY_PID_SLOT, 0);
                 break;
         }
     }
@@ -279,8 +274,6 @@ public class NeoDriveModule extends Module {
     public void reset() {
         mLeftEncoder.setPosition(0.0);
         mRightEncoder.setPosition(0.0);
-        mLeftMaster.set(0.0);
-        mRightMaster.set(0.0);
     }
 
 

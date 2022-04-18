@@ -104,9 +104,9 @@ public class FollowTrajectory implements ICommand {
         }
         mPreviousSpeeds = wheelSpeeds;
         mPreviousTime = curTime;
-//        if (mTrajectoryTimer.get() > mTrajectory.getTotalTimeSeconds()) {
-//            return true;
-//        }
+        if (mTrajectoryTimer.get() > mTrajectory.getTotalTimeSeconds()) {
+            return true;
+        }
         return false;
     }
 

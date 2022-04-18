@@ -1,5 +1,10 @@
 {
   "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    },
     "RoboRIO": {
       "6V Rail": {
         "open": false
@@ -28,6 +33,16 @@
         "First Leg": {
           "arrowSize": 14
         },
+        "Fourth path": {
+          "length": 0.0,
+          "weight": 0.0,
+          "width": 0.0
+        },
+        "Robot": {
+          "length": 0.699999988079071,
+          "style": "Box/Image",
+          "width": 0.6000000238418579
+        },
         "Second Leg Ball 3": {
           "arrowSize": 12,
           "style": "Track"
@@ -42,9 +57,13 @@
         },
         "Third path": {
           "arrowSize": 15,
-          "style": "Track"
+          "length": 0.0,
+          "style": "Box/Image",
+          "weight": 0.0,
+          "width": 0.0
         },
         "image": "C:\\Users\\Agrim\\Documents\\FRC-Robot-2022\\PathWeaver\\Games\\2022-field.png",
+        "units": "feet",
         "window": {
           "visible": true
         }
@@ -62,5 +81,8 @@
         "open": false
       }
     }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
