@@ -1,11 +1,13 @@
 package us.ilite.robot.controller;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import io.github.pseudoresonance.pixy2api.Pixy2CCC;
 import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
+import us.ilite.robot.Robot;
 
 import static us.ilite.common.types.EIntakeData.*;
 import static us.ilite.common.types.EFeederData.*;
@@ -41,21 +43,35 @@ public class TeleopController extends BaseManualController {
     }
 
     private void updateTargetLock() {
-        if (db.driverinput.isSet(InputMap.DRIVER.TARGET_LOCK)) {
-            if (db.limelight.isSet(ELimelightData.TV)) {
-                setLED(Enums.LEDColorMode.GREEN, Enums.LEDState.SOLID);
+        if (Robot.mode() == EMatchMode.TELEOPERATED) {
+            if (db.driverinput.isSet(InputMap.DRIVER.TARGET_LOCK)) {
+                if (db.limelight.isSet(ELimelightData.TV)) {
+                    setLED(Enums.LEDColorMode.GREEN, Enums.LEDState.SOLID);
+                } else {
+                    setLED(Enums.LEDColorMode.RED, Enums.LEDState.SOLID);
+                }
+                if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+                    db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.BLUE_BALL.id());
+                } else {
+                    db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.RED_BALL.id());
+                }
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
             } else {
-                setLED(Enums.LEDColorMode.RED, Enums.LEDState.SOLID);
+                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CAMERA.id());
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
             }
-            if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.BLUE_BALL.id());
-            } else {
-                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.RED_BALL.id());
-            }
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
         } else {
-            db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CAMERA.id());
-            db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
+            if (db.driverinput.isSet(InputMap.DRIVER.TARGET_LOCK)) {
+                if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+                    db.pixydata.set(EPixyData.SIGNATURE, Pixy2CCC.CCC_SIG1);
+                } else {
+                    db.pixydata.set(EPixyData.SIGNATURE, Pixy2CCC.CCC_SIG2);
+                }
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.PERCENT_OUTPUT);
+            } else {
+                db.limelight.set(ELimelightData.TARGET_ID, Field2022.FieldElement.CAMERA.id());
+                db.drivetrain.set(EDriveData.STATE, Enums.EDriveState.VELOCITY);
+            }
         }
     }
 

@@ -13,6 +13,7 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.EPixyData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
@@ -224,6 +225,14 @@ public class NeoDriveModule extends Module {
                     double targetLockOutput = 0;
                     if (db.limelight.isSet(ELimelightData.TV)) {
                         targetLockOutput = mTargetLockPID.calculate(-db.limelight.get(ELimelightData.TX), clock.dt());
+                        turn = targetLockOutput;
+                    }
+
+                    turn *= (1/(1-throttle)) * 0.5;
+                } else if (db.pixydata.isSet(EPixyData.SIGNATURE)) {
+                    double targetLockOutput = 0;
+                    if (db.pixydata.get(EPixyData.TARGET_VALID) == 1) {
+                        targetLockOutput = mTargetLockPID.calculate(-db.pixydata.get(EPixyData.LARGEST_ANGLE_FROM_CAMERA), clock.dt());
                         turn = targetLockOutput;
                     }
 
