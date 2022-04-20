@@ -49,5 +49,6 @@ public enum EClimberModuleData {
 
     DESIRED_RUNG,
     CURRENT_RUNG,
-    STAGE
+    STAGE,
+    RUNG_STATE,
     }

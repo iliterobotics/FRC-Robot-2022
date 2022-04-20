@@ -30,7 +30,8 @@ public enum ELogitech310 implements CodexOf<Double> {
     COMBINED_TRIGGER_AXIS,
     LEFT_TRIGGER_AXIS,
     RIGHT_TRIGGER_AXIS,
-    RUMBLE;
+    RUMBLE,
+    NULL;
 
 	public static void map(RobotCodex<ELogitech310> pCodex, Joystick pJoystick) {
 		map(pCodex, pJoystick, 0d);

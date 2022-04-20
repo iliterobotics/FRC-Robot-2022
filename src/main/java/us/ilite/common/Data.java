@@ -116,6 +116,7 @@ public class Data {
         feeder.createSimpleEnumConverter(EFeederData.STATE, Enums.EFeederState.class);
 
         climber.createSimpleEnumConverter(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.class);
+        climber.createSimpleEnumConverter(EClimberModuleData.RUNG_STATE, Enums.ERungState.class);
         climber.createSimpleBooleanConverter(EClimberModuleData.SET_COAST);
         climber.createSimpleEnumConverter(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.class);
         climber.createSimpleEnumConverter(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.class);
@@ -134,6 +135,7 @@ public class Data {
         mConvertedFields.add(EClimberModuleData.HANGER_STATE.name());
         mConvertedFields.add(EClimberModuleData.SET_COAST.name());
         mConvertedFields.add(EClimberModuleData.IS_DOUBLE_CLAMPED.name());
+        mConvertedFields.add(EClimberModuleData.RUNG_STATE.name());
         mConvertedFields.add(EClimberModuleData.IS_SINGLE_CLAMPED.name());
         mConvertedFields.add(ELEDControlData.DESIRED_COLOR.name());
         mConvertedFields.add(ELEDControlData.LED_STATE.name());

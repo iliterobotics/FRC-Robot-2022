@@ -60,8 +60,8 @@ public class ClimberModule extends Module{
         mCL12.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 20);
         mCLMR11.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor,0, 20);
 
-        mCLMR11.configAllowableClosedloopError(1, climberDegreesToTicks(1));
-        mCL12.configAllowableClosedloopError(1, climberDegreesToTicks(1));
+        mCLMR11.configAllowableClosedloopError(1, climberDegreesToTicks(2));
+        mCL12.configAllowableClosedloopError(1, climberDegreesToTicks(2));
 
         mVelocityPID = new PIDController(kVelocityGains, -kMaxClimberSpeed, kMaxClimberSpeed, Settings.kControlLoopPeriod);
 

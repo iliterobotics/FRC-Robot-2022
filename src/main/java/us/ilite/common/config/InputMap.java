@@ -73,16 +73,21 @@ public class InputMap {
         public static final ELogitech310
         SPIN_DOUBLE = ELogitech310.RIGHT_TRIGGER_AXIS,
         SPIN_SINGLE = ELogitech310.LEFT_TRIGGER_AXIS,
-        HIGH_RUNG = ELogitech310.L_BTN,
-        TRAVERSAL_RUNG = ELogitech310.R_BTN,
-        BALANCE_CLIMBER = ELogitech310.START,
-//        SET_COAST = ELogitech310.BACK,
+//        HIGH_RUNG = ELogitech310.L_BTN,
+//        TRAVERSAL_RUNG = ELogitech310.R_BTN,
+//        BALANCE_CLIMBER = ELogitech310.START,
+////        SET_COAST = ELogitech310.BACK,
         CLAMP_DOUBLE = ELogitech310.DPAD_UP,
         RELEASE_DOUBLE = ELogitech310.DPAD_DOWN,
         CLAMP_SINGLE = ELogitech310.Y_BTN,
         RELEASE_SINGLE = ELogitech310.A_BTN,
+
+
+
+        GRAB_MID = ELogitech310.L_BTN,
+        CONFIRM_CLAMPED_ON_HIGH_BAR = ELogitech310.R_BTN,
+        CONFIRM_CLAMPED_ON_TRAVERSAL_RELEASE_HIGH = ELogitech310.X_BTN;
         // Experimental Inputs for automation
-        CLIMB_TO_NEXT_RUNG = ELogitech310.R_BTN;
     }
 
 }

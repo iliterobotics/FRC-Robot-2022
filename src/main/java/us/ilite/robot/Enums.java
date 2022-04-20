@@ -9,6 +9,43 @@ public class Enums {
         DEFAULT
     }
 
+    public enum ERungState {
+        NULL,
+
+        // Driver activates move to initial position
+        GROUND,
+
+        // Grab the mid bar. Operator pushes button to enter this state.
+        //Automated go to high bar
+        GO_TO_HIGH_BAR,
+
+        GRAB_HIGH_BAR,
+
+        // Operator pushes button to enter this state.
+        // Balancing while grabbing both Mid and High. Drives the climber in reverse.
+        BALANCING,
+
+        // Automated entry.
+        // Release double claw after we're balanced. Should be 1 cycle or so.
+        RELEASING_MID,
+
+        // Automated entry.
+        // Go to traversal position. Keep double claw released during this time
+        MOVE_TO_TRAVERSAL,
+
+        // Automated entry.
+        // Close double claw, stay in this state until driver pushes button
+        GRAB_TRAVERSAL,
+
+        // Driver pushes the button to enter this state.
+        // Open single claw.
+        RELEASE_HIGH,
+
+        // Autoated entry after N seconds of RELEASE_HIGH state
+        // Move to final traversal position.
+        FINAL_LIFT
+    }
+
     public enum EClampMode {
         NULL,
         CLAMPED,
