@@ -1,11 +1,13 @@
 package us.ilite.robot.controller;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC;
 import us.ilite.common.Field2022;
 import us.ilite.common.config.InputMap;
 import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
+import us.ilite.common.types.input.ELogitech310;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
 
@@ -18,6 +20,8 @@ public class TeleopController extends BaseManualController {
     private static TeleopController INSTANCE;
     private boolean mPressed = false, mPrevPressed = false;
 
+    private Timer mClimbTimer;
+
     public static TeleopController getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new TeleopController();
@@ -26,6 +30,9 @@ public class TeleopController extends BaseManualController {
     }
 
     private TeleopController() {
+        mClimbTimer = new Timer();
+        mClimbTimer.reset();
+        mClimbTimer.start();
     }
 
     @Override
@@ -36,10 +43,65 @@ public class TeleopController extends BaseManualController {
         super.updateDrivetrain();
         updateCargo();
         super.updateBallCount();
-        updateHangerMotors();
-        updateHangerPneumatics();
+
+        //Makes sure that we call the right methods for the climber mode
+        if (Robot.CLIMB_MODE.equals("WCMP")) {
+            if (db.operatorinput.isSet(ELogitech310.START)) {
+                updateHangerManual();
+                mLastRungState = Enums.ERungState.NULL;
+            } else {
+                updateRungState();
+            }
+        } else {
+            //Add in methods from DCMP
+            updateHangerMotors();
+            updateHangerPneumatics();
+        }
+
         updateIntake();
         updateTargetLock();
+    }
+    private void updateHangerMotors() {
+        db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+
+        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.HANGER.SPIN_SINGLE)) {
+                db.climber.set(EClimberData.DESIRED_VEL_pct, 0.45);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
+                db.climber.set(EClimberData.DESIRED_VEL_pct, -0.45);
+            } else if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
+                db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberData.DESIRED_POS_deg, -90);
+//                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+//                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+            }
+            else if (db.operatorinput.isSet(InputMap.HANGER.HIGH_RUNG)) {
+                db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberData.DESIRED_POS_deg, 90);
+            }
+            else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
+                db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberData.DESIRED_POS_deg, 287.5);
+            }
+            else {
+                db.climber.set(EClimberData.DESIRED_VEL_pct, 0);
+            }
+        }
+    }
+    private void updateHangerPneumatics() {
+        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_DOUBLE)) {
+                db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+            } if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_DOUBLE)) {
+                db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+            }
+
+            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_SINGLE)) {
+                db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+            } if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_SINGLE)) {
+                db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+            }
+        }
     }
 
     private void updateTargetLock() {
@@ -74,53 +136,187 @@ public class TeleopController extends BaseManualController {
             }
         }
     }
-
-    private void updateHangerMotors() {
-        db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
-
+    private void updateHangerManual() {
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
             if (db.operatorinput.isSet(InputMap.HANGER.SPIN_SINGLE)) {
-                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.45);
+                db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+                db.climber.set(EClimberData.DESIRED_VEL_pct, 0.45);
             } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
-                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.45);
-            } else if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
-                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-                db.climber.set(EClimberModuleData.DESIRED_POS_deg, -90);
-//                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
-//                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+                db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+                db.climber.set(EClimberData.DESIRED_VEL_pct, -0.45);
+            } else {
+                db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+                db.climber.set(EClimberData.DESIRED_VEL_pct, 0.0);
             }
-            else if (db.operatorinput.isSet(InputMap.HANGER.HIGH_RUNG)) {
-                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 90);
+            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_DOUBLE)) {
+                db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
             }
             else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
-                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 setIntakeArmEnabled(true);
-                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 287.5);
-            } else if (db.operatorinput.isSet(InputMap.HANGER.BALANCE_CLIMBER)) {
-                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 250);
+                db.climber.set(EClimberData.DESIRED_POS_deg, 287.5);
             }
-            else {
-                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0);
+            if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_DOUBLE)) {
+                db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
             }
+            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_SINGLE)) {
+                db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+            }
+            if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_SINGLE)) {
+                db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+            }
+        } else {
+            db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+            db.climber.set(EClimberData.DESIRED_VEL_pct, 0.0);
         }
     }
 
-    private void updateHangerPneumatics() {
+    private Enums.ERungState mLastRungState = Enums.ERungState.NULL;
+    protected void updateRungState() {
+        Enums.ERungState newState = mLastRungState;
         if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_DOUBLE)) {
-                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
-            } if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_DOUBLE)) {
-                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+
+            double angle = db.climber.get(EClimberData.ACTUAL_POSITION_deg);
+            // Determine Rung State
+            switch (mLastRungState) {
+                case NULL:
+                    if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
+                        newState = Enums.ERungState.GROUND;
+                    }
+                    break;
+                case GROUND:
+                    if (db.operatorinput.isSet(InputMap.HANGER.GRAB_MID)) {
+                        newState = Enums.ERungState.TRAVEL_TILL_HIT_HIGH;
+                    } else {
+                        newState = Enums.ERungState.GROUND;
+                    }
+                    break;
+//                case GO_TO_HIGH_BAR:
+//                    if (climberWithinTolerance(1d, angle, Enums.EClimberAngle.HIGH)) {
+//                        newState = Enums.ERungState.TRAVEL_TILL_HIT_HIGH;
+//                    } else {
+//                        newState = Enums.ERungState.GO_TO_HIGH_BAR;
+//                    }
+//                    break;
+                case TRAVEL_TILL_HIT_HIGH:
+                    if (db.climber.isSet(EClimberData.SINGLE_BEAM_BROKEN)) {
+                        newState = Enums.ERungState.GRAB_HIGH_BAR;
+                    } else {
+                        newState = Enums.ERungState.TRAVEL_TILL_HIT_HIGH;
+                    }
+                    break;
+                case GRAB_HIGH_BAR:
+                    if (db.operatorinput.isSet(InputMap.HANGER.CONFIRM_CLAMPED_ON_HIGH_BAR)) {
+                        newState = Enums.ERungState.BALANCING;
+                    } else {
+                        newState = Enums.ERungState.GRAB_HIGH_BAR;
+                    }
+                    break;
+                case BALANCING:
+                    if (climberWithinTolerance(2, angle, Enums.EClimberAngle.BALANCED)) {
+                        newState = Enums.ERungState.RELEASING_MID;
+                    } else {
+                        newState = Enums.ERungState.BALANCING;
+                    }
+                    break;
+                    // If angle = balanced angle, then go to RELEASE_MID state
+                case RELEASING_MID:
+                    //Instantaneously move to next stage to traversal once released
+                    newState = Enums.ERungState.MOVE_TO_TRAVERSAL;
+                    break;
+                case MOVE_TO_TRAVERSAL:
+                    if (climberWithinTolerance(5, angle, Enums.EClimberAngle.TRAVERSAL)) {
+                        newState = Enums.ERungState.GRAB_TRAVERSAL;
+                    } else {
+                        newState = Enums.ERungState.MOVE_TO_TRAVERSAL;
+                    }
+                    break;
+                case GRAB_TRAVERSAL:
+                    if (db.operatorinput.isSet(InputMap.HANGER.CONFIRM_CLAMPED_ON_TRAVERSAL_RELEASE_HIGH)) {
+                        newState = Enums.ERungState.RELEASE_HIGH;
+                    }
+                    else {
+                        newState = Enums.ERungState.GRAB_TRAVERSAL;
+                    }
+                    break;
+                case RELEASE_HIGH:
+                    newState = Enums.ERungState.FINAL_LIFT;
+                    break;
+                case FINAL_LIFT:
+                    newState = Enums.ERungState.FINAL_LIFT;
+                    break;
+                default:
+                    newState = Enums.ERungState.NULL;
+
             }
 
-            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_SINGLE)) {
-                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
-            } if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_SINGLE)) {
-                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+            switch (newState) {
+                case GROUND:
+                    db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                    db.climber.set(EClimberData.DESIRED_POS_deg, Enums.EClimberAngle.MID.getAngle());
+                    db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+                    db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+                    break;
+                case GO_TO_HIGH_BAR:
+                    db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                    db.climber.set(EClimberData.DESIRED_POS_deg, Enums.EClimberAngle.HIGH.getAngle());
+                    db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+                    break;
+                case TRAVEL_TILL_HIT_HIGH:
+                    db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+                    db.climber.set(EClimberData.DESIRED_VEL_pct, 0.45);
+                    db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+                    break;
+                case GRAB_HIGH_BAR:
+                    db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+                    //Should this be in percent output and 0%?
+                    db.climber.set(EClimberData.DESIRED_VEL_pct, 0d);
+                    db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    break;
+                case BALANCING:
+                    db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                    db.climber.set(EClimberData.DESIRED_POS_deg, Enums.EClimberAngle.BALANCED.getAngle());
+                    db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    break;
+                case RELEASING_MID:
+                    db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                    db.climber.set(EClimberData.DESIRED_POS_deg, Enums.EClimberAngle.BALANCED.getAngle());
+                    db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+                    break;
+                case MOVE_TO_TRAVERSAL:
+                    db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                    db.climber.set(EClimberData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
+                    db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+                    break;
+                case GRAB_TRAVERSAL:
+                    setIntakeArmEnabled(true);
+                    db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                    db.climber.set(EClimberData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
+                    db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    break;
+                case RELEASE_HIGH:
+                    setIntakeArmEnabled(true);
+                    db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                    db.climber.set(EClimberData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
+                    db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+                    db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                    break;
+                case FINAL_LIFT:
+                    updateHangerManual();
+                    break;
             }
         }
+
+        // Set outputs based upon new state
+        mLastRungState = newState;
+        db.climber.set(EClimberData.RUNG_STATE, newState);
     }
 
     private void updateCargo() {
