@@ -80,7 +80,7 @@ public abstract class AbstractController {
     }
 
     protected boolean climberWithinTolerance(double pTolerance, double currentAngle, Enums.EClimberAngle pAngle) {
-        return Math.abs((currentAngle) - pAngle.getAngle()) <= pTolerance;
+        return Math.abs((currentAngle) - pAngle.getAngle()) < pTolerance;
     }
 
     /**

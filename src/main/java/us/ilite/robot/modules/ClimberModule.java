@@ -33,7 +33,8 @@ public class ClimberModule extends Module{
 
     private ProfileGains kVelocityGains = new ProfileGains().p(0.0).f(0.0001);
     //Old P was 0.0175
-    private ProfileGains kPositionGains = new ProfileGains().p(0.0225).f(0.00075).slot(POSITION_SLOT);
+    //Old F was 0.00075
+    private ProfileGains kPositionGains = new ProfileGains().p(0.0225).f(0.0010).slot(POSITION_SLOT);
 
     // ========================================
     // DO NOT MODIFY THESE PHYSICAL CONSTANTS
@@ -96,8 +97,8 @@ public class ClimberModule extends Module{
     public void readInputs() {
         db.climber.set(ACTUAL_VEL_rpm, mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM);
         db.climber.set(ACTUAL_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
-        db.climber.set(ACTUAL_POSITION_TARGET, mCL12.getClosedLoopTarget());
-        db.climber.set(ACTUAL_POSITION_ERROR, mCL12.getClosedLoopError());
+        db.climber.set(ACTUAL_POSITION_TARGET, ticksToClimberDegrees(mCL12.getClosedLoopTarget()));
+        db.climber.set(ACTUAL_POSITION_ERROR, ticksToClimberDegrees(mCL12.getClosedLoopError()));
         db.climber.set(ACTUAL_OUTPUT_CURRENT, mCL12.getStatorCurrent());
         db.climber.set(ACTUAL_BUS_VOLTAGE, mCL12.getMotorOutputVoltage());
         db.climber.set(ACTUAL_CLIMBER_PCT, (mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM) / (6380 * kClimberRatio));

@@ -171,7 +171,7 @@ public class TeleopController extends BaseManualController {
                     }
                     break;
                 case GO_TO_HIGH_BAR:
-                    if (climberWithinTolerance(2, angle, Enums.EClimberAngle.HIGH)) {
+                    if (climberWithinTolerance(1d, angle, Enums.EClimberAngle.HIGH)) {
                         newState = Enums.ERungState.GRAB_HIGH_BAR;
                     } else {
                         newState = Enums.ERungState.GO_TO_HIGH_BAR;
@@ -210,6 +210,7 @@ public class TeleopController extends BaseManualController {
                     }
                     break;
                 case RELEASE_HIGH:
+                    setIntakeArmEnabled(true);
                     newState = Enums.ERungState.RELEASE_HIGH;
                     break;
                 default:
@@ -257,12 +258,14 @@ public class TeleopController extends BaseManualController {
                 db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
                 break;
             case GRAB_TRAVERSAL:
+                setIntakeArmEnabled(true);
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
                 db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 break;
             case RELEASE_HIGH:
+                setIntakeArmEnabled(true);
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
                 db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
