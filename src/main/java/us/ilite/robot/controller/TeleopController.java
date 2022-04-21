@@ -95,6 +95,7 @@ public class TeleopController extends BaseManualController {
             }
             else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                setIntakeArmEnabled(true);
                 db.climber.set(EClimberModuleData.DESIRED_POS_deg, 287.5);
             } else if (db.operatorinput.isSet(InputMap.HANGER.BALANCE_CLIMBER)) {
                 db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
