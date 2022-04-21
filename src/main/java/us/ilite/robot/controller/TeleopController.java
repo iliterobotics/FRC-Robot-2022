@@ -43,6 +43,8 @@ public class TeleopController extends BaseManualController {
         super.updateDrivetrain();
         updateCargo();
         super.updateBallCount();
+
+        //Makes sure that we call the right methods for the climber mode
         if (Robot.CLIMB_MODE.equals("WCMP")) {
             if (db.operatorinput.isSet(ELogitech310.START)) {
                 updateHangerManual();
@@ -52,10 +54,54 @@ public class TeleopController extends BaseManualController {
             }
         } else {
             //Add in methods from DCMP
+            updateHangerMotors();
+            updateHangerPneumatics();
         }
 
         updateIntake();
         updateTargetLock();
+    }
+    private void updateHangerMotors() {
+        db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+
+        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.HANGER.SPIN_SINGLE)) {
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.45);
+            } else if (db.operatorinput.isSet(InputMap.HANGER.SPIN_DOUBLE)) {
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, -0.45);
+            } else if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberModuleData.DESIRED_POS_deg, -90);
+//                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+//                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+            }
+            else if (db.operatorinput.isSet(InputMap.HANGER.HIGH_RUNG)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 90);
+            }
+            else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
+                db.climber.set(EClimberModuleData.DESIRED_POS_deg, 287.5);
+            }
+            else {
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0);
+            }
+        }
+    }
+    private void updateHangerPneumatics() {
+        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
+            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_DOUBLE)) {
+                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+            } if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_DOUBLE)) {
+                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
+            }
+
+            if (db.operatorinput.isSet(InputMap.HANGER.CLAMP_SINGLE)) {
+                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
+            } if (db.operatorinput.isSet(InputMap.HANGER.RELEASE_SINGLE)) {
+                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
+            }
+        }
     }
 
     private void updateTargetLock() {
