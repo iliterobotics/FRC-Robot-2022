@@ -41,7 +41,9 @@ public abstract class AbstractController {
     protected Timer mShotTimer = new Timer();
     protected boolean mFireWanted = false;
 
-    protected double mFeederFireSpeed = 4500d;
+    //Was 5000, lowered it to 4500 before match 42.
+    //After match 42, we lowered it even further by 1000rpm
+    protected double mFeederFireSpeed = 3500d;
 
     public AbstractController(){
         super();
