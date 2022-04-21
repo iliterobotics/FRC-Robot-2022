@@ -36,8 +36,9 @@ public class ClimberModule extends Module{
     private ProfileGains kVelocityGains = new ProfileGains().p(0.0).f(0.0001);
     //Old P was 0.0175
     //Old F was 0.00075
-    private ProfileGains kPositionGains = new ProfileGains().p(0.0225).f(0.0010).slot(POSITION_SLOT);
+//    private ProfileGains kPositionGains = new ProfileGains().p(0.0225).f(0.0010).slot(POSITION_SLOT);
 
+    private ProfileGains kPositionGains = new ProfileGains().p(0.035).f(0.0010).slot(POSITION_SLOT);
     // ========================================
     // DO NOT MODIFY THESE PHYSICAL CONSTANTS
     // ========================================
