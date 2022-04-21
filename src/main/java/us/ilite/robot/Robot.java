@@ -11,6 +11,7 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.Data;
 import us.ilite.common.config.AbstractSystemSettingsUtils;
@@ -37,6 +38,7 @@ public class Robot extends TimedRobot {
     public static final Field2d FIELD = new Field2d();
     public static final boolean IS_SIMULATED = RobotBase.isSimulation();
     private static EMatchMode MODE = DISABLED;
+    public static String CLIMB_MODE = "";
     private ModuleList mRunningModules = new ModuleList();
     private final Settings mSettings = new Settings();
     private CSVLogger mCSVLogger;
@@ -51,6 +53,7 @@ public class Robot extends TimedRobot {
     private NeoDriveModule mNeoDrive;
     private Limelight mLimelight;
     private AutonSelection mAutonSelection;
+    private ClimbModeSelection mClimberSelector;
   //  private BallTracking mPixy;
 
     private OperatorInput mOI;
@@ -70,6 +73,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        mClimberSelector = new ClimbModeSelection();
         UsbCamera camera = CameraServer.startAutomaticCapture();
         camera.setFPS(30);
         CLOCK.update();
@@ -150,6 +154,7 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
+        CLIMB_MODE = mClimberSelector.getSelectedMode();
         BaseAutonController mAutoController = mAutonSelection.getSelectedAutonController();
         mActiveController = mAutoController;
         mAutoController.initialize();

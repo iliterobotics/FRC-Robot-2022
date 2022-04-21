@@ -8,7 +8,9 @@ public enum EClimberModuleData {
     ACTUAL_POSITION_deg,
 
     /**Left output in current**/
-    ACTUAL_OUTPUT_CURRENT,
+    ACTUAL_OUTPUT_CURRENT_12,
+    ACTUAL_OUTPUT_CURRENT_11,
+
 
     /**Bus voltage left**/
     ACTUAL_BUS_VOLTAGE,

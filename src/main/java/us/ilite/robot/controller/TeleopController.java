@@ -43,16 +43,19 @@ public class TeleopController extends BaseManualController {
         super.updateDrivetrain();
         updateCargo();
         super.updateBallCount();
-        if (db.operatorinput.isSet(ELogitech310.START)) {
-            updateHangerManual();
-            mLastRungState = Enums.ERungState.NULL;
+        if (Robot.CLIMB_MODE.equals("WCMP")) {
+            if (db.operatorinput.isSet(ELogitech310.START)) {
+                updateHangerManual();
+                mLastRungState = Enums.ERungState.NULL;
+            } else {
+                updateRungState();
+            }
         } else {
-            updateRungState();
+            //Add in methods from DCMP
         }
-//        updateHangerManual();
+
         updateIntake();
         updateTargetLock();
-      //  updateRungState();
     }
 
     private void updateTargetLock() {

@@ -99,7 +99,8 @@ public class ClimberModule extends Module{
         db.climber.set(ACTUAL_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
         db.climber.set(ACTUAL_POSITION_TARGET, ticksToClimberDegrees(mCL12.getClosedLoopTarget()));
         db.climber.set(ACTUAL_POSITION_ERROR, ticksToClimberDegrees(mCL12.getClosedLoopError()));
-        db.climber.set(ACTUAL_OUTPUT_CURRENT, mCL12.getStatorCurrent());
+        db.climber.set(ACTUAL_OUTPUT_CURRENT_12, mCL12.getStatorCurrent());
+        db.climber.set(ACTUAL_OUTPUT_CURRENT_11, mCLMR11.getStatorCurrent());
         db.climber.set(ACTUAL_BUS_VOLTAGE, mCL12.getMotorOutputVoltage());
         db.climber.set(ACTUAL_CLIMBER_PCT, (mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM) / (6380 * kClimberRatio));
     }
