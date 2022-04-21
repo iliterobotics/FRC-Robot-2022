@@ -55,13 +55,14 @@ public class Enums {
     public enum EClimberAngle {
         //Angles at desired rung
 
-        //At final test at playground
+        //At last test at playground
         //high at 104, traversal is 277, final lift is 150
         NULL(0.0),
         MID(-90.0),
-        HIGH(100.0),
+        HIGH(102.0),
         BALANCED(41.0),
-        TRAVERSAL(257.0),
+        TRAVERSAL(277.0),
+        FINAL_LIFT(150),
         SCORE(250.0);
 
         //Old traversal angle is 287.5
