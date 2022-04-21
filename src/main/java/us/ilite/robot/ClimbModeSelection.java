@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class ClimbModeSelection {
     private SendableChooser<String> mClimbSelection = new SendableChooser<String>();
-    private ShuffleboardTab mClimbOptions = Shuffleboard.getTab("Climber Selection");
+    private ShuffleboardTab mClimbOptions = Shuffleboard.getTab("Pre-Match Configuration");
 
     public ClimbModeSelection() {
         mClimbOptions.add("Climber Mode", mClimbSelection)

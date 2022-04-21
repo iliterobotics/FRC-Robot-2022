@@ -165,39 +165,6 @@ public class TeleopController extends BaseManualController {
             db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.0);
         }
     }
-    private boolean mBalanced = false;
-//    private void updateAutomaticHanger() {
-//        if (db.driverinput.isSet(InputMap.DRIVER.ACTIVATE_CLIMB)) {
-//            double angle = db.climber.get(EClimberModuleData.ACTUAL_POSITION_deg);
-//            if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
-//                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-//                db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.MID.getAngle());
-//            } else if (db.operatorinput.isSet(InputMap.HANGER.HIGH_RUNG)) {
-//                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-//                db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.HIGH.getAngle());
-//                if (climberWithinTolerance(1, angle, Enums.EClimberAngle.HIGH)) {
-//                    db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
-//                }
-//            }
-//            //Everything works up to this point
-//            else if (db.operatorinput.isSet(InputMap.HANGER.TRAVERSAL_RUNG)) {
-//                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-//                if (!mBalanced) {
-//                    db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.BALANCED.getAngle());
-//                } else {
-//                    db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
-//                }
-//                if (angle <= Enums.EClimberAngle.BALANCED.getAngle()) {
-//                    mBalanced = true;
-//                }
-//                if (angle >= Enums.EClimberAngle.HIGH.getAngle()) {
-//                    db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
-//                } else {
-//                    db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
-//                }
-//            }
-//        }
-//    }
 
     private Enums.ERungState mLastRungState = Enums.ERungState.NULL;
     protected void updateRungState() {
@@ -227,7 +194,7 @@ public class TeleopController extends BaseManualController {
                     }
                     break;
                 case TRAVEL_TILL_HIT_HIGH:
-                    if (db.climber.get(EClimberModuleData.SINGLE_BEAM_BROKEN) == 0d) {
+                    if (db.climber.isSet(EClimberModuleData.SINGLE_BEAM_BROKEN)) {
                         newState = Enums.ERungState.GRAB_HIGH_BAR;
                     } else {
                         newState = Enums.ERungState.TRAVEL_TILL_HIT_HIGH;

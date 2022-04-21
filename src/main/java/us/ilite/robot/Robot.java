@@ -154,7 +154,6 @@ public class Robot extends TimedRobot {
         mRunningModules.addModule(mLimelight);
         mRunningModules.addModule(mLEDControl);
         mRunningModules.modeInit(AUTONOMOUS);
-        CLIMB_MODE = mClimberSelector.getSelectedMode();
         BaseAutonController mAutoController = mAutonSelection.getSelectedAutonController();
         mActiveController = mAutoController;
         mAutoController.initialize();
@@ -170,6 +169,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        CLIMB_MODE = mClimberSelector.getSelectedMode();
+        SmartDashboard.putString("Climb Mode", CLIMB_MODE);
         if ( Settings.kIsLogging ){
             mCSVLogger.start();
         }
