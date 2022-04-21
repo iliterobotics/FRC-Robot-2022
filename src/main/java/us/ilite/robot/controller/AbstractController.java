@@ -41,7 +41,7 @@ public abstract class AbstractController {
     protected Timer mShotTimer = new Timer();
     protected boolean mFireWanted = false;
 
-    protected double mFeederFireSpeed = 5000d;
+    protected double mFeederFireSpeed = 4500d;
 
     public AbstractController(){
         super();
