@@ -21,7 +21,7 @@ public class FeederModule extends Module {
     private final TalonFX mIntakeFeeder;
 
     private final DigitalBeamSensor mEntryBeamBreaker;
-    private final DigitalBeamSensor mExitBeamBreaker;
+  //  private final DigitalBeamSensor mExitBeamBreaker;
 
     // ========================================
     // DO NOT MODIFY THESE HARDWARE CONSTANTS
@@ -40,7 +40,7 @@ public class FeederModule extends Module {
     public FeederModule () {
         mIntakeFeeder = new TalonFX(Settings.HW.CAN.kINFeeder);
         mEntryBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINEntryBeam, kDebounceTime);
-        mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINExitBeam, kDebounceTime);
+     //   mExitBeamBreaker = new DigitalBeamSensor(Settings.HW.DIO.kINExitBeam, kDebounceTime);
         mIntakeFeeder.configPeakOutputForward(1.0, 20);
         mIntakeFeeder.configPeakOutputReverse(-1.0, 20);
         setStatusFrames();
@@ -58,7 +58,7 @@ public class FeederModule extends Module {
         db.feeder.set(EXIT_BALL_VELOCITY_ft_s, mIntakeFeeder.getSelectedSensorVelocity() * kVelocityConversion);
         db.feeder.set(EXIT_BALL_VELOCITY_rpm, mIntakeFeeder.getSelectedSensorVelocity() * 600.0 / 2048.0);
         db.feeder.set(ENTRY_BEAM, mEntryBeamBreaker.isBroken());
-        db.feeder.set(EXIT_BEAM, mExitBeamBreaker.isBroken());
+   //     db.feeder.set(EXIT_BEAM, mExitBeamBreaker.isBroken());
     }
 
     @Override

@@ -221,9 +221,16 @@ public class TeleopController extends BaseManualController {
                     break;
                 case GO_TO_HIGH_BAR:
                     if (climberWithinTolerance(1d, angle, Enums.EClimberAngle.HIGH)) {
-                        newState = Enums.ERungState.GRAB_HIGH_BAR;
+                        newState = Enums.ERungState.TRAVEL_TILL_HIT_HIGH;
                     } else {
                         newState = Enums.ERungState.GO_TO_HIGH_BAR;
+                    }
+                    break;
+                case TRAVEL_TILL_HIT_HIGH:
+                    if (db.climber.get(EClimberModuleData.SINGLE_BEAM_BROKEN) == 0d) {
+                        newState = Enums.ERungState.GRAB_HIGH_BAR;
+                    } else {
+                        newState = Enums.ERungState.TRAVEL_TILL_HIT_HIGH;
                     }
                     break;
                 case GRAB_HIGH_BAR:
@@ -282,9 +289,15 @@ public class TeleopController extends BaseManualController {
                 db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
                 break;
+            case TRAVEL_TILL_HIT_HIGH:
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0.45);
+                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
+                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
             case GRAB_HIGH_BAR:
-                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.POSITION);
-                db.climber.set(EClimberModuleData.DESIRED_POS_deg, Enums.EClimberAngle.HIGH.getAngle());
+                db.climber.set(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
+                //Should this be in percent output and 0%?
+                db.climber.set(EClimberModuleData.DESIRED_VEL_pct, 0d);
                 db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.CLAMPED);
                 break;

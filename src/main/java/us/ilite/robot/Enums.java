@@ -19,6 +19,8 @@ public class Enums {
         //Automated go to high bar
         GO_TO_HIGH_BAR,
 
+        TRAVEL_TILL_HIT_HIGH,
+
         GRAB_HIGH_BAR,
 
         // Operator pushes button to enter this state.

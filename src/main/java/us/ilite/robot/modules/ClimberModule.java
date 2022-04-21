@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import us.ilite.common.config.Settings;
@@ -13,6 +14,7 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.types.EClimberModuleData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Enums;
+import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.HardwareUtils;
 
 import static us.ilite.common.types.EClimberModuleData.*;
@@ -22,6 +24,7 @@ public class ClimberModule extends Module{
     private final TalonFX mCL12;
     private final DoubleSolenoid mCLPNDouble;
     private final DoubleSolenoid mCLPNSingle;
+    private DigitalBeamSensor mSingleBreak;
 
     private PIDController mVelocityPID;
 
@@ -44,6 +47,7 @@ public class ClimberModule extends Module{
     public static final double kScaledUnitsToRPM = (600.0 / 2048.0) * kClimberRatio;
 
     public ClimberModule() {
+        mSingleBreak = new DigitalBeamSensor(3);
         mCLMR11 = new TalonFX(Settings.HW.CAN.kCLM1);
         mCL12 = new TalonFX(Settings.HW.CAN.kCL2);
         mCLMR11.setNeutralMode(NeutralMode.Brake);
@@ -101,6 +105,7 @@ public class ClimberModule extends Module{
         db.climber.set(ACTUAL_POSITION_ERROR, ticksToClimberDegrees(mCL12.getClosedLoopError()));
         db.climber.set(ACTUAL_OUTPUT_CURRENT_12, mCL12.getStatorCurrent());
         db.climber.set(ACTUAL_OUTPUT_CURRENT_11, mCLMR11.getStatorCurrent());
+        db.climber.set(SINGLE_BEAM_BROKEN, mSingleBreak.isBroken());
         db.climber.set(ACTUAL_BUS_VOLTAGE, mCL12.getMotorOutputVoltage());
         db.climber.set(ACTUAL_CLIMBER_PCT, (mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM) / (6380 * kClimberRatio));
     }

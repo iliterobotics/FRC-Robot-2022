@@ -1,12 +1,13 @@
 package us.ilite.robot;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class ClimbModeSelection {
     private SendableChooser<String> mClimbSelection = new SendableChooser<String>();
-    private ShuffleboardTab mClimbOptions;
+    private ShuffleboardTab mClimbOptions = Shuffleboard.getTab("Climber Selection");
 
     public ClimbModeSelection() {
         mClimbOptions.add("Climber Mode", mClimbSelection)

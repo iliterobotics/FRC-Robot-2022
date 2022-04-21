@@ -3,6 +3,7 @@ package us.ilite.common.types;
 public enum EClimberModuleData {
     /**Actual left velocity in rpm**/
     ACTUAL_VEL_rpm,
+    SINGLE_BEAM_BROKEN,
 
     /**Actual left position in degrees**/
     ACTUAL_POSITION_deg,
