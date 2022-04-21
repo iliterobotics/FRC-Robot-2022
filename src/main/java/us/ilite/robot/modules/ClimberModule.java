@@ -5,19 +5,18 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.types.EClimberModuleData;
+import us.ilite.common.types.EClimberData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Enums;
 import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.HardwareUtils;
 
-import static us.ilite.common.types.EClimberModuleData.*;
+import static us.ilite.common.types.EClimberData.*;
 
 public class ClimberModule extends Module{
     private final TalonFX mCLMR11;
@@ -112,10 +111,10 @@ public class ClimberModule extends Module{
 
     @Override
     public void setOutputs() {
-        Enums.EClimberMode mode = db.climber.get(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.class);
+        Enums.EClimberMode mode = db.climber.get(EClimberData.HANGER_STATE, Enums.EClimberMode.class);
         if (mode == null) return;
 
-        if (db.climber.isSet(EClimberModuleData.SET_COAST)) {
+        if (db.climber.isSet(EClimberData.SET_COAST)) {
             mCL12.setNeutralMode(NeutralMode.Coast);
             mCLMR11.setNeutralMode(NeutralMode.Coast);
         } else {
@@ -125,11 +124,11 @@ public class ClimberModule extends Module{
 
         switch(mode) {
             case PERCENT_OUTPUT:
-                mCL12.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.DESIRED_VEL_pct));
-                mCLMR11.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.DESIRED_VEL_pct));
+                mCL12.set(ControlMode.PercentOutput, db.climber.get(EClimberData.DESIRED_VEL_pct));
+                mCLMR11.set(ControlMode.PercentOutput, db.climber.get(EClimberData.DESIRED_VEL_pct));
                 break;
             case VELOCITY:
-                double desiredVel = mVelocityPID.calculate(db.climber.get(EClimberModuleData.ACTUAL_VEL_rpm), clock.getCurrentTimeInMillis());
+                double desiredVel = mVelocityPID.calculate(db.climber.get(EClimberData.ACTUAL_VEL_rpm), clock.getCurrentTimeInMillis());
                 mCL12.set(ControlMode.Velocity, desiredVel);
                 mCLMR11.set(ControlMode.Velocity, desiredVel);
                 break;

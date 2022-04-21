@@ -74,8 +74,8 @@ public abstract class AbstractController {
     }
 
     protected boolean climberWithinTolerance(double pTolerance) {
-        Enums.EClimberAngle current = db.climber.get(EClimberModuleData.CURRENT_RUNG, Enums.EClimberAngle.class);
-        Enums.EClimberAngle desired = db.climber.get(EClimberModuleData.DESIRED_RUNG, Enums.EClimberAngle.class);
+        Enums.EClimberAngle current = db.climber.get(EClimberData.CURRENT_RUNG, Enums.EClimberAngle.class);
+        Enums.EClimberAngle desired = db.climber.get(EClimberData.DESIRED_RUNG, Enums.EClimberAngle.class);
         return Math.abs(current.getAngle() - desired.getAngle()) < pTolerance;
     }
 

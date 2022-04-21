@@ -13,8 +13,8 @@ public class ClimbModeSelection {
         mClimbOptions.add("Climber Mode", mClimbSelection)
                 .withPosition(1, 3)
                 .withSize(2, 2);
-        mClimbSelection.setDefaultOption("Default", "DCMP");
-        mClimbSelection.addOption("District Automation", "DCMP");
+        mClimbSelection.setDefaultOption("Default - Districts", "DCMP");
+        mClimbSelection.addOption("Districts Automation", "DCMP");
         mClimbSelection.addOption("Worlds Automation", "WCMP");
     }
     public String getSelectedMode() {
