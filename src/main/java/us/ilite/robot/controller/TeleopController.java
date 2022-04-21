@@ -21,6 +21,8 @@ public class TeleopController extends BaseManualController {
     private boolean mPressed = false, mPrevPressed = false;
 
     private Timer mClimbTimer;
+    private Timer moveToTraversalTimer = new Timer();
+
 
     public static TeleopController getInstance() {
         if (INSTANCE == null) {
@@ -72,8 +74,6 @@ public class TeleopController extends BaseManualController {
             } else if (db.driverinput.isSet(InputMap.DRIVER.MID_RUNG)) {
                 db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
                 db.climber.set(EClimberData.DESIRED_POS_deg, -90);
-//                db.climber.set(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
-//                db.climber.set(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
             }
             else if (db.operatorinput.isSet(InputMap.HANGER.HIGH_RUNG)) {
                 db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
@@ -215,6 +215,7 @@ public class TeleopController extends BaseManualController {
                 case BALANCING:
                     if (climberWithinTolerance(2, angle, Enums.EClimberAngle.BALANCED)) {
                         newState = Enums.ERungState.RELEASING_MID;
+                        moveToTraversalTimer.reset();
                     } else {
                         newState = Enums.ERungState.BALANCING;
                     }
@@ -222,7 +223,10 @@ public class TeleopController extends BaseManualController {
                     // If angle = balanced angle, then go to RELEASE_MID state
                 case RELEASING_MID:
                     //Instantaneously move to next stage to traversal once released
-                    newState = Enums.ERungState.MOVE_TO_TRAVERSAL;
+                    //newState = Enums.ERungState.MOVE_TO_TRAVERSAL;
+                    if(moveToTraversalTimer.get() > 1.0) {
+                         newState = Enums.ERungState.MOVE_TO_TRAVERSAL;
+                    }
                     break;
                 case MOVE_TO_TRAVERSAL:
                     if (climberWithinTolerance(5, angle, Enums.EClimberAngle.TRAVERSAL)) {
@@ -265,7 +269,7 @@ public class TeleopController extends BaseManualController {
                     break;
                 case TRAVEL_TILL_HIT_HIGH:
                     db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.PERCENT_OUTPUT);
-                    db.climber.set(EClimberData.DESIRED_VEL_pct, 0.45);
+                    db.climber.set(EClimberData.DESIRED_VEL_pct, 0.6);
                     db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.CLAMPED);
                     db.climber.set(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.RELEASED);
                     break;
@@ -295,6 +299,7 @@ public class TeleopController extends BaseManualController {
                     db.climber.set(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.RELEASED);
                     break;
                 case GRAB_TRAVERSAL:
+                    //dont let it go from this state to the go to traversal until a timer has hit one second
                     setIntakeArmEnabled(true);
                     db.climber.set(EClimberData.HANGER_STATE, Enums.EClimberMode.POSITION);
                     db.climber.set(EClimberData.DESIRED_POS_deg, Enums.EClimberAngle.TRAVERSAL.getAngle());
