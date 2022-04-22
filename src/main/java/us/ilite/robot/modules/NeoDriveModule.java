@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
@@ -88,7 +87,6 @@ public class NeoDriveModule extends Module {
     // ========================================
     public static double kTurnSensitivity = 0.85;
     private DifferentialDriveOdometry mOdometry;
-    private DifferentialDrive mDrive;
 
     public NeoDriveModule() {
         mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTML1);
@@ -137,7 +135,6 @@ public class NeoDriveModule extends Module {
         HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);
 
         mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
-        mDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
 
         mLeftMaster.burnFlash();
         mLeftFollower.burnFlash();
