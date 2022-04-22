@@ -215,7 +215,7 @@ public class TeleopController extends BaseManualController {
                 case BALANCING:
                     if (climberWithinTolerance(2, angle, Enums.EClimberAngle.BALANCED)) {
                         newState = Enums.ERungState.RELEASING_MID;
-                        moveToTraversalTimer.reset();
+                        moveToTraversalTimer.start();
                     } else {
                         newState = Enums.ERungState.BALANCING;
                     }

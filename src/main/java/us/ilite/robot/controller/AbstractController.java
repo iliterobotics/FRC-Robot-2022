@@ -130,16 +130,17 @@ public abstract class AbstractController {
         } else if (mIsBallAdded && db.feeder.get(ENTRY_BEAM) == 1d) {
             mIsBallAdded = false;
         }
-        //Indexing balls coming out
-        //Got rid of else if here
-        if (db.feeder.get(EXIT_BEAM) == 0d) {
-            if (!mIsBallOut) {
-                mNumBalls--;
-                mIsBallOut = true;
-            }
-        } else if (mIsBallOut && db.feeder.get(EXIT_BEAM) == 1d) {
-            mIsBallOut = false;
-        }
+        //Removed exit beam
+//        //Indexing balls coming out
+//        //Got rid of else if here
+//        if (db.feeder.get(EXIT_BEAM) == 0d) {
+//            if (!mIsBallOut) {
+//                mNumBalls--;
+//                mIsBallOut = true;
+//            }
+//        } else if (mIsBallOut && db.feeder.get(EXIT_BEAM) == 1d) {
+//            mIsBallOut = false;
+//        }
         db.feeder.set(NUM_BALLS, mNumBalls);
     }
 

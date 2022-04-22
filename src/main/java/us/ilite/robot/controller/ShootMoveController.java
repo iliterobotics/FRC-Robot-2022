@@ -14,19 +14,15 @@ import us.ilite.robot.commands.DriveStraight;
 public class ShootMoveController extends BaseAutonController{
 
     public Timer mTimer;
-    public Timer mSecondLeg;
-    public boolean isFirstLeg = true;
-    public boolean isSecondLeg = false;
     private DriveStraight mFirstLeg = new DriveStraight(Distance.fromFeet(7));
     public void initialize(Trajectory pTrajectory) {
       //  super.initialize(TrajectoryCommandUtils.getJSONTrajectory());
         mTimer = new Timer();
         mTimer.reset();
         mTimer.start();
-        mSecondLeg = new Timer();
     }
     public void updateImpl() {
-        if (mTimer.get() < 1.0) {
+        if (mTimer.get() < 2.0) {
             fireCargo();
             mFirstLeg.init(mTimer.get());
         }
