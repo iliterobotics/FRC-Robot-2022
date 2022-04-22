@@ -225,7 +225,7 @@ public class NeoDriveModule extends Module {
                         targetLockOutput = mTargetLockPID.calculate(-db.limelight.get(ELimelightData.TX), clock.dt());
                         turn = targetLockOutput;
                     }
-
+                    turn += 0.1 * Math.signum(turn);
                     turn *= (1/(1-throttle)) * 0.5;
                 } else if (db.pixydata.isSet(EPixyData.SIGNATURE)) {
                     double targetLockOutput = 0;
@@ -233,7 +233,7 @@ public class NeoDriveModule extends Module {
                         targetLockOutput = mTargetLockPID.calculate(-db.pixydata.get(EPixyData.LARGEST_ANGLE_FROM_CAMERA), clock.dt());
                         turn = targetLockOutput;
                     }
-
+                    turn += 0.1 * Math.signum(turn);
                     turn *= (1/(1-throttle)) * 0.5;
                 }
 
