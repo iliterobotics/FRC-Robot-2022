@@ -8,7 +8,7 @@ import us.ilite.robot.controller.*;
 import java.lang.reflect.InvocationTargetException;
 
 public class AutonSelection {
-    public static ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Auton Configuration");
+    public static ShuffleboardTab mAutonConfiguration = Shuffleboard.getTab("Pre-Match Configuration");
     public static int mDelaySeconds;
     private SendableChooser<Class<?>> mSendableAutonControllers = new SendableChooser<>();
 

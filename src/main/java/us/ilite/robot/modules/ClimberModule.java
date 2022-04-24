@@ -10,19 +10,20 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
 import us.ilite.common.lib.control.ProfileGains;
-import us.ilite.common.types.EClimberModuleData;
+import us.ilite.common.types.EClimberData;
 import us.ilite.common.types.EMatchMode;
 import us.ilite.robot.Enums;
+import us.ilite.robot.hardware.DigitalBeamSensor;
 import us.ilite.robot.hardware.HardwareUtils;
 
-import static us.ilite.common.types.EClimberModuleData.*;
-import static us.ilite.common.types.EFeederData.ACTUAL_FEEDER_pct;
+import static us.ilite.common.types.EClimberData.*;
 
 public class ClimberModule extends Module{
     private final TalonFX mCLMR11;
     private final TalonFX mCL12;
     private final DoubleSolenoid mCLPNDouble;
     private final DoubleSolenoid mCLPNSingle;
+    private DigitalBeamSensor mSingleBreak;
 
     private PIDController mVelocityPID;
 
@@ -33,8 +34,11 @@ public class ClimberModule extends Module{
     private final int POSITION_SLOT = 0;
 
     private ProfileGains kVelocityGains = new ProfileGains().p(0.0).f(0.0001);
-    private ProfileGains kPositionGains = new ProfileGains().p(0.0175).f(0.00075).slot(POSITION_SLOT);
+    //Old P was 0.0175
+    //Old F was 0.00075
+//    private ProfileGains kPositionGains = new ProfileGains().p(0.0225).f(0.0010).slot(POSITION_SLOT);
 
+    private ProfileGains kPositionGains = new ProfileGains().p(0.035).f(0.0010).slot(POSITION_SLOT);
     // ========================================
     // DO NOT MODIFY THESE PHYSICAL CONSTANTS
     // ========================================
@@ -43,6 +47,7 @@ public class ClimberModule extends Module{
     public static final double kScaledUnitsToRPM = (600.0 / 2048.0) * kClimberRatio;
 
     public ClimberModule() {
+        mSingleBreak = new DigitalBeamSensor(3);
         mCLMR11 = new TalonFX(Settings.HW.CAN.kCLM1);
         mCL12 = new TalonFX(Settings.HW.CAN.kCL2);
         mCLMR11.setNeutralMode(NeutralMode.Brake);
@@ -88,27 +93,29 @@ public class ClimberModule extends Module{
     public void modeInit(EMatchMode mode) {
         if (mode == EMatchMode.TELEOPERATED) {
             mCLMR11.configClearPositionOnQuadIdx(true, 20);
-            db.climber.set(L_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
+            db.climber.set(ACTUAL_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
         }
     }
 
     @Override
     public void readInputs() {
-        db.climber.set(L_VEL_rpm, mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM);
-        db.climber.set(L_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
-        db.climber.set(L_POSITION_TARGET, mCL12.getClosedLoopTarget());
-        db.climber.set(L_POSITION_ERROR, mCL12.getClosedLoopError());
-        db.climber.set(L_OUTPUT_CURRENT, mCL12.getStatorCurrent());
-        db.climber.set(BUS_VOLTAGE_LEFT, mCL12.getMotorOutputVoltage());
-        db.climber.set(L_ACTUAL_CLIMBER_PCT, (mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM) / (6380 * kClimberRatio));
+        db.climber.set(ACTUAL_VEL_rpm, mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM);
+        db.climber.set(ACTUAL_POSITION_deg, ticksToClimberDegrees(mCL12.getSelectedSensorPosition()));
+        db.climber.set(ACTUAL_POSITION_TARGET, ticksToClimberDegrees(mCL12.getClosedLoopTarget()));
+        db.climber.set(ACTUAL_POSITION_ERROR, ticksToClimberDegrees(mCL12.getClosedLoopError()));
+        db.climber.set(ACTUAL_OUTPUT_CURRENT_12, mCL12.getStatorCurrent());
+        db.climber.set(ACTUAL_OUTPUT_CURRENT_11, mCLMR11.getStatorCurrent());
+        db.climber.set(SINGLE_BEAM_BROKEN, !mSingleBreak.isBroken()); // Inverted on purpose
+        db.climber.set(ACTUAL_BUS_VOLTAGE, mCL12.getMotorOutputVoltage());
+        db.climber.set(ACTUAL_CLIMBER_PCT, (mCL12.getSelectedSensorVelocity() * kScaledUnitsToRPM) / (6380 * kClimberRatio));
     }
 
     @Override
     public void setOutputs() {
-        Enums.EClimberMode mode = db.climber.get(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.class);
+        Enums.EClimberMode mode = db.climber.get(EClimberData.HANGER_STATE, Enums.EClimberMode.class);
         if (mode == null) return;
 
-        if (db.climber.isSet(EClimberModuleData.SET_COAST)) {
+        if (db.climber.isSet(EClimberData.SET_COAST)) {
             mCL12.setNeutralMode(NeutralMode.Coast);
             mCLMR11.setNeutralMode(NeutralMode.Coast);
         } else {
@@ -118,11 +125,11 @@ public class ClimberModule extends Module{
 
         switch(mode) {
             case PERCENT_OUTPUT:
-                mCL12.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.DESIRED_VEL_pct));
-                mCLMR11.set(ControlMode.PercentOutput, db.climber.get(EClimberModuleData.DESIRED_VEL_pct));
+                mCL12.set(ControlMode.PercentOutput, db.climber.get(EClimberData.DESIRED_VEL_pct));
+                mCLMR11.set(ControlMode.PercentOutput, db.climber.get(EClimberData.DESIRED_VEL_pct));
                 break;
             case VELOCITY:
-                double desiredVel = mVelocityPID.calculate(db.climber.get(EClimberModuleData.L_VEL_rpm), clock.getCurrentTimeInMillis());
+                double desiredVel = mVelocityPID.calculate(db.climber.get(EClimberData.ACTUAL_VEL_rpm), clock.getCurrentTimeInMillis());
                 mCL12.set(ControlMode.Velocity, desiredVel);
                 mCLMR11.set(ControlMode.Velocity, desiredVel);
                 break;

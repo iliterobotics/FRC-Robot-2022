@@ -9,6 +9,45 @@ public class Enums {
         DEFAULT
     }
 
+    public enum ERungState {
+        NULL,
+
+        // Driver activates move to initial position
+        GROUND,
+
+        // Grab the mid bar. Operator pushes button to enter this state.
+        //Automated go to high bar
+        GO_TO_HIGH_BAR,
+
+        TRAVEL_TILL_HIT_HIGH,
+
+        GRAB_HIGH_BAR,
+
+        // Operator pushes button to enter this state.
+        // Balancing while grabbing both Mid and High. Drives the climber in reverse.
+        BALANCING,
+
+        // Automated entry.
+        // Release double claw after we're balanced. Should be 1 cycle or so.
+        RELEASING_MID,
+
+        // Automated entry.
+        // Go to traversal position. Keep double claw released during this time
+        MOVE_TO_TRAVERSAL,
+
+        // Automated entry.
+        // Close double claw, stay in this state until driver pushes button
+        GRAB_TRAVERSAL,
+
+        // Driver pushes the button to enter this state.
+        // Open single claw.
+        RELEASE_HIGH,
+
+        // Autoated entry after N seconds of RELEASE_HIGH state
+        // Move to final traversal position.
+        FINAL_LIFT
+    }
+
     public enum EClampMode {
         NULL,
         CLAMPED,
@@ -16,40 +55,30 @@ public class Enums {
     }
 
     public enum EClimberAngle {
-        // Rungs/Stages
-        VERTICAL(90, 0),
-        MID(90, 1),
-        HIGH(-15, 2),
-        TRAVERSAL(-195, 3),
+        //Angles at desired rung
 
-        // States
-        START(0),
-        END(45),
-        BALANCE(0);
+        //At last test at playground
+        //high at 104, traversal is 277, final lift is 150
+        NULL(0.0),
+        MID(-90.0),
+        HIGH(102.0),
+        BALANCED(41.0),
+        TRAVERSAL(277.0),
+        FINAL_LIFT(150),
+        SCORE(250.0);
 
-        final int kAngle;
-        final int kStage;
+        //Old traversal angle is 287.5
+        final double kAngle;
 
-        EClimberAngle(int pAngle) {
+        EClimberAngle(double pAngle) {
             kAngle = pAngle;
-            kStage = -1;
         }
-
-        EClimberAngle(int pAngle, int pStage) {
-            kAngle = pAngle;
-            kStage = pStage;
-        }
-
-        public int getAngle() {
+        public double getAngle() {
             return kAngle;
-        }
-
-        public int getStage() {
-            return kStage;
         }
     }
 
-    // =============================================================================
+    // ============================ =================================================
     // Limelight States
     // =============================================================================
     //  Limelight LED state
