@@ -9,12 +9,8 @@ import static us.ilite.common.types.EFeederData.*;
 import static us.ilite.common.types.EIntakeData.DESIRED_ROLLER_pct;
 import static us.ilite.common.types.drive.EDriveData.*;
 
-
 import us.ilite.common.lib.util.XorLatch;
-import us.ilite.common.types.EFeederData;
-import us.ilite.common.types.EIntakeData;
-import us.ilite.common.types.ELEDControlData;
-import us.ilite.common.types.ELimelightData;
+import us.ilite.common.types.*;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.robot.Enums;
 import us.ilite.robot.Robot;
@@ -41,7 +37,9 @@ public abstract class AbstractController {
     protected Timer mShotTimer = new Timer();
     protected boolean mFireWanted = false;
 
-    protected double mFeederFireSpeed = 5000d;
+    //Was 5000, lowered it to 4500 before match 42.
+    //After match 42, we lowered it even further by 1000rpm
+    protected double mFeederFireSpeed = 3500d;
 
     public AbstractController(){
         super();
@@ -75,6 +73,16 @@ public abstract class AbstractController {
             }
         }
         db.feeder.set(NUM_BALLS, mNumBalls);
+    }
+
+    protected boolean climberWithinTolerance(double pTolerance) {
+        Enums.EClimberAngle current = db.climber.get(EClimberData.CURRENT_RUNG, Enums.EClimberAngle.class);
+        Enums.EClimberAngle desired = db.climber.get(EClimberData.DESIRED_RUNG, Enums.EClimberAngle.class);
+        return Math.abs(current.getAngle() - desired.getAngle()) < pTolerance;
+    }
+
+    protected boolean climberWithinTolerance(double pTolerance, double currentAngle, Enums.EClimberAngle pAngle) {
+        return Math.abs((currentAngle) - pAngle.getAngle()) < pTolerance;
     }
 
     /**
@@ -122,16 +130,17 @@ public abstract class AbstractController {
         } else if (mIsBallAdded && db.feeder.get(ENTRY_BEAM) == 1d) {
             mIsBallAdded = false;
         }
-        //Indexing balls coming out
-        //Got rid of else if here
-        if (db.feeder.get(EXIT_BEAM) == 0d) {
-            if (!mIsBallOut) {
-                mNumBalls--;
-                mIsBallOut = true;
-            }
-        } else if (mIsBallOut && db.feeder.get(EXIT_BEAM) == 1d) {
-            mIsBallOut = false;
-        }
+        //Removed exit beam
+//        //Indexing balls coming out
+//        //Got rid of else if here
+//        if (db.feeder.get(EXIT_BEAM) == 0d) {
+//            if (!mIsBallOut) {
+//                mNumBalls--;
+//                mIsBallOut = true;
+//            }
+//        } else if (mIsBallOut && db.feeder.get(EXIT_BEAM) == 1d) {
+//            mIsBallOut = false;
+//        }
         db.feeder.set(NUM_BALLS, mNumBalls);
     }
 

@@ -89,8 +89,6 @@ public class TwoBallController extends BaseAutonController {
         else {
             fireCargo();
             setIntakeArmEnabled(false);
-            db.intake.set(EIntakeData.ROLLER_STATE, Enums.ERollerState.PERCENT_OUTPUT);
-            db.intake.set(EIntakeData.ROLLER_PCT, 0.0);
         }
 //        else if (time < kSecondTurnTimeEnd + 1.1) {
 //            db.feeder.set(EFeederData.STATE, Enums.EFeederState.PERCENT_OUTPUT);

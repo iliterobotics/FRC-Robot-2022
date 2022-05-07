@@ -43,7 +43,7 @@ public class Data {
     public final RobotCodex<ELogitech310> operatorinput = new RobotCodex(NULL_CODEX_VALUE, ELogitech310.class);
     public final RobotCodex<EPowerDistPanel> pdp = new RobotCodex(NULL_CODEX_VALUE, EPowerDistPanel.class);
     public final RobotCodex<ERawLimelightData> rawLimelight = new RobotCodex(NULL_CODEX_VALUE, ERawLimelightData.class);
-    public final RobotCodex<EClimberModuleData> climber = new RobotCodex(NULL_CODEX_VALUE, EClimberModuleData.class);
+    public final RobotCodex<EClimberData> climber = new RobotCodex(NULL_CODEX_VALUE, EClimberData.class);
     public final RobotCodex<EDriveData> drivetrain = new RobotCodex(NULL_CODEX_VALUE, EDriveData.class);
     public final RobotCodex<EIntakeData> intake = new RobotCodex(NULL_CODEX_VALUE, EIntakeData.class);
     public final RobotCodex<EFeederData> feeder = new RobotCodex(NULL_CODEX_VALUE, EFeederData.class);
@@ -114,10 +114,11 @@ public class Data {
         feeder.createSimpleBooleanConverter(EFeederData.ENTRY_BEAM);
         feeder.createSimpleEnumConverter(EFeederData.STATE, Enums.EFeederState.class);
 
-        climber.createSimpleEnumConverter(EClimberModuleData.HANGER_STATE, Enums.EClimberMode.class);
-        climber.createSimpleBooleanConverter(EClimberModuleData.SET_COAST);
-        climber.createSimpleEnumConverter(EClimberModuleData.IS_DOUBLE_CLAMPED, Enums.EClampMode.class);
-        climber.createSimpleEnumConverter(EClimberModuleData.IS_SINGLE_CLAMPED, Enums.EClampMode.class);
+        climber.createSimpleEnumConverter(EClimberData.HANGER_STATE, Enums.EClimberMode.class);
+        climber.createSimpleEnumConverter(EClimberData.RUNG_STATE, Enums.ERungState.class);
+        climber.createSimpleBooleanConverter(EClimberData.SET_COAST);
+        climber.createSimpleEnumConverter(EClimberData.IS_DOUBLE_CLAMPED, Enums.EClampMode.class);
+        climber.createSimpleEnumConverter(EClimberData.IS_SINGLE_CLAMPED, Enums.EClampMode.class);
 
         ledcontrol.createSimpleEnumConverter(ELEDControlData.DESIRED_COLOR, Enums.LEDColorMode.class);
         ledcontrol.createSimpleBooleanConverter(ELEDControlData.LED_STATE);
@@ -130,10 +131,11 @@ public class Data {
         mConvertedFields.add(EIntakeData.ROLLER_STATE.name());
         mConvertedFields.add(EFeederData.ENTRY_BEAM.name());
         mConvertedFields.add(EFeederData.STATE.name());
-        mConvertedFields.add(EClimberModuleData.HANGER_STATE.name());
-        mConvertedFields.add(EClimberModuleData.SET_COAST.name());
-        mConvertedFields.add(EClimberModuleData.IS_DOUBLE_CLAMPED.name());
-        mConvertedFields.add(EClimberModuleData.IS_SINGLE_CLAMPED.name());
+        mConvertedFields.add(EClimberData.HANGER_STATE.name());
+        mConvertedFields.add(EClimberData.SET_COAST.name());
+        mConvertedFields.add(EClimberData.IS_DOUBLE_CLAMPED.name());
+        mConvertedFields.add(EClimberData.RUNG_STATE.name());
+        mConvertedFields.add(EClimberData.IS_SINGLE_CLAMPED.name());
         mConvertedFields.add(ELEDControlData.DESIRED_COLOR.name());
         mConvertedFields.add(ELEDControlData.LED_STATE.name());
     }

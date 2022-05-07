@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import us.ilite.common.config.Settings;
 import us.ilite.common.lib.control.PIDController;
@@ -13,6 +12,7 @@ import us.ilite.common.lib.control.ProfileGains;
 import us.ilite.common.lib.util.Units;
 import us.ilite.common.types.ELimelightData;
 import us.ilite.common.types.EMatchMode;
+import us.ilite.common.types.EPixyData;
 import us.ilite.common.types.drive.EDriveData;
 import us.ilite.common.types.sensor.EGyro;
 import us.ilite.robot.Enums;
@@ -80,14 +80,14 @@ public class NeoDriveModule extends Module {
             .slot(VELOCITY_PID_SLOT)
             .velocityConversion(kDriveNEOVelocityFactor);
     public static ProfileGains kTurnToProfileGains = new ProfileGains().p(0.02).f(0.1);
-    public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.0075);
+    //Old value is 0.0075
+    public static ProfileGains kTargetAngleLockGains = new ProfileGains().p(0.01);
 
     // ========================================
     // DO NOT MODIFY THESE OTHER CONSTANTS
     // ========================================
     public static double kTurnSensitivity = 0.85;
     private DifferentialDriveOdometry mOdometry;
-    private DifferentialDrive mDrive;
 
     public NeoDriveModule() {
         mLeftMaster = SparkMaxFactory.createDefaultSparkMax(Settings.HW.CAN.kDTML1);
@@ -105,10 +105,10 @@ public class NeoDriveModule extends Module {
         mRightFollower.setIdleMode(CANSparkMax.IdleMode.kCoast);
         mRightMaster.setInverted(true);
 
-        mRightMaster.setSmartCurrentLimit(60);
-        mRightFollower.setSmartCurrentLimit(60);
-        mLeftMaster.setSmartCurrentLimit(60);
-        mLeftFollower.setSmartCurrentLimit(60);
+        mRightMaster.setSmartCurrentLimit(65);
+        mRightFollower.setSmartCurrentLimit(65);
+        mLeftMaster.setSmartCurrentLimit(65);
+        mLeftFollower.setSmartCurrentLimit(65);
         
         mRightEncoder = mRightMaster.getEncoder();
         mLeftEncoder = mLeftMaster.getEncoder();
@@ -136,7 +136,6 @@ public class NeoDriveModule extends Module {
         HardwareUtils.setGains(mRightCtrl, kSmartMotionGains);
 
         mOdometry = new DifferentialDriveOdometry(mGyro.getHeading());
-        mDrive = new DifferentialDrive(mLeftMaster, mRightMaster);
 
         mLeftMaster.burnFlash();
         mLeftFollower.burnFlash();
@@ -223,8 +222,16 @@ public class NeoDriveModule extends Module {
                         targetLockOutput = mTargetLockPID.calculate(-db.limelight.get(ELimelightData.TX), clock.dt());
                         turn = targetLockOutput;
                     }
-
-                    turn *= (1 / (1 - throttle)) * 0.5;
+                    turn += 0.1 * Math.signum(turn);
+                    turn *= (1/(1-throttle)) * 0.5;
+                } else if (db.pixydata.isSet(EPixyData.SIGNATURE)) {
+                    double targetLockOutput = 0;
+                    if (db.pixydata.get(EPixyData.TARGET_VALID) == 1) {
+                        targetLockOutput = mTargetLockPID.calculate(-db.pixydata.get(EPixyData.LARGEST_ANGLE_FROM_CAMERA), clock.dt());
+                        turn = targetLockOutput;
+                    }
+                    turn += 0.1 * Math.signum(turn);
+                    turn *= (1/(1-throttle)) * 0.5;
                 }
 
                 mLeftMaster.set(throttle+turn);
